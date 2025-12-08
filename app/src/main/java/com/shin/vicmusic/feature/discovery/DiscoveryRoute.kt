@@ -39,6 +39,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController // 导入 NavController
 import com.shin.vicmusic.R
@@ -57,7 +58,7 @@ import com.shin.vicmusic.util.getPlayerViewModelSingleton
 @Composable
 fun DiscoveryRoute(
     navController: NavController,
-    viewModel: DiscoveryViewModel = viewModel(),
+    viewModel: DiscoveryViewModel = hiltViewModel(),
     playerViewModel: PlayerViewModel = getPlayerViewModelSingleton()
 ) {
     val datum by viewModel.datum.collectAsState()
