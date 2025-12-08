@@ -1,16 +1,13 @@
 package com.shin.vicmusic.ui
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import com.shin.vicmusic.feature.login.LOGIN_ROUTE
-import com.shin.vicmusic.feature.login.loginScreen
-import com.shin.vicmusic.feature.login.navigateToLogin
+import com.shin.vicmusic.feature.auth.loginScreen
+import com.shin.vicmusic.feature.auth.navigateToLogin
 import com.shin.vicmusic.feature.main.mainScreen
 import com.shin.vicmusic.feature.main.navigateToMain
-import com.shin.vicmusic.feature.register.registerScreen
+import com.shin.vicmusic.feature.auth.registerScreen
 import com.shin.vicmusic.feature.song.songDetailScreen
 import com.shin.vicmusic.feature.splash.SPLASH_ROUTE
 import com.shin.vicmusic.feature.splash.splashScreen

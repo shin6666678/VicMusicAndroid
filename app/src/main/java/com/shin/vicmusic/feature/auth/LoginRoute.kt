@@ -1,4 +1,4 @@
-package com.shin.vicmusic.feature.login
+package com.shin.vicmusic.feature.auth
 
 import android.graphics.Bitmap
 import android.util.Log
@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController // 确保导入 NavController
 import com.shin.vicmusic.R
+import com.shin.vicmusic.feature.auth.LoginViewModel
 
 @Composable
 @Preview
@@ -39,7 +40,7 @@ fun PreView(){
 }
 
 @Composable
-fun LoginRoute(navController: NavController, viewModel: LoginViewModel= viewModel()) { // 添加 navController 参数
+fun LoginRoute(navController: NavController, viewModel: LoginViewModel = viewModel()) { // 添加 navController 参数
 
     val qrcodeAuthStatus by viewModel.qrcodeAuthStatus.collectAsState()
     val qrcodeBitmap by viewModel.qrcodeBitmap.collectAsState()

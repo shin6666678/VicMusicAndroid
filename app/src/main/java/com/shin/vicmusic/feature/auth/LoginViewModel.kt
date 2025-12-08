@@ -1,4 +1,4 @@
-package com.shin.vicmusic.feature.login
+package com.shin.vicmusic.feature.auth
 
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
