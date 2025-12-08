@@ -123,6 +123,12 @@ class PlayerViewModel @Inject constructor(
      */
     fun togglePlayPause() {
         exoPlayer?.let {
+
+            // [新增] 如果播放已结束，手动跳转回开头
+            if (it.playbackState == Player.STATE_ENDED) {
+                it.seekTo(0)
+            }
+
             if (it.isPlaying) {
                 it.pause()
                 stopProgressUpdate()
