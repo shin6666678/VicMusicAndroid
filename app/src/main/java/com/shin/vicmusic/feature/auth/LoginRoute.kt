@@ -1,151 +1,179 @@
 package com.shin.vicmusic.feature.auth
 
-import android.graphics.Bitmap
-import android.util.Log
-import androidx.compose.foundation.Image
+import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController // 确保导入 NavController
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.shin.vicmusic.R
-import com.shin.vicmusic.feature.auth.LoginViewModel
 
 @Composable
-@Preview
-fun PreView(){
-    LoginScreen(801,null,null)
-}
+fun LoginRoute(
+    navController: NavController,
+    viewModel: LoginViewModel = hiltViewModel()
+) {
+    val mail by viewModel.mail.collectAsState()
+    val password by viewModel.password.collectAsState()
+    val loginState by viewModel.loginState.collectAsState()
+    val context = LocalContext.current
 
-@Composable
-fun LoginRoute(navController: NavController, viewModel: LoginViewModel = viewModel()) { // 添加 navController 参数
-
-    val qrcodeAuthStatus by viewModel.qrcodeAuthStatus.collectAsState()
-    val qrcodeBitmap by viewModel.qrcodeBitmap.collectAsState()
-    val getAccountInfoSuccess by viewModel.getAccountInfoSuccess.collectAsState()
-    LoginScreen(qrcodeAuthStatus, qrcodeBitmap, getAccountInfoSuccess) // 修复：传递实际的 qrcodeAuthStatus
-
-    LaunchedEffect(Unit) {
-        viewModel.qrcodeAuth()
-    }
-    LaunchedEffect(qrcodeAuthStatus) {
-        if (qrcodeAuthStatus == 800) {  // 二维码过期，重走认证流程
-            Log.e("ssk", "----二维码过期，重新生成")
-            viewModel.qrcodeAuth()
+    // 监听登录结果
+    LaunchedEffect(loginState) {
+        when (loginState) {
+            is LoginUiState.Success -> {
+                Toast.makeText(context, "登录成功", Toast.LENGTH_SHORT).show()
+                navController.popBackStack() // 返回上一页或跳转到主页
+            }
+            is LoginUiState.Error -> {
+                Toast.makeText(context, (loginState as LoginUiState.Error).message, Toast.LENGTH_SHORT).show()
+            }
+            else -> {}
         }
     }
-    LaunchedEffect(getAccountInfoSuccess) {
-        if (getAccountInfoSuccess == true) {
-            navController.popBackStack() // 使用传入的 navController
-            navController.navigate("home_route") // 替换为你的主页路由，这里使用"home_route"作为示例
-        } else if (getAccountInfoSuccess == false) {  // 获取用户信息失败，重走认证流程
-            viewModel.qrcodeAuth()
-        }
-    }
+
+    LoginScreen(
+        mail = mail,
+        password = password,
+        onMailChange = viewModel::updateMail,
+        onPasswordChange = viewModel::updatePassword,
+        onLoginClick = viewModel::login,
+        isLoading = loginState is LoginUiState.Loading,
+        onRegisterClick = { navController.navigate("register_route") } // 假设你的注册路由是这个
+    )
 }
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    qrcodeAuthStatus: Int?=801,
-    qrcodeBitmap: Bitmap?,
-    getAccountInfoSuccess: Boolean?
+    mail: String,
+    password: String,
+    onMailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onLoginClick: () -> Unit,
+    isLoading: Boolean,
+    onRegisterClick: () -> Unit
 ) {
+    var passwordVisible by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
-            .fillMaxSize(),
-            //.background(AppColorsProvider.current.primary),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Box {
-            Box(
-                Modifier
-                    .padding(top = 205.dp, start = 5.dp)
-                    .size(190.dp)
-                    .clip(RoundedCornerShape(50))
-                    .background(Color.White)
-            )
+        // Logo
+        Icon(
+            painter = painterResource(id = R.drawable.ic_splash_logo), // 确保你有这个资源
+            contentDescription = null,
+            modifier = Modifier.size(100.dp),
+            tint = MaterialTheme.colorScheme.primary
+        )
 
-            Icon(
-                painter = painterResource(id = R.drawable.ic_splash_logo),
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(top = 200.dp)
-                    .size(200.dp)
-                    .clip(RoundedCornerShape(50)),
-                tint = MaterialTheme.colorScheme.onSurface
-            )
-        }
+        Spacer(modifier = Modifier.height(32.dp))
 
-        Column(
+        Text(
+            text = "欢迎登录",
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // 账号输入框
+        OutlinedTextField(
+            value = mail,
+            onValueChange = onMailChange,
+            label = { Text("邮箱") },
+            leadingIcon = { Icon(imageVector = Icons.Default.Email, contentDescription = null) },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 密码输入框
+        OutlinedTextField(
+            value = password,
+            onValueChange = onPasswordChange,
+            label = { Text("密码") },
+            leadingIcon = { Icon(imageVector = Icons.Default.Lock, contentDescription = null) },
+            trailingIcon = {
+                val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(imageVector = image, contentDescription = null)
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done)
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // 登录按钮
+        Button(
+            onClick = onLoginClick,
             modifier = Modifier
-                .padding(top = 10.dp)
-                .width(250.dp)
-                .background(MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(16.dp)),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxWidth()
+                .height(50.dp),
+            enabled = !isLoading
         ) {
-            Text(
-                text = "扫码登录体验",
-                fontSize = 40.sp,
-                color = MaterialTheme.colorScheme.background,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(top = 32.dp, bottom = 16.dp)
-            )
-            if (qrcodeAuthStatus == 801 || qrcodeAuthStatus == 802) {
-                Image(
-                    //bitmap = qrcodeBitmap!!.asImageBitmap(),
-                    painter = painterResource(R.drawable.ic_launcher),
-                    modifier = Modifier.size(40.dp),
-                    contentDescription = "登录二维码"
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = Color.White,
+                    strokeWidth = 2.dp
                 )
             } else {
-                Box(modifier = Modifier.size(400.dp), contentAlignment = Alignment.Center) {
-                    //LoadingComponent(loadingWidth = 90.dp, loadingHeight = 75.dp)
-                }
+                Text(text = "登 录", fontSize = 18.sp)
             }
+        }
 
-            val tip = when (qrcodeAuthStatus) {
-                801, 802 -> "请使用网易云音乐app扫码授权登录"
-                803 -> "正在获取用户信息..."
-                else -> "正在加载二维码"
-            }
+        Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = tip,
-                fontSize = 28.sp,
-                textAlign = TextAlign.Center,
-                color = Color.Red,
-                modifier = Modifier.padding(top = 16.dp, start = 32.dp, end = 32.dp)
-            )
-            Text(
-                text = "(仅供学习使用)",
-                fontSize = 28.sp,
-                textAlign = TextAlign.Center,
-                color = Color.Red,
-                modifier = Modifier.padding(bottom = 32.dp, start = 32.dp, end = 32.dp)
-            )
+        // 注册跳转
+        TextButton(onClick = onRegisterClick) {
+            Text(text = "没有账号？立即注册")
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun LoginScreenPreview() {
+    LoginScreen(
+        mail = "",
+        password = "",
+        onMailChange = {},
+        onPasswordChange = {},
+        onLoginClick = {},
+        isLoading = false,
+        onRegisterClick = {}
+    )
 }

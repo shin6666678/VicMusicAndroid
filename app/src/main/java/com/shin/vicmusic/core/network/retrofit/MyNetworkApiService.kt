@@ -2,6 +2,7 @@ package com.shin.vicmusic.core.network.retrofit
 
 import com.shin.vicmusic.core.model.Song
 import com.shin.vicmusic.core.model.User
+import com.shin.vicmusic.core.model.request.UserLoginReq
 import com.shin.vicmusic.core.model.request.UserRegisterReq
 import com.shin.vicmusic.core.model.response.NetworkPageData
 import com.shin.vicmusic.core.model.response.NetworkResponse
@@ -27,4 +28,8 @@ interface MyNetworkApiService {
 
     @POST("/api/user/v1/register")
     suspend fun register(@Body req: UserRegisterReq):NetworkResponse<User>
+
+    // [新增] 登录接口
+    @POST("/api/user/v1/login")
+    suspend fun login(@Body req: UserLoginReq): NetworkResponse<String>
 }
