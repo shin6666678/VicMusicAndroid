@@ -17,6 +17,8 @@ import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,20 +27,33 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.shin.vicmusic.feature.auth.AuthViewModel
 import com.shin.vicmusic.feature.me.component.MeTopBar
 import com.shin.vicmusic.feature.me.component.TopNotifyBar
 import com.shin.vicmusic.feature.me.component.UserInfoCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MeRoute(onAvatarClick: () -> Unit = {}){ // 添加 onAvatarClick 参数
-    MeScreen(onAvatarClick = onAvatarClick)
+fun MeRoute(
+    onAvatarClick: () -> Unit = {},
+    authViewModel: AuthViewModel = hiltViewModel()
+) {
+    val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
+    // 添加 onAvatarClick 参数
+    MeScreen(
+        onAvatarClick = onAvatarClick,
+        isLoggedIn = isLoggedIn == true // [新增] 传入状态
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MeScreen(onAvatarClick: () -> Unit = {}) { // 添加 onAvatarClick 参数
+fun MeScreen(
+    onAvatarClick: () -> Unit = {},
+    isLoggedIn: Boolean = false // [新增] 默认为 false
+) {// 添加 onAvatarClick 参数
     Scaffold(
         topBar = {
             MeTopBar()
@@ -56,7 +71,10 @@ fun MeScreen(onAvatarClick: () -> Unit = {}) { // 添加 onAvatarClick 参数
 
             // User Info Card
             Spacer(Modifier.height(16.dp))
-            UserInfoCard(onAvatarClick = onAvatarClick) // 传入 onAvatarClick
+            UserInfoCard(
+                onAvatarClick = onAvatarClick,
+                isLoggedIn = isLoggedIn
+            )// 传入 onAvatarClick
 
             // Quick Access Icons
             Spacer(Modifier.height(16.dp))
@@ -83,8 +101,16 @@ fun MeScreen(onAvatarClick: () -> Unit = {}) { // 添加 onAvatarClick 参数
                     fontWeight = FontWeight.Bold
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "更多", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
-                    Icon(imageVector = Icons.Filled.KeyboardArrowRight, contentDescription = "More", tint = Color.Gray)
+                    Text(
+                        text = "更多",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
+                    )
+                    Icon(
+                        imageVector = Icons.Filled.KeyboardArrowRight,
+                        contentDescription = "More",
+                        tint = Color.Gray
+                    )
                 }
             }
             Spacer(Modifier.height(8.dp))
@@ -103,7 +129,11 @@ fun MeScreen(onAvatarClick: () -> Unit = {}) { // 添加 onAvatarClick 参数
                         )
                         Spacer(Modifier.height(4.dp))
                         Text("已播放歌曲", style = MaterialTheme.typography.bodySmall)
-                        Text("2245首", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                        Text(
+                            "2245首",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.Gray
+                        )
                     }
                 }
             }
@@ -114,7 +144,8 @@ fun MeScreen(onAvatarClick: () -> Unit = {}) { // 添加 onAvatarClick 参数
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.Bottom
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally,
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.clickable { /* Handle tab click */ }
                 ) {
                     Text(
@@ -132,7 +163,8 @@ fun MeScreen(onAvatarClick: () -> Unit = {}) { // 添加 onAvatarClick 参数
                     )
                 }
                 Spacer(Modifier.width(16.dp))
-                Column(horizontalAlignment = Alignment.CenterHorizontally,
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.clickable { /* Handle tab click */ }
                 ) {
                     Text(
@@ -149,9 +181,17 @@ fun MeScreen(onAvatarClick: () -> Unit = {}) { // 添加 onAvatarClick 参数
                     )
                 }
                 Spacer(Modifier.weight(1f))
-                Icon(imageVector = Icons.Filled.Add, contentDescription = "Add Playlist", tint = Color.Gray)
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "Add Playlist",
+                    tint = Color.Gray
+                )
                 Spacer(Modifier.width(8.dp))
-                Icon(imageVector = Icons.Filled.KeyboardArrowRight, contentDescription = "More Playlists", tint = Color.Gray)
+                Icon(
+                    imageVector = Icons.Filled.KeyboardArrowRight,
+                    contentDescription = "More Playlists",
+                    tint = Color.Gray
+                )
             }
             Spacer(Modifier.height(16.dp))
             Card(
@@ -186,7 +226,11 @@ fun MeScreen(onAvatarClick: () -> Unit = {}) { // 添加 onAvatarClick 参数
 }
 
 @Composable
-fun QuickAccessItem(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String, count: String) {
+fun QuickAccessItem(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    text: String,
+    count: String
+) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(imageVector = icon, contentDescription = text, modifier = Modifier.size(28.dp))
         Spacer(Modifier.height(4.dp))
@@ -196,9 +240,18 @@ fun QuickAccessItem(icon: androidx.compose.ui.graphics.vector.ImageVector, text:
 }
 
 @Composable
-fun ActionItem(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String, iconTint: Color) {
+fun ActionItem(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    text: String,
+    iconTint: Color
+) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Icon(imageVector = icon, contentDescription = text, modifier = Modifier.size(24.dp), tint = iconTint)
+        Icon(
+            imageVector = icon,
+            contentDescription = text,
+            modifier = Modifier.size(24.dp),
+            tint = iconTint
+        )
         Spacer(Modifier.height(4.dp))
         Text(text = text, style = MaterialTheme.typography.bodySmall)
     }

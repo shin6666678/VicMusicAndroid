@@ -6,12 +6,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -28,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState // 导入 currentBackStackEntryAsState
@@ -36,7 +32,6 @@ import androidx.navigation.compose.rememberNavController
 import com.shin.vicmusic.core.design.component.MyNavigationBar
 import com.shin.vicmusic.core.design.component.SongBar
 import com.shin.vicmusic.core.design.theme.LocalDividerColor
-import com.shin.vicmusic.core.design.theme.SpaceExtraMedium
 import com.shin.vicmusic.core.model.Song
 import com.shin.vicmusic.feature.player.PlayerState
 import com.shin.vicmusic.feature.player.PlayerViewModel
@@ -44,7 +39,7 @@ import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONG
 import com.shin.vicmusic.feature.discovery.DiscoveryRoute
 import com.shin.vicmusic.feature.feed.FeedRoute
 import com.shin.vicmusic.feature.me.MeRoute
-import com.shin.vicmusic.feature.register.navigateToRegister
+import com.shin.vicmusic.feature.auth.navigateToRegister
 import com.shin.vicmusic.feature.search.SEARCH_ROUTE // 导入 SEARCH_ROUTE
 import com.shin.vicmusic.feature.shortVideo.ShortVideoRoute
 import com.shin.vicmusic.feature.song.PlaybackQueueSheet

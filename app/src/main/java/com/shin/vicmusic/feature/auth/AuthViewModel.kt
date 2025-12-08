@@ -1,10 +1,10 @@
-package com.shin.vicmusic.feature.login
+package com.shin.vicmusic.feature.auth
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
-import javax.inject.Singleton // 导入 @Singleton
+import javax.inject.Singleton
 
 @Singleton // 更改为 @Singleton
 class AuthViewModel @Inject constructor() : ViewModel() {

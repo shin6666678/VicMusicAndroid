@@ -1,14 +1,10 @@
-package com.shin.vicmusic.feature.register
+package com.shin.vicmusic.feature.auth
 
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.shin.vicmusic.feature.login.LOGIN_ROUTE
-import com.shin.vicmusic.feature.login.LoginRoute
-import com.shin.vicmusic.feature.main.MAIN_ROUTE
 import com.shin.vicmusic.feature.splash.SPLASH_ROUTE
-import com.shin.vicmusic.feature.splash.SplashRoute
 
 const val REGISTER_ROUTE="register"
 
@@ -20,6 +16,23 @@ fun NavGraphBuilder.registerScreen(navController: NavController){
 
 fun NavController.navigateToRegister():Unit{
     navigate(REGISTER_ROUTE){
+        launchSingleTop=true
+        popUpTo(SPLASH_ROUTE){
+            inclusive=true
+        }
+    }
+}
+
+const val LOGIN_ROUTE="login"
+
+fun NavGraphBuilder.loginScreen(navController: NavController){
+    composable(LOGIN_ROUTE){
+        LoginRoute(navController = navController)
+    }
+}
+
+fun NavController.navigateToLogin():Unit{
+    navigate(LOGIN_ROUTE){
         launchSingleTop=true
         popUpTo(SPLASH_ROUTE){
             inclusive=true
