@@ -36,6 +36,7 @@ import com.shin.vicmusic.core.model.Song
 import com.shin.vicmusic.feature.player.PlayerState
 import com.shin.vicmusic.feature.player.PlayerViewModel
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONG
+import com.shin.vicmusic.feature.auth.navigateToLogin
 import com.shin.vicmusic.feature.discovery.DiscoveryRoute
 import com.shin.vicmusic.feature.feed.FeedRoute
 import com.shin.vicmusic.feature.me.MeRoute
@@ -106,7 +107,7 @@ fun MainRoute(
             onSongBarTogglePlayPause = playerViewModel::togglePlayPause,
             onSongBarLikeClick = { /* TODO: 实现点赞逻辑 */ },
             onSongBarPlaylistClick = { showQueueSheet = true },
-            onAvatarClick = { navController.navigateToRegister() },
+            onAvatarClick = { navController.navigateToLogin() },
             showNavigationBar = showNavigationBar // 传递给 MainScreen
         )
 
