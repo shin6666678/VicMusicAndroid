@@ -27,14 +27,9 @@ class DiscoveryViewModel @Inject constructor(
     }
 
     private fun loadData() {
-        //_datum.value= DiscoveryPreviewParameterData.SONGS
-//        val json = Json.encodeToString(SONG)
-//        Log.d(TAG,"encodeToString: $json")
-//
-//        val obj = Json.decodeFromString<Song>(json)
-//        Log.d(TAG,"decodeFromString: $obj")
         viewModelScope.launch {
             val songs=datasource.songs()
+            Log.d(TAG, "Fetched songs: ${songs.data?.list?.size}")
             _datum.value=songs.data?.list?:emptyList()
         }
 
