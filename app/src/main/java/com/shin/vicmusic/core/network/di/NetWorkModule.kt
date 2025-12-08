@@ -1,22 +1,36 @@
 package com.shin.vicmusic.core.network.di
 
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.shin.vicmusic.core.config.Config
+import com.shin.vicmusic.core.network.retrofit.MyNetworkApiService
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
 import okhttp3.Call
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
+import javax.inject.Singleton
 
 /**
  * 网络依赖注入模块
  */
+@Module
+@InstallIn(SingletonComponent::class) // 1. 指定这是一个全局单例组件
 object NetWorkModule {
+
+    @Provides
+    @Singleton // 2. 标记提供 Json 的方法
     fun providesNetworkJson(): Json=Json{
         ignoreUnknownKeys=true
     }
-    fun okHttpCallFactory(
-        okHttpClient: OkHttpClient
-    ): Call.Factory=okHttpClient
 
+    @Provides
+    @Singleton
     fun providesOkHttpClient(): OkHttpClient{
         // 创建日志拦截器 (Create logging interceptor)
         val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -29,5 +43,25 @@ object NetWorkModule {
             .writeTimeout(10,TimeUnit.SECONDS)
             .readTimeout(10,TimeUnit.SECONDS)
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(
+        okHttpClient: OkHttpClient,
+        networkJson: Json
+    ): Retrofit {
+        val contentType = "application/json".toMediaType()
+        return Retrofit.Builder()
+            .baseUrl(Config.BASE_URL) // 4. 使用 Config 中的 BASE_URL
+            .client(okHttpClient)
+            .addConverterFactory(networkJson.asConverterFactory(contentType)) // 5. 绑定 Serialization
+            .build()
+    }
+
+    @Provides
+    @Singleton // 6. 最重要的一步：告诉 Hilt 如何提供 MyNetworkApiService
+    fun provideMyNetworkApiService(retrofit: Retrofit): MyNetworkApiService {
+        return retrofit.create(MyNetworkApiService::class.java)
     }
 }

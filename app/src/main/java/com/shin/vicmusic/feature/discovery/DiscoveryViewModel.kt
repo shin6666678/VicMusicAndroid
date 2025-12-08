@@ -8,13 +8,18 @@ import com.shin.vicmusic.core.model.Song
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONG
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import javax.inject.Inject
 
-class DiscoveryViewModel: ViewModel() {
+@HiltViewModel
+class DiscoveryViewModel @Inject constructor(
+    private val datasource: MyRetrofitDatasource // [新增] 注入 API
+) : ViewModel(){
     private val _datum = MutableStateFlow<List<Song>>(emptyList())
     val datum: StateFlow<List<Song>> = _datum
     init{
@@ -29,7 +34,7 @@ class DiscoveryViewModel: ViewModel() {
 //        val obj = Json.decodeFromString<Song>(json)
 //        Log.d(TAG,"decodeFromString: $obj")
         viewModelScope.launch {
-            val songs=MyRetrofitDatasource.songs()
+            val songs=datasource.songs()
             _datum.value=songs.data?.list?:emptyList()
         }
 

@@ -5,11 +5,13 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import com.shin.vicmusic.core.config.Config
 import com.shin.vicmusic.core.model.Song
 import com.shin.vicmusic.core.model.User
+import com.shin.vicmusic.core.model.request.UserLoginReq
 import com.shin.vicmusic.core.model.request.UserRegisterReq
 import com.shin.vicmusic.core.model.response.NetworkPageData
 import com.shin.vicmusic.core.model.response.NetworkResponse
 import com.shin.vicmusic.core.network.di.NetWorkModule
 import com.shin.vicmusic.core.network.retrofit.MyNetworkApiService
+import com.shin.vicmusic.feature.auth.AuthViewModel
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.HttpException
 import retrofit2.Retrofit
@@ -18,19 +20,13 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 import java.io.IOException
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object MyRetrofitDatasource {
-    /**
-     * 网络请求接口
-     */
-    private val service= Retrofit.Builder()
-        .baseUrl(Config.BASE_URL)
-        .callFactory(NetWorkModule.providesOkHttpClient())
-        .addConverterFactory(NetWorkModule
-            .providesNetworkJson()
-            .asConverterFactory("application/json".toMediaType()))
-        .build()
-        .create(MyNetworkApiService::class.java)
+@Singleton // 标记为单例，全局共享
+class MyRetrofitDatasource @Inject constructor(
+    private val service: MyNetworkApiService // 直接注入 Hilt 提供的接口实例
+) {
 
     /**
      * 统一处理网络请求的异常，并封装成 NetworkResponse 返回。
@@ -54,6 +50,10 @@ object MyRetrofitDatasource {
 
     suspend fun mailCode(@Query(value = "to")to:String,@Query(value = "captcha")captcha:String):NetworkResponse<Unit>{
         return safeApiCall { service.mailCode(to, captcha) }
+    }
+
+    suspend fun login(req: UserLoginReq): NetworkResponse<String> {
+        return safeApiCall { service.login(req) }
     }
 
     suspend fun register(@Body req: UserRegisterReq):NetworkResponse<User>{

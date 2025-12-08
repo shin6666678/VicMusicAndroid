@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.model.request.UserLoginReq
+import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import com.shin.vicmusic.core.network.retrofit.MyNetworkApiService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val authViewModel: AuthViewModel,
-    private val api: MyNetworkApiService // [新增] 注入 API
+    private val datasource: MyRetrofitDatasource // [新增] 注入 API
 ) : ViewModel() {
 
     // UI State
@@ -46,7 +47,7 @@ class LoginViewModel @Inject constructor(
             _loginState.value = LoginUiState.Loading
             try {
                 val req = UserLoginReq(mail = _mail.value, password = _password.value)
-                val response = api.login(req)
+                val response = datasource.login(req)
 
                 if (response.status == 0) { // 假设 0 是成功码，请根据实际后端调整
                     // 登录成功
