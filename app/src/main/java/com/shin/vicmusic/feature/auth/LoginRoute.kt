@@ -61,7 +61,7 @@ fun LoginRoute(
         onPasswordChange = viewModel::updatePassword,
         onLoginClick = viewModel::login,
         isLoading = loginState is LoginUiState.Loading,
-        onRegisterClick = { navController.navigate("register_route") } // 假设你的注册路由是这个
+        onRegisterClick = { navController.navigateToRegister() }
     )
 }
 
@@ -157,9 +157,9 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 注册跳转
+        //注册跳转按钮
         TextButton(onClick = onRegisterClick) {
-            Text(text = "没有账号？立即注册")
+            Text(text = "没有账号？立即注册", color = MaterialTheme.colorScheme.primary)
         }
     }
 }
