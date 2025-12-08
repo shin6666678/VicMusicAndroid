@@ -5,12 +5,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.model.request.UserRegisterReq
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class RegisterViewModel : ViewModel() {
+@HiltViewModel
+class RegisterViewModel @Inject constructor(
+    private val datasource: MyRetrofitDatasource // [新增] 注入 API
+) : ViewModel() {
     val TAG = "RegisterViewModel"
 
     // 用户输入的邮箱
@@ -68,7 +73,7 @@ class RegisterViewModel : ViewModel() {
     fun requestEmailVerificationCode(mail: String, code: String) {
         viewModelScope.launch {
             Log.d(TAG, "发送验证码: ${mail},${code}")
-            val sendMailCodeResult = MyRetrofitDatasource.mailCode(mail, code)
+            val sendMailCodeResult = datasource.mailCode(mail, code)
             _sendEmailCodeStatus.value = sendMailCodeResult.status == 0
         }
     }
@@ -77,7 +82,7 @@ class RegisterViewModel : ViewModel() {
     fun register(mail: String, mailCode: String, password: String) {
         viewModelScope.launch {
             Log.d(TAG, "注册按钮点击: ${mail},${mailCode},${password}")
-            val sendMailCodeResult = MyRetrofitDatasource.register(
+            val sendMailCodeResult = datasource.register(
                 UserRegisterReq(
                     name = "123",
                     pwd = password,
@@ -90,3 +95,4 @@ class RegisterViewModel : ViewModel() {
         }
     }
 }
+

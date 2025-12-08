@@ -27,6 +27,7 @@ sealed class SongUiState {
 @HiltViewModel
 class SongDetailViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle, // 用于获取导航参数
+    private val datasource: MyRetrofitDatasource
 ) : ViewModel() {
 
     // 从导航参数中获取 songId
@@ -57,7 +58,7 @@ class SongDetailViewModel @Inject constructor(
             _songUiState.value = SongUiState.Loading
             try {
                 // 2. 发起网络请求获取歌曲详情
-                val response = MyRetrofitDatasource.songDetail(id)
+                val response = datasource.songDetail(id)
                 response.data?.let {
                     // 3. 网络请求成功且数据不为空
                     _songUiState.value = SongUiState.Success(it) // 更新UI状态为成功 // 命令全局 PlayerViewModel 播放这首歌
