@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -71,30 +72,22 @@ fun SplashScreen(
     onSkipAdClick: () -> Unit = {},
     timeLeft: Long=0
 ){
-    Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary)){
-//        Button(
-//            onClick = {},
-//            modifier = Modifier
-//                //.statusBarsPadding()
-//                .background(Color.White)
-//        ) {
-//            Text("惦记我")
-//        }
+    Box(modifier = Modifier.fillMaxSize().background(color = Color.White)){
         Image(
-            painter = painterResource(id=R.drawable.ic_splash_logo),
+            painter = painterResource(id=R.drawable.logo),
             contentDescription = null,
-            modifier = Modifier.padding(top = 120.dp).align(Alignment.TopCenter)
+            modifier = Modifier.padding(top = 120.dp).align(Alignment.TopCenter).size(200.dp)
         )
         Text(
-            text = "网易云音乐 , 音乐的力量",
-            color = Color.White,
+            text = "维克音乐 , 一起聆听世界",
+            color = Color.Black,
             modifier = Modifier
                 .padding(bottom = 70.dp)
                 .align(Alignment.BottomCenter)
         )
         Text(
             text = stringResource(id = R.string.copyright,year),
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = Color.Black,
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(30.dp).align(Alignment.BottomCenter)
         )
