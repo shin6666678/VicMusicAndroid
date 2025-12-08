@@ -19,8 +19,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
+import androidx.core.content.edit
 
 /**
  * 播放器状态数据类。
@@ -71,6 +74,19 @@ class PlayerViewModel @Inject constructor(
         // 此实例将在整个应用生命周期中保持不变。
         exoPlayer = ExoPlayer.Builder(context).build()
         setupPlayerListener() // 设置 ExoPlayer 监听器以更新播放状态
+        // [新增] 恢复上次播放的歌曲
+        restoreLastPlayedSong()
+
+        // [新增] 监听歌曲变化并保存到本地
+        viewModelScope.launch {
+            currentPlayingSong.collect { song ->
+                song?.let {
+                    val json = Json.encodeToString(it)
+                    context.getSharedPreferences("vic_music_prefs", Context.MODE_PRIVATE)
+                        .edit { putString("last_song", json) }
+                }
+            }
+        }
         Log.d(TAG, "PlayerViewModel initialized. ExoPlayer instance created.")
     }
 
@@ -311,5 +327,27 @@ class PlayerViewModel @Inject constructor(
         startProgressUpdate()
 
         Log.d(TAG, "播放索引更新为:$index")
+    }
+
+    // [新增] 恢复逻辑函数
+    private fun restoreLastPlayedSong() {
+        try {
+            val prefs = context.getSharedPreferences("vic_music_prefs", Context.MODE_PRIVATE)
+            val json = prefs.getString("last_song", null)
+            if (json != null) {
+                val song = Json.decodeFromString<Song>(json)
+                // 恢复队列管理器状态（单曲队列）
+                queueManager.setQueue(listOf(song), 0)
+                // 显式更新当前歌曲状态
+                _currentPlayingSong.value = song
+
+                // 准备播放器资源，但不调用 play()
+                val mediaItem = MediaItem.fromUri(ResourceUtil.r2(song.uri))
+                exoPlayer?.setMediaItem(mediaItem)
+                exoPlayer?.prepare()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }
