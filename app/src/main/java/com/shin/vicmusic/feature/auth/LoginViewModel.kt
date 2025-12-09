@@ -3,6 +3,7 @@ package com.shin.vicmusic.feature.auth
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.shin.vicmusic.core.config.AppGlobalData
 import com.shin.vicmusic.core.model.request.UserLoginReq
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import com.shin.vicmusic.core.network.retrofit.MyNetworkApiService
@@ -51,6 +52,8 @@ class LoginViewModel @Inject constructor(
 
                 if (response.status == 0) { // 假设 0 是成功码，请根据实际后端调整
                     // 登录成功
+                    // [New] 保存 Token
+                    AppGlobalData.token = response.data.toString()
                     Log.d("LoginViewModel", "Login Success: ${response.data}")
                     authViewModel.setLoginStatus(true)
                     _loginState.value = LoginUiState.Success

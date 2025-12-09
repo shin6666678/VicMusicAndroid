@@ -67,4 +67,9 @@ class MyRetrofitDatasource @Inject constructor(
     suspend fun songDetail(@Query(value = "id") id:String,): NetworkResponse<Song>{
         return safeApiCall { service.songDetail(id) }
     }
+
+    // [新增] 获取喜欢歌曲列表方法
+    suspend fun getLikedSongs(): NetworkResponse<NetworkPageData<Song>>{
+        return safeApiCall { service.getLikedSongs() }
+    }
 }
