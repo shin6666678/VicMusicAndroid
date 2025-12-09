@@ -26,7 +26,7 @@ import com.shin.vicmusic.feature.me.ActionItem // 确保导入了 ActionItem
 @Preview
 @Composable
 fun UserInfoCardPreview() {
-    UserInfoCard(onAvatarClick = {}, isLoggedIn = false)
+    UserInfoCard(onAvatarClick = {}, isLoggedIn = true)
 }
 
 @Composable
@@ -144,10 +144,10 @@ private fun LoggedOutHeader(onAvatarClick: () -> Unit) {
 private fun UserStatsRow() {
     // 定义数据类或直接使用 List<Pair>
     val stats = listOf(
-        "12" to "关注",
-        "340" to "粉丝",
-        "Lv.8" to "等级",
-        "209h" to "听歌"
+        "null" to "关注",
+        "null" to "粉丝",
+        "null" to "等级",
+        "null" to "听歌"
     )
     Row(
         modifier = Modifier.fillMaxWidth(),

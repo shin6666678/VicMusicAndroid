@@ -1,5 +1,6 @@
 package com.shin.vicmusic.feature.me
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -26,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,18 +38,20 @@ import com.shin.vicmusic.feature.auth.AuthViewModel
 import com.shin.vicmusic.feature.me.component.MeTopBar
 import com.shin.vicmusic.feature.me.component.TopNotifyBar
 import com.shin.vicmusic.feature.me.component.UserInfoCard
+import com.shin.vicmusic.util.getAuthViewModelSingleton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MeRoute(
     onAvatarClick: () -> Unit = {},
-    authViewModel: AuthViewModel = hiltViewModel()
+    authViewModel: AuthViewModel = getAuthViewModelSingleton()
 ) {
     val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
     // 添加 onAvatarClick 参数
+    Log.d("MeRoute", "isLoggedIn: $isLoggedIn")
     MeScreen(
         onAvatarClick = onAvatarClick,
-        isLoggedIn = isLoggedIn == true // [新增] 传入状态
+        isLoggedIn = isLoggedIn ?: false // [修复] 确保状态为非空Boolean，null时默认为false
     )
 }
 
@@ -55,7 +59,7 @@ fun MeRoute(
 @Composable
 fun MeScreen(
     onAvatarClick: () -> Unit = {},
-    isLoggedIn: Boolean = false // [新增] 默认为 false
+    isLoggedIn: Boolean
 ) {
     // [新增] 控制是否显示“喜欢列表”的状态
     var showLikedList by remember { mutableStateOf(false) }
@@ -247,7 +251,7 @@ fun MeScreen(
 
 @Composable
 fun QuickAccessItem(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     text: String,
     count: String,
     onClick: () -> Unit = {} // [新增] 默认为空
@@ -265,7 +269,7 @@ fun QuickAccessItem(
 
 @Composable
 fun ActionItem(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     text: String,
     iconTint: Color
 ) {
@@ -285,5 +289,7 @@ fun ActionItem(
 @Preview
 @Composable
 fun MeScreenPreview() {
-    MeScreen()
+    MeScreen(
+        isLoggedIn = false
+    )
 }
