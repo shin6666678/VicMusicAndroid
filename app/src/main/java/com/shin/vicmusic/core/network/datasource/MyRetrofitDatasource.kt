@@ -68,6 +68,11 @@ class MyRetrofitDatasource @Inject constructor(
         return safeApiCall { service.songDetail(id) }
     }
 
+    // [新增] 对应 Service 的 userInfo 方法
+    suspend fun userInfo(): NetworkResponse<User> {
+        return safeApiCall { service.userInfo() }
+    }
+
     // [新增] 获取喜欢歌曲列表方法
     suspend fun getLikedSongs(): NetworkResponse<NetworkPageData<Song>>{
         return safeApiCall { service.getLikedSongs() }

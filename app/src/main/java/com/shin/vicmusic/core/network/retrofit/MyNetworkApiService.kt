@@ -33,6 +33,10 @@ interface MyNetworkApiService {
     @POST("/api/user/v1/login")
     suspend fun login(@Body req: UserLoginReq): NetworkResponse<String>
 
+    // [新增] 获取用户信息接口 (Info Interface)
+    @GET("/api/user/v1/info")
+    suspend fun userInfo(): NetworkResponse<User>
+
     // [新增] 获取喜欢歌曲列表接口
     @GET("/api/like/v1/listSong")
     suspend fun getLikedSongs(): NetworkResponse<NetworkPageData<Song>>
