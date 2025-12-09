@@ -38,12 +38,14 @@ import com.shin.vicmusic.feature.me.component.UserInfoCard
 @Composable
 fun MeRoute(
     onAvatarClick: () -> Unit = {},
+    onLikedSongsClick: () -> Unit = {},
     authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
     // 添加 onAvatarClick 参数
     MeScreen(
         onAvatarClick = onAvatarClick,
+        onLikedSongsClick = onLikedSongsClick, // [新增] 传递回调
         isLoggedIn = isLoggedIn == true // [新增] 传入状态
     )
 }
@@ -52,6 +54,7 @@ fun MeRoute(
 @Composable
 fun MeScreen(
     onAvatarClick: () -> Unit = {},
+    onLikedSongsClick: () -> Unit = {}, // [新增]
     isLoggedIn: Boolean = false // [新增] 默认为 false
 ) {// 添加 onAvatarClick 参数
     Scaffold(
@@ -82,7 +85,13 @@ fun MeScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
-                QuickAccessItem(icon = Icons.Filled.Favorite, text = "收藏", count = "2")
+                // [修改] 传入 onClick 回调
+                QuickAccessItem(
+                    icon = Icons.Filled.Favorite,
+                    text = "收藏",
+                    count = "2", // 这里的数据后续可以绑定 ViewModel
+                    onClick = onLikedSongsClick
+                )
                 QuickAccessItem(icon = Icons.Filled.Download, text = "本地", count = "29")
                 QuickAccessItem(icon = Icons.Filled.Headphones, text = "有声", count = "6")
                 QuickAccessItem(icon = Icons.Filled.ReceiptLong, text = "已购", count = "1")
@@ -229,9 +238,13 @@ fun MeScreen(
 fun QuickAccessItem(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     text: String,
-    count: String
+    count: String,
+    onClick: () -> Unit = {} // [新增] 默认为空
 ) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.clickable { onClick() }
+    ) {
         Icon(imageVector = icon, contentDescription = text, modifier = Modifier.size(28.dp))
         Spacer(Modifier.height(4.dp))
         Text(text = text, style = MaterialTheme.typography.bodySmall)
