@@ -21,18 +21,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.shin.vicmusic.R
+import com.shin.vicmusic.core.model.User
 import com.shin.vicmusic.feature.me.ActionItem // 确保导入了 ActionItem
 
 @Preview
 @Composable
 fun UserInfoCardPreview() {
-    UserInfoCard(onAvatarClick = {}, isLoggedIn = true)
+    UserInfoCard(onAvatarClick = {}, isLoggedIn = true,user = null)
 }
 
 @Composable
 fun UserInfoCard(
     onAvatarClick: () -> Unit,
-    isLoggedIn: Boolean
+    isLoggedIn: Boolean,
+    user: User? // [新增] 接收 User 对象
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -43,7 +45,7 @@ fun UserInfoCard(
         Column(modifier = Modifier.padding(16.dp)) {
             // 1. 头部区域：根据登录状态切换
             if (isLoggedIn) {
-                LoggedInHeader(onAvatarClick)
+                LoggedInHeader(onAvatarClick,user)
             } else {
                 LoggedOutHeader(onAvatarClick)
             }
@@ -64,10 +66,10 @@ fun UserInfoCard(
 // --- 抽取的子组件 ---
 
 @Composable
-private fun LoggedInHeader(onAvatarClick: () -> Unit) {
+private fun LoggedInHeader(onAvatarClick: () -> Unit, user: User?) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         AsyncImage(
-            model = "https://picsum.photos/200",
+            model = user?.headImg ?: "https://picsum.photos/200",
             contentDescription = "Avatar",
             modifier = Modifier
                 .size(60.dp)
@@ -80,7 +82,7 @@ private fun LoggedInHeader(onAvatarClick: () -> Unit) {
         Spacer(Modifier.width(16.dp))
         Column(verticalArrangement = Arrangement.Center) {
             Text(
-                text = "Shin_Music",
+                text = user?.name ?: "Shin_Music",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )

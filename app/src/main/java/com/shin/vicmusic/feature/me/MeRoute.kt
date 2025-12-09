@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.shin.vicmusic.core.model.User
 import com.shin.vicmusic.feature.auth.AuthViewModel
 import com.shin.vicmusic.feature.me.component.MeTopBar
 import com.shin.vicmusic.feature.me.component.TopNotifyBar
@@ -47,11 +49,21 @@ fun MeRoute(
     authViewModel: AuthViewModel = getAuthViewModelSingleton()
 ) {
     val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
+    val currentUser by authViewModel.currentUser.collectAsState() // [新增] 观察 currentUser
+
+    // [新增] 如果已登录但无用户信息，尝试获取
+    LaunchedEffect(isLoggedIn) {
+        if (isLoggedIn == true && currentUser == null) {
+            authViewModel.fetchUserInfo()
+        }
+    }
+
     // 添加 onAvatarClick 参数
     Log.d("MeRoute", "isLoggedIn: $isLoggedIn")
     MeScreen(
         onAvatarClick = onAvatarClick,
-        isLoggedIn = isLoggedIn ?: false // [修复] 确保状态为非空Boolean，null时默认为false
+        isLoggedIn = isLoggedIn ?: false ,// [修复] 确保状态为非空Boolean，null时默认为false
+        user = currentUser // [新增] 传递 user
     )
 }
 
@@ -59,7 +71,8 @@ fun MeRoute(
 @Composable
 fun MeScreen(
     onAvatarClick: () -> Unit = {},
-    isLoggedIn: Boolean
+    isLoggedIn: Boolean,
+    user: User? = null // [新增] 接收参数
 ) {
     // [新增] 控制是否显示“喜欢列表”的状态
     var showLikedList by remember { mutableStateOf(false) }
@@ -89,7 +102,8 @@ fun MeScreen(
                 Spacer(Modifier.height(16.dp))
                 UserInfoCard(
                     onAvatarClick = onAvatarClick,
-                    isLoggedIn = isLoggedIn
+                    isLoggedIn = isLoggedIn,
+                    user = user // [修改] 传入 user
                 )// 传入 onAvatarClick
 
                 // Quick Access Icons
