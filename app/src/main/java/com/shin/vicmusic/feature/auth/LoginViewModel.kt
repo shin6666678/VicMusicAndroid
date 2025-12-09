@@ -46,7 +46,7 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             _loginState.value = LoginUiState.Loading
             try {
-                val req = UserLoginReq(mail = _mail.value, password = _password.value)
+                val req = UserLoginReq(mail = _mail.value, pwd = _password.value)
                 val response = datasource.login(req)
 
                 if (response.status == 0) { // 假设 0 是成功码，请根据实际后端调整
