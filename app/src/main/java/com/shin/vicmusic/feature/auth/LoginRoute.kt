@@ -87,7 +87,7 @@ fun LoginScreen(
     ) {
         // Logo
         Icon(
-            painter = painterResource(id = R.drawable.ic_splash_logo), // 确保你有这个资源
+            painter = painterResource(id = R.drawable.logo_splash), // 确保你有这个资源
             contentDescription = null,
             modifier = Modifier.size(100.dp),
             tint = MaterialTheme.colorScheme.primary
