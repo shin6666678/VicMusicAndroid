@@ -17,10 +17,4 @@ class AuthViewModel @Inject constructor() : ViewModel() {
     fun setLoginStatus(loggedIn: Boolean) {
         _isLoggedIn.value = loggedIn
     }
-
-//    // 可以选择在init块中检查初始登录状态，例如从DataStore或SharedPreferences读取
-//    init {
-//        // 示例：假设AppGlobalData.sLoginResult是唯一的登录凭证
-//        _isLoggedIn.value = AppGlobalData.sLoginResult != null
-//    }
 }

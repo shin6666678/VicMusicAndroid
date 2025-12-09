@@ -2,7 +2,9 @@ package com.shin.vicmusic.util
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import com.shin.vicmusic.core.network.di.AuthViewModelEntryPoint
 import com.shin.vicmusic.core.network.di.PlayerViewModelEntryPoint
+import com.shin.vicmusic.feature.auth.AuthViewModel
 import com.shin.vicmusic.feature.player.PlayerViewModel
 import dagger.hilt.android.EntryPointAccessors
 
@@ -15,4 +17,14 @@ fun getPlayerViewModelSingleton(): PlayerViewModel {
         PlayerViewModelEntryPoint::class.java
     )
     return entryPoint.getPlayerViewModel()
+}
+
+@Composable
+fun getAuthViewModelSingleton(): AuthViewModel {
+    val context = LocalContext.current
+    val entryPoint = EntryPointAccessors.fromApplication(
+        context.applicationContext,
+        AuthViewModelEntryPoint::class.java
+    )
+    return entryPoint.getAuthViewModel()
 }
