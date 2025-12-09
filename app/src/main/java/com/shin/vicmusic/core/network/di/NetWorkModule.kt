@@ -1,6 +1,7 @@
 package com.shin.vicmusic.core.network.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.shin.vicmusic.core.config.AppGlobalData
 import com.shin.vicmusic.core.config.Config
 import com.shin.vicmusic.core.network.retrofit.MyNetworkApiService
 import dagger.Module
@@ -37,8 +38,18 @@ object NetWorkModule {
             // 设置日志级别为 BODY，这将打印请求和响应的全部信息，包括 header 和 body
             setLevel(HttpLoggingInterceptor.Level.BODY)
         }
+        // [New] 添加认证拦截器
+        val authInterceptor = okhttp3.Interceptor { chain ->
+            val builder = chain.request().newBuilder()
+            AppGlobalData.token?.let { token ->
+                // 通常是 "Bearer $token"，请根据后端要求调整
+                builder.addHeader("Authorization", token)
+            }
+            chain.proceed(builder.build())
+        }
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
+            .addInterceptor(authInterceptor) // [New] 注册拦截器
             .connectTimeout(10,TimeUnit.SECONDS)
             .writeTimeout(10,TimeUnit.SECONDS)
             .readTimeout(10,TimeUnit.SECONDS)
