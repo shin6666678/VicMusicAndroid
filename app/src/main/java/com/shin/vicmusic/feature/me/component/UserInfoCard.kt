@@ -113,7 +113,7 @@ private fun LoggedOutHeader(onAvatarClick: () -> Unit) {
         Button(
             onClick = onAvatarClick,
             modifier = Modifier
-                .weight(0.4f) // 使用 weight 而不是写死宽度比例
+                .weight(0.5f) // 使用 weight 而不是写死宽度比例
                 .height(40.dp), // 稍微调整高度使其更紧凑
             colors = ButtonDefaults.buttonColors(
                 containerColor = VdGreen,

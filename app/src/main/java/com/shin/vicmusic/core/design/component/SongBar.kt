@@ -103,8 +103,8 @@ fun SongBar(
                         //.clip(RoundedCornerShape(25.dp)), // 圆形剪裁
                         //.background(MaterialTheme.colorScheme.surfaceVariant), // 占位背景色
                         //.background(color = Color.Red),
-                    placeholder = painterResource(id = R.drawable.ic_launcher), // 替换为你的默认封面
-                    error = painterResource(id = R.drawable.ic_launcher) // 加载失败时显示
+                    placeholder = painterResource(id = R.drawable.logo), // 替换为你的默认封面
+                    error = painterResource(id = R.drawable.logo) // 加载失败时显示
                 )
             }
 
