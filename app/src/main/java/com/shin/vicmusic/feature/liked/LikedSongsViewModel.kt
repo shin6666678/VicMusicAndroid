@@ -1,4 +1,4 @@
-package com.shin.vicmusic.feature.me
+package com.shin.vicmusic.feature.liked
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
