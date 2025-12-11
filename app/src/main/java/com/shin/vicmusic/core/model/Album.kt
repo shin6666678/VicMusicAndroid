@@ -5,7 +5,7 @@ import org.w3c.dom.Comment
 
 
 @Serializable
-data class Sheet (
+data class Album (
     val id:String="",
     val title:String="",
     val created:String="",

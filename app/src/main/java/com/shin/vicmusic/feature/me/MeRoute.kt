@@ -33,10 +33,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.shin.vicmusic.core.model.User
 import com.shin.vicmusic.feature.auth.AuthViewModel
+import com.shin.vicmusic.feature.liked.LikedScreen
 import com.shin.vicmusic.feature.me.component.MeTopBar
 import com.shin.vicmusic.feature.me.component.TopNotifyBar
 import com.shin.vicmusic.feature.me.component.UserInfoCard
@@ -79,7 +79,7 @@ fun MeScreen(
 
     if (showLikedList) {
         // [新增] 显示喜欢列表，传入返回回调
-        LikedSongsScreen(
+        LikedScreen(
             onBack = { showLikedList = false }
         )
     }else{
