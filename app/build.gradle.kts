@@ -92,4 +92,7 @@ dependencies {
 
     implementation("com.google.accompanist:accompanist-flowlayout:0.28.0") // 检查最新版本
 
+    //数据存储
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
 }
