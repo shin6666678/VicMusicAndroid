@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
@@ -30,7 +32,9 @@ import com.shin.vicmusic.feature.song.navigateToSongDetail
 import com.shin.vicmusic.util.getPlayerViewModelSingleton
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -57,31 +61,36 @@ fun DiscoveryScreen(
     onSongClick: (String) -> Unit = {} ,
     onAddToQueueClick: (Song) -> Unit = {}
 ) {
-    // 0 for 推荐, 1 for 乐馆
-    var selectedTabIndex by remember { mutableIntStateOf(0) }
+    val pagerState = rememberPagerState(pageCount = {2})
+    val coroutineScope= rememberCoroutineScope()
     Scaffold(
         topBar = {
             DiscoveryTopBar(
                 toSearch = toSearch,
-                selectedTabIndex = selectedTabIndex,
-                onTabSelected = { index -> selectedTabIndex = index }
+                selectedTabIndex = pagerState.currentPage,
+                onTabSelected = { index ->
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(index)
+                    }
+                }
             )
         },
         contentWindowInsets = ScaffoldDefaults
             .contentWindowInsets
             .exclude(WindowInsets.navigationBars)
     ) { paddingValues ->
-        Box(
+        HorizontalPager(
+            state = pagerState,
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.surfaceVariant)
-                .padding(paddingValues)
-        ) {
-            if(selectedTabIndex == 0){
-                Recommend()
-            }
-            else if (selectedTabIndex == 1) {
-                MusicHall(
+                .padding(paddingValues) // 保持原有的 padding 以避免被 TopBar 遮挡
+
+        ) { page ->
+            // 6. 根据 page 索引渲染对应的内容
+            when (page) {
+                0 -> Recommend()
+                1 -> MusicHall(
                     songs = songs,
                     onSongClick = onSongClick,
                     onAddToQueueClick = onAddToQueueClick
