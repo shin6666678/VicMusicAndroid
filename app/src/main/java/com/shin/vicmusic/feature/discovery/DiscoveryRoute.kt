@@ -25,6 +25,7 @@ import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterProvider
 import com.shin.vicmusic.feature.song.navigateToSongDetail
 import com.shin.vicmusic.util.getPlayerViewModelSingleton
 import androidx.compose.runtime.rememberCoroutineScope
+import com.shin.vicmusic.core.model.User
 import com.shin.vicmusic.feature.discovery.musicHall.MusicHall
 import com.shin.vicmusic.feature.discovery.recommend.Recommend
 import kotlinx.coroutines.launch
@@ -37,8 +38,11 @@ fun DiscoveryRoute(
     playerViewModel: PlayerViewModel = getPlayerViewModelSingleton()
 ) {
     val datum by viewModel.datum.collectAsState()
+    val user by viewModel.user.collectAsState() // [新增] 收集用户状态
+
     DiscoveryScreen(
         songs = datum,
+        user=user,
         toggleDrawer = {}, // 保持原有的空实现，或者替换为实际逻辑
         toSearch = { navController.navigate("search_route") }, // 点击搜索框时导航到搜索界面
         onSongClick = { songId -> navController.navigateToSongDetail(songId) } ,
@@ -51,6 +55,7 @@ fun DiscoveryScreen(
     toggleDrawer: () -> Unit = {},
     toSearch: () -> Unit = {},
     songs: List<Song> = listOf(),
+    user: User?=null,
     onSongClick: (String) -> Unit = {} ,
     onAddToQueueClick: (Song) -> Unit = {}
 ) {
@@ -82,7 +87,7 @@ fun DiscoveryScreen(
         ) { page ->
             // 6. 根据 page 索引渲染对应的内容
             when (page) {
-                0 -> Recommend()
+                0 -> Recommend(user=user)
                 1 -> MusicHall(
                     songs = songs,
                     onSongClick = onSongClick,
