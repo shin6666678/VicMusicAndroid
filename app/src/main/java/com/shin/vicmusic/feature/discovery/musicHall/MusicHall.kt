@@ -1,4 +1,4 @@
-package com.shin.vicmusic.feature.discovery
+package com.shin.vicmusic.feature.discovery.musicHall
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

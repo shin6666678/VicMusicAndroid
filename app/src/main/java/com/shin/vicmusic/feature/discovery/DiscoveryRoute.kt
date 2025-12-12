@@ -1,7 +1,6 @@
 package com.shin.vicmusic.feature.discovery
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,25 +14,19 @@ import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController // 导入 NavController
 import com.shin.vicmusic.core.model.Song
 import com.shin.vicmusic.feature.player.PlayerViewModel
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterProvider
 import com.shin.vicmusic.feature.song.navigateToSongDetail
 import com.shin.vicmusic.util.getPlayerViewModelSingleton
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import com.shin.vicmusic.feature.discovery.musicHall.MusicHall
+import com.shin.vicmusic.feature.discovery.recommend.Recommend
 import kotlinx.coroutines.launch
 
 
