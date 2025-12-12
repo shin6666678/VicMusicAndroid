@@ -2,6 +2,8 @@ package com.shin.vicmusic.feature.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.shin.vicmusic.core.config.AppGlobalData
+import com.shin.vicmusic.core.config.TokenManager
 import com.shin.vicmusic.core.model.User
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +14,8 @@ import javax.inject.Singleton
 
 @Singleton // 更改为 @Singleton
 class AuthViewModel @Inject constructor(
-    private val datasource: MyRetrofitDatasource // [新增] 注入数据源
+    private val datasource: MyRetrofitDatasource, // [新增] 注入数据源
+    private val tokenManager: TokenManager // [修改1] 注入 TokenManager
 ) : ViewModel() {
 
     // true 表示已登录，false 表示未登录，null 表示尚未确定
@@ -23,6 +26,21 @@ class AuthViewModel @Inject constructor(
     private val _currentUser = MutableStateFlow<User?>(null)
     val currentUser: StateFlow<User?> = _currentUser
 
+    init {
+        // [修改2] 初始化时监听 Token，如果有则自动恢复登录
+        viewModelScope.launch {
+            tokenManager.tokenFlow.collect { savedToken ->
+                if (!savedToken.isNullOrBlank()) {
+                    AppGlobalData.token = savedToken
+                    // 仅当状态未设置时才调用，避免循环
+                    if (_isLoggedIn.value != true) {
+                        setLoginStatus(true)
+                    }
+                }
+            }
+        }
+    }
+
     // 供LoginViewModel或其他认证流程调用，以更新全局登录状态
     fun setLoginStatus(loggedIn: Boolean) {
         _isLoggedIn.value = loggedIn
@@ -30,6 +48,7 @@ class AuthViewModel @Inject constructor(
             fetchUserInfo() // [新增] 登录成功自动获取用户信息
         } else {
             _currentUser.value = null // 登出清空信息
+            viewModelScope.launch { tokenManager.clearToken() }
         }
     }
 
