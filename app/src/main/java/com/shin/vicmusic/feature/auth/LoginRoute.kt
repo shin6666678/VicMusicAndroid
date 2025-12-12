@@ -1,9 +1,7 @@
 package com.shin.vicmusic.feature.auth
 
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -27,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.shin.vicmusic.R
 
 @Composable
@@ -87,7 +84,7 @@ fun LoginScreen(
     ) {
         // Logo
         Icon(
-            painter = painterResource(id = R.drawable.logo_splash), // 确保你有这个资源
+            painter = painterResource(id = R.drawable.ic_launcher_foreground), // 确保你有这个资源
             contentDescription = null,
             modifier = Modifier.size(100.dp),
             tint = MaterialTheme.colorScheme.primary
