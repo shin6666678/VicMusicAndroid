@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
 import com.shin.vicmusic.core.model.Song
@@ -78,7 +79,9 @@ fun SongDetailRoute(
                 onSeek = playerViewModel::seekTo,                   // 传递跳转回调
                 onBackClick = { navController.popBackStack() },
                 onSkipNext = playerViewModel::skipToNext,           // 传递下一首回调
-                onSkipPrevious = playerViewModel::skipToPrevious      // 传递上一首回调
+                onSkipPrevious = playerViewModel::skipToPrevious  ,    // 传递上一首回调
+                // [新增] 传递 ViewModel 的 toggleLike 方法
+                onToggleLike = detailViewModel::toggleLike
             )
         }
         is SongUiState.Error -> {
@@ -106,7 +109,8 @@ fun SongDetailScreen(
     onSeek: (Long) -> Unit,
     onBackClick: () -> Unit,
     onSkipNext: () -> Unit,
-    onSkipPrevious: () -> Unit
+    onSkipPrevious: () -> Unit,
+    onToggleLike: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -126,7 +130,10 @@ fun SongDetailScreen(
         SongInfoSection(song = song)
 
         // 操作按钮行
-        SongActionButtons()
+        SongActionButtons(
+            isLiked = song.isLiked,   // 从 Song 对象中获取状态
+            onLikeClick = onToggleLike // 绑定回调
+        )
         Spacer(modifier = Modifier.height(16.dp))
 
         // 播放进度条
@@ -157,7 +164,8 @@ fun SongDetailPreView() {
             onSeek = { /* Do nothing for preview */ },
             onBackClick = { /* Do nothing for preview */ },
             onSkipNext = { /* Do nothing for preview */ },
-            onSkipPrevious = { /* Do nothing for preview */ }
+            onSkipPrevious = { /* Do nothing for preview */ },
+            onToggleLike = { }
         )
     }
 }

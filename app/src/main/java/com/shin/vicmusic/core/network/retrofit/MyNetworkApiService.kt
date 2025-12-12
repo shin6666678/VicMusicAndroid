@@ -2,6 +2,7 @@ package com.shin.vicmusic.core.network.retrofit
 
 import com.shin.vicmusic.core.model.Song
 import com.shin.vicmusic.core.model.User
+import com.shin.vicmusic.core.model.request.LikeSongReq
 import com.shin.vicmusic.core.model.request.UserLoginReq
 import com.shin.vicmusic.core.model.request.UserRegisterReq
 import com.shin.vicmusic.core.model.response.NetworkPageData
@@ -40,4 +41,8 @@ interface MyNetworkApiService {
     // [新增] 获取喜欢歌曲列表接口
     @GET("/api/like/v1/listSong")
     suspend fun getLikedSongs(): NetworkResponse<NetworkPageData<Song>>
+
+    // [新增] 喜欢歌曲接口
+    @POST("/api/like/v1/likeSong")
+    suspend fun likeSong(@Body req: LikeSongReq): NetworkResponse<Unit>
 }

@@ -46,7 +46,9 @@ fun DiscoveryRoute(
         toggleDrawer = {}, // 保持原有的空实现，或者替换为实际逻辑
         toSearch = { navController.navigate("search_route") }, // 点击搜索框时导航到搜索界面
         onSongClick = { songId -> navController.navigateToSongDetail(songId) } ,
-        onAddToQueueClick = { song -> playerViewModel.addSongToQueue(song) }
+        onAddToQueueClick = { song -> playerViewModel.addSongToQueue(song) },
+        // [新增] 传递 ViewModel 的 toggleLike 方法
+        onLikeClick = viewModel::toggleLike
     )
 }
 
@@ -57,7 +59,9 @@ fun DiscoveryScreen(
     songs: List<Song> = listOf(),
     user: User?=null,
     onSongClick: (String) -> Unit = {} ,
-    onAddToQueueClick: (Song) -> Unit = {}
+    onAddToQueueClick: (Song) -> Unit = {},
+    // [新增] 接收点击回调
+    onLikeClick: (Song) -> Unit = {}
 ) {
     val pagerState = rememberPagerState(pageCount = {2})
     val coroutineScope= rememberCoroutineScope()
@@ -91,7 +95,9 @@ fun DiscoveryScreen(
                 1 -> MusicHall(
                     songs = songs,
                     onSongClick = onSongClick,
-                    onAddToQueueClick = onAddToQueueClick
+                    onAddToQueueClick = onAddToQueueClick,
+                    // [新增] 将回调传递给 MusicHall
+                    onLikeClick = onLikeClick
                 )
             }
         }

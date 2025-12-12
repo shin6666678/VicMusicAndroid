@@ -18,7 +18,9 @@ import com.shin.vicmusic.feature.song.ItemSong
 fun MusicHall(
     songs:List<Song>,
     onSongClick: (String) -> Unit = {},
-    onAddToQueueClick: (Song) -> Unit = {}
+    onAddToQueueClick: (Song) -> Unit = {},
+    // [新增] 传递回调
+    onLikeClick: (Song) -> Unit = {}
 ){
     LazyColumn(
         contentPadding = PaddingValues(horizontal = SpaceOuter),
@@ -29,7 +31,8 @@ fun MusicHall(
             ItemSong(
                 data = song,
                 modifier = Modifier.clickable { onSongClick(song.id) } ,
-                onAddToQueueClick = { onAddToQueueClick(song) }
+                onAddToQueueClick = { onAddToQueueClick(song) },
+                onLikeClick = onLikeClick
             )
         }
     }

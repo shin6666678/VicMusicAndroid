@@ -13,6 +13,7 @@ import com.shin.vicmusic.feature.auth.AuthViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -40,8 +41,32 @@ class DiscoveryViewModel @Inject constructor(
             Log.d(TAG, "Fetched songs: ${songs.data?.list?.size}")
             _datum.value=songs.data?.list?:emptyList()
         }
-
     }
+
+    // [新增] 处理喜欢/取消喜欢
+    fun toggleLike(song: Song) {
+        viewModelScope.launch {
+            // 1. 发起网络请求
+            val response = datasource.likeSong(song.id)
+
+            if (response.status == 0) {
+                // 2. 请求成功，更新本地列表状态 (局部刷新)
+                _datum.update { list ->
+                    list.map { item ->
+                        if (item.id == song.id) {
+                            item.copy(isLiked = !item.isLiked)
+                        } else {
+                            item
+                        }
+                    }
+                }
+            } else {
+                // 处理失败情况，如提示用户
+                Log.e(TAG, "Like failed: ${response.message}")
+            }
+        }
+    }
+
     companion object{
         const val TAG ="DiscoveryViewModel"
     }

@@ -5,6 +5,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import com.shin.vicmusic.core.config.Config
 import com.shin.vicmusic.core.model.Song
 import com.shin.vicmusic.core.model.User
+import com.shin.vicmusic.core.model.request.LikeSongReq
 import com.shin.vicmusic.core.model.request.UserLoginReq
 import com.shin.vicmusic.core.model.request.UserRegisterReq
 import com.shin.vicmusic.core.model.response.NetworkPageData
@@ -76,5 +77,10 @@ class MyRetrofitDatasource @Inject constructor(
     // [新增] 获取喜欢歌曲列表方法
     suspend fun getLikedSongs(): NetworkResponse<NetworkPageData<Song>>{
         return safeApiCall { service.getLikedSongs() }
+    }
+
+    // [新增] 喜欢歌曲
+    suspend fun likeSong(songId: String): NetworkResponse<Unit>{
+        return safeApiCall { service.likeSong(LikeSongReq(songId)) }
     }
 }
