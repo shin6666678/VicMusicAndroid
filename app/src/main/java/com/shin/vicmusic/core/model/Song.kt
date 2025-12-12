@@ -18,6 +18,7 @@ data class Song (
     val lyricStyle:Int= Constant.VALUE0,
     val lyric:String="",
     val trackNumber: Int=1,
-    val totalTrackCount:Int=1
-
+    val totalTrackCount:Int=1,
+    // [新增] 喜欢状态，默认为 false
+    var isLiked: Boolean = false
 )

@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -14,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.shin.vicmusic.core.design.component.MyAsyncImage
@@ -24,7 +27,12 @@ import com.shin.vicmusic.core.model.Song
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONG
 
 @Composable
-fun ItemSong(data: Song, modifier: Modifier= Modifier,onAddToQueueClick: (Song) -> Unit = {}) {
+fun ItemSong(
+    data: Song,
+    modifier: Modifier= Modifier,
+    onAddToQueueClick: (Song) -> Unit = {},
+    onLikeClick:(Song)->Unit={}
+) {
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -46,6 +54,19 @@ fun ItemSong(data: Song, modifier: Modifier= Modifier,onAddToQueueClick: (Song) 
                 color = MaterialTheme.colorScheme.onSurface
             )
         }
+
+        IconButton(
+            onClick = {onLikeClick(data)}
+        ) {
+            Icon(
+                imageVector = if(data.isLiked)Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                contentDescription = "喜欢",
+                // 喜欢状态为红色，否则为默认色
+                tint = if (data.isLiked) Color.Red else MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+
         // ⭐ 新增操作按钮：添加到队列
         IconButton(
             onClick = { onAddToQueueClick(data) } // 调用回调，传递当前歌曲

@@ -6,26 +6,43 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.shin.vicmusic.R
 
 @Composable
-fun SongActionButtons(modifier: Modifier = Modifier) {
+fun SongActionButtons(
+    modifier: Modifier = Modifier,
+    // [新增] 接收喜欢状态和点击回调
+    isLiked: Boolean = false,
+    onLikeClick: () -> Unit = {}
+) {
     Row(
         modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // [新增] 喜欢按钮
+        IconButton(onClick = onLikeClick) {
+            Icon(
+                imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                contentDescription = "喜欢",
+                tint = if (isLiked) Color.Red else MaterialTheme.colorScheme.onSurface
+            )
+        }
         IconButton(onClick = { /* TODO */ }) { // 评论
             Icon(painterResource(id = R.drawable.ic_video_comment), contentDescription = "评论") // 假设有评论图标
             Text("721", fontSize = 10.sp, modifier = Modifier.offset(x = (-8).dp, y = (-8).dp)) // 示例评论数
