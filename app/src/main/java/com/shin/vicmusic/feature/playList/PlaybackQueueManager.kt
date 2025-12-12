@@ -57,4 +57,31 @@ class PlaybackQueueManager @Inject constructor() {
         val list = _queue.value
         return if (index in list.indices) list[index] else null
     }
+
+    // ⭐ [新增] 移除指定索引的歌曲
+    fun removeSongAt(index: Int) {
+        val currentList = _queue.value.toMutableList()
+        if (index in currentList.indices) {
+            currentList.removeAt(index)
+            _queue.value = currentList
+
+            val currentIdx = _currentIndex.value
+
+            // 情況 1: 移除的歌在當前播放歌曲之前，當前索引需要減 1
+            if (index < currentIdx) {
+                _currentIndex.value = currentIdx - 1
+            }
+            // 情況 2: 移除的正是當前歌曲
+            else if (index == currentIdx) {
+                if (currentList.isEmpty()) {
+                    _currentIndex.value = -1
+                } else if (index >= currentList.size) {
+                    // 如果移除的是最後一首，索引修正為新的最後一首
+                    _currentIndex.value = currentList.size - 1
+                }
+                // 如果後面還有歌，索引保持不變（指向下一首自動補上來的歌）
+            }
+            // 情況 3: 移除的歌在當前播放之後，索引無需變動
+        }
+    }
 }

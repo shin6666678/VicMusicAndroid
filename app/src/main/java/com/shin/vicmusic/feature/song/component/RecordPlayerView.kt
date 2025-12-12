@@ -1,5 +1,6 @@
 package com.shin.vicmusic.feature.song.component
 
+import android.R.attr.contentDescription
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloatAsState
@@ -28,6 +29,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.shin.vicmusic.R
+import com.shin.vicmusic.util.ResourceUtil
 
 @Composable
 fun RecordPlayerView(
@@ -86,7 +88,7 @@ fun RecordPlayerView(
         ) {
             // 专辑封面 (中间的圆)
             AsyncImage(
-                model = albumArtUrl,
+                model =ResourceUtil.r2(albumArtUrl ?:""),
                 contentDescription = "专辑封面",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
