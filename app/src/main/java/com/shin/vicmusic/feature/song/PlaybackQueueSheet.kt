@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,6 +37,8 @@ fun PlaybackQueueSheet(
     onToggleRepeatMode: () -> Unit={},
     // 点击列表歌曲的回调，需要告诉 PlayerViewModel 播放这个索引的歌曲
     onSongClick: (Int) -> Unit,
+    // ⭐ [新增] 移除歌曲的回調參數
+    onRemoveSong: (Int) -> Unit,
     // 关闭抽屉的回调
     onClose: () -> Unit,
     modifier: Modifier,
@@ -100,8 +103,14 @@ fun PlaybackQueueSheet(
                         )
                     }
 
-                    // 移除按钮 (Placeholder)
-                    // Icon(Icons.Default.Close, contentDescription = "移除")
+                    // ⭐ [修改] 實作移除按鈕
+                    IconButton(onClick = { onRemoveSong(index) }) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "移除",
+                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        )
+                    }
                 }
             }
         }

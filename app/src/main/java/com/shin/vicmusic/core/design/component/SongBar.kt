@@ -1,5 +1,6 @@
 package com.shin.vicmusic.core.design.component
 
+import android.R.attr.data
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -94,18 +95,7 @@ fun SongBar(
         ) {
             // 专辑封面 (左侧，带半圆露出)
             Box(modifier = Modifier.offset(x = (7).dp)) { // 微调位置，使其左侧露出
-                AsyncImage(
-                    model = song?.icon, // 使用歌曲的封面
-                    contentDescription = "专辑封面",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(50.dp), // 专辑封面尺寸
-                        //.clip(RoundedCornerShape(25.dp)), // 圆形剪裁
-                        //.background(MaterialTheme.colorScheme.surfaceVariant), // 占位背景色
-                        //.background(color = Color.Red),
-                    placeholder = painterResource(id = R.drawable.logo), // 替换为你的默认封面
-                    error = painterResource(id = R.drawable.logo) // 加载失败时显示
-                )
+                MyAsyncImage(model = song?.icon, modifier = Modifier.size(50.dp))
             }
 
             // 歌曲信息

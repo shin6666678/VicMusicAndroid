@@ -125,6 +125,9 @@ fun MainRoute(
                         playerViewModel.playSongAtIndex(index)
                         showQueueSheet = false
                     },
+                    onRemoveSong = { index ->
+                        playerViewModel.removeSong(index)
+                    },
                     onClose = { showQueueSheet = false },
                     modifier = Modifier.align(Alignment.BottomCenter)
                 )

@@ -335,6 +335,23 @@ class PlayerViewModel @Inject constructor(
         Log.d(TAG, "播放索引更新为:$index")
     }
 
+    /**
+     * ⭐ [新增] 從隊列中移除指定索引的歌曲
+     */
+    fun removeSong(index: Int) {
+        val queue = playbackQueue.value
+        if (index in queue.indices) {
+            // 1. 更新 Manager 內部狀態
+            queueManager.removeSongAt(index)
+
+            // 2. 通知 ExoPlayer 移除該 MediaItem
+            // ExoPlayer 會自動處理移除當前播放項目的邏輯（通常是跳到下一首或停止）
+            exoPlayer?.removeMediaItem(index)
+
+            Log.d(TAG, "已移除索引為 $index 的歌曲")
+        }
+    }
+
     // [新增] 恢复逻辑函数
     private fun restoreLastPlayedSong() {
         try {
