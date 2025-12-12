@@ -27,7 +27,6 @@ class LikedSongsViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = LikedSongsUiState.Loading
             try {
-                // 调用之前在 MyRetrofitDatasource 添加的方法
                 val response = datasource.getLikedSongs()
                 if (response.status == 0 && response.data?.list != null) {
                     _uiState.value = LikedSongsUiState.Success(response.data.list)

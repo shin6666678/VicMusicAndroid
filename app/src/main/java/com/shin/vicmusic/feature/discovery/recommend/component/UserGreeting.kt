@@ -24,53 +24,60 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.shin.vicmusic.R
+import com.shin.vicmusic.core.design.component.MyAsyncImage
 import com.shin.vicmusic.core.design.theme.SpaceExtraMedium
 import com.shin.vicmusic.core.design.theme.SpaceMedium
 import com.shin.vicmusic.core.design.theme.SpaceOuter
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
+import com.shin.vicmusic.core.model.User
+import com.shin.vicmusic.util.ResourceUtil
 
 @Composable
-fun UserGreeting() {
+fun UserGreeting(
+    user: User?=null
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = SpaceOuter, vertical = SpaceMedium),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_launcher_foreground), // Placeholder avatar
-            contentDescription = "User Avatar",
+        // [修改] 使用 MyAsyncImage 加载网络头像
+        MyAsyncImage(
+            model = ResourceUtil.r2(user?.headImg?:""), // 传入头像 URL
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape)
-                .background(Color.Gray),
-            contentScale = ContentScale.Crop
+                .background(Color.Gray)
         )
+
         Spacer(modifier = Modifier.width(SpaceMedium))
         Text(
-            text = "上尉诗人",
+            text = user?.name ?: "未登录", // 如果 user 为 null 显示默认文本
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.width(SpaceExtraMedium))
         // VIP6 Badge - Simplified for now
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(4.dp))
-                .background(Color(0xFF81C784)) // Light green
-                .padding(horizontal = 6.dp, vertical = 2.dp)
-        ) {
-            Text(text = "VIP6", style = MaterialTheme.typography.labelSmall, color = Color.White)
-        }
-        Spacer(modifier = Modifier.width(SpaceExtraMedium))
-        // Another badge - Simplified
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(4.dp))
-                .background(Color.LightGray)
-                .padding(horizontal = 6.dp, vertical = 2.dp)
-        ) {
-            Text(text = "V1", style = MaterialTheme.typography.labelSmall, color = Color.DarkGray)
+        if(user!=null){
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(Color(0xFF81C784)) // Light green
+                    .padding(horizontal = 6.dp, vertical = 2.dp)
+            ) {
+                Text(text = "VIP6", style = MaterialTheme.typography.labelSmall, color = Color.White)
+            }
+            Spacer(modifier = Modifier.width(SpaceExtraMedium))
+            // Another badge - Simplified
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(Color.LightGray)
+                    .padding(horizontal = 6.dp, vertical = 2.dp)
+            ) {
+                Text(text = "V1", style = MaterialTheme.typography.labelSmall, color = Color.DarkGray)
+            }
         }
         Spacer(modifier = Modifier.weight(1f)) // Pushes content to the right
         Text(

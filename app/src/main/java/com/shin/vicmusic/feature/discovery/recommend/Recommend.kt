@@ -12,6 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.shin.vicmusic.core.design.theme.SpaceExtraMedium
 import com.shin.vicmusic.core.design.theme.SpaceOuter
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
+import com.shin.vicmusic.core.model.User
 import com.shin.vicmusic.feature.discovery.recommend.component.AlsoListeningSection
 import com.shin.vicmusic.feature.discovery.recommend.component.HorizontalMediaCards
 import com.shin.vicmusic.feature.discovery.recommend.component.RecommendSongItem
@@ -37,6 +38,7 @@ data class RecommendSongData(
 
 @Composable
 fun Recommend(
+    user: User?=null,
     onSongClick: (String) -> Unit = {},
     onSearchClick: () -> Unit = {},
     onMediaCardClick: (String) -> Unit = {}
@@ -48,7 +50,7 @@ fun Recommend(
     ) {
 
         item {
-            UserGreeting()
+            UserGreeting(user=user)
         }
         item {
             HorizontalMediaCards(
