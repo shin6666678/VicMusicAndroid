@@ -18,6 +18,8 @@ class RegisterViewModel @Inject constructor(
 ) : ViewModel() {
     val TAG = "RegisterViewModel"
 
+    var flashTimes=0;
+
     // 用户输入的邮箱
     private val _email = MutableStateFlow("")
     val email: StateFlow<String> = _email.asStateFlow()
@@ -65,7 +67,8 @@ class RegisterViewModel @Inject constructor(
     fun fetchCaptchaImage() {
         viewModelScope.launch {
             Log.d(TAG, "获取验证码图片")
-            _captchaImageUrl.value = "http://115.190.155.131:9001/api/notify/v1/captcha"
+            flashTimes++
+            _captchaImageUrl.value = "http://115.190.155.131:9001/api/notify/v1/captcha/$flashTimes"
         }
     }
 
