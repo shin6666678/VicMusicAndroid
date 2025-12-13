@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -35,6 +36,25 @@ class LikedSongsViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _uiState.value = LikedSongsUiState.Error(e.message ?: "未知错误")
+            }
+        }
+    }
+    // [新增] 在喜欢列表中取消喜欢
+    fun toggleLike(song: Song) {
+        viewModelScope.launch {
+            // 调用后端接口
+            val response = datasource.likeSong(song.id)
+            if (response.status == 0) {
+                // 成功后，从本地列表中移除该歌曲 (UI即时刷新)
+                _uiState.update { state ->
+                    if (state is LikedSongsUiState.Success) {
+                        // 过滤掉已被取消喜欢的歌曲
+                        val newList = state.songs.filter { it.id != song.id }
+                        LikedSongsUiState.Success(newList)
+                    } else {
+                        state
+                    }
+                }
             }
         }
     }
