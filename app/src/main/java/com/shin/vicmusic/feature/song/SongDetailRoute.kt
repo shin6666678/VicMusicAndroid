@@ -24,7 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
-import com.shin.vicmusic.core.model.Song
+import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.feature.player.PlayerState
 import com.shin.vicmusic.feature.player.PlayerViewModel // 导入全局 PlayerViewModel
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONG

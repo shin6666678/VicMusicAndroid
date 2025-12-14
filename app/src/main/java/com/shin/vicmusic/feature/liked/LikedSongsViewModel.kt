@@ -2,7 +2,7 @@ package com.shin.vicmusic.feature.liked
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.shin.vicmusic.core.model.Song
+import com.shin.vicmusic.core.domain.Song // [修改] 引用 Domain Model
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,7 +39,7 @@ class LikedSongsViewModel @Inject constructor(
             }
         }
     }
-    // [新增] 在喜欢列表中取消喜欢
+    //  在喜欢列表中取消喜欢
     fun toggleLike(song: Song) {
         viewModelScope.launch {
             // 调用后端接口

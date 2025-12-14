@@ -24,7 +24,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.flowlayout.FlowRow
-import com.shin.vicmusic.core.model.Song
+import com.shin.vicmusic.core.domain.Song
 
 @Composable
 fun SongInfoSection(song: Song, modifier: Modifier = Modifier, onLikeClick: () -> Unit = {}) {
@@ -53,7 +53,7 @@ fun SongInfoSection(song: Song, modifier: Modifier = Modifier, onLikeClick: () -
             mainAxisSpacing = 8.dp, // 横向间距
             crossAxisSpacing = 4.dp // 纵向间距
         ) { // 标签区域
-            TagChip(text = song.artist) // 艺术家作为标签
+            TagChip(text = song.artist.name) // 艺术家作为标签
             TagChip(text = "387人在听") // 示例数据
             TagChip(text = "标准") // 示例数据
             TagChip(text = "VIP") // 示例数据

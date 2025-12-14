@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
-import com.shin.vicmusic.core.model.Song
+import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.feature.playList.PlaybackQueueManager
 import com.shin.vicmusic.util.ResourceUtil
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -105,7 +105,7 @@ class PlayerViewModel @Inject constructor(
         _currentPlayingSong.value = queueManager.getCurrentSong()
 
         // 2. 更新 ExoPlayer 媒体项
-        val mediaItems = newQueue.map { MediaItem.fromUri(ResourceUtil.r2(it.uri)) }
+        val mediaItems = newQueue.map { MediaItem.fromUri(ResourceUtil.r2(it.uri?:"")) }
 
         exoPlayer?.apply {
             setMediaItems(mediaItems) // 设置整个队列
@@ -303,7 +303,7 @@ class PlayerViewModel @Inject constructor(
      */
     fun addSongToQueue(song: Song) {
         queueManager.addSong(song)
-        val mediaItem = MediaItem.fromUri(ResourceUtil.r2(song.uri))
+        val mediaItem = MediaItem.fromUri(ResourceUtil.r2(song.uri ?:""))
         exoPlayer?.addMediaItem(mediaItem)
         Log.d(TAG,"添加歌曲,${song.title}")
     }
@@ -365,7 +365,7 @@ class PlayerViewModel @Inject constructor(
                 _currentPlayingSong.value = song
 
                 // 准备播放器资源，但不调用 play()
-                val mediaItem = MediaItem.fromUri(ResourceUtil.r2(song.uri))
+                val mediaItem = MediaItem.fromUri(ResourceUtil.r2(song.uri?: ""))
                 exoPlayer?.setMediaItem(mediaItem)
                 exoPlayer?.prepare()
             }

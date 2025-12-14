@@ -25,7 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.shin.vicmusic.core.model.Song
+import com.shin.vicmusic.core.domain.Song
 
 @Composable
 fun PlaybackQueueSheet(
@@ -97,7 +97,7 @@ fun PlaybackQueueSheet(
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            text = song.artist,
+                            text = song.artist.name,
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                         )

@@ -1,24 +1,17 @@
 package com.shin.vicmusic.core.network.datasource
 
 import android.util.Log
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import com.shin.vicmusic.core.config.Config
-import com.shin.vicmusic.core.model.Song
+import com.shin.vicmusic.core.data.mapper.toDomain
+import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.model.User
 import com.shin.vicmusic.core.model.request.LikeSongReq
 import com.shin.vicmusic.core.model.request.UserLoginReq
 import com.shin.vicmusic.core.model.request.UserRegisterReq
 import com.shin.vicmusic.core.model.response.NetworkPageData
 import com.shin.vicmusic.core.model.response.NetworkResponse
-import com.shin.vicmusic.core.network.di.NetWorkModule
 import com.shin.vicmusic.core.network.retrofit.MyNetworkApiService
-import com.shin.vicmusic.feature.auth.AuthViewModel
-import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.HttpException
-import retrofit2.Retrofit
 import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
 import retrofit2.http.Query
 import java.io.IOException
 import javax.inject.Inject
@@ -49,7 +42,7 @@ class MyRetrofitDatasource @Inject constructor(
         return resp as NetworkResponse<T>
     }
 
-    suspend fun mailCode(@Query(value = "to")to:String,@Query(value = "captcha")captcha:String):NetworkResponse<Unit>{
+    suspend fun mailCode(@Query(value = "to")to:String, @Query(value = "captcha")captcha:String):NetworkResponse<Unit>{
         return safeApiCall { service.mailCode(to, captcha) }
     }
 
@@ -60,13 +53,36 @@ class MyRetrofitDatasource @Inject constructor(
     suspend fun register(@Body req: UserRegisterReq):NetworkResponse<User>{
         return safeApiCall { service.register(req) }
     }
+
+    // [修改] 获取列表：DTO -> Domain
     suspend fun songs(): NetworkResponse<NetworkPageData<Song>>{
-        return safeApiCall { service.songs() }
+        val dtoResponse = safeApiCall { service.songs() }
+
+        // 如果成功，进行数据转换
+        if (dtoResponse.status == 0 && dtoResponse.data != null) {
+            val dtoList = dtoResponse.data.list ?: emptyList()
+            // 使用 Mapper 扩展函数转换
+            val domainList = dtoList.map { it.toDomain() }
+
+            val domainData = NetworkPageData(
+                list = domainList,
+                pagination = dtoResponse.data.pagination
+            )
+            return NetworkResponse(status = 0, message = dtoResponse.message, data = domainData)
+        }
+
+        // 失败则原样返回错误信息
+        return NetworkResponse(status = dtoResponse.status, message = dtoResponse.message, data = null)
     }
 
-
+    // [修改] 获取详情：DTO -> Domain
     suspend fun songDetail(@Query(value = "id") id:String,): NetworkResponse<Song>{
-        return safeApiCall { service.songDetail(id) }
+        val dtoResponse = safeApiCall { service.songDetail(id) }
+
+        if (dtoResponse.status == 0 && dtoResponse.data != null) {
+            return NetworkResponse(status = 0, message = dtoResponse.message, data = dtoResponse.data.toDomain())
+        }
+        return NetworkResponse(status = dtoResponse.status, message = dtoResponse.message, data = null)
     }
 
     // [新增] 对应 Service 的 userInfo 方法
@@ -74,9 +90,20 @@ class MyRetrofitDatasource @Inject constructor(
         return safeApiCall { service.userInfo() }
     }
 
-    // [新增] 获取喜欢歌曲列表方法
+    // [修改] 获取喜欢列表：DTO -> Domain
     suspend fun getLikedSongs(): NetworkResponse<NetworkPageData<Song>>{
-        return safeApiCall { service.getLikedSongs() }
+        val dtoResponse = safeApiCall { service.getLikedSongs() }
+
+        if (dtoResponse.status == 0 && dtoResponse.data != null) {
+            val dtoList = dtoResponse.data.list ?: emptyList()
+            val domainList = dtoList.map { it.toDomain() }
+            val domainData = NetworkPageData(
+                list = domainList,
+                pagination = dtoResponse.data.pagination
+            )
+            return NetworkResponse(status = 0, message = dtoResponse.message, data = domainData)
+        }
+        return NetworkResponse(status = dtoResponse.status, message = dtoResponse.message, data = null)
     }
 
     // [新增] 喜欢歌曲

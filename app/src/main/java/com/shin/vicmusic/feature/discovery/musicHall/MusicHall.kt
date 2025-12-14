@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.shin.vicmusic.core.design.theme.SpaceExtraMedium
 import com.shin.vicmusic.core.design.theme.SpaceOuter
-import com.shin.vicmusic.core.model.Song
+import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.feature.song.ItemSong
 
 

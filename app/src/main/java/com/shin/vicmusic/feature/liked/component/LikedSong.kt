@@ -30,7 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.shin.vicmusic.core.model.Song
+import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.feature.song.ItemSong
 
 @Composable

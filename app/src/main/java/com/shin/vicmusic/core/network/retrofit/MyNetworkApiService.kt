@@ -1,7 +1,8 @@
 package com.shin.vicmusic.core.network.retrofit
 
-import com.shin.vicmusic.core.model.Song
 import com.shin.vicmusic.core.model.User
+import com.shin.vicmusic.core.model.api.SongDetailDto
+import com.shin.vicmusic.core.model.api.SongListItemDto
 import com.shin.vicmusic.core.model.request.LikeSongReq
 import com.shin.vicmusic.core.model.request.UserLoginReq
 import com.shin.vicmusic.core.model.request.UserRegisterReq
@@ -15,14 +16,15 @@ import retrofit2.http.Query
 
 /**
  * 网络请求接口
+ * 修改：将 Song 实体替换为 API 层的 DTO (SongListItemDTO, SongDetailDTO)
  */
 interface MyNetworkApiService {
 
     @GET("/api/songs/v1/page")
-    suspend fun songs(): NetworkResponse<NetworkPageData<Song>>
+    suspend fun songs(): NetworkResponse<NetworkPageData<SongListItemDto>>
 
     @GET("/api/songs/v1/{id}")
-    suspend fun songDetail(@Path(value = "id") id:String,): NetworkResponse<Song>
+    suspend fun songDetail(@Path(value = "id") id:String,): NetworkResponse<SongDetailDto>
 
     @GET("/api/notify/v1/send_code")
     suspend fun mailCode(@Query(value = "to")to:String,@Query(value = "captcha") captcha:String): NetworkResponse<Unit>
@@ -40,7 +42,7 @@ interface MyNetworkApiService {
 
     // [新增] 获取喜欢歌曲列表接口
     @GET("/api/like/v1/listSong")
-    suspend fun getLikedSongs(): NetworkResponse<NetworkPageData<Song>>
+    suspend fun getLikedSongs(): NetworkResponse<NetworkPageData<SongListItemDto>>
 
     // [新增] 喜欢歌曲接口
     @POST("/api/like/v1/likeSong")
