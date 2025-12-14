@@ -1,8 +1,6 @@
 package com.shin.vicmusic.core.model
 
 import kotlinx.serialization.Serializable
-import java.util.Date
-
 
 @Serializable
 data class User(

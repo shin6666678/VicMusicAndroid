@@ -3,7 +3,7 @@ package com.shin.vicmusic.feature.song
 import androidx.lifecycle.SavedStateHandle // 导入 SavedStateHandle 用于获取导航参数
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.shin.vicmusic.core.model.Song
+import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

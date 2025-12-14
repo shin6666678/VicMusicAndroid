@@ -19,7 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController // 导入 NavController
-import com.shin.vicmusic.core.model.Song
+import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.feature.player.PlayerViewModel
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterProvider
 import com.shin.vicmusic.feature.song.navigateToSongDetail

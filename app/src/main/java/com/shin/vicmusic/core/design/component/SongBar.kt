@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.shin.vicmusic.R
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
-import com.shin.vicmusic.core.model.Song
+import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.feature.player.PlayerState
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONG // 导入示例歌曲数据
 
@@ -114,7 +114,7 @@ fun SongBar(
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = song?.artist ?: "未知艺术家", // 艺术家
+                        text = song?.artist?.name ?: "未知艺术家", // 艺术家
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
                         maxLines = 1,

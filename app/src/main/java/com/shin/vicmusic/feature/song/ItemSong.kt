@@ -23,7 +23,7 @@ import com.shin.vicmusic.core.design.component.MyAsyncImage
 import com.shin.vicmusic.core.design.theme.SpaceMedium
 import com.shin.vicmusic.core.design.theme.SpaceSmallHeight
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
-import com.shin.vicmusic.core.model.Song
+import com.shin.vicmusic.core.domain.Song // [修改] 引用 Domain Model
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONG
 
 @Composable
@@ -49,7 +49,8 @@ fun ItemSong(
             )
             SpaceSmallHeight()
             Text(
-                text = "${data.artist} - ${data.album}",
+                // [修改] Domain Model 中 artist 和 album 是对象，需要取其 name/title
+                text = "${data.artist.name} - ${data.album.title}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -67,7 +68,7 @@ fun ItemSong(
             )
         }
 
-        // ⭐ 新增操作按钮：添加到队列
+        // ⭐ 操作按钮：添加到队列
         IconButton(
             onClick = { onAddToQueueClick(data) } // 调用回调，传递当前歌曲
         ) {

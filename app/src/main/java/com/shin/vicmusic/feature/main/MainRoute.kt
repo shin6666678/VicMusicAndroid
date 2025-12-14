@@ -32,7 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import com.shin.vicmusic.core.design.component.MyNavigationBar
 import com.shin.vicmusic.core.design.component.SongBar
 import com.shin.vicmusic.core.design.theme.LocalDividerColor
-import com.shin.vicmusic.core.model.Song
+import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.feature.player.PlayerState
 import com.shin.vicmusic.feature.player.PlayerViewModel
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONG

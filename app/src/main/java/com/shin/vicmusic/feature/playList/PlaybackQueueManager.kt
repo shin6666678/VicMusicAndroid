@@ -3,7 +3,7 @@ package com.shin.vicmusic.feature.playList
 
 import javax.inject.Inject
 import javax.inject.Singleton
-import com.shin.vicmusic.core.model.Song
+import com.shin.vicmusic.core.domain.Song
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
