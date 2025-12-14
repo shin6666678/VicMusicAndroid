@@ -1,22 +1,23 @@
 package com.shin.vicmusic.feature.auth
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.config.AppGlobalData
 import com.shin.vicmusic.core.config.TokenManager
 import com.shin.vicmusic.core.model.User
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton // 更改为 @Singleton
-class AuthViewModel @Inject constructor(
-    private val datasource: MyRetrofitDatasource, // [新增] 注入数据源
-    private val tokenManager: TokenManager // [修改1] 注入 TokenManager
-) : ViewModel() {
+@Singleton// 更改为 @Singleton
+class AuthManager @Inject constructor(
+    private val datasource: MyRetrofitDatasource,
+    private val tokenManager: TokenManager // 必须注入
+) {
+    private val scope = CoroutineScope(SupervisorJob())
 
     // true 表示已登录，false 表示未登录，null 表示尚未确定
     private val _isLoggedIn = MutableStateFlow<Boolean?>(null)
@@ -28,7 +29,7 @@ class AuthViewModel @Inject constructor(
 
     init {
         // [修改2] 初始化时监听 Token，如果有则自动恢复登录
-        viewModelScope.launch {
+        scope.launch {
             tokenManager.tokenFlow.collect { savedToken ->
                 if (!savedToken.isNullOrBlank()) {
                     AppGlobalData.token = savedToken
@@ -48,13 +49,13 @@ class AuthViewModel @Inject constructor(
             fetchUserInfo() // [新增] 登录成功自动获取用户信息
         } else {
             _currentUser.value = null // 登出清空信息
-            viewModelScope.launch { tokenManager.clearToken() }
+            scope.launch { tokenManager.clearToken() }
         }
     }
 
     // [新增] 获取用户信息方法
     fun fetchUserInfo() {
-        viewModelScope.launch {
+        scope.launch {
             val response = datasource.userInfo()
             if (response.status == 0) {
                 _currentUser.value = response.data

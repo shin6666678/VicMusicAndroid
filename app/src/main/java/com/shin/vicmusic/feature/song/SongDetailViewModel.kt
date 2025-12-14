@@ -1,10 +1,12 @@
 package com.shin.vicmusic.feature.song
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle // 导入 SavedStateHandle 用于获取导航参数
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
+import com.shin.vicmusic.feature.player.PlayerManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,8 +30,27 @@ sealed class SongUiState {
 @HiltViewModel
 class SongDetailViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle, // 用于获取导航参数
-    private val datasource: MyRetrofitDatasource
+    private val datasource: MyRetrofitDatasource,
+    private val playerManager: PlayerManager
 ) : ViewModel() {
+
+    val currentPlayingSong=playerManager.currentPlayingSong
+    val playerState=playerManager.playerState
+    fun seekTo(positionMs: Long) {
+        playerManager.seekTo(positionMs)
+    }
+    fun togglePlayPause(){
+        playerManager.togglePlayPause()
+    }
+    fun playSong(song: Song) {
+        playerManager.playSong(song)
+    }
+    fun skipToNext(){
+        playerManager.skipToNext()
+    }
+    fun skipToPrevious(){
+        playerManager.skipToPrevious()
+    }
 
     // 从导航参数中获取 songId
     val songId: String? = savedStateHandle["songId"]
@@ -101,5 +122,7 @@ class SongDetailViewModel @Inject constructor(
             }
         }
     }
+
+
 
 }

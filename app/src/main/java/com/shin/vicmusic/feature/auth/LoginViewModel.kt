@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val authViewModel: AuthViewModel,
+    private val authViewModel: AuthManager,
     private val datasource: MyRetrofitDatasource, // [新增] 注入 API
     private val tokenManager: TokenManager // [修改1] 注入 TokenManager
 ) : ViewModel() {

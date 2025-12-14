@@ -21,38 +21,36 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.media3.common.Player
 import androidx.navigation.NavController
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.feature.player.PlayerState
-import com.shin.vicmusic.feature.player.PlayerViewModel // 导入全局 PlayerViewModel
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONG
+import com.shin.vicmusic.feature.player.PlayerManager
 import com.shin.vicmusic.feature.song.component.PlaybackControlBar
 import com.shin.vicmusic.feature.song.component.PlayerControls
 import com.shin.vicmusic.feature.song.component.RecordPlayerView
 import com.shin.vicmusic.feature.song.component.SongActionButtons
 import com.shin.vicmusic.feature.song.component.SongDetailTopBar
 import com.shin.vicmusic.feature.song.component.SongInfoSection
-import com.shin.vicmusic.util.getPlayerViewModelSingleton
 
 
 @Composable
 fun SongDetailRoute(
     navController: NavController,                                  // 接收 NavController
-    detailViewModel: SongDetailViewModel = hiltViewModel(),        // 获取歌曲详情的 ViewModel
-    playerViewModel: PlayerViewModel = getPlayerViewModelSingleton()           // 获取全局的播放器 ViewModel
+    viewModel: SongDetailViewModel = hiltViewModel(),        // 获取歌曲详情的 ViewModel
 ) {
     // 观察歌曲数据的加载状态
-    val songUiState by detailViewModel.songUiState.collectAsState()
-    val currentPlayingSong by playerViewModel.currentPlayingSong.collectAsState() // 监听当前播放歌曲
+    val songUiState by viewModel.songUiState.collectAsState()
+    val currentPlayingSong by viewModel.currentPlayingSong.collectAsState() // 监听当前播放歌曲
 
     LaunchedEffect(songUiState) {
         if (songUiState is SongUiState.Success) {
             val song = (songUiState as SongUiState.Success).song
             // 避免重复播放（当前播放的就是这首歌时，不重复调用）
             if (currentPlayingSong?.id != song.id) {
-                playerViewModel.playSong(song)
+                viewModel.playSong(song)
             }
         }
     }
@@ -71,17 +69,17 @@ fun SongDetailRoute(
         is SongUiState.Success -> {
             // 数据加载成功，渲染歌曲详情屏幕
             // 从全局 PlayerViewModel 获取播放状态
-            val playerState by playerViewModel.playerState.collectAsState()
+            val playerState by viewModel.playerState.collectAsState()
             SongDetailScreen(
                 song = uiState.song,
                 playerState = playerState,
-                onTogglePlayPause = playerViewModel::togglePlayPause, // 传递播放/暂停回调
-                onSeek = playerViewModel::seekTo,                   // 传递跳转回调
+                onTogglePlayPause = viewModel::togglePlayPause, // 传递播放/暂停回调
+                onSeek = viewModel::seekTo,                   // 传递跳转回调
                 onBackClick = { navController.popBackStack() },
-                onSkipNext = playerViewModel::skipToNext,           // 传递下一首回调
-                onSkipPrevious = playerViewModel::skipToPrevious  ,    // 传递上一首回调
+                onSkipNext = viewModel::skipToNext,           // 传递下一首回调
+                onSkipPrevious = viewModel::skipToPrevious  ,    // 传递上一首回调
                 // [新增] 传递 ViewModel 的 toggleLike 方法
-                onToggleLike = detailViewModel::toggleLike
+                onToggleLike = viewModel::toggleLike
             )
         }
         is SongUiState.Error -> {
@@ -92,7 +90,7 @@ fun SongDetailRoute(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(text = "加载失败: ${uiState.message}", color = MaterialTheme.colorScheme.error)
-                    Button(onClick = { detailViewModel.loadSongDetail(detailViewModel.songId ?: "") }) { // 重试按钮
+                    Button(onClick = { viewModel.loadSongDetail(viewModel.songId ?: "") }) { // 重试按钮
                         Text("重试")
                     }
                 }

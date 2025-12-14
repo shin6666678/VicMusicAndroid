@@ -20,14 +20,13 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController // 导入 NavController
 import com.shin.vicmusic.core.domain.Song
-import com.shin.vicmusic.feature.player.PlayerViewModel
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterProvider
 import com.shin.vicmusic.feature.song.navigateToSongDetail
-import com.shin.vicmusic.util.getPlayerViewModelSingleton
 import androidx.compose.runtime.rememberCoroutineScope
 import com.shin.vicmusic.core.model.User
 import com.shin.vicmusic.feature.discovery.musicHall.MusicHall
 import com.shin.vicmusic.feature.discovery.recommend.Recommend
+import com.shin.vicmusic.feature.player.PlayerManager
 import kotlinx.coroutines.launch
 
 
@@ -35,7 +34,6 @@ import kotlinx.coroutines.launch
 fun DiscoveryRoute(
     navController: NavController,
     viewModel: DiscoveryViewModel = hiltViewModel(),
-    playerViewModel: PlayerViewModel = getPlayerViewModelSingleton()
 ) {
     val datum by viewModel.datum.collectAsState()
     val user by viewModel.user.collectAsState() // [新增] 收集用户状态
@@ -46,7 +44,7 @@ fun DiscoveryRoute(
         toggleDrawer = {}, // 保持原有的空实现，或者替换为实际逻辑
         toSearch = { navController.navigate("search_route") }, // 点击搜索框时导航到搜索界面
         onSongClick = { songId -> navController.navigateToSongDetail(songId) } ,
-        onAddToQueueClick = { song -> playerViewModel.addSongToQueue(song) },
+        onAddToQueueClick = { song -> viewModel.addSongToQueue(song) },
         // [新增] 传递 ViewModel 的 toggleLike 方法
         onLikeClick = viewModel::toggleLike
     )
