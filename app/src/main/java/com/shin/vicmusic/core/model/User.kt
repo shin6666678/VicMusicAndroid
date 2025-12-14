@@ -43,5 +43,8 @@ data class User(
     /**
      * 邮箱 (Mail)
      */
-    val mail: String?=null
+    val mail: String?=null,
+
+    // [新增] 对应 JSON 中的 "vipLevel": "0"
+    val vipLevel: String? = null
 )
