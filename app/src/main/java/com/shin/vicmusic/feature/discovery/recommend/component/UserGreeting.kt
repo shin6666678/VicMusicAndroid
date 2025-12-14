@@ -18,12 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.shin.vicmusic.R
 import com.shin.vicmusic.core.design.component.MyAsyncImage
 import com.shin.vicmusic.core.design.theme.SpaceExtraMedium
 import com.shin.vicmusic.core.design.theme.SpaceMedium
@@ -36,6 +33,14 @@ import com.shin.vicmusic.util.ResourceUtil
 fun UserGreeting(
     user: User?=null
 ) {
+    // 1. 同步 VIP 解析逻辑
+    val vipLevelInt = user?.vipLevel?.toIntOrNull() ?: 0
+    val (vipTagText, vipBgColor, vipTextColor) = when {
+        vipLevelInt >= 6 -> Triple("VIP $vipLevelInt", Color(0xFF000000), Color(0xFFFFD700)) // 黑金配色
+        vipLevelInt >= 1 -> Triple("VIP $vipLevelInt", Color(0xFFD4AF37), Color.White) // 普通 VIP 金色
+        else -> Triple("普通用户", Color.LightGray, Color.White) // 非 VIP 灰色
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -63,10 +68,14 @@ fun UserGreeting(
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(4.dp))
-                    .background(Color(0xFF81C784)) // Light green
+                    .background(vipBgColor)
                     .padding(horizontal = 6.dp, vertical = 2.dp)
             ) {
-                Text(text = "VIP6", style = MaterialTheme.typography.labelSmall, color = Color.White)
+                Text(
+                    text = vipTagText, // 动态文本
+                    style = MaterialTheme.typography.labelSmall,
+                    color = vipTextColor // 动态颜色
+                )
             }
             Spacer(modifier = Modifier.width(SpaceExtraMedium))
             // Another badge - Simplified
@@ -92,6 +101,11 @@ fun UserGreeting(
 @Composable
 fun PreviewUserGreeting() {
     VicMusicTheme {
-        UserGreeting()
+        UserGreeting(
+            User(
+                name = "发现界面测试用户",
+                vipLevel = "6"
+            )
+        )
     }
 }

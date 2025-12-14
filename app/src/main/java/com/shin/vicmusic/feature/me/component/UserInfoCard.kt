@@ -27,7 +27,14 @@ import com.shin.vicmusic.feature.me.ActionItem // 确保导入了 ActionItem
 @Preview
 @Composable
 fun UserInfoCardPreview() {
-    UserInfoCard(onAvatarClick = {}, isLoggedIn = true,user = null)
+    UserInfoCard(
+        onAvatarClick = {},
+        isLoggedIn = true,
+        user = User(
+            name = "登录情况测试用户",
+            vipLevel = "5",
+        )
+    )
 }
 
 @Composable
@@ -67,6 +74,17 @@ fun UserInfoCard(
 
 @Composable
 private fun LoggedInHeader(onAvatarClick: () -> Unit, user: User?) {
+    // 1. 解析 VIP 等级 (默认为 0)
+    val vipLevelInt = user?.vipLevel?.toIntOrNull() ?: 0
+
+    // 2. 根据等级定义 UI 样式 (颜色和文字)
+    // 这里是一个简单的示例逻辑，你可以根据需求调整颜色和等级划分
+    val (vipTagText, vipBgColor, vipTextColor) = when {
+        vipLevelInt >= 6 -> Triple("VIP $vipLevelInt", Color(0xFF000000), Color(0xFFFFD700)) // 黑金配色
+        vipLevelInt >= 1 -> Triple("VIP $vipLevelInt", Color(0xFFD4AF37), Color.White) // 普通 VIP 金色
+        else -> Triple("普通用户", Color.LightGray, Color.White) // 非 VIP 灰色
+    }
+
     Row(verticalAlignment = Alignment.CenterVertically) {
         AsyncImage(
             model = user?.headImg ?: "https://picsum.photos/200",
@@ -82,7 +100,7 @@ private fun LoggedInHeader(onAvatarClick: () -> Unit, user: User?) {
         Spacer(Modifier.width(16.dp))
         Column(verticalArrangement = Arrangement.Center) {
             Text(
-                text = user?.name ?: "Shin_Music",
+                text = user?.name ?: "未登录用户",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -90,14 +108,14 @@ private fun LoggedInHeader(onAvatarClick: () -> Unit, user: User?) {
             // VIP 标签
             Surface(
                 shape = RoundedCornerShape(4.dp),
-                color = Color(0xFFD4AF37),
+                color = vipBgColor,
                 modifier = Modifier.padding(vertical = 2.dp)
             ) {
                 Text(
-                    text = "VIP",
+                    text = vipTagText,
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White,
+                    color = vipTextColor,
                     modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
                 )
             }
