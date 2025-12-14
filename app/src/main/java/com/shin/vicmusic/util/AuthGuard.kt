@@ -1,7 +1,7 @@
 package com.shin.vicmusic.util
 
 import androidx.navigation.NavController
-import com.shin.vicmusic.feature.auth.AuthViewModel
+import com.shin.vicmusic.feature.auth.AuthManager
 
 import com.shin.vicmusic.feature.auth.navigateToLogin
 
@@ -11,10 +11,10 @@ import com.shin.vicmusic.feature.auth.navigateToLogin
  * - 未登录：跳转到登录页
  */
 fun NavController.checkLoginAndRun(
-    authViewModel: AuthViewModel,
+    authManager: AuthManager,
     block: () -> Unit
 ) {
-    if (authViewModel.isLoggedIn.value == true) {
+    if (authManager.isLoggedIn.value == true) {
         block()
     } else {
         this.navigateToLogin()

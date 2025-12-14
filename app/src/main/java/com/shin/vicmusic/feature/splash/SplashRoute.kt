@@ -25,19 +25,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.shin.vicmusic.R
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
 import com.shin.vicmusic.util.SuperDateUtil
-import androidx.hilt.navigation.compose.hiltViewModel // 导入 hiltViewModel
-import com.shin.vicmusic.feature.auth.AuthViewModel
 
 @Composable
 fun SplashRoute(
     toMain:()->Unit,
     toLogin:()->Unit,
     viewModel: SplashViewModel= viewModel(),
-    //authViewModel: AuthViewModel = hiltViewModel()
 ){
     val timeLeft by viewModel.timeLeft.collectAsStateWithLifecycle()
     val navigateToMain by viewModel.navigateToMain.collectAsState()
-    //val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
 
     SplashScreen(
         year = SuperDateUtil.currentYear(),

@@ -33,28 +33,29 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.shin.vicmusic.core.model.User
-import com.shin.vicmusic.feature.auth.AuthViewModel
+import com.shin.vicmusic.feature.auth.AuthManager
 import com.shin.vicmusic.feature.liked.LikedScreen
 import com.shin.vicmusic.feature.me.component.MeTopBar
 import com.shin.vicmusic.feature.me.component.TopNotifyBar
 import com.shin.vicmusic.feature.me.component.UserInfoCard
-import com.shin.vicmusic.util.getAuthViewModelSingleton
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MeRoute(
     onAvatarClick: () -> Unit = {},
-    authViewModel: AuthViewModel = getAuthViewModelSingleton()
+    viewModel: MeViewModel = hiltViewModel()
 ) {
-    val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
-    val currentUser by authViewModel.currentUser.collectAsState() // [新增] 观察 currentUser
+    val isLoggedIn by viewModel.isLoggedIn.collectAsState()
+    val currentUser by viewModel.currentUser.collectAsState() // [新增] 观察 currentUser
 
     // [新增] 如果已登录但无用户信息，尝试获取
     LaunchedEffect(isLoggedIn) {
         if (isLoggedIn == true && currentUser == null) {
-            authViewModel.fetchUserInfo()
+            viewModel.fetchUserInfo()
         }
     }
 

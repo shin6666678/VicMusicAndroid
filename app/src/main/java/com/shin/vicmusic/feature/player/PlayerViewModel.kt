@@ -24,6 +24,10 @@ import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
 import androidx.core.content.edit
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 
 /**
  * 播放器状态数据类。
@@ -42,13 +46,14 @@ data class PlayerState(
  * 这是一个应用作用域的单例ViewModel，负责管理整个应用的 ExoPlayer 实例和播放状态。
  * 所有需要播放器功能的 Composable 都可以注入此 ViewModel 来控制和观察播放。
  */
-@Singleton     // 保持 Singleton 以表明它是单例意图（虽然 HiltViewModel 生命周期由 ViewModelStoreOwner 决定，但在单 Activity 应用中 MainRoute 获取的实例实际上是全局的）
-class PlayerViewModel @Inject constructor(
+@Singleton
+class PlayerManager @Inject constructor(
     @ApplicationContext private val context: Context, // Hilt 注入应用上下文
     private val queueManager: PlaybackQueueManager
-) : ViewModel() {
-
-    private val TAG = "PlayerViewModel"
+) {
+    // [修改1] 创建自定义协程作用域，使用 Main Dispatcher 以便安全更新 UI 状态
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private val TAG = "PlayerManager"
 
     // 应用程序中唯一的 ExoPlayer 实例
     private var exoPlayer: ExoPlayer? = null
@@ -78,7 +83,7 @@ class PlayerViewModel @Inject constructor(
         restoreLastPlayedSong()
 
         // [新增] 监听歌曲变化并保存到本地
-        viewModelScope.launch {
+        scope.launch {
             currentPlayingSong.collect { song ->
                 song?.let {
                     val json = Json.encodeToString(it)
@@ -201,7 +206,7 @@ class PlayerViewModel @Inject constructor(
         // 如果任务已存在，先取消旧任务，防止重复启动
         progressJob?.cancel()
 
-        progressJob = viewModelScope.launch {
+        progressJob = scope.launch {
             // 确保协程在 ViewModel 生命周期内运行
             while (isActive && exoPlayer != null) {
                 exoPlayer?.let { player ->
@@ -284,17 +289,14 @@ class PlayerViewModel @Inject constructor(
         })
     }
 
-    /**
-     * 当 ViewModel 被销毁时调用，用于释放 ExoPlayer 资源。
-     */
-    override fun onCleared() {
-        super.onCleared()
+    // 在单例模式下，通常不需要调用 release，除非是在应用退出时（Android 会自动回收进程资源）
+    fun release() {
         exoPlayer?.release()
         exoPlayer = null
-        stopProgressUpdate() // 停止任何正在进行的进度更新
-        _playerState.update { PlayerState() } // 重置播放器状态
-        _currentPlayingSong.value = null // 清空当前播放歌曲
-        Log.d(TAG, "PlayerViewModel被销毁,ExoPlayer资源释放")
+        stopProgressUpdate()
+        _playerState.update { PlayerState() }
+        _currentPlayingSong.value = null
+        Log.d(TAG, "PlayerManager 资源释放")
     }
 
     /**
