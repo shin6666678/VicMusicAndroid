@@ -45,14 +45,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.shin.vicmusic.R // 确保导入 R
+import com.shin.vicmusic.core.design.composition.LocalPlayerManager
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONGS
 import com.shin.vicmusic.feature.discovery.DiscoveryViewModel
@@ -68,13 +67,10 @@ fun MusicHallPreview() {
 fun MusicHall(
     viewModel: DiscoveryViewModel = hiltViewModel(),
     songs:List<Song>,
-    onSongClick: (String) -> Unit = {},
-    onAddToQueueClick: (Song) -> Unit = {},
     // [新增] 传递回调
     onLikeClick: (Song) -> Unit = {}
 ) {
-    // 获取 ViewModel 中的歌曲列表
-    val songList by viewModel.datum.collectAsState()
+    val playerManager = LocalPlayerManager.current
 
     LazyColumn(
         modifier = Modifier
@@ -96,15 +92,15 @@ fun MusicHall(
 
         // 4. "全部播放" 悬浮条头
         item {
-            PlayAllHeader(count = songList.size)
+            PlayAllHeader(count = songs.size)
         }
 
         // 5. 歌曲列表 (复用你刚才改好的 ItemSong)
-        items(songList) { song ->
+        items(songs) { song ->
             ItemSong(
                 song = song,
-                modifier = Modifier.clickable { onSongClick(song.id) } ,
-                onAddToQueueClick = { onAddToQueueClick(song) },
+                modifier = Modifier.clickable { playerManager.playSong(song)} ,
+                onAddToQueueClick = { playerManager.addSongToQueue(song) },
                 onLikeClick = onLikeClick
             )
         }
@@ -276,7 +272,5 @@ fun PlayAllHeader(count: Int) {
         )
         Spacer(modifier = Modifier.weight(1f))
 
-        // 可选：右侧多选按钮
-        // Icon(...)
     }
 }

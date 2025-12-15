@@ -26,13 +26,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.media3.common.Player
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState // 导入 currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.shin.vicmusic.core.design.component.MyNavigationBar
 import com.shin.vicmusic.core.design.component.SongBar
+import com.shin.vicmusic.core.design.composition.LocalPlayerManager
 import com.shin.vicmusic.core.design.theme.LocalDividerColor
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.feature.player.PlayerState
@@ -41,7 +40,6 @@ import com.shin.vicmusic.feature.auth.navigateToLogin
 import com.shin.vicmusic.feature.discovery.DiscoveryRoute
 import com.shin.vicmusic.feature.feed.FeedRoute
 import com.shin.vicmusic.feature.me.MeRoute
-import com.shin.vicmusic.feature.player.PlayerManager
 import com.shin.vicmusic.feature.search.SEARCH_ROUTE // 导入 SEARCH_ROUTE
 import com.shin.vicmusic.feature.shortVideo.ShortVideoRoute
 import com.shin.vicmusic.feature.song.PlaybackQueueSheet
@@ -71,16 +69,16 @@ fun MainPreView(){
 fun MainRoute(
     finishPage:()-> Unit,
     navController:NavHostController,
-    viewModel: MainViewModel=hiltViewModel(),
 ){
+    val playerManager = LocalPlayerManager.current
     // 观察当前播放的歌曲
-    val currentPlayingSong by viewModel.currentPlayingSong.collectAsState()
+    val currentPlayingSong by playerManager.currentPlayingSong.collectAsState()
     // 观察播放器状态
-    val playerState by viewModel.playerState.collectAsState()
+    val playerState by playerManager.playerState.collectAsState()
 
     // ⭐ 1. 播放队列和索引的观察
-    val playbackQueue by viewModel.playbackQueue.collectAsState()
-    val currentQueueIndex by viewModel.currentQueueIndex.collectAsState()
+    val playbackQueue by playerManager.playbackQueue.collectAsState()
+    val currentQueueIndex by playerManager.currentQueueIndex.collectAsState()
 
     // ⭐ 2. 底部抽屉的显示状态
     var showQueueSheet by remember { mutableStateOf(false) }
@@ -104,7 +102,7 @@ fun MainRoute(
                     navController.navigateToSongDetail(song.id)
                 }
             },
-            onSongBarTogglePlayPause = viewModel::togglePlayPause,
+            onSongBarTogglePlayPause = playerManager::togglePlayPause,
             onSongBarLikeClick = { /* TODO: 实现点赞逻辑 */ },
             onSongBarPlaylistClick = { showQueueSheet = true },
             onAvatarClick = { navController.navigateToLogin() },
@@ -122,11 +120,11 @@ fun MainRoute(
                     queue = playbackQueue,
                     currentIndex = currentQueueIndex,
                     onSongClick = { index ->
-                        viewModel.playSongAtIndex(index)
+                        playerManager.playSongAtIndex(index)
                         showQueueSheet = false
                     },
                     onRemoveSong = { index ->
-                        viewModel.removeSong(index)
+                        playerManager.removeSong(index)
                     },
                     onClose = { showQueueSheet = false },
                     modifier = Modifier.align(Alignment.BottomCenter)
