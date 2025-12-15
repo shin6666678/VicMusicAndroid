@@ -45,4 +45,9 @@ data class User(
 
     // [新增] 对应 JSON 中的 "vipLevel": "0"
     val vipLevel: String? = null
-)
+
+){
+    fun isVip(): Boolean {
+        return vipLevel != null && vipLevel != "0"
+    }
+}
