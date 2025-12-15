@@ -35,7 +35,7 @@ fun SongListItemDto.toDomain(): Song {
     return Song(
         id = this.id,
         title = this.title,
-        uri = null, // 列表接口未返回，填充 null
+        uri = this.uri,
         icon = this.icon,
         album = this.album.toDomain(),
         artist = this.artist.toDomain(),
