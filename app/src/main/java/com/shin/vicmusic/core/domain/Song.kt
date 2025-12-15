@@ -1,6 +1,8 @@
 package com.shin.vicmusic.core.domain // 建议将 core.model 迁移至 core.domain
 
+import androidx.media3.common.MediaItem
 import com.shin.vicmusic.util.Constant
+import com.shin.vicmusic.util.ResourceUtil
 import kotlinx.serialization.Serializable
 
 /**
@@ -25,4 +27,12 @@ data class Song (
     val uploaderUserId: String?=null,
     val createdAt: String?=null,
     val updatedAt: String?=null
-)
+
+){
+    /**
+     * 将 Song 转换为 ExoPlayer 需要的 MediaItem
+     */
+    fun toMediaItem(): MediaItem {
+        return MediaItem.fromUri(ResourceUtil.r2(this.uri ?: ""))
+    }
+}

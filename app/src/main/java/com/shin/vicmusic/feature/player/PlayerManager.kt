@@ -2,6 +2,7 @@ package com.shin.vicmusic.feature.player
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
@@ -22,9 +23,16 @@ import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
 import androidx.core.content.edit
+import com.shin.vicmusic.core.data.repository.PlayerRepository
+import com.shin.vicmusic.core.domain.PayType
+import com.shin.vicmusic.core.domain.usecase.CheckVipPermissionUseCase
+import com.shin.vicmusic.feature.auth.AuthManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
 /**
  * 播放器状态数据类。
@@ -39,98 +47,166 @@ data class PlayerState(
 )
 
 /**
- * 全局播放器 ViewModel。
- * 这是一个应用作用域的单例ViewModel，负责管理整个应用的 ExoPlayer 实例和播放状态。
- * 所有需要播放器功能的 Composable 都可以注入此 ViewModel 来控制和观察播放。
+ * 全局播放器 ViewModel。负责管理整个应用的 ExoPlayer 实例和播放状态。
  */
 @Singleton
 class PlayerManager @Inject constructor(
     @ApplicationContext private val context: Context, // Hilt 注入应用上下文
-    private val queueManager: PlaybackQueueManager
+    private val queueManager: PlaybackQueueManager,
+    private val playerRepository: PlayerRepository,          // [注入] 仓库
+    private val checkVipPermission: CheckVipPermissionUseCase // [注入] UseCase
 ) {
-    // [修改1] 创建自定义协程作用域，使用 Main Dispatcher 以便安全更新 UI 状态
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private val TAG = "PlayerManager"
-
-    // 应用程序中唯一的 ExoPlayer 实例
     private var exoPlayer: ExoPlayer? = null
 
-    // 当前正在播放的歌曲
     private val _currentPlayingSong = MutableStateFlow<Song?>(null)
     val currentPlayingSong: StateFlow<Song?> = _currentPlayingSong.asStateFlow()
 
-    // 播放队列中的所有歌曲（核心数据）
     val currentQueueIndex: StateFlow<Int> = queueManager.currentIndex
-    // 供外部观察，用于显示在播放列表详情界面 (Playlist Detail UI)
     val playbackQueue: StateFlow<List<Song>> = queueManager.queue
 
-    // 播放器状态
     private val _playerState = MutableStateFlow(PlayerState())
     val playerState: StateFlow<PlayerState> = _playerState.asStateFlow()
+
+    // [新增] UI 事件流，用于通知 UI 层显示 Toast 或 Dialog
+    private val _uiEvent = MutableSharedFlow<String>()
+    val uiEvent: SharedFlow<String> = _uiEvent.asSharedFlow()
 
     // 用于管理播放进度更新协程的 Job
     private var progressJob: Job? = null
 
     init {
-        // ViewModel 初始化时，创建 ExoPlayer 实例。
-        // 此实例将在整个应用生命周期中保持不变。
         exoPlayer = ExoPlayer.Builder(context).build()
-        setupPlayerListener() // 设置 ExoPlayer 监听器以更新播放状态
-        // [新增] 恢复上次播放的歌曲
+        setupPlayerListener()
+
+        //恢复播放历史
         restoreLastPlayedSong()
 
-        // [新增] 监听歌曲变化并保存到本地
+        //监听当前歌曲变化并自动保存
         scope.launch {
             currentPlayingSong.collect { song ->
-                song?.let {
-                    val json = Json.encodeToString(it)
-                    context.getSharedPreferences("vic_music_prefs", Context.MODE_PRIVATE)
-                        .edit { putString("last_song", json) }
-                }
+                playerRepository.saveLastPlayedSong(song)
             }
         }
-        Log.d(TAG, "PlayerViewModel initialized. ExoPlayer instance created.")
+        Log.d(TAG, "PlayerViewModel initialized.")
     }
 
     /**
-     * 播放指定的歌曲。
-     * 如果当前有歌曲正在播放，将停止并播放新歌曲。
-     * @param song 要播放的歌曲对象
-     * @param queue 可选参数：如果提供，则设置一个新队列，并播放该歌曲。
+     * [核心方法] 统一切歌逻辑
+     * 包含：边界检查 -> VIP权限检查 -> 队列更新 -> Player跳转
+     * @param index 目标索引
+     * @param showToast 如果无权限，是否显示 Toast 提示 (自动连播时通常不弹窗)
+     * @return 是否切换成功
      */
-    fun playSong(song: Song, queue: List<Song>? = null) {
-        val newQueue = queue ?: listOf(song)
-        val startIndex = newQueue.indexOfFirst { it.id == song.id } // 找到歌曲在队列中的索引
+    private suspend fun performSwitchSong(index: Int, showToast: Boolean = true): Boolean {
+        val queue = playbackQueue.value
+        if (index !in queue.indices || exoPlayer == null) return false
 
-        // 1. 更新播放队列状态
-        queueManager.setQueue(newQueue, startIndex)
+        val targetSong = queue[index]
+
+        // 1. 权限检查
+        val isAllowed = checkVipPermission(targetSong)
+        if (!isAllowed) {
+            if (showToast) {
+                _uiEvent.emit("VIP专享歌曲，请开通VIP(VIP Only)")
+            }
+            return false
+        }
+
+        // 2. 更新队列状态
+        queueManager.updateIndex(index)
         _currentPlayingSong.value = queueManager.getCurrentSong()
 
-        // 2. 更新 ExoPlayer 媒体项
-        val mediaItems = newQueue.map { MediaItem.fromUri(ResourceUtil.r2(it.uri?:"")) }
-
+        // 3. 操作播放器
         exoPlayer?.apply {
-            setMediaItems(mediaItems) // 设置整个队列
-            seekTo(startIndex, 0)     // 跳转到正确的索引
-            prepare()
+            seekTo(index, 0)
             playWhenReady = true
         }
+        // 确保状态更新为播放中
         _playerState.update { it.copy(isPlaying = true) }
         startProgressUpdate()
-        Log.d(TAG, "播放歌曲: ${song.title} . Index为: $startIndex, 队列大小: ${newQueue.size}")
+
+        Log.d(TAG, "切歌成功: ${targetSong.title}, Index: $index")
+        return true
+    }
+
+
+    /**
+     * 播放指定的歌曲（通常用于点击列表中的某首歌开始播放新列表）
+     */
+    fun playSong(song: Song, queue: List<Song>? = null) {
+        scope.launch {
+            // 对于 playSong，因为可能涉及重置队列，所以单独处理权限逻辑
+            val isAllowed = checkVipPermission(song)
+            if (!isAllowed) {
+                _uiEvent.emit("VIP专享歌曲，请开通VIP(VIP Only)")
+                return@launch
+            }
+
+            val newQueue = queue ?: listOf(song)
+            val startIndex = newQueue.indexOfFirst { it.id == song.id }
+
+            // 1. 重置队列
+            queueManager.setQueue(newQueue, startIndex)
+            _currentPlayingSong.value = queueManager.getCurrentSong()
+
+            // 2. 重置 Player MediaItems
+            val mediaItems = newQueue.map { it.toMediaItem() }
+
+            exoPlayer?.apply {
+                setMediaItems(mediaItems)
+                seekTo(startIndex, 0)
+                prepare()
+                playWhenReady = true
+            }
+            _playerState.update { it.copy(isPlaying = true) }
+            startProgressUpdate()
+            Log.d(TAG, "播放新队列: ${song.title}")
+        }
     }
 
     /**
-     * 切换当前歌曲的播放/暂停状态。
+     * 播放当前队列中指定索引的歌曲
+     */
+    fun playSongAtIndex(index: Int) {
+        scope.launch {
+            performSwitchSong(index, showToast = true)
+        }
+    }
+
+    /**
+     * 下一首
+     */
+    fun skipToNext() {
+        scope.launch {
+            val nextIndex = queueManager.getNextIndex()
+            if (nextIndex != -1) {
+                performSwitchSong(nextIndex, showToast = true)
+            }
+        }
+    }
+
+    /**
+     * 上一首
+     */
+    fun skipToPrevious() {
+        scope.launch {
+            // 如果队列为空直接返回
+            if (playbackQueue.value.isEmpty()) return@launch
+
+            val prevIndex = queueManager.getPreviousIndex()
+            performSwitchSong(prevIndex, showToast = true)
+        }
+    }
+    /**
+     * 切换播放/暂停
      */
     fun togglePlayPause() {
         exoPlayer?.let {
-
-            // [新增] 如果播放已结束，手动跳转回开头
             if (it.playbackState == Player.STATE_ENDED) {
                 it.seekTo(0)
             }
-
             if (it.isPlaying) {
                 it.pause()
                 stopProgressUpdate()
@@ -138,90 +214,79 @@ class PlayerManager @Inject constructor(
                 it.play()
                 startProgressUpdate()
             }
-            _playerState.update { state -> state.copy(isPlaying = it.isPlaying) } // 更新 isPlaying 状态
-            Log.d(TAG, "歌曲播放状态切换为: ${it.isPlaying}")
+            _playerState.update { state -> state.copy(isPlaying = it.isPlaying) }
         }
     }
 
     /**
-     * 跳转到当前歌曲的指定位置。
-     * @param positionMs 要跳转到的位置 (毫秒)
+     * 进度条拖动
      */
     fun seekTo(positionMs: Long) {
         exoPlayer?.seekTo(positionMs)
-        _playerState.update { it.copy(currentPosition = positionMs) } // 立即更新当前位置
-        Log.d(TAG, "跳转到当前歌曲的: $positionMs ms")
+        _playerState.update { it.copy(currentPosition = positionMs) }
+    }
+    /**
+     * 移除歌曲
+     */
+    fun removeSong(index: Int) {
+        val queue = playbackQueue.value
+        if (index in queue.indices) {
+            queueManager.removeSongAt(index)
+            exoPlayer?.removeMediaItem(index)
+            Log.d(TAG, "已移除索引: $index")
+        }
     }
 
     /**
-     * 跳到播放列表中的下一首歌曲。
+     * 释放资源
      */
-    fun skipToNext() {
-        // 1. 计算下一个索引
-        val nextIndex = queueManager.getNextIndex()
-        if (nextIndex == -1) return
-
-        // 2.更新 Manager 的索引
-        queueManager.updateIndex(nextIndex)
-        _currentPlayingSong.value = queueManager.getCurrentSong()
-
-        // 3. 通知 ExoPlayer 跳转
-        exoPlayer?.apply {
-            seekToNextMediaItem()
-            playWhenReady = true // 确保跳转后继续播放
-        }
-        Log.d(TAG,"跳转到下一首歌曲,索引为:$nextIndex")
+    fun release() {
+        exoPlayer?.release()
+        exoPlayer = null
+        stopProgressUpdate()
+        _playerState.update { PlayerState() }
+        _currentPlayingSong.value = null
+    }
+    /**
+     * 添加歌曲到队尾
+     */
+    fun addSongToQueue(song: Song) {
+        queueManager.addSong(song)
+        exoPlayer?.addMediaItem(song.toMediaItem())
     }
 
-    /**
-     * 跳到播放列表中的上一首歌曲
-     */
-    fun skipToPrevious() {
-        val queue = playbackQueue.value // 使用公开的 flow 属性获取数据
-        if (queue.isEmpty() || exoPlayer == null) {
-            Log.w(TAG, "Queue is empty or player is null, cannot skip previous.")
-            return
+    // 内部: 恢复上次播放状态
+    private fun restoreLastPlayedSong() {
+        try {
+            val song = playerRepository.getLastPlayedSong()
+            if (song != null) {
+                queueManager.setQueue(listOf(song), 0)
+                _currentPlayingSong.value = song
+                exoPlayer?.setMediaItem(song.toMediaItem())
+                exoPlayer?.prepare()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-
-        // ⭐ 1. 委托：计算上一个索引并更新 Manager 内部状态
-        val prevIndex = queueManager.getPreviousIndex()
-        queueManager.updateIndex(prevIndex) // 更新 Manager 的内部状态
-
-        // 2. 通知 ExoPlayer 跳转 (命令)
-        exoPlayer?.apply {
-            seekToPreviousMediaItem()
-            playWhenReady = true
-        }
-        Log.d(TAG,"跳转到上一首歌曲,索引为:$prevIndex")
     }
-
-    /**
-     * 启动一个协程循环，每隔 200ms 更新一次播放进度。
-     * 这保证了 UI 进度条的流畅更新，同时避免了主线程阻塞。
-     */
+    // 内部: 进度更新协程
     private fun startProgressUpdate() {
-        // 如果任务已存在，先取消旧任务，防止重复启动
         progressJob?.cancel()
-
         progressJob = scope.launch {
-            // 确保协程在 ViewModel 生命周期内运行
             while (isActive && exoPlayer != null) {
                 exoPlayer?.let { player ->
-                    val currentPos = player.currentPosition
-                    val totalDuration = player.duration
-                    val bufferedPos = player.bufferedPosition
-
-                    // 通过 StateFlow 更新 UI
-                    _playerState.update { currentState ->
-                        currentState.copy(
-                            currentPosition = if (currentPos >= 0) currentPos else 0,
-                            // duration 为 -9223372036854775807L (C.TIME_UNSET) 表示未知，需处理
-                            duration = if (totalDuration > 0) totalDuration else 0,
-                            bufferedPosition = bufferedPos
-                        )
+                    // 只有在播放时才频繁更新
+                    if (player.isPlaying) {
+                        _playerState.update {
+                            it.copy(
+                                currentPosition = player.currentPosition.coerceAtLeast(0),
+                                duration = player.duration.coerceAtLeast(0),
+                                bufferedPosition = player.bufferedPosition
+                            )
+                        }
                     }
                 }
-                delay(200L) // 更新频率：每 200 毫秒
+                delay(200L)
             }
         }
     }
@@ -234,142 +299,39 @@ class PlayerManager @Inject constructor(
         progressJob = null
     }
 
-    /**
-     * 设置 ExoPlayer 监听器，以便在播放状态变化时自动更新 ViewModel 内部状态。
-     */
+    // 内部: Player 事件监听
     private fun setupPlayerListener() {
         exoPlayer?.addListener(object : Player.Listener {
-            // 1. 监听播放状态改变
             override fun onIsPlayingChanged(isPlaying: Boolean) {
-                // 根据播放状态来启动/停止进度更新协程
-                if (isPlaying) {
-                    startProgressUpdate()
-                } else {
-                    stopProgressUpdate()
-                }
-                // 更新 StateFlow 中的 isPlaying 状态，供 UI 观察
+                if (isPlaying) startProgressUpdate() else stopProgressUpdate()
                 _playerState.update { it.copy(isPlaying = isPlaying) }
-                Log.d(TAG, "ExoPlayer onIsPlayingChanged: $isPlaying")
             }
 
-            // 2. 监听播放状态改变 (如：准备就绪、缓冲、播放结束)
             override fun onPlaybackStateChanged(playbackState: Int) {
                 if (playbackState == Player.STATE_ENDED) {
-                    Log.d(TAG, "ExoPlayer onPlaybackStateChanged: STATE_ENDED, attempting to skip next.")
+                    scope.launch {
+                        val nextIndex = queueManager.getNextIndex()
+                        val currentIdx = currentQueueIndex.value
+                        val queueSize = playbackQueue.value.size
 
-                    //  1. 委托 Manager 获取下一索引
-                    val nextIndex = queueManager.getNextIndex()
-                    val currentQueueIndexValue = currentQueueIndex.value // 使用暴露的 Flow 获取当前索引
-                    val currentQueueSize = playbackQueue.value.size
-
-                    if (currentQueueSize > 0 && nextIndex != currentQueueIndexValue) {
-                        // 如果队列非空且下一首不是当前这首（即需要继续播放）
-
-                        //  2. 更新 Manager 状态
-                        queueManager.updateIndex(nextIndex)
-
-                        // 3. 跳转到计算出的下一首歌
-                        exoPlayer?.apply {
-                            seekTo(nextIndex, 0)
-                            playWhenReady = true
+                        if (queueSize > 0 && nextIndex != currentIdx) {
+                            // 自动切歌：调用通用逻辑，但不显示Toast (showToast = false)
+                            // 如果自动切歌遇到VIP歌曲且无权限，则停止播放
+                            val success = performSwitchSong(nextIndex, showToast = false)
+                            if (!success) {
+                                _playerState.update { it.copy(isPlaying = false, currentPosition = 0) }
+                                stopProgressUpdate()
+                                Log.d(TAG, "自动切歌失败(无权限)，停止播放")
+                            }
+                        } else {
+                            // 列表播放结束
+                            _playerState.update { it.copy(isPlaying = false, currentPosition = 0) }
+                            stopProgressUpdate()
                         }
-                        Log.d(TAG, "STATE_ENDED: Forced seek to index $nextIndex (Next song).")
-
-                    } else {
-                        // 播放结束或队列为空，停止播放
-                        _playerState.update { it.copy(isPlaying = false, currentPosition = 0) }
-                        stopProgressUpdate()
-                        Log.d(TAG, "STATE_ENDED: Playback stopped.")
                     }
                 }
             }
         })
     }
 
-    // 在单例模式下，通常不需要调用 release，除非是在应用退出时（Android 会自动回收进程资源）
-    fun release() {
-        exoPlayer?.release()
-        exoPlayer = null
-        stopProgressUpdate()
-        _playerState.update { PlayerState() }
-        _currentPlayingSong.value = null
-        Log.d(TAG, "PlayerManager 资源释放")
-    }
-
-    /**
-     * 将一首歌曲添加到当前的播放队列末尾。
-     * @param song 要添加的歌曲对象
-     */
-    fun addSongToQueue(song: Song) {
-        queueManager.addSong(song)
-        val mediaItem = MediaItem.fromUri(ResourceUtil.r2(song.uri ?:""))
-        exoPlayer?.addMediaItem(mediaItem)
-        Log.d(TAG,"添加歌曲,${song.title}")
-    }
-
-    /**
-     * 播放队列中指定索引的歌曲。
-     * @param index 歌曲在当前队列中的索引
-     */
-    fun playSongAtIndex(index: Int) {
-        val queue = playbackQueue.value // 使用公开的 flow 属性获取数据
-        if (index !in queue.indices || exoPlayer == null) {
-            Log.e(TAG, "队列中不存在索引$index,或exoplayer为空")
-            return
-        }
-
-        //  1.更新 Manager 内部状态
-        queueManager.updateIndex(index)
-
-        // 2. 通知 ExoPlayer 跳转
-        exoPlayer?.apply {
-            seekTo(index, 0) // 跳转到队列中的指定索引
-            playWhenReady = true
-        }
-
-        // 3. 播放状态更新
-        _playerState.update { it.copy(isPlaying = true) }
-        startProgressUpdate()
-
-        Log.d(TAG, "播放索引更新为:$index")
-    }
-
-    /**
-     * ⭐ [新增] 從隊列中移除指定索引的歌曲
-     */
-    fun removeSong(index: Int) {
-        val queue = playbackQueue.value
-        if (index in queue.indices) {
-            // 1. 更新 Manager 內部狀態
-            queueManager.removeSongAt(index)
-
-            // 2. 通知 ExoPlayer 移除該 MediaItem
-            // ExoPlayer 會自動處理移除當前播放項目的邏輯（通常是跳到下一首或停止）
-            exoPlayer?.removeMediaItem(index)
-
-            Log.d(TAG, "已移除索引為 $index 的歌曲")
-        }
-    }
-
-    // [新增] 恢复逻辑函数
-    private fun restoreLastPlayedSong() {
-        try {
-            val prefs = context.getSharedPreferences("vic_music_prefs", Context.MODE_PRIVATE)
-            val json = prefs.getString("last_song", null)
-            if (json != null) {
-                val song = Json.decodeFromString<Song>(json)
-                // 恢复队列管理器状态（单曲队列）
-                queueManager.setQueue(listOf(song), 0)
-                // 显式更新当前歌曲状态
-                _currentPlayingSong.value = song
-
-                // 准备播放器资源，但不调用 play()
-                val mediaItem = MediaItem.fromUri(ResourceUtil.r2(song.uri?: ""))
-                exoPlayer?.setMediaItem(mediaItem)
-                exoPlayer?.prepare()
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
 }
