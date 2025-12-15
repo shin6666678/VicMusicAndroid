@@ -1,10 +1,12 @@
 package com.shin.vicmusic.core.domain // 建议将 core.model 迁移至 core.domain
 
 import com.shin.vicmusic.util.Constant
+import kotlinx.serialization.Serializable
 
 /**
  * 歌曲领域模型 (Domain Model) - 用于业务逻辑层和 UI 层
  */
+@Serializable
 data class Song (
     val id:String,
     val title:String,

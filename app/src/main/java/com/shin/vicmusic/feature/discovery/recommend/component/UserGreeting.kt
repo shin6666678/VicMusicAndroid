@@ -85,7 +85,7 @@ fun UserGreeting(
                     .background(Color.LightGray)
                     .padding(horizontal = 6.dp, vertical = 2.dp)
             ) {
-                Text(text = "V1", style = MaterialTheme.typography.labelSmall, color = Color.DarkGray)
+                Text(text = "LV1", style = MaterialTheme.typography.labelSmall, color = Color.DarkGray)
             }
         }
         Spacer(modifier = Modifier.weight(1f)) // Pushes content to the right

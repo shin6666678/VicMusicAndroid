@@ -26,11 +26,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.shin.vicmusic.core.design.theme.LocalDividerColor
 import com.shin.vicmusic.core.design.theme.SpaceExtraMedium
 import com.shin.vicmusic.core.design.theme.SpaceOuter
 
+@Preview
+@Composable
+fun PreviewDiscoveryTopBar() {
+    DiscoveryTopBar(
+        toSearch = {},
+        selectedTabIndex = 0,
+        onTabSelected = {}
+    )
+}
 /**
  * 发现顶部标题栏
  */
@@ -40,7 +50,7 @@ fun DiscoveryTopBar(
     selectedTabIndex: Int,
     onTabSelected: (Int) -> Unit
 ) {
-    val tabs = listOf("推荐", "乐馆")
+    val tabs = listOf("推荐", "乐馆","测试列")
     Column(
         modifier = Modifier
             .fillMaxWidth()
