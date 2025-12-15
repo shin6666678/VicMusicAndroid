@@ -24,6 +24,7 @@ import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterProvider
 import com.shin.vicmusic.feature.song.navigateToSongDetail
 import androidx.compose.runtime.rememberCoroutineScope
 import com.shin.vicmusic.core.model.User
+import com.shin.vicmusic.feature.discovery.TestList.TestList
 import com.shin.vicmusic.feature.discovery.musicHall.MusicHall
 import com.shin.vicmusic.feature.discovery.recommend.Recommend
 import com.shin.vicmusic.feature.player.PlayerManager
@@ -61,7 +62,7 @@ fun DiscoveryScreen(
     // [新增] 接收点击回调
     onLikeClick: (Song) -> Unit = {}
 ) {
-    val pagerState = rememberPagerState(pageCount = {2})
+    val pagerState = rememberPagerState(pageCount = {3})
     val coroutineScope= rememberCoroutineScope()
     Scaffold(
         topBar = {
@@ -94,7 +95,12 @@ fun DiscoveryScreen(
                     songs = songs,
                     onSongClick = onSongClick,
                     onAddToQueueClick = onAddToQueueClick,
-                    // [新增] 将回调传递给 MusicHall
+                    onLikeClick = onLikeClick
+                )
+                2-> TestList(
+                    songs = songs,
+                    onSongClick = onSongClick,
+                    onAddToQueueClick = onAddToQueueClick,
                     onLikeClick = onLikeClick
                 )
             }

@@ -2,8 +2,6 @@ package com.shin.vicmusic.feature.player
 
 import android.content.Context
 import android.util.Log
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
@@ -24,7 +22,6 @@ import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
 import androidx.core.content.edit
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.shin.vicmusic.R
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
+import com.shin.vicmusic.core.domain.PayType
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.feature.player.PlayerState
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONG // 导入示例歌曲数据
@@ -121,20 +122,40 @@ fun SongBar(
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    // VIP 标签 (硬编码替代)
-                    Surface(
-                        shape = RoundedCornerShape(4.dp),
-                        color = Color(0xFFD4AF37), // 模拟VIP金色
-                        modifier = Modifier.padding(vertical = 2.dp)
-                    ) {
-                        Text(
-                            text = "VIP",
-                            fontSize = 8.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White,
-                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
-                        )
+                    // VIP 标签
+                    if(song != null && song.payType != PayType.FREE){
+                        if(song.payType== PayType.VIP){
+                            Surface(
+                                shape = RoundedCornerShape(4.dp),
+                                color = Color(0xFFD4AF37), // 模拟VIP金色
+                                modifier = Modifier.padding(vertical = 2.dp)
+                            ) {
+                                Text(
+                                    text = "VIP",
+                                    fontSize = 8.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                                )
+                            }
+                        }else if(song.payType== PayType.PAY){
+                            Surface(
+                                shape = RoundedCornerShape(4.dp),
+                                color = Color(0xFFD4AF37), // 模拟VIP金色
+                                modifier = Modifier.padding(vertical = 2.dp)
+                            ) {
+                                Text(
+                                    text = "付费",
+                                    fontSize = 8.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                                )
+                            }
+                        }
+
                     }
+
                 }
             }
 

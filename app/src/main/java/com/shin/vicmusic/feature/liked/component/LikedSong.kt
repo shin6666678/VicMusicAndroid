@@ -89,7 +89,7 @@ fun LikedSong(
 
         LazyColumn {
             items(songs) { song ->
-                ItemSong(data = song)
+                ItemSong(song = song)
             }
         }
     }
