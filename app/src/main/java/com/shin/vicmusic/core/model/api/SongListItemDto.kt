@@ -10,5 +10,6 @@ data class SongListItemDto(
     val album: AlbumDto,   // 嵌套对象
     val payType: PayTypeDto, // 嵌套对象
     val icon: String? = null,
+    val uri:String?=null,
     val isLiked: Boolean = false // 列表接口返回的字段
 )
