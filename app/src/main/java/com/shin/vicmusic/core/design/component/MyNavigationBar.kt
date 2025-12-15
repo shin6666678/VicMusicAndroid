@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -53,10 +54,12 @@ fun MyNavigationBar(
                     },
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Image(
-                    painter = painterResource(id = if (selected) destination.selectedIcon else destination.unselectedIcon),
-                    contentDescription = null,
-                    modifier = Modifier.size(25.dp)
+                // [修改] 使用 Icon 组件代替 Image，支持 ImageVector 和 Tint
+                Icon(
+                    imageVector = if (selected) destination.selectedIcon else destination.unselectedIcon,
+                    contentDescription = stringResource(id = destination.titleTextId),
+                    modifier = Modifier.size(25.dp),
+                    tint = color // [关键] 直接设置图标颜色
                 )
                 SpaceSmallHeight()
                 Text(
