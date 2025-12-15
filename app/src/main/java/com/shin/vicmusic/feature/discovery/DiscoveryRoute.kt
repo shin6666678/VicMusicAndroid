@@ -21,13 +21,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController // 导入 NavController
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterProvider
-import com.shin.vicmusic.feature.song.navigateToSongDetail
 import androidx.compose.runtime.rememberCoroutineScope
+import com.shin.vicmusic.core.design.composition.LocalPlayerManager
 import com.shin.vicmusic.core.model.User
 import com.shin.vicmusic.feature.discovery.TestList.TestList
 import com.shin.vicmusic.feature.discovery.musicHall.MusicHall
 import com.shin.vicmusic.feature.discovery.recommend.Recommend
-import com.shin.vicmusic.feature.player.PlayerManager
 import kotlinx.coroutines.launch
 
 
@@ -36,6 +35,7 @@ fun DiscoveryRoute(
     navController: NavController,
     viewModel: DiscoveryViewModel = hiltViewModel(),
 ) {
+    val playerManager = LocalPlayerManager.current
     val datum by viewModel.datum.collectAsState()
     val user by viewModel.user.collectAsState() // [新增] 收集用户状态
 
@@ -44,8 +44,8 @@ fun DiscoveryRoute(
         user=user,
         toggleDrawer = {}, // 保持原有的空实现，或者替换为实际逻辑
         toSearch = { navController.navigate("search_route") }, // 点击搜索框时导航到搜索界面
-        onSongClick = { songId -> navController.navigateToSongDetail(songId) } ,
-        onAddToQueueClick = { song -> viewModel.addSongToQueue(song) },
+        onSongClick = { songId -> playerManager::playSong} ,
+        onAddToQueueClick = { song -> playerManager.addSongToQueue(song) },
         // [新增] 传递 ViewModel 的 toggleLike 方法
         onLikeClick = viewModel::toggleLike
     )
@@ -93,14 +93,10 @@ fun DiscoveryScreen(
                 0 -> Recommend(user=user)
                 1 -> MusicHall(
                     songs = songs,
-                    onSongClick = onSongClick,
-                    onAddToQueueClick = onAddToQueueClick,
                     onLikeClick = onLikeClick
                 )
                 2-> TestList(
                     songs = songs,
-                    onSongClick = onSongClick,
-                    onAddToQueueClick = onAddToQueueClick,
                     onLikeClick = onLikeClick
                 )
             }

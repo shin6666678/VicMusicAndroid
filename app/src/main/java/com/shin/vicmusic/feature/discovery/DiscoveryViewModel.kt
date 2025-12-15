@@ -24,11 +24,7 @@ import javax.inject.Inject
 class DiscoveryViewModel @Inject constructor(
     private val datasource: MyRetrofitDatasource,
     private val authManager: AuthManager,
-    private val playerManager: PlayerManager
 ) : ViewModel(){
-    fun addSongToQueue(song: Song){
-        playerManager.addSongToQueue(song)
-    }
     private val _datum = MutableStateFlow<List<Song>>(emptyList())
     val datum: StateFlow<List<Song>> = _datum
 
@@ -48,26 +44,16 @@ class DiscoveryViewModel @Inject constructor(
         }
     }
 
-    // [新增] 处理喜欢/取消喜欢
+    // 处理喜欢/取消喜欢
     fun toggleLike(song: Song) {
         viewModelScope.launch {
-            // 1. 发起网络请求
             val response = datasource.likeSong(song.id)
-
             if (response.status == 0) {
-                // 2. 请求成功，更新本地列表状态 (局部刷新)
                 _datum.update { list ->
                     list.map { item ->
-                        if (item.id == song.id) {
-                            item.copy(isLiked = !item.isLiked)
-                        } else {
-                            item
-                        }
+                        if (item.id == song.id) item.copy(isLiked = !item.isLiked) else item
                     }
                 }
-            } else {
-                // 处理失败情况，如提示用户
-                Log.e(TAG, "Like failed: ${response.message}")
             }
         }
     }

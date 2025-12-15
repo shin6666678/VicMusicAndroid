@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.shin.vicmusic.core.design.composition.LocalPlayerManager
 import com.shin.vicmusic.core.design.theme.SpaceExtraMedium
 import com.shin.vicmusic.core.design.theme.SpaceOuter
 import com.shin.vicmusic.core.domain.Song
@@ -16,11 +17,10 @@ import com.shin.vicmusic.feature.song.ItemSong
 @Composable
 fun TestList(
     songs:List<Song>,
-    onSongClick: (String) -> Unit = {},
-    onAddToQueueClick: (Song) -> Unit = {},
-    // [新增] 传递回调
     onLikeClick: (Song) -> Unit = {}
 ){
+    val playerManager = LocalPlayerManager.current
+
     LazyColumn(
         contentPadding = PaddingValues(horizontal = SpaceOuter),
         verticalArrangement = Arrangement.spacedBy(SpaceExtraMedium),
@@ -29,8 +29,8 @@ fun TestList(
         items(songs) { song ->
             ItemSong(
                 song = song,
-                modifier = Modifier.clickable { onSongClick(song.id) } ,
-                onAddToQueueClick = { onAddToQueueClick(song) },
+                modifier = Modifier.clickable { playerManager.playSong(song)} ,
+                onAddToQueueClick = { playerManager.addSongToQueue(song) },
                 onLikeClick = onLikeClick
             )
         }
