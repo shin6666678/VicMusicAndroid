@@ -14,7 +14,8 @@ fun ArtistDto.toDomain(): Artist {
     return Artist(
         id = this.id,
         name = this.name,
-        image = this.image
+        image = this.image,
+
     )
 }
 

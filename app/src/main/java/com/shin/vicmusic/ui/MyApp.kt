@@ -8,6 +8,7 @@ import com.shin.vicmusic.feature.auth.navigateToLogin
 import com.shin.vicmusic.feature.main.mainScreen
 import com.shin.vicmusic.feature.main.navigateToMain
 import com.shin.vicmusic.feature.auth.registerScreen
+import com.shin.vicmusic.feature.discovery.artistListScreen
 import com.shin.vicmusic.feature.song.songDetailScreen
 import com.shin.vicmusic.feature.splash.SPLASH_ROUTE
 import com.shin.vicmusic.feature.splash.splashScreen
@@ -22,5 +23,6 @@ fun MyApp(navController: NavHostController) {
         songDetailScreen(navController = navController) // 添加歌曲详情页的路由定义
         registerScreen(navController = navController)
         searchScreen(navController = navController) // 添加 searchScreen 作为目的地
+        artistListScreen(navController = navController) // 添加歌手列表页
     }
 }

@@ -6,5 +6,11 @@ import kotlinx.serialization.Serializable
 data class Artist(
     val id: String,
     val name: String,
-    val image: String? = null
+    val image: String? = null,
+    val description: String?=null,
+    val followerCount: Int = 0,
+    val isFollowing: Boolean = false,
+    val region: String = "全部",
+    val type: String = "全部",
+    val style: String = "全部"
 )

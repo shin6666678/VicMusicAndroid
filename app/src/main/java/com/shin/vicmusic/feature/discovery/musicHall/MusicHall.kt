@@ -68,7 +68,8 @@ fun MusicHall(
     viewModel: DiscoveryViewModel = hiltViewModel(),
     songs:List<Song>,
     // [新增] 传递回调
-    onLikeClick: (Song) -> Unit = {}
+    onLikeClick: (Song) -> Unit = {},
+    onQuickAccessClick: (String) -> Unit = {}
 ) {
     val playerManager = LocalPlayerManager.current
 
@@ -85,7 +86,7 @@ fun MusicHall(
 
         // 2. 金刚区 (功能入口：每日推荐、歌单等)
         item {
-            QuickAccessSection()
+            QuickAccessSection(onItemClick = onQuickAccessClick)
         }
 
         // 3. 可以在这里加 "推荐歌单" 的横向滚动列表 (这里先留空)
@@ -147,7 +148,7 @@ data class QuickAccessMenu(
     val icon: ImageVector
 )
 @Composable
-fun QuickAccessSection() {
+fun QuickAccessSection(onItemClick: (String) -> Unit = {}) {
     // 定义菜单数据列表
     val menus = listOf(
         QuickAccessMenu("每日推荐", Icons.Default.CalendarToday),
@@ -192,8 +193,7 @@ fun QuickAccessSection() {
                 icon = menu.icon,
                 label = menu.label,
                 onClick = {
-                    // TODO: 处理点击事件，例如导航到对应页面
-                    // navController.navigate("route/${menu.label}")
+                    onItemClick(menu.label)
                 }
             )
         }
