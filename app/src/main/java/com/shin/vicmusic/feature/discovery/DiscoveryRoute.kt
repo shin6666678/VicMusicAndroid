@@ -47,7 +47,13 @@ fun DiscoveryRoute(
         onSongClick = { songId -> playerManager::playSong} ,
         onAddToQueueClick = { song -> playerManager.addSongToQueue(song) },
         // [新增] 传递 ViewModel 的 toggleLike 方法
-        onLikeClick = viewModel::toggleLike
+        onLikeClick = viewModel::toggleLike,
+        onQuickAccessClick = { label ->
+            if (label == "歌手") {
+                navController.navigate("artist_list")
+            }
+            // 可以繼續處理其他點擊，例如 "每日推薦"
+        }
     )
 }
 
@@ -60,7 +66,8 @@ fun DiscoveryScreen(
     onSongClick: (String) -> Unit = {} ,
     onAddToQueueClick: (Song) -> Unit = {},
     // [新增] 接收点击回调
-    onLikeClick: (Song) -> Unit = {}
+    onLikeClick: (Song) -> Unit = {},
+    onQuickAccessClick: (String) -> Unit = {}
 ) {
     val pagerState = rememberPagerState(pageCount = {3})
     val coroutineScope= rememberCoroutineScope()
@@ -93,7 +100,8 @@ fun DiscoveryScreen(
                 0 -> Recommend(user=user)
                 1 -> MusicHall(
                     songs = songs,
-                    onLikeClick = onLikeClick
+                    onLikeClick = onLikeClick,
+                    onQuickAccessClick = onQuickAccessClick
                 )
                 2-> TestList(
                     songs = songs,

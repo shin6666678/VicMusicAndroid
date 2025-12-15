@@ -158,7 +158,7 @@ fun QuickAccessSection(onItemClick: (String) -> Unit = {}) {
         QuickAccessMenu("专辑", Icons.Default.Album),
         QuickAccessMenu("电台", Icons.Default.Radio)
     )
-// [新增] 定义嵌套滑动连接，拦截并消耗剩余的滑动事件
+    // 定义嵌套滑动连接，拦截并消耗剩余的滑动事件
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             // 处理拖动结束后的剩余滑动 (Overscroll)
