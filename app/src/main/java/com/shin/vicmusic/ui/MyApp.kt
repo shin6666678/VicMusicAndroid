@@ -136,7 +136,7 @@ fun MyApp(navController: NavHostController) {
                             .fillMaxWidth()
                             .align(Alignment.TopCenter) // 对齐顶部
                             .zIndex(1f) // 确保浮在背景层上面
-                            .padding(horizontal = 18.dp)
+                            .padding(horizontal = 16.dp)
                     )
                 }
             }
