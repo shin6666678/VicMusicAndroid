@@ -1,5 +1,6 @@
 package com.shin.vicmusic.feature.main
 
+import androidx.compose.runtime.MutableIntState
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -10,10 +11,14 @@ const val MAIN_ROUTE="main"
 
 fun NavGraphBuilder.mainScreen(
     finishPage: () -> Unit,
-    navController:NavHostController
+    navController:NavHostController,
+    mainTabState: MutableIntState
 ) {
     composable(MAIN_ROUTE){
-        MainRoute(finishPage = finishPage,navController=navController)
+        MainRoute(
+            navController = navController,
+            mainTabState = mainTabState
+        )
     }
 }
 fun NavController.navigateToMain():Unit{

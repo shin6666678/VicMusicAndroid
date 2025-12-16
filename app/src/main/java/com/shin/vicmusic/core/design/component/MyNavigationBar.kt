@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -34,7 +35,7 @@ fun MyNavigationBar(
     onNavigateToDestination: (Int) -> Unit,
     modifier: Modifier = Modifier
 ): Unit {
-    Row(modifier = modifier.fillMaxWidth().background(LocalDividerColor.current)) {
+    Row(modifier = modifier.fillMaxWidth().background(color = MaterialTheme.colorScheme.surface)) {
         destinations.forEachIndexed { index, destination ->
             val selected = destination.route == currentDestination
             val color = if (selected)
@@ -44,8 +45,6 @@ fun MyNavigationBar(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(vertical = SpaceExtraMedium)
-                    //.navigationBarsPadding()
                     .clickable(
                         indication = null,
                         interactionSource = interactionSource,

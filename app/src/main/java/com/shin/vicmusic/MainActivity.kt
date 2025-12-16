@@ -6,9 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.navigation.compose.rememberNavController
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
-import com.shin.vicmusic.ui.MyApp
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
 import com.shin.vicmusic.feature.player.PlayerManager
+import com.shin.vicmusic.ui.MyApp
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -26,7 +26,7 @@ class MainActivity : ComponentActivity() {
                 CompositionLocalProvider(
                     LocalPlayerManager provides playerManager
                 ) {
-                    MyApp(navController=navController)
+                    MyApp(navController = navController)
                 }
             }
         }

@@ -24,9 +24,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.shin.vicmusic.core.domain.Song
+import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONGS
 
+@Preview
+@Composable
+fun PlaybackQueuePreview() {
+    PlaybackQueueSheet(
+        queue = SONGS,
+        currentIndex = 1,
+        onSongClick = {},
+        onRemoveSong = {},
+        onClose = {},
+        modifier = Modifier
+    )
+}
 @Composable
 fun PlaybackQueueSheet(
     // 假设从 PlayerViewModel 获取的完整队列
