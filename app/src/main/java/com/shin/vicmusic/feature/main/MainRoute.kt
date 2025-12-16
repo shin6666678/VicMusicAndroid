@@ -49,14 +49,6 @@ fun MainRoute(
     navController:NavHostController,
     mainTabState: MutableIntState
 ){
-    val playerManager = LocalPlayerManager.current
-
-    // ⭐ 1. 播放队列和索引的观察
-    val playbackQueue by playerManager.playbackQueue.collectAsState()
-    val currentQueueIndex by playerManager.currentQueueIndex.collectAsState()
-
-    // ⭐ 2. 底部抽屉的显示状态
-    var showQueueSheet by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -72,29 +64,6 @@ fun MainRoute(
                 }
             }
         )
-
-        if (showQueueSheet) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.5f))
-                    .clickable { showQueueSheet = false }
-            ) {
-                PlaybackQueueSheet(
-                    queue = playbackQueue,
-                    currentIndex = currentQueueIndex,
-                    onSongClick = { index ->
-                        playerManager.playSongAtIndex(index)
-                        showQueueSheet = false
-                    },
-                    onRemoveSong = { index ->
-                        playerManager.removeSong(index)
-                    },
-                    onClose = { showQueueSheet = false },
-                    modifier = Modifier.align(Alignment.BottomCenter)
-                )
-            }
-        }
     }
 }
 
