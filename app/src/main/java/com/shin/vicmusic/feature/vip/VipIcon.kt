@@ -1,6 +1,7 @@
 package com.shin.vicmusic.feature.vip
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,11 +17,13 @@ import androidx.compose.ui.unit.dp
 fun VipIcon(
     vipTagText: String,
     vipBgColor: Color,
-    vipTextColor: Color
+    vipTextColor: Color,
+    onClick:()->Unit={}
 ){
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(4.dp))
+            .clickable(onClick=onClick)
             .background(vipBgColor)
             .padding(horizontal = 6.dp, vertical = 2.dp)
     ) {
