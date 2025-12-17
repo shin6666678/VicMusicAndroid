@@ -42,7 +42,7 @@ import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONGS
 @Composable
 fun PlaybackQueuePreview() {
     PlaybackQueueSheet(
-        queue = SONGS,
+        isPlayingQueue = SONGS,
         currentIndex = 1,
         onSongClick = {},
         onRemoveSong = {},
@@ -53,7 +53,7 @@ fun PlaybackQueuePreview() {
 
 @Composable
 fun PlaybackQueueSheet(
-    queue: List<Song>,
+    isPlayingQueue: List<Song>,
     currentIndex: Int,
     onSongClick: (Int) -> Unit,
     onRemoveSong: (Int) -> Unit,
@@ -61,8 +61,7 @@ fun PlaybackQueueSheet(
     onClose:()->Unit={},
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
-    val tabs = listOf("正在播放", "已播歌曲", "已播歌单")
-
+    val tabs = listOf("正在播放 ${isPlayingQueue.size}", "已播歌曲", "已播歌单")
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -70,6 +69,12 @@ fun PlaybackQueueSheet(
             .background(MaterialTheme.colorScheme.surface)
             .padding(16.dp)
     ) {
+
+        PlayBackQueueTopBar(
+            tabs = tabs,
+            selectedTab = selectedTab,
+            onTabClick = { newIndex -> selectedTab = newIndex }
+        )
 
         HorizontalDivider(
             thickness = 0.5.dp,
@@ -79,7 +84,7 @@ fun PlaybackQueueSheet(
         // 2. 内容区域
         Box(modifier = Modifier.fillMaxSize()) {
             when (selectedTab) {
-                0 -> IsPlayingQueue(queue, currentIndex, onSongClick, onRemoveSong)
+                0 -> IsPlayingQueue(isPlayingQueue, currentIndex, onSongClick, onRemoveSong)
                 1 -> AlreadyPlayedSongQueue()
                 2 -> AlreadyPlayedPlayListQueue()
             }

@@ -36,6 +36,7 @@ import com.shin.vicmusic.core.design.theme.VicMusicTheme
 import com.shin.vicmusic.core.domain.PayType
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONG
+import com.shin.vicmusic.feature.songAuth.PayTypeIcon
 
 @Composable
 fun ItemSong(
@@ -80,40 +81,7 @@ fun ItemSong(
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // [修改] VIP 标签：描边风格 (Outlined Style)
-                if (song.payType == PayType.VIP) {
-                    Box(
-                        modifier = Modifier
-                            .padding(end = 4.dp)
-                            // 红色或金色描边，1px 细线，圆角 2dp
-                            .border(1.dp, Color(0xFFFE3C30), RoundedCornerShape(3.dp))
-                            .padding(horizontal = 3.dp, vertical = 0.dp) // 极小的内部 Padding
-                    ) {
-                        Text(
-                            text = "VIP",
-                            fontSize = 8.sp, // 超小字体
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFFFE3C30), // 文字颜色与边框一致
-                            lineHeight = 8.sp, // 防止行高撑开
-                            modifier = Modifier.align(Alignment.Center)
-                        )
-                    }
-                }else if(song.payType == PayType.PAY){
-                    Box(
-                        modifier = Modifier
-                            .padding(end = 4.dp)
-                            // 灰色描边，1px 细线，圆角 2dp
-                            .border(1.dp, Color(0xFF12B2DE), RoundedCornerShape(3.dp))
-                            .padding(horizontal = 3.dp, vertical = 0.dp) // 极小的内部 Padding
-                    ) {
-                        Text(
-                            text = "付费",
-                            fontSize = 8.sp, // 超小字体
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF12B2DE), // 颜色与边框一致
-                        )
-                    }
-                }
+                PayTypeIcon(song=song)
 
                 // 歌手 - 专辑
                 Text(

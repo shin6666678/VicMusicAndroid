@@ -73,10 +73,13 @@ fun MyApp(navController: NavHostController) {
 
     val playQueue by playerManager.playbackQueue.collectAsState()
     val currentQueueIndex by playerManager.currentQueueIndex.collectAsState()
+
     // 播放列表弹窗显示状态
     var showPlaylistSheet by rememberSaveable { mutableStateOf(false) }
     // BottomSheet 状态
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+
 
     // 2. 定义位移量
     // 如果是主页 -> 位移 0dp
@@ -142,7 +145,7 @@ fun MyApp(navController: NavHostController) {
                         playerState = playerState,
                         onTogglePlayPause = playerManager::togglePlayPause,
                         onLikeClick = { /* Like */ },
-                        onPlaylistClick = { /* Playlist */ },
+                        onPlaylistClick = {showPlaylistSheet=true},
                         onBarClick = { navController.navigateToSongDetail(currentSong!!.id) },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -153,6 +156,8 @@ fun MyApp(navController: NavHostController) {
                 }
             }
         }
+
+
         // 播放列表弹窗 (Bottom Sheet)
         if (showPlaylistSheet) {
             ModalBottomSheet(
@@ -162,7 +167,7 @@ fun MyApp(navController: NavHostController) {
                 dragHandle = null // 隐藏默认的拖拽手柄，使顶部更紧凑
             ) {
                 PlaybackQueueSheet(
-                    queue = playQueue,
+                    isPlayingQueue = playQueue,
                     currentIndex = currentQueueIndex,
                     onSongClick = playerManager::playSongAtIndex,
                     onRemoveSong = playerManager::removeSong,

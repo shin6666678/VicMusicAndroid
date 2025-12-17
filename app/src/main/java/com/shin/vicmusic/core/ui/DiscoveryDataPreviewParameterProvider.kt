@@ -108,7 +108,7 @@ object DiscoveryPreviewParameterData {
             icon = "", // 使用默认值：无图标
             album = Album("1", "Neon Dreams"),
             artist = Artist("1", "SynthWave Explorer", description = "test"),
-            payType = PayType.FREE,
+            payType = PayType.VIP,
             genre = "Electronic/Ambient",
             lyricStyle = Constant.VALUE0,
             lyric = "",
@@ -121,7 +121,7 @@ object DiscoveryPreviewParameterData {
             icon = "ephemeral_cover.png",
             album = Album("1", "Neon Dreams"),
             artist = Artist("1", "SynthWave Explorer", description = "test"),
-            payType = PayType.FREE,
+            payType = PayType.PAY,
             genre = "Indie Pop",
             lyricStyle = Constant.VALUE0,
             lyric = "It vanished as soon as it appeared, like an ephemeral whisper in the wind.",
