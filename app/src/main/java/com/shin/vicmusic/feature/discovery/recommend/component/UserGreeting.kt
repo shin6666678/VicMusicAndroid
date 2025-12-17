@@ -27,6 +27,7 @@ import com.shin.vicmusic.core.design.theme.SpaceMedium
 import com.shin.vicmusic.core.design.theme.SpaceOuter
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
 import com.shin.vicmusic.core.model.User
+import com.shin.vicmusic.feature.vip.VipIcon
 import com.shin.vicmusic.util.ResourceUtil
 
 @Composable
@@ -65,18 +66,11 @@ fun UserGreeting(
         Spacer(modifier = Modifier.width(SpaceExtraMedium))
         // VIP6 Badge - Simplified for now
         if(user!=null){
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(vipBgColor)
-                    .padding(horizontal = 6.dp, vertical = 2.dp)
-            ) {
-                Text(
-                    text = vipTagText, // 动态文本
-                    style = MaterialTheme.typography.labelSmall,
-                    color = vipTextColor // 动态颜色
-                )
-            }
+            VipIcon(
+                vipTagText=vipTagText,
+                vipBgColor=vipBgColor,
+                vipTextColor=vipTextColor
+            )
             Spacer(modifier = Modifier.width(SpaceExtraMedium))
             // Another badge - Simplified
             Box(

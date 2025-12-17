@@ -23,6 +23,7 @@ import coil.compose.AsyncImage
 import com.shin.vicmusic.R
 import com.shin.vicmusic.core.model.User
 import com.shin.vicmusic.feature.me.ActionItem // 确保导入了 ActionItem
+import com.shin.vicmusic.feature.vip.VipIcon
 
 @Preview
 @Composable
@@ -104,21 +105,13 @@ private fun LoggedInHeader(onAvatarClick: () -> Unit, user: User?) {
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             // VIP 标签
-            Surface(
-                shape = RoundedCornerShape(4.dp),
-                color = vipBgColor,
-                modifier = Modifier.padding(vertical = 2.dp)
-            ) {
-                Text(
-                    text = vipTagText,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = vipTextColor,
-                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
-                )
-            }
+            VipIcon(
+                vipTagText = vipTagText,
+                vipBgColor = vipBgColor,
+                vipTextColor = vipTextColor
+            )
         }
     }
 }
