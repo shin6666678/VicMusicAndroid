@@ -45,11 +45,16 @@ import com.shin.vicmusic.feature.splash.SPLASH_ROUTE
 import com.shin.vicmusic.feature.splash.splashScreen
 import androidx.compose.foundation.layout.offset // 确保导入
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.zIndex
 import com.shin.vicmusic.core.design.theme.SpaceExtraMedium
-import com.shin.vicmusic.core.design.theme.SpaceOuter
-import com.shin.vicmusic.feature.song.SONG_DETAIL_ROUTE
+import com.shin.vicmusic.feature.playBackQueue.PlaybackQueueSheet
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyApp(navController: NavHostController) {
     val playerManager = LocalPlayerManager.current
@@ -65,6 +70,13 @@ fun MyApp(navController: NavHostController) {
     val isSplashScreen = currentRoute == SPLASH_ROUTE
     val isSongDetail = currentRoute?.contains("songDetail") == true
     val showBottomContainer = !isSplashScreen&&!isSongDetail
+
+    val playQueue by playerManager.playbackQueue.collectAsState()
+    val currentQueueIndex by playerManager.currentQueueIndex.collectAsState()
+    // 播放列表弹窗显示状态
+    var showPlaylistSheet by rememberSaveable { mutableStateOf(false) }
+    // BottomSheet 状态
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     // 2. 定义位移量
     // 如果是主页 -> 位移 0dp
@@ -139,6 +151,24 @@ fun MyApp(navController: NavHostController) {
                             .padding(horizontal = 16.dp)
                     )
                 }
+            }
+        }
+        // 播放列表弹窗 (Bottom Sheet)
+        if (showPlaylistSheet) {
+            ModalBottomSheet(
+                onDismissRequest = { showPlaylistSheet = false },
+                sheetState = sheetState,
+                containerColor = MaterialTheme.colorScheme.surface,
+                dragHandle = null // 隐藏默认的拖拽手柄，使顶部更紧凑
+            ) {
+                PlaybackQueueSheet(
+                    queue = playQueue,
+                    currentIndex = currentQueueIndex,
+                    onSongClick = playerManager::playSongAtIndex,
+                    onRemoveSong = playerManager::removeSong,
+                    onClose = { showPlaylistSheet = false },
+                    // 高度在 PlaybackQueueSheet 内部控制，这里不需要额外修饰
+                )
             }
         }
     }
