@@ -68,7 +68,51 @@ object DiscoveryPreviewParameterData {
             region = "港台",
             type = "男",
             style = "流行"
-        )
+        ),
+        Artist(
+            id = "6",
+            name = "王力宏",
+            image = "https://example.com/leehom_wang.jpg",
+            description = "华语流行乐男歌手",
+            followerCount = 500000,
+            isFollowing = true,
+            region = "港台",
+            type = "男",
+            style = "流行"
+        ),
+        Artist(
+            id = "7",
+            name = "王力宏",
+            image = "https://example.com/leehom_wang.jpg",
+            description = "华语流行乐男歌手",
+            followerCount = 500000,
+            isFollowing = true,
+            region = "港台",
+            type = "男",
+            style = "流行"
+        ),
+        Artist(
+            id = "8",
+            name = "王力宏",
+            image = "https://example.com/leehom_wang.jpg",
+            description = "华语流行乐男歌手",
+            followerCount = 500000,
+            isFollowing = true,
+            region = "港台",
+            type = "男",
+            style = "流行"
+        ),
+        Artist(
+            id = "9",
+            name = "王力宏",
+            image = "https://example.com/leehom_wang.jpg",
+            description = "华语流行乐男歌手",
+            followerCount = 500000,
+            isFollowing = true,
+            region = "港台",
+            type = "男",
+            style = "流行"
+        ),
     )
 
     val SONG = Song(

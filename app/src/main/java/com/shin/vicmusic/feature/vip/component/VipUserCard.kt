@@ -2,6 +2,7 @@ package com.shin.vicmusic.feature.vip.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,11 +24,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.shin.vicmusic.core.design.component.MyAsyncImage
+import coil.compose.AsyncImage
+import com.shin.vicmusic.R
 import com.shin.vicmusic.core.model.User
 import com.shin.vicmusic.feature.vip.VipGold
 import com.shin.vicmusic.feature.vip.VipSubText
@@ -76,13 +80,15 @@ fun VipUserCard(
                 .padding(20.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 头像
-            MyAsyncImage(
-                model = "", // 替换为真实头像链接或资源
+            AsyncImage(
+                model = user?.headImg ?: "https://picsum.photos/200",
+                contentDescription = "Avatar",
                 modifier = Modifier
                     .size(60.dp)
-                    .clip(CircleShape)
-                    .border(2.dp, VipGold, CircleShape)
+                    .clip(CircleShape),
+                placeholder = painterResource(id = R.drawable.ic_launcher),
+                error = painterResource(id = R.drawable.ic_launcher),
+                contentScale = ContentScale.Crop
             )
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -91,7 +97,7 @@ fun VipUserCard(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "未登录用户", // 这里应该从UserViewModel获取
+                    text = user?.name ?: "未登录用户",
                     color = VipGold,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold

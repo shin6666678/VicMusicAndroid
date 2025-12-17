@@ -42,7 +42,7 @@ fun VipRoute() {
 
     // 收集 StateFlow 状态
     val isLoggedIn by authManager.isLoggedIn.collectAsState()
-// 检查登录状态 (假设 AuthManager 有 isLogin 属性，根据实际情况修改)
+    // 检查登录状态 (假设 AuthManager 有 isLogin 属性，根据实际情况修改)
     if (isLoggedIn != true) {
         LaunchedEffect(Unit) {
             navController.navigate("login_route") { // 请确保这是你的登录路由名称
