@@ -23,15 +23,16 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.shin.vicmusic.R
+import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
+import com.shin.vicmusic.feature.main.navigateToMain
 import com.shin.vicmusic.util.SuperDateUtil
 
 @Composable
 fun SplashRoute(
-    toMain:()->Unit,
-    toLogin:()->Unit,
     viewModel: SplashViewModel= viewModel(),
 ){
+    val navController = LocalNavController.current
     val timeLeft by viewModel.timeLeft.collectAsStateWithLifecycle()
     val navigateToMain by viewModel.navigateToMain.collectAsState()
 
@@ -43,22 +44,7 @@ fun SplashRoute(
     // 当倒计时结束 (navigateToMain 变为 true) 且登录状态明确时才进行导航
     LaunchedEffect(navigateToMain, ) {
         if(navigateToMain) {
-            toMain()
-//            when (isLoggedIn) {
-//                true -> {
-//                    Log.d("SplashRoute", "倒计时结束，用户已登录。跳转到主页。")
-//                    toMain()
-//                }
-//                false -> {
-//                    Log.d("SplashRoute", "倒计时结束，用户未登录。跳转到登录页。")
-//                    toLogin()
-//                }
-//                null -> {
-//                    // 倒计时已结束，但登录状态仍在确定中。
-//                    // 由于LaunchedEffect监听了isLoggedIn，当它变为true/false时，会再次触发。
-//                    Log.d("SplashRoute", "倒计时结束，登录状态仍在检查中，等待...")
-//                }
-//            }
+            navController.navigateToMain()
         }
     }
 }

@@ -6,11 +6,9 @@ import androidx.navigation.compose.composable
 
 const val SEARCH_ROUTE = "search_route"
 
-fun NavGraphBuilder.searchScreen(
-    navController: NavController
-) {
+fun NavGraphBuilder.searchScreen() {
     composable(SEARCH_ROUTE) {
-        SearchRoute(navController = navController)
+        SearchRoute()
     }
 }
 

@@ -10,8 +10,8 @@ fun NavController.navigateToVip() {
     navigate(VIP_ROUTE)
 }
 
-fun NavGraphBuilder.vipScreen(onBackClick: () -> Unit) {
+fun NavGraphBuilder.vipScreen() {
     composable(VIP_ROUTE) {
-        VipRoute(onBackClick = onBackClick)
+        VipRoute()
     }
 }

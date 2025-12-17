@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.shin.vicmusic.core.model.User
-import com.shin.vicmusic.feature.auth.AuthManager
+import com.shin.vicmusic.core.manager.AuthManager
 import com.shin.vicmusic.feature.liked.LikedScreen
 import com.shin.vicmusic.feature.me.component.MeTopBar
 import com.shin.vicmusic.feature.me.component.TopNotifyBar

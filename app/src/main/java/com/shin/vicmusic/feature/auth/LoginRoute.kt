@@ -26,12 +26,14 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.shin.vicmusic.R
+import com.shin.vicmusic.core.design.composition.LocalNavController
 
 @Composable
 fun LoginRoute(
-    navController: NavController,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
+    val navController = LocalNavController.current
+    
     val mail by viewModel.mail.collectAsState()
     val password by viewModel.password.collectAsState()
     val loginState by viewModel.loginState.collectAsState()

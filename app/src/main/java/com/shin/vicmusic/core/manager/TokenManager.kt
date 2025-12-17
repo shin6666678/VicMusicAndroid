@@ -1,4 +1,4 @@
-package com.shin.vicmusic.core.config
+package com.shin.vicmusic.core.manager
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit
@@ -12,7 +12,9 @@ import javax.inject.Singleton
 private val Context.dataStore by preferencesDataStore(name = "user_prefs")
 
 @Singleton
-class TokenManager @Inject constructor(@ApplicationContext private val context: Context) {
+class TokenManager @Inject constructor(
+    @ApplicationContext private val context: Context
+) {
     private val TOKEN_KEY = stringPreferencesKey("jwt_token")
 
     val tokenFlow = context.dataStore.data.map { preferences ->

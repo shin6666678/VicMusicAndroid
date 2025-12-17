@@ -1,23 +1,17 @@
 package com.shin.vicmusic.feature.discovery
 
-import android.nfc.Tag
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.domain.Song // [修改] 引用 Domain Model
 import com.shin.vicmusic.core.model.User
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
-import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData
-import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONG
-import com.shin.vicmusic.feature.auth.AuthManager
-import com.shin.vicmusic.feature.player.PlayerManager
+import com.shin.vicmusic.core.manager.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 @HiltViewModel

@@ -8,16 +8,12 @@ import androidx.navigation.navArgument
 
 const val SONG_DETAIL_ROUTE="songDetail"
 
-fun NavGraphBuilder.songDetailScreen(navController: NavController) {
+fun NavGraphBuilder.songDetailScreen() {
     composable(
         route = "$SONG_DETAIL_ROUTE/{songId}", // Define the route with the argument
         arguments = listOf(navArgument("songId") { type = NavType.StringType }) // Specify argument type
-    ) { backStackEntry ->
-        // SongDetailViewModel 会通过 SavedStateHandle 自动获取 songId，
-        // 所以 SongDetailRoute 不需要再显式传递 songId。
-        // val songId = backStackEntry.arguments?.getLong("songId")
-
-        SongDetailRoute(navController = navController) // 传递 navController
+    ) {
+        SongDetailRoute() // 传递 navController
     }
 }
 

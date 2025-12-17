@@ -1,18 +1,16 @@
-package com.shin.vicmusic.feature.playList
+package com.shin.vicmusic.core.manager
 
-
-import javax.inject.Inject
-import javax.inject.Singleton
 import com.shin.vicmusic.core.domain.Song
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton // 确保它是单例，全局共享同一个播放队列
 class PlaybackQueueManager @Inject constructor() {
 
-    // 队列状态 (不再在 ViewModel 中维护)
     private val _queue = MutableStateFlow<List<Song>>(emptyList())
     val queue: StateFlow<List<Song>> = _queue.asStateFlow()
 

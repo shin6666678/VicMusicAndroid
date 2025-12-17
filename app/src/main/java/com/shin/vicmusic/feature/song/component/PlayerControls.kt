@@ -22,7 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.shin.vicmusic.feature.player.PlayerState
+import com.shin.vicmusic.core.manager.PlayerState
 @Composable
 fun PlayerControls(
     playerState: PlayerState,
