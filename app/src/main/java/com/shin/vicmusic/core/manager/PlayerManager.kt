@@ -1,14 +1,11 @@
-package com.shin.vicmusic.feature.player
+package com.shin.vicmusic.core.manager
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
-import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import com.shin.vicmusic.core.domain.Song
-import com.shin.vicmusic.feature.playList.PlaybackQueueManager
-import com.shin.vicmusic.util.ResourceUtil
+import com.shin.vicmusic.core.manager.PlaybackQueueManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -18,15 +15,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
-import androidx.core.content.edit
 import com.shin.vicmusic.core.data.repository.PlayerRepository
-import com.shin.vicmusic.core.domain.PayType
 import com.shin.vicmusic.core.domain.usecase.CheckVipPermissionUseCase
-import com.shin.vicmusic.feature.auth.AuthManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

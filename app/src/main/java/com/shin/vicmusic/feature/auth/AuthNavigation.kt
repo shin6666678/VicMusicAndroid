@@ -8,9 +8,9 @@ import com.shin.vicmusic.feature.splash.SPLASH_ROUTE
 
 const val REGISTER_ROUTE="register"
 
-fun NavGraphBuilder.registerScreen(navController: NavController){
+fun NavGraphBuilder.registerScreen(){
     composable(REGISTER_ROUTE){
-        RegisterRoute(navController = navController)
+        RegisterRoute()
     }
 }
 
@@ -25,9 +25,9 @@ fun NavController.navigateToRegister():Unit{
 
 const val LOGIN_ROUTE="login"
 
-fun NavGraphBuilder.loginScreen(navController: NavController){
+fun NavGraphBuilder.loginScreen(){
     composable(LOGIN_ROUTE){
-        LoginRoute(navController = navController)
+        LoginRoute()
     }
 }
 

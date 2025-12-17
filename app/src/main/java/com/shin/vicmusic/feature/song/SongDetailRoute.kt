@@ -22,10 +22,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
 import com.shin.vicmusic.core.domain.Song
-import com.shin.vicmusic.feature.player.PlayerState
+import com.shin.vicmusic.core.manager.PlayerState
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONG
 import com.shin.vicmusic.feature.song.component.PlaybackControlBar
 import com.shin.vicmusic.feature.song.component.PlayerControls
@@ -36,10 +37,10 @@ import com.shin.vicmusic.feature.song.component.SongInfoSection
 
 
 @Composable
-fun SongDetailRoute(
-    navController: NavController,                                  // 接收 NavController
+fun SongDetailRoute(     // 接收 NavController
     viewModel: SongDetailViewModel = hiltViewModel(),        // 获取歌曲详情的 ViewModel
 ) {
+    val navController = LocalNavController.current
     val playerManager = LocalPlayerManager.current
     // 观察歌曲数据的加载状态
     val songUiState by viewModel.songUiState.collectAsState()

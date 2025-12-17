@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.feature.auth.navigateToLogin
 import com.shin.vicmusic.feature.discovery.DiscoveryRoute
 import com.shin.vicmusic.feature.feed.FeedRoute
@@ -36,9 +37,9 @@ fun MainPreView(){
 
 @Composable
 fun MainRoute(
-    navController:NavHostController,
     mainTabState: MutableIntState
 ){
+    val navController = LocalNavController.current
 
     Box(modifier = Modifier.fillMaxSize()) {
 

@@ -59,20 +59,22 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.ARTISTS
 import com.shin.vicmusic.feature.discovery.DiscoveryViewModel
 @Preview
 @Composable
 fun ArtistListScreenPreview() {
-    ArtistListScreen(navController = NavController(LocalContext.current))
+    ArtistListScreen()
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArtistListScreen(
-    navController: NavController,
     viewModel: DiscoveryViewModel = hiltViewModel()
 ) {
+
+    val navController = LocalNavController.current
     // 模拟数据，实际应该从 ViewModel 获取
     // 这里使用预览数据
     val artists = ARTISTS

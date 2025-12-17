@@ -1,7 +1,6 @@
-package com.shin.vicmusic.feature.auth
+package com.shin.vicmusic.core.manager
 
 import com.shin.vicmusic.core.config.AppGlobalData
-import com.shin.vicmusic.core.config.TokenManager
 import com.shin.vicmusic.core.model.User
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import kotlinx.coroutines.CoroutineScope

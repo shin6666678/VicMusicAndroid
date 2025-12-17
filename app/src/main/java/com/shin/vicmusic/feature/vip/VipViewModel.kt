@@ -2,7 +2,6 @@ package com.shin.vicmusic.feature.vip
 
 import androidx.lifecycle.ViewModel
 import com.shin.vicmusic.core.domain.VipProduct
-import com.shin.vicmusic.feature.auth.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,8 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 @HiltViewModel
-class VipViewModel @Inject constructor( // 2. 注入 AuthManager
-    private val authManager: AuthManager
+class VipViewModel @Inject constructor(
 ): ViewModel() {
 
     private val _vipProducts = MutableStateFlow<List<VipProduct>>(emptyList())

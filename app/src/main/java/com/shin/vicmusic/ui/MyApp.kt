@@ -9,57 +9,55 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import androidx.compose.ui.zIndex
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.shin.vicmusic.core.design.component.MyNavigationBar
 import com.shin.vicmusic.core.design.component.SongBar
+import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
+import com.shin.vicmusic.core.design.theme.SpaceExtraMedium
 import com.shin.vicmusic.feature.auth.loginScreen
-import com.shin.vicmusic.feature.auth.navigateToLogin
 import com.shin.vicmusic.feature.auth.registerScreen
 import com.shin.vicmusic.feature.discovery.artistListScreen
 import com.shin.vicmusic.feature.main.MAIN_ROUTE
 import com.shin.vicmusic.feature.main.TopLevelDestination
 import com.shin.vicmusic.feature.main.mainScreen
-import com.shin.vicmusic.feature.main.navigateToMain
+import com.shin.vicmusic.feature.playBackQueue.PlaybackQueueSheet
 import com.shin.vicmusic.feature.search.searchScreen
 import com.shin.vicmusic.feature.song.navigateToSongDetail
 import com.shin.vicmusic.feature.song.songDetailScreen
 import com.shin.vicmusic.feature.splash.SPLASH_ROUTE
 import com.shin.vicmusic.feature.splash.splashScreen
-import androidx.compose.foundation.layout.offset // 确保导入
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.zIndex
-import com.shin.vicmusic.core.design.theme.SpaceExtraMedium
-import com.shin.vicmusic.feature.playBackQueue.PlaybackQueueSheet
 import com.shin.vicmusic.feature.vip.VIP_ROUTE
 import com.shin.vicmusic.feature.vip.vipScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyApp(navController: NavHostController) {
+fun MyApp() {
+
+    val navController=LocalNavController.current
     val playerManager = LocalPlayerManager.current
+
     val currentSong by playerManager.currentPlayingSong.collectAsState()
     val playerState by playerManager.playerState.collectAsState()
 
@@ -84,8 +82,6 @@ fun MyApp(navController: NavHostController) {
     // BottomSheet 状态
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-
-
     // 2. 定义位移量
     // 如果是主页 -> 位移 0dp
     // 如果不是主页 -> 位移 80dp
@@ -102,14 +98,14 @@ fun MyApp(navController: NavHostController) {
             startDestination = SPLASH_ROUTE,
             modifier = Modifier.fillMaxSize()
         ) {
-            splashScreen(toMain = navController::navigateToMain, toLogin = navController::navigateToLogin)
-            mainScreen(finishPage = navController::popBackStack, navController = navController, mainTabState = mainTabState)
-            loginScreen(navController)
-            songDetailScreen(navController = navController)
-            registerScreen(navController = navController)
-            searchScreen(navController = navController)
-            artistListScreen(navController = navController)
-            vipScreen(onBackClick = navController::popBackStack)
+            splashScreen()
+            mainScreen(mainTabState = mainTabState)
+            loginScreen()
+            songDetailScreen()
+            registerScreen()
+            searchScreen()
+            artistListScreen()
+            vipScreen()
         }
 
         // 底部整体容器 (SongBar + 导航栏)

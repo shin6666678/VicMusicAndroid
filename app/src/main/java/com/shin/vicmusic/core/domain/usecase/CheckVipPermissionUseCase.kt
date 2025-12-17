@@ -2,7 +2,7 @@ package com.shin.vicmusic.core.domain.usecase
 
 import com.shin.vicmusic.core.domain.PayType
 import com.shin.vicmusic.core.domain.Song
-import com.shin.vicmusic.feature.auth.AuthManager
+import com.shin.vicmusic.core.manager.AuthManager
 import javax.inject.Inject
 
 class CheckVipPermissionUseCase @Inject constructor(

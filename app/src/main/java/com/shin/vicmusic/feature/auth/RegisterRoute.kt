@@ -38,6 +38,7 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.feature.auth.RegisterViewModel
 
 @Composable
@@ -61,8 +62,9 @@ fun RegisterPreView(){
 
 @Composable
 fun RegisterRoute(
-    navController: NavController,
     viewModel: RegisterViewModel = hiltViewModel()) { // 使用 RegisterViewModel
+
+    val navController = LocalNavController.current
 
     // 收集 ViewModel 的 StateFlows
     val email by viewModel.email.collectAsState()

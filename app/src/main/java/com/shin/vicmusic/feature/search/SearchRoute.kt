@@ -26,15 +26,16 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.flowlayout.FlowRow
 import com.shin.vicmusic.R
+import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchRoute(
-    navController: NavController,
     viewModel: SearchViewModel = hiltViewModel()
 ) {
+    val navController = LocalNavController.current
     var searchText by remember { mutableStateOf("") }
 
     Scaffold(
@@ -411,7 +412,7 @@ fun HotSearchItem(
 @Composable
 fun PreviewSearchRoute() {
     VicMusicTheme {
-        SearchRoute(rememberNavController())
+        SearchRoute()
     }
 }
 

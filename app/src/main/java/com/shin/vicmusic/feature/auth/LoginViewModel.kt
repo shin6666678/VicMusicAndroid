@@ -4,10 +4,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.config.AppGlobalData
-import com.shin.vicmusic.core.config.TokenManager
+import com.shin.vicmusic.core.manager.AuthManager
+import com.shin.vicmusic.core.manager.TokenManager
 import com.shin.vicmusic.core.model.request.UserLoginReq
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
-import com.shin.vicmusic.core.network.retrofit.MyNetworkApiService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val authViewModel: AuthManager,
+    private val authManager: AuthManager,
     private val datasource: MyRetrofitDatasource, // [新增] 注入 API
     private val tokenManager: TokenManager // [修改1] 注入 TokenManager
 ) : ViewModel() {
@@ -58,7 +58,7 @@ class LoginViewModel @Inject constructor(
                     // [修改2] 持久化保存 Token
                     tokenManager.saveToken(token)
                     Log.d("LoginViewModel", "Login Success: ${response.data}")
-                    authViewModel.setLoginStatus(true)
+                    authManager.setLoginStatus(true)
                     _loginState.value = LoginUiState.Success
                 } else {
                     _loginState.value = LoginUiState.Error(response.message ?: "登录失败")

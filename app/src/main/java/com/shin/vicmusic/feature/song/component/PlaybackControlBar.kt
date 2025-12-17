@@ -13,7 +13,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.shin.vicmusic.feature.player.PlayerState
+import com.shin.vicmusic.core.manager.PlayerState
 import com.shin.vicmusic.util.formatTime
 
 @Composable

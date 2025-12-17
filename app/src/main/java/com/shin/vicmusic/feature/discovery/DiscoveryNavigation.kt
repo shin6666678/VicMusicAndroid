@@ -14,9 +14,9 @@ fun NavGraphBuilder.discoveryScreen(navController: NavController) {
     }
 }
 
-fun NavGraphBuilder.artistListScreen(navController: NavController) {
+fun NavGraphBuilder.artistListScreen() {
     composable(ARTIST_LIST_ROUTE) {
-        ArtistListScreen(navController = navController)
+        ArtistListScreen()
     }
 }
 

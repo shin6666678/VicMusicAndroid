@@ -3,20 +3,16 @@ package com.shin.vicmusic.feature.main
 import androidx.compose.runtime.MutableIntState
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.shin.vicmusic.feature.splash.SPLASH_ROUTE
 
 const val MAIN_ROUTE="main"
 
 fun NavGraphBuilder.mainScreen(
-    finishPage: () -> Unit,
-    navController:NavHostController,
     mainTabState: MutableIntState
 ) {
     composable(MAIN_ROUTE){
         MainRoute(
-            navController = navController,
             mainTabState = mainTabState
         )
     }

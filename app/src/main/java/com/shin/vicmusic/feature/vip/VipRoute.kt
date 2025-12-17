@@ -10,6 +10,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -19,6 +20,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.shin.vicmusic.core.design.composition.LocalAuthManager
+import com.shin.vicmusic.core.design.composition.LocalNavController
+import com.shin.vicmusic.core.model.User
 import com.shin.vicmusic.feature.vip.component.VipBottomBar
 import com.shin.vicmusic.feature.vip.component.VipPrivilegesSection
 import com.shin.vicmusic.feature.vip.component.VipProductList
@@ -28,12 +32,33 @@ import com.shin.vicmusic.feature.vip.component.VipUserCard
 @Preview
 @Composable
 fun VipRoutePreview() {
-    VipScreen(onBackClick = {})
+    VipScreen(onBackClick = {}, user = null)
 }
 
 @Composable
-fun VipRoute(onBackClick: () -> Unit) {
-    VipScreen(onBackClick = onBackClick)
+fun VipRoute() {
+    val navController = LocalNavController.current
+    val authManager = LocalAuthManager.current
+
+    // 收集 StateFlow 状态
+    val isLoggedIn by authManager.isLoggedIn.collectAsState()
+// 检查登录状态 (假设 AuthManager 有 isLogin 属性，根据实际情况修改)
+    if (isLoggedIn != true) {
+        LaunchedEffect(Unit) {
+            navController.navigate("login_route") { // 请确保这是你的登录路由名称
+                // 可选：弹出当前栈，防止返回
+                // popUpTo("vip_route") { inclusive = true }
+            }
+        }
+        // 未登录时不显示内容或显示Loading
+        return
+    }
+
+    val loginUser by authManager.currentUser.collectAsState()
+    VipScreen(
+        onBackClick = navController::popBackStack,
+        user = loginUser
+    )
 }
 
 // 定义一些VIP页面专用的颜色
@@ -47,6 +72,7 @@ val VipSubText = Color(0xFF9E9E9E)
 @Composable
 fun VipScreen(
     onBackClick: () -> Unit,
+    user: User?,
     viewModel: VipViewModel = viewModel()
 ) {
     val vipProducts by viewModel.vipProducts.collectAsState()
@@ -70,7 +96,7 @@ fun VipScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             // 用户信息卡片
-            VipUserCard()
+            VipUserCard(user=user)
 
             Spacer(modifier = Modifier.height(24.dp))
 

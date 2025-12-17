@@ -1,7 +1,7 @@
 package com.shin.vicmusic.feature.me
 
 import androidx.lifecycle.ViewModel
-import com.shin.vicmusic.feature.auth.AuthManager
+import com.shin.vicmusic.core.manager.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
