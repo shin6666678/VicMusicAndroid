@@ -21,7 +21,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun PlayBackQueueTopBar(){
+fun PlayBackQueueTopBar(
+    tabs: List<String>,
+    selectedTab: Int,
+    onTabClick: (Int) -> Unit
+){
     // 头部：标题和模式切换
     Row(
         modifier = Modifier
@@ -34,7 +38,7 @@ fun PlayBackQueueTopBar(){
             val isSelected = selectedTab == index
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.clickable { selectedTab = index }
+                modifier = Modifier.clickable { onTabClick(index) }
             ) {
                 Text(
                     text = title,
