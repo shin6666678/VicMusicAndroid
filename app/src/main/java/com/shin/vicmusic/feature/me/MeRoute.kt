@@ -47,6 +47,7 @@ import com.shin.vicmusic.feature.me.component.UserInfoCard
 @Composable
 fun MeRoute(
     onAvatarClick: () -> Unit = {},
+    onVipClick: () -> Unit = {}, // [新增]
     viewModel: MeViewModel = hiltViewModel()
 ) {
     val isLoggedIn by viewModel.isLoggedIn.collectAsState()
@@ -63,8 +64,9 @@ fun MeRoute(
     Log.d("MeRoute", "isLoggedIn: $isLoggedIn")
     MeScreen(
         onAvatarClick = onAvatarClick,
+        onVipClick = onVipClick,
         isLoggedIn = isLoggedIn ?: false ,// [修复] 确保状态为非空Boolean，null时默认为false
-        user = currentUser // [新增] 传递 user
+        user = currentUser //传递 user
     )
 }
 
@@ -72,8 +74,9 @@ fun MeRoute(
 @Composable
 fun MeScreen(
     onAvatarClick: () -> Unit = {},
+    onVipClick: () -> Unit = {},
     isLoggedIn: Boolean,
-    user: User? = null // [新增] 接收参数
+    user: User? = null
 ) {
     // [新增] 控制是否显示“喜欢列表”的状态
     var showLikedList by remember { mutableStateOf(false) }
@@ -103,6 +106,7 @@ fun MeScreen(
                 Spacer(Modifier.height(16.dp))
                 UserInfoCard(
                     onAvatarClick = onAvatarClick,
+                    onVipClick = onVipClick, // [新增]
                     isLoggedIn = isLoggedIn,
                     user = user // [修改] 传入 user
                 )// 传入 onAvatarClick

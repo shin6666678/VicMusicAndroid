@@ -41,6 +41,7 @@ fun UserInfoCardPreview() {
 @Composable
 fun UserInfoCard(
     onAvatarClick: () -> Unit,
+    onVipClick: () -> Unit = {}, // [新增] 接收 VIP 點擊事件
     isLoggedIn: Boolean,
     user: User? // [新增] 接收 User 对象
 ) {
@@ -53,7 +54,7 @@ fun UserInfoCard(
         Column(modifier = Modifier.padding(16.dp)) {
             // 1. 头部区域：根据登录状态切换
             if (isLoggedIn) {
-                LoggedInHeader(onAvatarClick,user)
+                LoggedInHeader(onAvatarClick,onVipClick,user)
             } else {
                 LoggedOutHeader(onAvatarClick)
             }
@@ -74,7 +75,11 @@ fun UserInfoCard(
 // --- 抽取的子组件 ---
 
 @Composable
-private fun LoggedInHeader(onAvatarClick: () -> Unit, user: User?) {
+private fun LoggedInHeader(
+    onAvatarClick: () -> Unit,
+    onVipClick: () -> Unit, // [新增] 參數
+    user: User?
+) {
     // 1. 解析 VIP 等级 (默认为 0)
     val vipLevelInt = user?.vipLevel?.toIntOrNull() ?: 0
 
@@ -110,7 +115,8 @@ private fun LoggedInHeader(onAvatarClick: () -> Unit, user: User?) {
             VipIcon(
                 vipTagText = vipTagText,
                 vipBgColor = vipBgColor,
-                vipTextColor = vipTextColor
+                vipTextColor = vipTextColor,
+                onClick = onVipClick
             )
         }
     }

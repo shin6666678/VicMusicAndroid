@@ -53,6 +53,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.zIndex
 import com.shin.vicmusic.core.design.theme.SpaceExtraMedium
 import com.shin.vicmusic.feature.playBackQueue.PlaybackQueueSheet
+import com.shin.vicmusic.feature.vip.VIP_ROUTE
+import com.shin.vicmusic.feature.vip.vipScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,9 +69,12 @@ fun MyApp(navController: NavHostController) {
 
     // 1. 定义状态
     val isMainScreen = currentRoute == MAIN_ROUTE
+
+
     val isSplashScreen = currentRoute == SPLASH_ROUTE
     val isSongDetail = currentRoute?.contains("songDetail") == true
-    val showBottomContainer = !isSplashScreen&&!isSongDetail
+    val isVipScreen= currentRoute == VIP_ROUTE
+    val showBottomContainer = !isSplashScreen&&!isSongDetail&&!isVipScreen
 
     val playQueue by playerManager.playbackQueue.collectAsState()
     val currentQueueIndex by playerManager.currentQueueIndex.collectAsState()
@@ -104,6 +109,7 @@ fun MyApp(navController: NavHostController) {
             registerScreen(navController = navController)
             searchScreen(navController = navController)
             artistListScreen(navController = navController)
+            vipScreen(onBackClick = navController::popBackStack)
         }
 
         // 底部整体容器 (SongBar + 导航栏)

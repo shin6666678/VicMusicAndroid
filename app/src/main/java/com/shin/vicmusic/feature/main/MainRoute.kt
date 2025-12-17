@@ -20,6 +20,7 @@ import com.shin.vicmusic.feature.discovery.DiscoveryRoute
 import com.shin.vicmusic.feature.feed.FeedRoute
 import com.shin.vicmusic.feature.me.MeRoute
 import com.shin.vicmusic.feature.shortVideo.ShortVideoRoute
+import com.shin.vicmusic.feature.vip.navigateToVip
 
 
 @Preview
@@ -48,7 +49,10 @@ fun MainRoute(
                 when (page) {
                     0 -> DiscoveryRoute(navController)
                     1 -> ShortVideoRoute()
-                    2 -> MeRoute(onAvatarClick = { navController.navigateToLogin() })
+                    2 -> MeRoute(
+                        onAvatarClick = { navController.navigateToLogin() },
+                        onVipClick = { navController.navigateToVip() }
+                    )
                     3 -> FeedRoute()
                 }
             }
