@@ -91,7 +91,7 @@ class MyRetrofitDatasource @Inject constructor(
     }
 
     // [修改] 获取喜欢列表：DTO -> Domain
-    suspend fun getLikedSongs(): NetworkResponse<NetworkPageData<Song>>{
+    suspend fun likedSongs(): NetworkResponse<NetworkPageData<Song>>{
         val dtoResponse = safeApiCall { service.getLikedSongs() }
 
         if (dtoResponse.status == 0 && dtoResponse.data != null) {
@@ -107,7 +107,7 @@ class MyRetrofitDatasource @Inject constructor(
     }
 
     // [新增] 喜欢歌曲
-    suspend fun likeSong(songId: String): NetworkResponse<Unit>{
-        return safeApiCall { service.likeSong(LikeSongReq(songId)) }
+    suspend fun likeSong(likeSongReq: LikeSongReq): NetworkResponse<Unit>{
+        return safeApiCall { service.likeSong(likeSongReq) }
     }
 }

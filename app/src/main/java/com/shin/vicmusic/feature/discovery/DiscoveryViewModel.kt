@@ -3,6 +3,7 @@ package com.shin.vicmusic.feature.discovery
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.shin.vicmusic.core.data.repository.SongRepository
 import com.shin.vicmusic.core.domain.Song // [修改] 引用 Domain Model
 import com.shin.vicmusic.core.model.User
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
@@ -16,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DiscoveryViewModel @Inject constructor(
-    private val datasource: MyRetrofitDatasource,
+    private val songRepository: SongRepository,
     private val authManager: AuthManager,
 ) : ViewModel(){
     private val _datum = MutableStateFlow<List<Song>>(emptyList())
@@ -32,7 +33,7 @@ class DiscoveryViewModel @Inject constructor(
 
     private fun loadData() {
         viewModelScope.launch {
-            val songs=datasource.songs()
+            val songs= songRepository.getSongs()
             Log.d(TAG, "Fetched songs: ${songs.data?.list?.size}")
             _datum.value=songs.data?.list?:emptyList()
         }
@@ -41,7 +42,7 @@ class DiscoveryViewModel @Inject constructor(
     // 处理喜欢/取消喜欢
     fun toggleLike(song: Song) {
         viewModelScope.launch {
-            val response = datasource.likeSong(song.id)
+            val response = songRepository.likeSong(song.id)
             if (response.status == 0) {
                 _datum.update { list ->
                     list.map { item ->

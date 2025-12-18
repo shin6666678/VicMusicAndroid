@@ -4,5 +4,4 @@ import androidx.lifecycle.ViewModel
 
 // Placeholder for SearchViewModel
 class SearchViewModel : ViewModel() {
-    // ViewModel logic goes here
 }

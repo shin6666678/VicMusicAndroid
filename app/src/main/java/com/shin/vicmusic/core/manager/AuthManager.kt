@@ -1,6 +1,7 @@
 package com.shin.vicmusic.core.manager
 
 import com.shin.vicmusic.core.config.AppGlobalData
+import com.shin.vicmusic.core.data.repository.AuthRepository
 import com.shin.vicmusic.core.model.User
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import kotlinx.coroutines.CoroutineScope
@@ -13,7 +14,7 @@ import javax.inject.Singleton
 
 @Singleton// 更改为 @Singleton
 class AuthManager @Inject constructor(
-    private val datasource: MyRetrofitDatasource,
+    private val authRepository: AuthRepository,
     private val tokenManager: TokenManager // 必须注入
 ) {
     private val scope = CoroutineScope(SupervisorJob())
@@ -55,7 +56,7 @@ class AuthManager @Inject constructor(
     // [新增] 获取用户信息方法
     fun fetchUserInfo() {
         scope.launch {
-            val response = datasource.userInfo()
+            val response =  authRepository.getUserInfo()
             if (response.status == 0) {
                 _currentUser.value = response.data
                 // 确保登录状态为 true

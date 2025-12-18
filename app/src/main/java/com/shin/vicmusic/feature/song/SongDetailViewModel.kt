@@ -3,6 +3,7 @@ package com.shin.vicmusic.feature.song
 import androidx.lifecycle.SavedStateHandle // 导入 SavedStateHandle 用于获取导航参数
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.shin.vicmusic.core.data.repository.SongRepository
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,7 +29,7 @@ sealed class SongUiState {
 @HiltViewModel
 class SongDetailViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle, // 用于获取导航参数
-    private val datasource: MyRetrofitDatasource,
+    private val songRepository: SongRepository,
 ) : ViewModel() {
 
 
@@ -61,7 +62,7 @@ class SongDetailViewModel @Inject constructor(
             _songUiState.value = SongUiState.Loading
             try {
                 // 2. 发起网络请求获取歌曲详情
-                val response = datasource.songDetail(id)
+                val response = songRepository.getSongDetail(id)
                 response.data?.let {
                     // 3. 网络请求成功且数据不为空
                     _songUiState.value = SongUiState.Success(it) // 更新UI状态为成功 // 命令全局 PlayerViewModel 播放这首歌
@@ -86,7 +87,7 @@ class SongDetailViewModel @Inject constructor(
 
             viewModelScope.launch {
                 // 发送网络请求
-                val response = datasource.likeSong(currentSong.id)
+                val response = songRepository.likeSong(currentSong.id)
 
                 if (response.status == 0) {
                     // 请求成功，更新本地 UI 状态 (翻转 isLiked)

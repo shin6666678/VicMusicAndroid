@@ -38,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.shin.vicmusic.core.data.repository.ArtistRepository
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.ARTISTS
@@ -68,17 +70,19 @@ import com.shin.vicmusic.feature.search.navigateToSearch
 fun ArtistListScreenPreview() {
     ArtistListScreen()
 }
+@Composable
+fun ArtistListRoute(
+    viewModel: ArtistListViewModel = hiltViewModel(),
+){
+    val artists by viewModel.artist.collectAsState()
+    ArtistListScreen(artists = artists)
+}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArtistListScreen(
-    viewModel: DiscoveryViewModel = hiltViewModel()
+    artists: List<Artist> = ARTISTS
 ) {
-
     val navController = LocalNavController.current
-    // 模拟数据，实际应该从 ViewModel 获取
-    // 这里使用预览数据
-    val artists = ARTISTS
-
     Scaffold(
         topBar = {
             TopAppBar(

@@ -3,6 +3,7 @@ package com.shin.vicmusic.feature.auth
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.shin.vicmusic.core.data.repository.AuthRepository
 import com.shin.vicmusic.core.model.request.UserRegisterReq
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val datasource: MyRetrofitDatasource // [新增] 注入 API
+    private val authRepository: AuthRepository
 ) : ViewModel() {
     val TAG = "RegisterViewModel"
 
@@ -76,7 +77,7 @@ class RegisterViewModel @Inject constructor(
     fun requestEmailVerificationCode(mail: String, code: String) {
         viewModelScope.launch {
             Log.d(TAG, "发送验证码: ${mail},${code}")
-            val sendMailCodeResult = datasource.mailCode(mail, code)
+            val sendMailCodeResult = authRepository.mailCode(mail, code)
             _sendEmailCodeStatus.value = sendMailCodeResult.status == 0
         }
     }
@@ -85,7 +86,7 @@ class RegisterViewModel @Inject constructor(
     fun register(mail: String, mailCode: String, password: String) {
         viewModelScope.launch {
             Log.d(TAG, "注册按钮点击: ${mail},${mailCode},${password}")
-            val sendMailCodeResult = datasource.register(
+            val sendMailCodeResult = authRepository.register(
                 UserRegisterReq(
                     name = "123",
                     pwd = password,
