@@ -28,13 +28,16 @@ fun MyAsyncImage(model: String?,
             painter = painterResource(id = R.drawable.ic_launcher),
             contentDescription = null,
             contentScale = contentScale,
-            modifier = modifier
+            modifier = modifier,
+
         )
     else
         AsyncImage(
             model = ResourceUtil.r2(model),
             contentDescription = null,
             contentScale = contentScale,
-            modifier = modifier
+            modifier = modifier,
+            placeholder = painterResource(id = R.drawable.ic_launcher), // 替换为你的默认封面
+            error = painterResource(id = R.drawable.ic_launcher) // 加载失败时显示
         )
 }
