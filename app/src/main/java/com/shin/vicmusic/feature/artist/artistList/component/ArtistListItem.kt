@@ -32,11 +32,14 @@ import coil.compose.AsyncImage
 import com.shin.vicmusic.core.domain.Artist
 
 @Composable
-fun ArtistListItem(artist: Artist) {
+fun ArtistListItem(
+    artist: Artist,
+    onClick: (String) -> Unit = {}
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { /* TODO: Navigate to Artist Detail */ }
+            .clickable { onClick(artist.id) }
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

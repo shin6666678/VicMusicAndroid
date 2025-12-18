@@ -36,9 +36,10 @@ import com.shin.vicmusic.core.design.component.SongBar
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
 import com.shin.vicmusic.core.design.theme.SpaceExtraMedium
+import com.shin.vicmusic.feature.artist.artistDetail.artistDetailScreen
+import com.shin.vicmusic.feature.artist.artistList.artistListScreen
 import com.shin.vicmusic.feature.auth.loginScreen
 import com.shin.vicmusic.feature.auth.registerScreen
-import com.shin.vicmusic.feature.discovery.artistListScreen
 import com.shin.vicmusic.feature.main.MAIN_ROUTE
 import com.shin.vicmusic.feature.main.TopLevelDestination
 import com.shin.vicmusic.feature.main.mainScreen
@@ -106,6 +107,7 @@ fun MyApp() {
             searchScreen()
             artistListScreen()
             vipScreen()
+            artistDetailScreen()
         }
 
         // 底部整体容器 (SongBar + 导航栏)
