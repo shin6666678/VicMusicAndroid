@@ -14,7 +14,7 @@ object ResourceUtil {
 
     }
     fun r2(uri:String):String{
-        if(uri.startsWith("http"))
+        if(uri.startsWith("http")||uri.startsWith("https"))
             return uri
         return if (uri.startsWith("files"))
             uri
