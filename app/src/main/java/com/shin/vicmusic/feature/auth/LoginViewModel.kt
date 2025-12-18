@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.config.AppGlobalData
+import com.shin.vicmusic.core.data.repository.AuthRepository
 import com.shin.vicmusic.core.manager.AuthManager
 import com.shin.vicmusic.core.manager.TokenManager
 import com.shin.vicmusic.core.model.request.UserLoginReq
@@ -18,8 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val authManager: AuthManager,
-    private val datasource: MyRetrofitDatasource, // [新增] 注入 API
-    private val tokenManager: TokenManager // [修改1] 注入 TokenManager
+    private val authRepository: AuthRepository,
+    private val tokenManager: TokenManager
 ) : ViewModel() {
 
     // UI State
@@ -50,7 +51,7 @@ class LoginViewModel @Inject constructor(
             _loginState.value = LoginUiState.Loading
             try {
                 val req = UserLoginReq(mail = _mail.value, pwd = _password.value)
-                val response = datasource.login(req)
+                val response = authRepository.login(req)
 
                 if (response.status == 0) { // 假设 0 是成功码，请根据实际后端调整
                     val token = response.data.toString()

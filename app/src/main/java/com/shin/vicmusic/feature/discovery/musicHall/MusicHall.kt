@@ -151,7 +151,7 @@ data class QuickAccessMenu(
 fun QuickAccessSection(onItemClick: (String) -> Unit = {}) {
     // 定义菜单数据列表
     val menus = listOf(
-        QuickAccessMenu("每日推荐", Icons.Default.CalendarToday),
+        //QuickAccessMenu("每日推荐", Icons.Default.CalendarToday),
         QuickAccessMenu("歌手", Icons.Default.Mic), // 使用 Mic 或 Person
         QuickAccessMenu("排行", Icons.Default.BarChart), // 使用柱状图代表排行
         QuickAccessMenu("歌单", Icons.AutoMirrored.Filled.QueueMusic), // 使用 QueueMusic

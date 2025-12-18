@@ -2,6 +2,7 @@ package com.shin.vicmusic.feature.liked
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.shin.vicmusic.core.data.repository.SongRepository
 import com.shin.vicmusic.core.domain.Song // [修改] 引用 Domain Model
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LikedSongsViewModel @Inject constructor(
-    private val datasource: MyRetrofitDatasource
+    private val songRepository: SongRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<LikedSongsUiState>(LikedSongsUiState.Loading)
@@ -28,7 +29,7 @@ class LikedSongsViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = LikedSongsUiState.Loading
             try {
-                val response = datasource.getLikedSongs()
+                val response = songRepository.getLikedSongs()
                 if (response.status == 0 && response.data?.list != null) {
                     _uiState.value = LikedSongsUiState.Success(response.data.list)
                 } else {
@@ -43,7 +44,7 @@ class LikedSongsViewModel @Inject constructor(
     fun toggleLike(song: Song) {
         viewModelScope.launch {
             // 调用后端接口
-            val response = datasource.likeSong(song.id)
+            val response = songRepository.likeSong(song.id)
             if (response.status == 0) {
                 // 成功后，从本地列表中移除该歌曲 (UI即时刷新)
                 _uiState.update { state ->
