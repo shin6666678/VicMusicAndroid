@@ -21,23 +21,20 @@ import com.shin.vicmusic.util.ResourceUtil
 
 @Composable
 fun MyAsyncImage(model: String?,
-                 modifier: Modifier): Unit {
+                 modifier: Modifier,
+                 contentScale: ContentScale = ContentScale.Crop): Unit {
     if(model==""||model==null)
         Image(
             painter = painterResource(id = R.drawable.ic_launcher),
             contentDescription = null,
-            contentScale = ContentScale.Crop,
+            contentScale = contentScale,
             modifier = modifier
-                .clip(extraSmallRoundedCornerShape)
-            //.clip(RoundedCornerShape(5.dp))
         )
     else
         AsyncImage(
             model = ResourceUtil.r2(model),
             contentDescription = null,
-            contentScale = ContentScale.Crop,
+            contentScale = contentScale,
             modifier = modifier
-                .clip(MaterialTheme.shapes.small)
-                .background(LocalDividerColor.current)
         )
 }

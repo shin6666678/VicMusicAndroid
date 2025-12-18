@@ -10,5 +10,5 @@ class ArtistRepository@Inject constructor(
     private val datasource: MyMockDatasource
 ){
     suspend fun getArtists()=datasource.getArtists()
-
+    suspend fun getArtistDetailById(artistId:String)=datasource.getArtistById(artistId)
 }

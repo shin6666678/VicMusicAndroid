@@ -82,5 +82,27 @@ class MyMockDatasource @Inject constructor(
         return NetworkResponse(status = 0, message = "成功", data = artists)
     }
 
+    fun getArtistById(artistId: String): NetworkResponse<Artist>{
+        val artist = when (artistId) {
+            "1" -> Artist(
+                id = "1",
+                name = "周杰伦",
+                image = "https://example.com/jay_chou.jpg",
+                description = "华语流行乐男歌手、词曲创作人、制作人、MV及电影导演、编剧。",
+                followerCount = 1000000,
+                isFollowing = true,
+                region = "港台",
+                type = "男",
+                style = "流行"
+            )
+            else  -> Artist(
+                id = "2",
+                name = "林俊杰",
+                image = "https://example.com/jj_lin.jpg",
+            )
+         }
+        return NetworkResponse(status = 0, message = "成功", data = artist)
+    }
+
 
 }
