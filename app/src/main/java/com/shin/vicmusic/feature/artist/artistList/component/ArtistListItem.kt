@@ -1,4 +1,4 @@
-package com.shin.vicmusic.feature.discovery.musicHall.artistList.component
+package com.shin.vicmusic.feature.artist.artistList.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

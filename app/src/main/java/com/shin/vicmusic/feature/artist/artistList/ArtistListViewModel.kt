@@ -1,4 +1,4 @@
-package com.shin.vicmusic.feature.discovery.musicHall.artistList
+package com.shin.vicmusic.feature.artist.artistList
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

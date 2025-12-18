@@ -3,9 +3,7 @@ package com.shin.vicmusic.feature.discovery
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.shin.vicmusic.core.domain.Artist
-import com.shin.vicmusic.feature.discovery.musicHall.artistList.ArtistListRoute
-import com.shin.vicmusic.feature.discovery.musicHall.artistList.ArtistListScreen
+import com.shin.vicmusic.feature.artist.artistList.ArtistListRoute
 
 const val DISCOVERY_ROUTE = "discovery"
 const val ARTIST_LIST_ROUTE = "artist_list"

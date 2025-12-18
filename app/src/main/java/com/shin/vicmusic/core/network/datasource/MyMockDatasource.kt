@@ -2,10 +2,13 @@ package com.shin.vicmusic.core.network.datasource
 
 import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.model.response.NetworkResponse
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import com.shin.vicmusic.core.network.retrofit.MyNetworkApiService
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class MyMockDatasource {
+@Singleton
+class MyMockDatasource @Inject constructor(
+) {
     suspend fun getArtists():NetworkResponse<List<Artist>>{
         // 模拟数据
         val artists = listOf(
