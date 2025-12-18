@@ -43,6 +43,7 @@ import androidx.navigation.compose.rememberNavController
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.ARTISTS
+import com.shin.vicmusic.feature.artist.artistDetail.navigateToArtistDetail
 import com.shin.vicmusic.feature.artist.artistList.component.ArtistListItem
 import com.shin.vicmusic.feature.artist.artistList.component.TopArtistSection
 import com.shin.vicmusic.feature.search.navigateToSearch
@@ -61,7 +62,8 @@ fun ArtistListRoute(
     ArtistListScreen(
         artists = artists,
         popBackStack = navController::popBackStack,
-        navigateToSearch = navController::navigateToSearch
+        navigateToSearch = navController::navigateToSearch,
+        onItemClick = navController::navigateToArtistDetail
     )
 }
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,6 +72,7 @@ fun ArtistListScreen(
     artists: List<Artist> = ARTISTS,
     popBackStack: () -> Unit = {},
     navigateToSearch: () -> Unit = {},
+    onItemClick: (String) -> Unit = {}
 ) {
 
     Scaffold(
@@ -120,7 +123,7 @@ fun ArtistListScreen(
                     FilterSection()
                 }
                 items(artists) { artist ->
-                    ArtistListItem(artist = artist)
+                    ArtistListItem(artist = artist, onClick = onItemClick)
                 }
             }
         }
