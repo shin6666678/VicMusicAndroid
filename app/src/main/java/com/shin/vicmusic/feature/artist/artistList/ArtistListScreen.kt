@@ -38,6 +38,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.ARTISTS
@@ -48,21 +50,28 @@ import com.shin.vicmusic.feature.search.navigateToSearch
 @Preview
 @Composable
 fun ArtistListScreenPreview() {
-    ArtistListScreen()
+    ArtistListScreen(artists = ARTISTS)
 }
 @Composable
 fun ArtistListRoute(
     viewModel: ArtistListViewModel = hiltViewModel(),
 ){
     val artists by viewModel.artist.collectAsState()
-    ArtistListScreen(artists = artists)
+    val navController = LocalNavController.current
+    ArtistListScreen(
+        artists = artists,
+        popBackStack = navController::popBackStack,
+        navigateToSearch = navController::navigateToSearch
+    )
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArtistListScreen(
-    artists: List<Artist> = ARTISTS
+    artists: List<Artist> = ARTISTS,
+    popBackStack: () -> Unit = {},
+    navigateToSearch: () -> Unit = {},
 ) {
-    val navController = LocalNavController.current
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -78,12 +87,12 @@ fun ArtistListScreen(
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = { popBackStack() }) {
                         Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
-                    IconButton(onClick = { navController.navigateToSearch()}) {
+                    IconButton(onClick = { navigateToSearch()}) {
                         Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
                     }
                 },
