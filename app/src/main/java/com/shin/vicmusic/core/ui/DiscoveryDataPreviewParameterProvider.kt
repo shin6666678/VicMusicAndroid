@@ -13,6 +13,17 @@ class DiscoveryPreviewParameterProvider : PreviewParameterProvider<List<Song>> {
 }
 
 object DiscoveryPreviewParameterData {
+    val ARTIST=Artist(
+        id = "1",
+        name = "周杰伦",
+        image = "https://example.com/jay_chou.jpg",
+        description = "华语流行乐男歌手",
+        followerCount = 1000000,
+        isFollowing = true,
+        region = "港台",
+        type = "男",
+        style = "流行"
+    )
     val ARTISTS = listOf(
         Artist(
             id = "1",
@@ -169,6 +180,7 @@ object DiscoveryPreviewParameterData {
             genre = "Indie Pop",
             lyricStyle = Constant.VALUE0,
             lyric = "It vanished as soon as it appeared, like an ephemeral whisper in the wind.",
-        )
+        ),
+        SONG,SONG,SONG,SONG,SONG,SONG,SONG,SONG,SONG,SONG,SONG,SONG,SONG,SONG,SONG,SONG,SONG,SONG
     )
 }
