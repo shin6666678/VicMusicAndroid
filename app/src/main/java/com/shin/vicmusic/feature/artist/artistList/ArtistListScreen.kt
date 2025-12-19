@@ -45,6 +45,8 @@ import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.ARTISTS
 import com.shin.vicmusic.feature.artist.artistDetail.navigateToArtistDetail
 import com.shin.vicmusic.feature.artist.artistList.component.ArtistListItem
+import com.shin.vicmusic.feature.artist.artistList.component.ArtistListTopBar
+import com.shin.vicmusic.feature.artist.artistList.component.FilterSection
 import com.shin.vicmusic.feature.artist.artistList.component.TopArtistSection
 import com.shin.vicmusic.feature.search.navigateToSearch
 
@@ -53,10 +55,11 @@ import com.shin.vicmusic.feature.search.navigateToSearch
 fun ArtistListScreenPreview() {
     ArtistListScreen(artists = ARTISTS)
 }
+
 @Composable
 fun ArtistListRoute(
     viewModel: ArtistListViewModel = hiltViewModel(),
-){
+) {
     val artists by viewModel.artist.collectAsState()
     val navController = LocalNavController.current
     ArtistListScreen(
@@ -66,6 +69,7 @@ fun ArtistListRoute(
         onItemClick = navController::navigateToArtistDetail
     )
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArtistListScreen(
@@ -76,34 +80,7 @@ fun ArtistListScreen(
 ) {
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "歌手",
-                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
-                        )
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = { popBackStack() }) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { navigateToSearch()}) {
-                        Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
-            )
-        }
+        topBar = { ArtistListTopBar(popBackStack, navigateToSearch) }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -131,43 +108,3 @@ fun ArtistListScreen(
 }
 
 
-@Composable
-fun FilterSection() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-    ) {
-        FilterRow(listOf("全部", "内地", "港台", "欧美", "日本", "韩国"))
-        FilterRow(listOf("全部", "男", "女", "组合"))
-        FilterRow(listOf("全部", "流行", "说唱", "国风", "摇滚", "电子"))
-    }
-}
-
-@Composable
-fun FilterRow(options: List<String>) {
-    var selectedOption by remember { mutableStateOf(options[0]) }
-
-    LazyRow(
-        contentPadding = PaddingValues(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.padding(vertical = 4.dp)
-    ) {
-        items(options) { option ->
-            val isSelected = option == selectedOption
-            FilterChip(
-                selected = isSelected,
-                onClick = { selectedOption = option },
-                label = { Text(text = option) },
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = Color(0xFF1DB954), // 类似 Spotify 绿或者图中的绿色
-                    selectedLabelColor = Color.White,
-                    containerColor = Color.Transparent,
-                    labelColor = Color.Black
-                ),
-                border = null, // 去掉边框
-                shape = RoundedCornerShape(50) // 圆角
-            )
-        }
-    }
-}
