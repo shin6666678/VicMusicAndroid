@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.ArtistRepository
+import com.shin.vicmusic.core.data.repository.SongRepository
 import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.domain.Song
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,6 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ArtistDetailViewModel @Inject constructor(
     private val artistRepository: ArtistRepository,
+    private val songRepository: SongRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -33,9 +35,14 @@ class ArtistDetailViewModel @Inject constructor(
 
     private fun fetchArtistDetail() {
         viewModelScope.launch {
-            val response = artistRepository.getArtistDetailById(artistId)
-            if (response.status == 0) {
-                _artist.value = response.data
+            val artistResponse = artistRepository.getArtistDetailById(artistId)
+            if (artistResponse.status == 0) {
+                _artist.value = artistResponse.data
+
+                val songsResponse = songRepository.getSongsByArtistId(artistId)
+                if (songsResponse.status == 0 && songsResponse.data != null) {
+                    _songs.value = songsResponse.data
+                }
             }
         }
     }

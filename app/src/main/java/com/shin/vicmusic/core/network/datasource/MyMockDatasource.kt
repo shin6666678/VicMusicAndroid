@@ -1,8 +1,10 @@
 package com.shin.vicmusic.core.network.datasource
 
 import com.shin.vicmusic.core.domain.Artist
+import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.model.response.NetworkResponse
 import com.shin.vicmusic.core.network.retrofit.MyNetworkApiService
+import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONGS
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -102,6 +104,11 @@ class MyMockDatasource @Inject constructor(
             )
          }
         return NetworkResponse(status = 0, message = "成功", data = artist)
+    }
+
+    fun getSongsByArtistId(artistId: String): NetworkResponse<List<Song>>{
+        val songs = SONGS
+        return NetworkResponse(status = 0, message = "成功", data = songs)
     }
 
 
