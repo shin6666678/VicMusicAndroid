@@ -27,6 +27,7 @@ import com.shin.vicmusic.core.model.User
 import com.shin.vicmusic.feature.discovery.TestList.TestList
 import com.shin.vicmusic.feature.discovery.musicHall.MusicHall
 import com.shin.vicmusic.feature.discovery.recommend.Recommend
+import com.shin.vicmusic.feature.rankList.rankList.RANK_LIST_ROUTE
 import kotlinx.coroutines.launch
 
 
@@ -51,6 +52,8 @@ fun DiscoveryRoute(
         onQuickAccessClick = { label ->
             if (label == "歌手") {
                 navController.navigate("artist_list")
+            }else if(label=="排行"){
+                navController.navigate(RANK_LIST_ROUTE)
             }
             // 可以繼續處理其他點擊，例如 "每日推薦"
         }

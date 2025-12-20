@@ -27,4 +27,6 @@ class SongRepository @Inject constructor(
     // 根据歌手id获取歌曲
     suspend fun getSongsByArtistId(artistId: String) = mockDatasource.getSongsByArtistId(artistId)
 
+    // 获取排行榜数据
+    suspend fun getRankData() = mockDatasource.getRankData()
 }
