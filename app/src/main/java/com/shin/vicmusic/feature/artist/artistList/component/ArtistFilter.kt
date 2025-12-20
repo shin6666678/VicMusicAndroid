@@ -12,31 +12,48 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun FilterSection() {
+fun FilterSection(
+    selectedRegion: String,
+    selectedType: String,
+    selectedStyle: String,
+    onRegionChange: (String) -> Unit,
+    onTypeChange: (String) -> Unit,
+    onStyleChange: (String) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
     ) {
-        FilterRow(listOf("全部", "内地", "港台", "欧美", "日本", "韩国"))
-        FilterRow(listOf("全部", "男", "女", "组合"))
-        FilterRow(listOf("全部", "流行", "说唱", "国风", "摇滚", "电子"))
+        FilterRow(
+            options = listOf("全部", "内地", "港台", "欧美", "日本", "韩国"),
+            selectedOption = selectedRegion,
+            onOptionSelected = onRegionChange
+        )
+        FilterRow(
+            options = listOf("全部", "男", "女", "组合"),
+            selectedOption = selectedType,
+            onOptionSelected = onTypeChange
+        )
+        FilterRow(
+            options = listOf("全部", "流行", "说唱", "国风", "摇滚", "电子"),
+            selectedOption = selectedStyle,
+            onOptionSelected = onStyleChange
+        )
     }
 }
 
 @Composable
-fun FilterRow(options: List<String>) {
-    var selectedOption by remember { mutableStateOf(options[0]) }
-
+fun FilterRow(
+    options: List<String>,
+    selectedOption: String,
+    onOptionSelected: (String) -> Unit
+) {
     LazyRow(
         contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -46,16 +63,16 @@ fun FilterRow(options: List<String>) {
             val isSelected = option == selectedOption
             FilterChip(
                 selected = isSelected,
-                onClick = { selectedOption = option },
+                onClick = { onOptionSelected(option) },
                 label = { Text(text = option) },
                 colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = Color(0xFF1DB954), // 类似 Spotify 绿或者图中的绿色
+                    selectedContainerColor = Color(0xFF1DB954),
                     selectedLabelColor = Color.White,
                     containerColor = Color.Transparent,
                     labelColor = Color.Black
                 ),
-                border = null, // 去掉边框
-                shape = RoundedCornerShape(50) // 圆角
+                border = null,
+                shape = RoundedCornerShape(50)
             )
         }
     }

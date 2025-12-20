@@ -61,12 +61,17 @@ fun ArtistListRoute(
     viewModel: ArtistListViewModel = hiltViewModel(),
 ) {
     val artists by viewModel.artist.collectAsState()
+    val filterState by viewModel.filterState.collectAsState()
     val navController = LocalNavController.current
     ArtistListScreen(
         artists = artists,
+        filterState = filterState,
         popBackStack = navController::popBackStack,
         navigateToSearch = navController::navigateToSearch,
-        onItemClick = navController::navigateToArtistDetail
+        onItemClick = navController::navigateToArtistDetail,
+        onRegionChange = viewModel::updateRegion,
+        onTypeChange = viewModel::updateType,
+        onStyleChange = viewModel::updateStyle
     )
 }
 
@@ -74,9 +79,13 @@ fun ArtistListRoute(
 @Composable
 fun ArtistListScreen(
     artists: List<Artist> = ARTISTS,
+    filterState: ArtistFilterState = ArtistFilterState(),
     popBackStack: () -> Unit = {},
     navigateToSearch: () -> Unit = {},
-    onItemClick: (String) -> Unit = {}
+    onItemClick: (String) -> Unit = {},
+    onRegionChange: (String) -> Unit = {},
+    onTypeChange: (String) -> Unit = {},
+    onStyleChange: (String) -> Unit = {}
 ) {
 
     Scaffold(
@@ -97,7 +106,14 @@ fun ArtistListScreen(
                     TopArtistSection()
 
                     // 筛选区域
-                    FilterSection()
+                    FilterSection(
+                        selectedRegion = filterState.region,
+                        selectedType = filterState.type,
+                        selectedStyle = filterState.style,
+                        onRegionChange = onRegionChange,
+                        onTypeChange = onTypeChange,
+                        onStyleChange = onStyleChange
+                    )
                 }
                 items(artists) { artist ->
                     ArtistListItem(artist = artist, onClick = onItemClick)

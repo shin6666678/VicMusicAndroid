@@ -9,6 +9,9 @@ import javax.inject.Singleton
 class ArtistRepository@Inject constructor(
     private val datasource: MyMockDatasource
 ){
-    suspend fun getArtists()=datasource.getArtists()
-    suspend fun getArtistDetailById(artistId:String)=datasource.getArtistById(artistId)
+    // 透传筛选参数到数据源
+    suspend fun getArtists(region: String, type: String, style: String) =
+        datasource.getArtists(region, type, style)
+
+    suspend fun getArtistDetailById(artistId:String) = datasource.getArtistById(artistId)
 }
