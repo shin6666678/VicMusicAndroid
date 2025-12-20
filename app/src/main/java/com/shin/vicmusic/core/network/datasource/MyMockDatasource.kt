@@ -8,6 +8,14 @@ import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONGS
 import javax.inject.Inject
 import javax.inject.Singleton
 
+data class RankPageData(
+    val recommends: List<RankRecommendDto>,
+    val peaks: List<RankPeakDto>
+)
+data class RankRecommendDto(val title: String, val color: Long)
+data class RankPeakDto(val title: String, val img: String, val top3: List<RankSongDto>)
+data class RankSongDto(val name: String, val artist: String)
+
 @Singleton
 class MyMockDatasource @Inject constructor(
 ) {
@@ -39,8 +47,6 @@ class MyMockDatasource @Inject constructor(
                     (style == "全部" || artist.style == style)
         }
 
-        // 模拟网络延迟
-        kotlinx.coroutines.delay(500)
 
         return NetworkResponse(status = 0, message = "成功", data = filteredData)
     }
@@ -71,6 +77,32 @@ class MyMockDatasource @Inject constructor(
         val songs = SONGS
         return NetworkResponse(status = 0, message = "成功", data = songs)
     }
-
+    // [新增] 模拟排行榜数据
+    suspend fun getRankData(): NetworkResponse<RankPageData> {
+        val recommends = listOf(
+            RankRecommendDto("腾讯音乐榜", 0xFF42A5F5),
+            RankRecommendDto("巅峰潮流榜", 0xFFEF5350),
+            RankRecommendDto("韩国Melon榜", 0xFF66BB6A),
+            RankRecommendDto("日本Oricon榜", 0xFFFFA726)
+        )
+        val peaks = listOf(
+            RankPeakDto(
+                "热歌榜_23首新歌上榜",
+                "https://via.placeholder.com/150/00FF00/FFFFFF?text=Chart3",
+                listOf(RankSongDto("奇迹航线", "马嘉祺"), RankSongDto("爱错", "王力宏"), RankSongDto("恋人", "李荣浩"))
+            ),
+            RankPeakDto(
+                "巅峰潮流榜_QQ音乐 x 微博",
+                "https://via.placeholder.com/150/0000FF/FFFFFF?text=Chart1",
+                listOf(RankSongDto("不渝", "梓渝"), RankSongDto("深海漫游指南", "梓渝"), RankSongDto("全世界下雨", "周深"))
+            ),
+            RankPeakDto(
+                "飙升榜_21首新歌上榜",
+                "https://via.placeholder.com/150/FF0000/FFFFFF?text=Chart2",
+                listOf(RankSongDto("恒星不忘 Forever Forever", "周杰"), RankSongDto("奇迹航线", "马嘉祺"), RankSongDto("爱与欠", "黄子弘凡"))
+            )
+        )
+        return NetworkResponse(status = 0, message = "成功", data = RankPageData(recommends, peaks))
+    }
 
 }

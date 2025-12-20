@@ -44,6 +44,7 @@ import com.shin.vicmusic.feature.main.MAIN_ROUTE
 import com.shin.vicmusic.feature.main.TopLevelDestination
 import com.shin.vicmusic.feature.main.mainScreen
 import com.shin.vicmusic.feature.playBackQueue.PlaybackQueueSheet
+import com.shin.vicmusic.feature.rankList.rankList.rankListScreen
 import com.shin.vicmusic.feature.search.searchScreen
 import com.shin.vicmusic.feature.song.navigateToSongDetail
 import com.shin.vicmusic.feature.song.songDetailScreen
@@ -106,6 +107,7 @@ fun MyApp() {
             registerScreen()
             searchScreen()
             artistListScreen()
+            rankListScreen()
             vipScreen()
             artistDetailScreen()
         }
