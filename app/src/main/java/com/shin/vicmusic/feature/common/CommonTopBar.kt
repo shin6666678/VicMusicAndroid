@@ -1,10 +1,11 @@
-package com.shin.vicmusic.feature.artist.artistList.component
+package com.shin.vicmusic.feature.common
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -16,24 +17,28 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+
+@Preview
+@Composable
+fun CommonTopBarPreview() {
+    CommonTopBar(midText = "维克音乐排行榜")
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArtistListTopBar(
+fun CommonTopBar(
+    midText: String = "没写",
+    showSearch: Boolean = false,
     popBackStack: () -> Unit = {},
     navigateToSearch: () -> Unit = {}
 ) {
-    TopAppBar(
+    CenterAlignedTopAppBar(
         title = {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "歌手",
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
-                )
-            }
+            Text(
+                text = midText,
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+            )
         },
         navigationIcon = {
             IconButton(onClick = { popBackStack() }) {
@@ -41,9 +46,10 @@ fun ArtistListTopBar(
             }
         },
         actions = {
-            IconButton(onClick = { navigateToSearch()}) {
-                Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
-            }
+            if (showSearch)
+                IconButton(onClick = { navigateToSearch() }) {
+                    Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
+                }
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.surface
