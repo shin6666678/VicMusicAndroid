@@ -63,7 +63,7 @@ fun SongInfoSection(song: Song, modifier: Modifier = Modifier, onLikeClick: () -
         Spacer(modifier = Modifier.height(8.dp))
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = "曲: ${song.artist}", // 曲信息
+                text = "曲: ${song.artist.name}", // 曲信息
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.weight(1f)

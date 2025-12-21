@@ -1,4 +1,4 @@
-package com.shin.vicmusic.core.domain // 建议将 core.model 迁移至 core.domain
+package com.shin.vicmusic.core.domain
 
 import androidx.media3.common.MediaItem
 import com.shin.vicmusic.util.Constant
@@ -20,6 +20,7 @@ data class Song (
     val genre:String,
     val lyricStyle:Int= Constant.VALUE0,
     val lyric:String?,
+    val lyricList: List<LyricLine> = emptyList(),
     val isLiked: Boolean = false,
     val likesCount: Int=0,
     val clicksCount: Int=0,
@@ -36,3 +37,5 @@ data class Song (
         return MediaItem.fromUri(ResourceUtil.r2(this.uri ?: ""))
     }
 }
+@Serializable
+data class LyricLine(val time: Long, val content: String)
