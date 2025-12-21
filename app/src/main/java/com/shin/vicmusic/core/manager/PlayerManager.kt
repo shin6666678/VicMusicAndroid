@@ -1,6 +1,7 @@
 package com.shin.vicmusic.core.manager
 
 import android.content.Context
+import android.util.Log
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import com.shin.vicmusic.core.data.repository.PlayerRepository
@@ -92,6 +93,7 @@ class PlayerManager @Inject constructor(
 
         //更新当前歌曲状态，否则UI不刷新
         _currentPlayingSong.value = song
+        Log.d("Mana111",song.toString())
         loadLyric(song)
         performPlay()
         playerRepository.saveLastPlayedSong(song)
@@ -157,6 +159,7 @@ class PlayerManager @Inject constructor(
             playerRepository.getLastPlayedSong()?.let { song ->
                 queueManager.setQueue(listOf(song), 0)
                 _currentPlayingSong.value = song // [必须补上] 更新UI状态
+                Log.d("Mana111",song.toString())
                 loadLyric(song)
                 exoPlayer.setMediaItem(song.toMediaItem())
                 exoPlayer.prepare()
@@ -210,10 +213,12 @@ class PlayerManager @Inject constructor(
 
     // 新增：异步加载歌词方法
     private fun loadLyric(song: Song) {
+        song.lyric?.let { Log.d("Mana111",it) }
         if (song.lyric.isNullOrEmpty()) return
         scope.launch(Dispatchers.IO) {
             try {
                 val text = java.net.URL(ResourceUtil.r2(song.lyric)).readText()
+                Log.d("Mana111",text)
                 val list = LrcHelper.parse(text)
                 // 校验ID防止切歌后覆盖错误
                 _currentPlayingSong.update { if (it?.id == song.id) it.copy(lyricList = list) else it }
