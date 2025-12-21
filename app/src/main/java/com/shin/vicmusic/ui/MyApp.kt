@@ -45,6 +45,7 @@ import com.shin.vicmusic.feature.main.TopLevelDestination
 import com.shin.vicmusic.feature.main.mainScreen
 import com.shin.vicmusic.feature.playBackQueue.PlaybackQueueSheet
 import com.shin.vicmusic.feature.rankList.rankList.rankListScreen
+import com.shin.vicmusic.feature.rankList.rankListDetail.rankListDetailScreen
 import com.shin.vicmusic.feature.search.searchScreen
 import com.shin.vicmusic.feature.song.navigateToSongDetail
 import com.shin.vicmusic.feature.song.songDetailScreen
@@ -110,6 +111,7 @@ fun MyApp() {
             rankListScreen()
             vipScreen()
             artistDetailScreen()
+            rankListDetailScreen()
         }
 
         // 底部整体容器 (SongBar + 导航栏)
@@ -175,7 +177,7 @@ fun MyApp() {
                 PlaybackQueueSheet(
                     isPlayingQueue = playQueue,
                     currentIndex = currentQueueIndex,
-                    onSongClick = playerManager::playSongAtIndex,
+                    onSongClick = playerManager::playAtIndex,
                     onRemoveSong = playerManager::removeSong,
                     onClose = { showPlaylistSheet = false },
                     // 高度在 PlaybackQueueSheet 内部控制，这里不需要额外修饰

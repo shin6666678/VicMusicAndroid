@@ -27,5 +27,8 @@ class SongRepository @Inject constructor(
     // 根据歌手id获取歌曲
     suspend fun getSongsByArtistId(artistId: String) = mockDatasource.getSongsByArtistId(artistId)
 
-
+    // [新增] 访问服务端获取歌词文本
+    suspend fun getLyricText(url: String): String = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+        java.net.URL(url).readText() // 使用 ResourceUtil 构建的 URL 直接读取文本
+    }
 }
