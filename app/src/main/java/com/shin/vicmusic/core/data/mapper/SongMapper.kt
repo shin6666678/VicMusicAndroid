@@ -43,7 +43,7 @@ fun SongListItemDto.toDomain(): Song {
         payType = this.payType.toDomain(),
         genre = "未知", // 列表接口未返回，填充默认值
         lyricStyle = 0,
-        lyric = null,
+        lyric = this.lyric,
         isLiked = this.isLiked,
         likesCount = 0,
         clicksCount = 0,

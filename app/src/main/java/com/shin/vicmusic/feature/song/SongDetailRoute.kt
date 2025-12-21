@@ -1,5 +1,6 @@
 package com.shin.vicmusic.feature.song
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -72,8 +73,13 @@ fun SongDetailRoute(
         }
         is SongUiState.Success -> {
             val playerState by playerManager.playerState.collectAsState()
+            val displaySong = if (currentPlayingSong?.id == uiState.song.id) {
+                currentPlayingSong!!
+            } else {
+                uiState.song
+            }
             SongDetailScreen(
-                song = uiState.song,
+                song = displaySong,
                 playerState = playerState,
                 onTogglePlayPause = playerManager::togglePlayPause,
                 onSeek = playerManager::seekTo,
@@ -151,6 +157,7 @@ fun SongDetailScreen(
                 }
             } else {
                 // 页面 1: 歌词
+                Log.d("1111111111111111",song.toString())
                 LyricView(
                     lyricList = song.lyricList,
                     currentIndex = playerState.currentLyricLineIndex,
