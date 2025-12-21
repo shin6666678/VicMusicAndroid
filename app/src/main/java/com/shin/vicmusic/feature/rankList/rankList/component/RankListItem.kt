@@ -28,19 +28,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
+import com.shin.vicmusic.core.domain.RankListPeak
+import com.shin.vicmusic.core.domain.Song
+import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONGS
 
-data class Song(val title: String, val artist: String)
-
-data class RankListItemInfo(
-    val imageUrl: String,
-    val title: String,
-    val songs: List<Song>
-)
 
 @Composable
 fun RankListItem(
     modifier: Modifier = Modifier,
-    rankListItemInfo: RankListItemInfo
+    rankListItemInfo: RankListPeak
 ) {
     Row(
         modifier = modifier
@@ -79,13 +75,14 @@ fun RankListItem(
                 fontSize = 16.sp
             )
             Spacer(modifier = Modifier.height(4.dp))
-            rankListItemInfo.songs.forEachIndexed { index, song ->
-                Text(
-                    text = "${index + 1}. ${song.title} - ${song.artist}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray,
-                    fontSize = 14.sp
-                )
+            rankListItemInfo.items.forEachIndexed { index, item ->
+                if (item is Song)
+                    Text(
+                        text = "${index + 1}. ${item.title} - ${item.artist.name}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray,
+                        fontSize = 14.sp
+                    )
             }
         }
     }
@@ -95,14 +92,11 @@ fun RankListItem(
 @Composable
 private fun RankListItemPreview() {
     RankListItem(
-        rankListItemInfo = RankListItemInfo(
+        rankListItemInfo = RankListPeak(
+            id = "1",
             imageUrl = "https://via.placeholder.com/150",
             title = "巅峰潮流榜_QQ音乐 x 微博",
-            songs = listOf(
-                Song("不渝", "梓渝"),
-                Song("深海漫游指南", "梓渝"),
-                Song("全世界下雨", "周深")
-            )
+            items = SONGS.subList(0,3)
         )
     )
 }

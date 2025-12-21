@@ -1,20 +1,17 @@
 package com.shin.vicmusic.core.network.datasource
 
+import com.shin.vicmusic.core.data.mapper.toDomain
 import com.shin.vicmusic.core.domain.Artist
+import com.shin.vicmusic.core.domain.RankListDetail
+import com.shin.vicmusic.core.domain.RankListPeak
 import com.shin.vicmusic.core.domain.Song
+import com.shin.vicmusic.core.model.api.RankListPeakDto
+import com.shin.vicmusic.core.model.api.SongListItemDto
 import com.shin.vicmusic.core.model.response.NetworkResponse
-import com.shin.vicmusic.core.network.retrofit.MyNetworkApiService
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONGS
 import javax.inject.Inject
 import javax.inject.Singleton
 
-data class RankPageData(
-    val recommends: List<RankRecommendDto>,
-    val peaks: List<RankPeakDto>
-)
-data class RankRecommendDto(val title: String, val color: Long)
-data class RankPeakDto(val title: String, val img: String, val top3: List<RankSongDto>)
-data class RankSongDto(val name: String, val artist: String)
 
 @Singleton
 class MyMockDatasource @Inject constructor(
@@ -78,31 +75,67 @@ class MyMockDatasource @Inject constructor(
         return NetworkResponse(status = 0, message = "成功", data = songs)
     }
     // [新增] 模拟排行榜数据
-    suspend fun getRankData(): NetworkResponse<RankPageData> {
-        val recommends = listOf(
-            RankRecommendDto("腾讯音乐榜", 0xFF42A5F5),
-            RankRecommendDto("巅峰潮流榜", 0xFFEF5350),
-            RankRecommendDto("韩国Melon榜", 0xFF66BB6A),
-            RankRecommendDto("日本Oricon榜", 0xFFFFA726)
-        )
+    suspend fun getRankListPeeks(): NetworkResponse<List<RankListPeak>> {
         val peaks = listOf(
-            RankPeakDto(
+            RankListPeakDto(
+                "1",
                 "热歌榜_23首新歌上榜",
                 "https://via.placeholder.com/150/00FF00/FFFFFF?text=Chart3",
-                listOf(RankSongDto("奇迹航线", "马嘉祺"), RankSongDto("爱错", "王力宏"), RankSongDto("恋人", "李荣浩"))
+                listOf(
+                    SongListItemDto("1", "奇迹航线",),
+                    SongListItemDto("2", "爱错",),
+                    SongListItemDto("3", "恋人")
+                )
             ),
-            RankPeakDto(
+            RankListPeakDto(
+                "2",
                 "巅峰潮流榜_QQ音乐 x 微博",
                 "https://via.placeholder.com/150/0000FF/FFFFFF?text=Chart1",
-                listOf(RankSongDto("不渝", "梓渝"), RankSongDto("深海漫游指南", "梓渝"), RankSongDto("全世界下雨", "周深"))
+                listOf(
+                    SongListItemDto("4","不渝", ),
+                    SongListItemDto("5","深海漫游指南", ),
+                    SongListItemDto("6","全世界下雨", )
+                )
             ),
-            RankPeakDto(
+            RankListPeakDto(
+                "3",
                 "飙升榜_21首新歌上榜",
                 "https://via.placeholder.com/150/FF0000/FFFFFF?text=Chart2",
-                listOf(RankSongDto("恒星不忘 Forever Forever", "周杰"), RankSongDto("奇迹航线", "马嘉祺"), RankSongDto("爱与欠", "黄子弘凡"))
+                listOf(
+                    SongListItemDto("7","恒星不忘 Forever Forever"),
+                    SongListItemDto("8","奇迹航线", ),
+                    SongListItemDto("9","爱与欠", )
+                )
             )
         )
-        return NetworkResponse(status = 0, message = "成功", data = RankPageData(recommends, peaks))
+        val data= peaks.map{item->item.toDomain()}
+        return NetworkResponse(status = 0, message = "成功", data = data)
+    }
+
+    fun getRankListById(id: String): NetworkResponse<RankListDetail> {
+        return when (id) {
+            "1" -> NetworkResponse(
+                status = 0,
+                message = "成功",
+                data = RankListDetail(
+                    id = "1",
+                    imageUrl = "https://via.placeholder.com/150/00FF00/FFFFFF?text=Chart3",
+                    title = "热歌榜_23首新歌上榜",
+                    items = SONGS.subList(0,5)
+                )
+            )
+            else -> NetworkResponse(
+                status = 0,
+                message = "成功",
+                data = RankListDetail(
+                    id = "2",
+                    imageUrl = "https://via.placeholder.com/150/0000FF/FFFFFF?text=Chart1",
+                    title = "巅峰潮流榜_QQ音乐 x 微博",
+                    items = SONGS.subList(0,9)
+                )
+            )
+        }
+
     }
 
 }

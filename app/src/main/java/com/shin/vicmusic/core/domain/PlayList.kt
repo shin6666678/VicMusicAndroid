@@ -1,4 +1,4 @@
-package com.shin.vicmusic.core.model
+package com.shin.vicmusic.core.domain
 
 data class Playlist(
     val id: String,
