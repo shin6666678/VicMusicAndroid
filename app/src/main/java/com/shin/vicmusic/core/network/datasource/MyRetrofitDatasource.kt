@@ -5,6 +5,7 @@ import com.shin.vicmusic.core.data.mapper.toDomain
 import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.model.User
+import com.shin.vicmusic.core.model.request.FollowReq
 import com.shin.vicmusic.core.model.request.LikeSongReq
 import com.shin.vicmusic.core.model.request.UserLoginReq
 import com.shin.vicmusic.core.model.request.UserRegisterReq
@@ -122,6 +123,24 @@ class MyRetrofitDatasource @Inject constructor(
 
     suspend fun getArtistById(artistId: String): NetworkResponse<Artist>{
         return safeApiCall { service.getArtistById(artistId) }
+    }
+
+    suspend fun follow(followReq: FollowReq): NetworkResponse<Unit>{
+        return safeApiCall { service.follow(followReq) }
+    }
+
+    suspend fun getSongsByArtistId(artistId: String): NetworkResponse<NetworkPageData<Song>> {
+        val dtoResponse= safeApiCall{ service.getSongsByArtistId(artistId) }
+        if (dtoResponse.status == 0 && dtoResponse.data != null) {
+            val dtoList = dtoResponse.data.list ?: emptyList()
+            val domainList = dtoList.map { it.toDomain() }
+            val domainData = NetworkPageData(
+                list = domainList,
+                pagination = dtoResponse.data.pagination
+            )
+            return NetworkResponse(status = 0, message = dtoResponse.message, data = domainData)
+        }
+        return NetworkResponse(status = dtoResponse.status, message = dtoResponse.message, data = null)
     }
 
 }

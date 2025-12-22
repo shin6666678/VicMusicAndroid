@@ -40,8 +40,8 @@ class ArtistDetailViewModel @Inject constructor(
                 _artist.value = artistResponse.data
 
                 val songsResponse = songRepository.getSongsByArtistId(artistId)
-                if (songsResponse.status == 0 && songsResponse.data != null) {
-                    _songs.value = songsResponse.data
+                if (songsResponse.status == 0 && songsResponse.data!= null && songsResponse.data.list != null) {
+                    _songs.value = songsResponse.data.list
                 }
             }
         }

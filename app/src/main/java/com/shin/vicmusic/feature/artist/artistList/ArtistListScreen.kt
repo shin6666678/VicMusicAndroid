@@ -48,7 +48,8 @@ fun ArtistListRoute(
         onItemClick = navController::navigateToArtistDetail,
         onRegionChange = viewModel::updateRegion,
         onTypeChange = viewModel::updateType,
-        onStyleChange = viewModel::updateStyle
+        onStyleChange = viewModel::updateStyle,
+        onFollowClick = viewModel::followArtist
     )
 }
 
@@ -62,7 +63,8 @@ fun ArtistListScreen(
     onItemClick: (String) -> Unit = {},
     onRegionChange: (String) -> Unit = {},
     onTypeChange: (String) -> Unit = {},
-    onStyleChange: (String) -> Unit = {}
+    onStyleChange: (String) -> Unit = {},
+    onFollowClick:(String)->Unit={}
 ) {
 
     Scaffold(
@@ -97,7 +99,11 @@ fun ArtistListScreen(
                     )
                 }
                 items(artists) { artist ->
-                    ArtistListItem(artist = artist, onClick = onItemClick)
+                    ArtistListItem(
+                        artist = artist,
+                        onClick = onItemClick,
+                        onFollowClick=onFollowClick
+                    )
                 }
             }
         }

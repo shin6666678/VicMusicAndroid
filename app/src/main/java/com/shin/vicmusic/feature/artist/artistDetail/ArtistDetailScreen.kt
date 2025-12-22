@@ -7,10 +7,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -18,12 +21,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -33,26 +38,25 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.shin.vicmusic.core.data.repository.SongRepository
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
 import com.shin.vicmusic.core.design.theme.SpaceOuter
 import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.domain.Song
-import com.shin.vicmusic.core.domain.usecase.CheckVipPermissionUseCase
-import com.shin.vicmusic.core.manager.PlaybackQueueManager
 import com.shin.vicmusic.core.manager.PlayerManager
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.ARTIST
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONGS
 import com.shin.vicmusic.feature.artist.artistDetail.component.ArtistMainCard
-import com.shin.vicmusic.feature.artist.artistDetail.component.ArtistSongList
+import com.shin.vicmusic.feature.artist.artistDetail.component.ArtistTabRow
 import com.shin.vicmusic.feature.artist.artistDetail.component.ArtistTopBar
 import com.shin.vicmusic.feature.song.ItemSong
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Preview
@@ -73,7 +77,6 @@ fun ArtistDetailRoute(
     viewModel: ArtistDetailViewModel = hiltViewModel(),
 ) {
     val playerManager = LocalPlayerManager.current
-
     val artist by viewModel.artist.collectAsState()
     val songs by viewModel.songs.collectAsState()
     val navController = LocalNavController.current
@@ -103,31 +106,53 @@ fun ArtistDetailScreen(
     val tabs = listOf("百科", "歌曲", "专辑")
     val pagerState = rememberPagerState(pageCount = { tabs.size }, initialPage = 1)
     val coroutineScope = rememberCoroutineScope()
-    // 获取屏幕高度，赋值给 Pager 确保其能正确测量
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+    val density = LocalDensity.current
 
-    // 1. 创建外部列表状态
+    // 计算关键高度
+    val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+    val topBarHeight = 56.dp + statusBarHeight
+    val imageHeight = 340.dp
+
+    // 转换为像素进行计算
+    val topBarHeightPx = with(density) { topBarHeight.toPx() }
+    val imageHeightPx = with(density) { imageHeight.toPx() }
+    // 触发吸顶和变色的阈值：图片高度 - TopBar高度
+    val triggerPx = imageHeightPx - topBarHeightPx
+
     val outerState = rememberLazyListState()
 
-    // 2. 创建连接
+    // 计算 TopBar 背景透明度
+    val topBarAlpha by remember {
+        derivedStateOf {
+            if (outerState.firstVisibleItemIndex > 0) 1f
+            else (outerState.firstVisibleItemScrollOffset / triggerPx).coerceIn(0f, 1f)
+        }
+    }
+
+    // 判断是否显示悬浮的 Tab 栏
+    val showStickyTabs by remember {
+        derivedStateOf {
+            outerState.firstVisibleItemIndex > 0 || outerState.firstVisibleItemScrollOffset >= triggerPx
+        }
+    }
+
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
-            // 下滑时 (手指上推, available.y < 0): 外部优先消费 (隐藏 Header)
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                if (available.y < 0) {
+                if (available.y < 0) { // 手指上推
                     val consumed = outerState.dispatchRawDelta(-available.y)
                     return Offset(0f, -consumed)
                 }
                 return Offset.Zero
             }
 
-            // 上滑时 (手指下拉, available.y > 0): 内部先消费，剩下来的外部再消费 (显示 Header)
             override fun onPostScroll(
                 consumed: Offset,
                 available: Offset,
                 source: NestedScrollSource
             ): Offset {
-                if (available.y > 0) {
+                if (available.y > 0) { // 手指下拉
                     val consumedY = outerState.dispatchRawDelta(-available.y)
                     return Offset(0f, -consumedY)
                 }
@@ -136,91 +161,85 @@ fun ArtistDetailScreen(
         }
     }
 
-    LazyColumn(
-        state = outerState, // 3. 绑定状态
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-    ) {
-        item { ArtistTopBar(onBackClick = onBackClick) }
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            state = outerState,
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+        ) {
+            // 0. 头部图片
+            item {
+                ArtistMainCard(
+                    artist = artist,
+                    onFollowClick = onFollowClick,
+                    onPlayHotSongsClick = onPlayHotSongsClick,
+                    modifier = Modifier
+                )
+            }
 
-        item {
-            ArtistMainCard(
-                artist = artist,
-                onFollowClick = onFollowClick,
-                onPlayHotSongsClick = onPlayHotSongsClick,
-                modifier = Modifier
-            )
-        }
+            // 1. Tab 栏 (列表内的占位，滚动时会随列表移动)
+            item {
+                ArtistTabRow(
+                    tabs = tabs,
+                    pagerState = pagerState,
+                    coroutineScope = coroutineScope
+                )
+            }
 
-        stickyHeader { // 使用 stickyHeader 让 Tab 栏吸顶
-            Column( // 给 Tab栏添加背景色防止透明重叠
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .padding(top = 16.dp, bottom = 8.dp)
-            ) {
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(horizontal = SpaceOuter),
-                    horizontalArrangement = Arrangement.spacedBy(24.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    itemsIndexed(tabs) { index, tabText ->
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = tabText,
-                                style = MaterialTheme.typography.titleLarge,
-                                color = if (pagerState.currentPage == index) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.clickable {
-                                    coroutineScope.launch {
-                                        pagerState.animateScrollToPage(
-                                            index
-                                        )
-                                    }
+            // 2. 内容 Pager
+            item {
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier
+                        .height(screenHeight)
+                        .nestedScroll(nestedScrollConnection)
+                ) { page ->
+                    when (page) {
+                        1 -> if (songs != null) {
+                            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                                items(songs) { song ->
+                                    ItemSong(
+                                        song = song,
+                                        modifier = Modifier.clickable { playerManager?.playSong(song) },
+                                        onAddToQueueClick = { playerManager?.addSongToQueue(song) },
+                                        onLikeClick = onLikeClick
+                                    )
                                 }
-                            )
-                            if (pagerState.currentPage == index) {
-                                Box(
-                                    modifier = Modifier
-                                        .padding(top = 4.dp)
-                                        .width(24.dp)
-                                        .height(2.dp)
-                                        .background(
-                                            MaterialTheme.colorScheme.primary,
-                                            RoundedCornerShape(1.dp)
-                                        )
-                                )
                             }
                         }
+                        else -> {}
                     }
                 }
             }
         }
 
-        item {
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier
-                    .height(screenHeight) // 必须设置高度为屏幕高度
-                    .nestedScroll(nestedScrollConnection) // 4. 绑定连接
-            ) { page ->
-                when (page) {
-                    1 -> if (songs != null) {
-                        LazyColumn(modifier = Modifier.fillMaxSize()) {
-                            items(songs) { song ->
-                                ItemSong(
-                                    song = song,
-                                    modifier = Modifier.clickable { playerManager?.playSong(song) },
-                                    onAddToQueueClick = { playerManager?.addSongToQueue(song) },
-                                    onLikeClick = onLikeClick
-                                )
-                            }
-                        }
-                    }
+        // --- 悬浮层 (Overlay) ---
 
-                    else -> {}
-                }
+        // 1. 顶部 TopBar (固定在顶部，背景色动态变化)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                // 使用 surfaceVariant 或其他你喜欢的背景色，并应用 alpha
+                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = topBarAlpha))
+                .zIndex(2f)
+        ) {
+            ArtistTopBar(onBackClick = onBackClick)
+        }
+
+        // 2. 吸顶的 Tab 栏 (仅在列表滚动超过阈值时显示，位置在 TopBar 下方)
+        if (showStickyTabs) {
+            Box(
+                modifier = Modifier
+                    .padding(top = topBarHeight) // 关键：位置偏移到 TopBar 下方
+                    .fillMaxWidth()
+                    .zIndex(1f)
+            ) {
+                ArtistTabRow(
+                    tabs = tabs,
+                    pagerState = pagerState,
+                    coroutineScope = coroutineScope
+                )
             }
         }
     }
