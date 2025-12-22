@@ -1,5 +1,6 @@
 package com.shin.vicmusic.feature.artist.artistList
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.ArtistRepository
@@ -65,6 +66,7 @@ class ArtistListViewModel @Inject constructor(
     }
 
     fun followArtist(artistId: String){
+        Log.d("follow","follow${artistId}")
         viewModelScope.launch {
             val response=userRepository.follow(artistId, 1)
             if (response.status==0){

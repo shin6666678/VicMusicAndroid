@@ -4,7 +4,7 @@ import android.util.Log
 import com.shin.vicmusic.core.data.mapper.toDomain
 import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.domain.Song
-import com.shin.vicmusic.core.model.User
+import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.model.request.FollowReq
 import com.shin.vicmusic.core.model.request.LikeSongReq
 import com.shin.vicmusic.core.model.request.UserLoginReq
@@ -89,7 +89,12 @@ class MyRetrofitDatasource @Inject constructor(
 
     // [新增] 对应 Service 的 userInfo 方法
     suspend fun userInfo(): NetworkResponse<User> {
-        return safeApiCall { service.userInfo() }
+        val dtoResponse = safeApiCall { service.userInfo() }
+        if(dtoResponse.status == 0 && dtoResponse.data != null){
+            val domainUser = dtoResponse.data.toDomain()
+            return NetworkResponse(status = 0, message = dtoResponse.message, data = domainUser)
+        }
+        return NetworkResponse(status = dtoResponse.status, message = dtoResponse.message, data = null)
     }
 
     // [修改] 获取喜欢列表：DTO -> Domain
@@ -125,7 +130,7 @@ class MyRetrofitDatasource @Inject constructor(
         return safeApiCall { service.getArtistById(artistId) }
     }
 
-    suspend fun follow(followReq: FollowReq): NetworkResponse<Unit>{
+    suspend fun follow(followReq: FollowReq): NetworkResponse<String>{
         return safeApiCall { service.follow(followReq) }
     }
 

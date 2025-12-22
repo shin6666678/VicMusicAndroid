@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.shin.vicmusic.core.design.composition.LocalAuthManager
 import com.shin.vicmusic.core.design.composition.LocalNavController
-import com.shin.vicmusic.core.model.User
+import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.feature.vip.component.VipBottomBar
 import com.shin.vicmusic.feature.vip.component.VipPrivilegesSection
 import com.shin.vicmusic.feature.vip.component.VipProductList

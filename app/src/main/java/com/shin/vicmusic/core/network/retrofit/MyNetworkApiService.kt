@@ -2,9 +2,10 @@ package com.shin.vicmusic.core.network.retrofit
 
 import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.domain.Song
-import com.shin.vicmusic.core.model.User
+import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.model.api.SongDetailDto
 import com.shin.vicmusic.core.model.api.SongListItemDto
+import com.shin.vicmusic.core.model.api.UserInfoDto
 import com.shin.vicmusic.core.model.request.FollowReq
 import com.shin.vicmusic.core.model.request.LikeSongReq
 import com.shin.vicmusic.core.model.request.UserLoginReq
@@ -44,7 +45,7 @@ interface MyNetworkApiService {
 
     // [新增] 获取用户信息接口 (Info Interface)
     @GET("/api/user/v1/info")
-    suspend fun userInfo(): NetworkResponse<User>
+    suspend fun userInfo(): NetworkResponse<UserInfoDto>
 
     // [新增] 获取喜欢歌曲列表接口
     @GET("/api/like/v1/listSong")
@@ -65,9 +66,10 @@ interface MyNetworkApiService {
     suspend fun getArtistById(@Path(value = "id") id: String): NetworkResponse<Artist>
 
     @POST("/api/relationship/v1/follow")
-    suspend fun follow(@Body req: FollowReq): NetworkResponse<Unit>
+    suspend fun follow(@Body req: FollowReq): NetworkResponse<String>
 
     @GET("/api/songs/v1/page")
-    fun getSongsByArtistId(@Query(value = "artistId") artistId: String): NetworkResponse<NetworkPageData<SongListItemDto>>
+    suspend fun getSongsByArtistId(@Query(value = "artistId") artistId: String):
+            NetworkResponse<NetworkPageData<SongListItemDto>>
 
 }
