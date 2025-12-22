@@ -7,6 +7,7 @@ import com.shin.vicmusic.core.domain.RankListPeak
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.model.api.RankListPeakDto
 import com.shin.vicmusic.core.model.api.SongListItemDto
+import com.shin.vicmusic.core.model.response.NetworkPageData
 import com.shin.vicmusic.core.model.response.NetworkResponse
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONGS
 import javax.inject.Inject
@@ -21,7 +22,7 @@ class MyMockDatasource @Inject constructor(
         region: String = "全部",
         type: String = "全部",
         style: String = "全部"
-    ): NetworkResponse<List<Artist>> {
+    ): NetworkResponse<NetworkPageData<Artist>> {
         // 模拟数据库中的全量数据
         val allArtists = listOf(
             Artist("1", "周杰伦", "https://example.com/jay.jpg", "华语流行天王", 1000000, true, "港台", "男", "流行"),
@@ -45,7 +46,7 @@ class MyMockDatasource @Inject constructor(
         }
 
 
-        return NetworkResponse(status = 0, message = "成功", data = filteredData)
+        return NetworkResponse(status = 0, message = "成功", data = NetworkPageData(filteredData,null))
     }
 
     fun getArtistById(artistId: String): NetworkResponse<Artist>{
