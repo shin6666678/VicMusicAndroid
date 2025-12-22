@@ -3,6 +3,7 @@ package com.shin.vicmusic.feature.artist.artistList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.ArtistRepository
+import com.shin.vicmusic.core.data.repository.UserRepository
 import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.domain.Song
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +21,8 @@ data class ArtistFilterState(
 
 @HiltViewModel
 class ArtistListViewModel @Inject constructor(
-    private val artistRepository: ArtistRepository
+    private val artistRepository: ArtistRepository,
+    private val userRepository: UserRepository
 ) : ViewModel(){
     // 直接存储从后端获取的列表，不再保存全量 originalArtists
     private val _artists = MutableStateFlow<List<Artist>>(emptyList())
@@ -60,5 +62,20 @@ class ArtistListViewModel @Inject constructor(
     fun updateStyle(style: String) {
         _filterState.value = _filterState.value.copy(style = style)
         loadData()
+    }
+
+    fun followArtist(artistId: String){
+        viewModelScope.launch {
+            val response=userRepository.follow(artistId, 1)
+            if (response.status==0){
+                // 更新 artist
+                val artist=_artists.value.find { it.id==artistId }
+                if (artist!=null){
+                    _artists.value=_artists.value.map {
+                        if (it.id==artistId) artist.copy(isFollowing=true) else it
+                    }
+                }
+            }
+        }
     }
 }

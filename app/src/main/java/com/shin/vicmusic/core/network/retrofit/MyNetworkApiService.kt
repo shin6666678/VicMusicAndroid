@@ -1,9 +1,11 @@
 package com.shin.vicmusic.core.network.retrofit
 
 import com.shin.vicmusic.core.domain.Artist
+import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.model.User
 import com.shin.vicmusic.core.model.api.SongDetailDto
 import com.shin.vicmusic.core.model.api.SongListItemDto
+import com.shin.vicmusic.core.model.request.FollowReq
 import com.shin.vicmusic.core.model.request.LikeSongReq
 import com.shin.vicmusic.core.model.request.UserLoginReq
 import com.shin.vicmusic.core.model.request.UserRegisterReq
@@ -61,4 +63,11 @@ interface MyNetworkApiService {
 
     @GET("/api/artist/v1/{id}")
     suspend fun getArtistById(@Path(value = "id") id: String): NetworkResponse<Artist>
+
+    @POST("/api/relationship/v1/follow")
+    suspend fun follow(@Body req: FollowReq): NetworkResponse<Unit>
+
+    @GET("/api/songs/v1/page")
+    fun getSongsByArtistId(@Query(value = "artistId") artistId: String): NetworkResponse<NetworkPageData<SongListItemDto>>
+
 }

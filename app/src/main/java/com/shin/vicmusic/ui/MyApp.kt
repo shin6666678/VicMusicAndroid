@@ -31,8 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.shin.vicmusic.core.design.component.MyNavigationBar
-import com.shin.vicmusic.core.design.component.SongBar
+import com.shin.vicmusic.feature.common.MyNavigationBar
+import com.shin.vicmusic.feature.common.SongBar
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
 import com.shin.vicmusic.core.design.theme.SpaceExtraMedium

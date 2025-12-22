@@ -28,14 +28,14 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import com.shin.vicmusic.core.design.component.MyAsyncImage
+import com.shin.vicmusic.feature.common.MyAsyncImage
 import com.shin.vicmusic.core.domain.Artist
 
 @Composable
 fun ArtistListItem(
     artist: Artist,
-    onClick: (String) -> Unit = {}
+    onClick: (String) -> Unit = {},
+    onFollowClick: (String) -> Unit = {},
 ) {
     Row(
         modifier = Modifier
@@ -62,7 +62,7 @@ fun ArtistListItem(
         // 关注按钮
         if (artist.isFollowing) {
             OutlinedButton(
-                onClick = { /* TODO: Unfollow */ },
+                onClick = { onFollowClick(artist.id)},
                 shape = RoundedCornerShape(50),
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
                 modifier = Modifier.height(32.dp),
