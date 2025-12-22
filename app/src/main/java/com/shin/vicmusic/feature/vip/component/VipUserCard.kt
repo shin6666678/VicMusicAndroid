@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.shin.vicmusic.R
-import com.shin.vicmusic.core.model.User
+import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.feature.vip.VipGold
 import com.shin.vicmusic.feature.vip.VipSubText
 

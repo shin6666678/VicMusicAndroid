@@ -25,7 +25,7 @@ import com.shin.vicmusic.core.design.theme.SpaceExtraMedium
 import com.shin.vicmusic.core.design.theme.SpaceMedium
 import com.shin.vicmusic.core.design.theme.SpaceOuter
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
-import com.shin.vicmusic.core.model.User
+import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.feature.vip.VipIcon
 import com.shin.vicmusic.util.ResourceUtil
 
@@ -34,7 +34,7 @@ fun UserGreeting(
     user: User?=null
 ) {
     // 1. 同步 VIP 解析逻辑
-    val vipLevelInt = user?.vipLevel?.toIntOrNull() ?: 0
+    val vipLevelInt = user?.vipLevel?: 0
     val (vipTagText, vipBgColor, vipTextColor) = when {
         vipLevelInt >= 6 -> Triple("VIP $vipLevelInt", Color(0xFF000000), Color(0xFFFFD700)) // 黑金配色
         vipLevelInt >= 1 -> Triple("VIP $vipLevelInt", Color(0xFFD4AF37), Color.White) // 普通 VIP 金色
@@ -97,7 +97,7 @@ fun PreviewUserGreeting() {
         UserGreeting(
             User(
                 name = "发现界面测试用户",
-                vipLevel = "6"
+                vipLevel = 6
             )
         )
     }

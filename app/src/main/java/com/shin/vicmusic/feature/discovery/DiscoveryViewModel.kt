@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.SongRepository
 import com.shin.vicmusic.core.domain.Song // [修改] 引用 Domain Model
-import com.shin.vicmusic.core.model.User
+import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import com.shin.vicmusic.core.manager.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel

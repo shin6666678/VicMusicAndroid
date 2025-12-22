@@ -77,7 +77,7 @@ fun ArtistListItem(
             }
         } else {
             OutlinedButton(
-                onClick = { /* TODO: Follow */ },
+                onClick = { onFollowClick(artist.id) },
                 shape = RoundedCornerShape(50),
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
                 modifier = Modifier.height(32.dp),

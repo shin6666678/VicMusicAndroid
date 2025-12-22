@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.shin.vicmusic.R
-import com.shin.vicmusic.core.model.User
+import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.feature.me.ActionItem // 确保导入了 ActionItem
 import com.shin.vicmusic.feature.vip.VipIcon
 
@@ -33,7 +33,7 @@ fun UserInfoCardPreview() {
         isLoggedIn = true,
         user = User(
             name = "登录情况测试用户",
-            vipLevel = "5",
+            vipLevel = 0,
         )
     )
 }
@@ -53,16 +53,16 @@ fun UserInfoCard(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             // 1. 头部区域：根据登录状态切换
-            if (isLoggedIn) {
-                LoggedInHeader(onAvatarClick,onVipClick,user)
+            if (isLoggedIn && user != null) {
+                LoggedInHeader(onAvatarClick, onVipClick, user)
             } else {
                 LoggedOutHeader(onAvatarClick)
             }
 
             // 2. 统计数据区域 (仅登录显示)
-            if (isLoggedIn) {
+            if (isLoggedIn && user != null) {
                 Spacer(modifier = Modifier.height(20.dp))
-                UserStatsRow()
+                UserStatsRow(user = user)
             }
 
             // 3. 底部功能按钮区域 (使用循环减少代码)
@@ -81,7 +81,7 @@ private fun LoggedInHeader(
     user: User?
 ) {
     // 1. 解析 VIP 等级 (默认为 0)
-    val vipLevelInt = user?.vipLevel?.toIntOrNull() ?: 0
+    val vipLevelInt = user?.vipLevel ?: -1
 
     // 2. 根据等级定义 UI 样式 (颜色和文字)
     // 这里是一个简单的示例逻辑，你可以根据需求调整颜色和等级划分
@@ -160,13 +160,15 @@ private fun LoggedOutHeader(onAvatarClick: () -> Unit) {
 }
 
 @Composable
-private fun UserStatsRow() {
+private fun UserStatsRow(
+    user: User
+) {
     // 定义数据类或直接使用 List<Pair>
     val stats = listOf(
-        "null" to "关注",
-        "null" to "粉丝",
-        "null" to "等级",
-        "null" to "听歌"
+        user.followCount to "关注",
+        user.followerCount to "粉丝",
+        user.level to "等级",
+        user.heardCount to "听歌"
     )
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -182,6 +184,7 @@ private fun UserStatsRow() {
 private fun ActionButtonsRow() {
     // 定义按钮数据
     data class ActionBtn(val icon: ImageVector, val text: String, val color: Color)
+
     val actions = listOf(
         ActionBtn(Icons.Filled.Star, "提现", Color(0xFFFF9800)),
         ActionBtn(Icons.Filled.Favorite, "会员", Color(0xFF00BFA5)),
@@ -204,10 +207,11 @@ private fun ActionButtonsRow() {
 }
 
 @Composable
-fun StatItem(count: String, label: String) {
+fun StatItem(count: Int?, label: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
-            text = count,
+            // 修复: 判空并转换为String
+            text = (count ?: 0).toString(),
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Bold
         )

@@ -23,7 +23,7 @@ import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterProvider
 import androidx.compose.runtime.rememberCoroutineScope
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
-import com.shin.vicmusic.core.model.User
+import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.feature.discovery.TestList.TestList
 import com.shin.vicmusic.feature.discovery.musicHall.MusicHall
 import com.shin.vicmusic.feature.discovery.recommend.Recommend

@@ -2,7 +2,7 @@ package com.shin.vicmusic.core.manager
 
 import com.shin.vicmusic.core.config.AppGlobalData
 import com.shin.vicmusic.core.data.repository.AuthRepository
-import com.shin.vicmusic.core.model.User
+import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
