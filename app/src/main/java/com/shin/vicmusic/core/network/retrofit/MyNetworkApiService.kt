@@ -1,5 +1,6 @@
 package com.shin.vicmusic.core.network.retrofit
 
+import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.model.User
 import com.shin.vicmusic.core.model.api.SongDetailDto
 import com.shin.vicmusic.core.model.api.SongListItemDto
@@ -24,13 +25,16 @@ interface MyNetworkApiService {
     suspend fun songs(): NetworkResponse<NetworkPageData<SongListItemDto>>
 
     @GET("/api/songs/v1/{id}")
-    suspend fun songDetail(@Path(value = "id") id:String,): NetworkResponse<SongDetailDto>
+    suspend fun songDetail(@Path(value = "id") id: String): NetworkResponse<SongDetailDto>
 
     @GET("/api/notify/v1/send_code")
-    suspend fun mailCode(@Query(value = "to")to:String,@Query(value = "captcha") captcha:String): NetworkResponse<Unit>
+    suspend fun mailCode(
+        @Query(value = "to") to: String,
+        @Query(value = "captcha") captcha: String
+    ): NetworkResponse<Unit>
 
     @POST("/api/user/v1/register")
-    suspend fun register(@Body req: UserRegisterReq):NetworkResponse<User>
+    suspend fun register(@Body req: UserRegisterReq): NetworkResponse<User>
 
     // [新增] 登录接口
     @POST("/api/user/v1/login")
@@ -47,4 +51,14 @@ interface MyNetworkApiService {
     // [新增] 喜欢歌曲接口
     @POST("/api/like/v1/likeSong")
     suspend fun likeSong(@Body req: LikeSongReq): NetworkResponse<Unit>
+
+    @GET("/api/artist/v1/page")
+    suspend fun getArtists(
+        @Query(value = "region") region: String,
+        @Query(value = "type")type: String,
+        @Query(value = "style")style: String
+    ): NetworkResponse<NetworkPageData<Artist>>
+
+    @GET("/api/artist/v1/{id}")
+    suspend fun getArtistById(@Path(value = "id") id: String): NetworkResponse<Artist>
 }

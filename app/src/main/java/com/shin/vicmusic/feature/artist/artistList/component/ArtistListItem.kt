@@ -29,6 +29,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.shin.vicmusic.core.design.component.MyAsyncImage
 import com.shin.vicmusic.core.domain.Artist
 
 @Composable
@@ -43,9 +44,8 @@ fun ArtistListItem(
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        AsyncImage(
+        MyAsyncImage(
             model = artist.image,
-            contentDescription = null,
             modifier = Modifier
                 .size(56.dp)
                 .clip(CircleShape)

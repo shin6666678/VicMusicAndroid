@@ -43,7 +43,7 @@ class ArtistListViewModel @Inject constructor(
                 type = filter.type,
                 style = filter.style
             )
-            _artists.value = artistsResp.data ?: emptyList()
+            _artists.value = artistsResp.data?.list?: emptyList()
         }
     }
 

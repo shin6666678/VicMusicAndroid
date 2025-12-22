@@ -2,6 +2,7 @@ package com.shin.vicmusic.core.network.datasource
 
 import android.util.Log
 import com.shin.vicmusic.core.data.mapper.toDomain
+import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.model.User
 import com.shin.vicmusic.core.model.request.LikeSongReq
@@ -110,4 +111,17 @@ class MyRetrofitDatasource @Inject constructor(
     suspend fun likeSong(likeSongReq: LikeSongReq): NetworkResponse<Unit>{
         return safeApiCall { service.likeSong(likeSongReq) }
     }
+
+    suspend fun getArtists(
+        region: String = "全部",
+        type: String = "全部",
+        style: String = "全部"
+    ): NetworkResponse<NetworkPageData<Artist>>{
+        return safeApiCall { service.getArtists(region, type, style) }
+    }
+
+    suspend fun getArtistById(artistId: String): NetworkResponse<Artist>{
+        return safeApiCall { service.getArtistById(artistId) }
+    }
+
 }
