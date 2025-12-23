@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.ArtistRepository
 import com.shin.vicmusic.core.data.repository.SongRepository
 import com.shin.vicmusic.core.domain.Artist
+import com.shin.vicmusic.core.domain.Result
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.model.request.SongPageReq
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,14 +37,15 @@ class ArtistDetailViewModel @Inject constructor(
 
     private fun fetchArtistDetail() {
         viewModelScope.launch {
-            val artistResponse = artistRepository.getArtistDetailById(artistId)
-            if (artistResponse.status == 0) {
-                _artist.value = artistResponse.data
-
-                val songsResponse = songRepository.getSongs(SongPageReq(artistId=artistId))
-                if (songsResponse.status == 0 && songsResponse.data!= null && songsResponse.data.list != null) {
-                    _songs.value = songsResponse.data.list
+            when(val artistResult = artistRepository.getArtistDetailById(artistId)){
+                is Result.Success->{
+                    _artist.value = artistResult.data
+                    val songsResult = songRepository.getSongs(SongPageReq(artistId=artistId))
+                    if (songsResult is Result.Success) {
+                        _songs.value = songsResult.data.list?:emptyList()
+                    }
                 }
+                is Result.Error ->{}
             }
         }
     }

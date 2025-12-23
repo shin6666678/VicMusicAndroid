@@ -2,6 +2,7 @@ package com.shin.vicmusic.core.manager
 
 import com.shin.vicmusic.core.config.AppGlobalData
 import com.shin.vicmusic.core.data.repository.AuthRepository
+import com.shin.vicmusic.core.domain.Result
 import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import kotlinx.coroutines.CoroutineScope
@@ -53,15 +54,19 @@ class AuthManager @Inject constructor(
         }
     }
 
-    // [新增] 获取用户信息方法
+    // 获取用户信息方法
     fun fetchUserInfo() {
         scope.launch {
-            val response =  authRepository.getUserInfo()
-            if (response.status == 0) {
-                _currentUser.value = response.data
-                // 确保登录状态为 true
-                if (_isLoggedIn.value != true) _isLoggedIn.value = true
+            val result =  authRepository.getUserInfo()
+            when(result){
+                is Result.Success->{
+                    _currentUser.value = result.data
+                    // 确保登录状态为 true
+                    if (_isLoggedIn.value != true) _isLoggedIn.value = true
+                }
+                is Result.Error->{}
             }
+
         }
     }
 }

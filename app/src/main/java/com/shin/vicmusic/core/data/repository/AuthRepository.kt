@@ -1,9 +1,11 @@
 package com.shin.vicmusic.core.data.repository
 
+import com.shin.vicmusic.core.data.mapper.toDomain
+import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.model.request.UserLoginReq
 import com.shin.vicmusic.core.model.request.UserRegisterReq
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
-import retrofit2.http.Query
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -19,5 +21,12 @@ class AuthRepository @Inject constructor(
     suspend fun register(req: UserRegisterReq) = datasource.register(req)
 
     // 获取用户信息(Get User Info)
-    suspend fun getUserInfo() = datasource.userInfo()
+    suspend fun getUserInfo(): Result<User> {
+        val dtoResponse = datasource.userInfo()
+        if(dtoResponse.status == 0 && dtoResponse.data != null){
+            val domainUser = dtoResponse.data.toDomain()
+            return Result.Success(domainUser)
+        }
+        return Result.Error(dtoResponse.message ?: "未知错误")
+    }
 }

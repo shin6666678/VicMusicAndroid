@@ -7,7 +7,10 @@ import com.shin.vicmusic.core.data.repository.AlbumRepository
 import com.shin.vicmusic.core.data.repository.LikeRepository
 import com.shin.vicmusic.core.data.repository.SongRepository
 import com.shin.vicmusic.core.domain.Album
+import com.shin.vicmusic.core.domain.AlbumDetail
+import com.shin.vicmusic.core.domain.Result
 import com.shin.vicmusic.core.domain.Song
+import com.shin.vicmusic.core.model.request.AlbumDetailReq
 import com.shin.vicmusic.core.model.request.SongPageReq
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +26,6 @@ import javax.inject.Inject
 @HiltViewModel
 class AlbumDetailViewModel @Inject constructor(
     private val albumRepository: AlbumRepository,
-    private val songRepository: SongRepository,
     private val likeRepository: LikeRepository,
     savedStateHandle: SavedStateHandle // 获取传递的参数
 ) : ViewModel() {
@@ -36,98 +38,68 @@ class AlbumDetailViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
-        getAlbumDetail(albumId)
-        getSongsByAlbumId(albumId)
+        loadAlbumDetail()
     }
 
     /**
-     * 获取专辑详情
-     * @param albumId 专辑ID
+     * 获取聚合详情数据 (专辑信息 + 歌曲列表)
      */
-    fun getAlbumDetail(albumId: String) {
+    fun loadAlbumDetail() {
         viewModelScope.launch {
-            // 设置为加载中状态
             _uiState.update { it.copy(isLoading = true) }
-            try {
-                // 调用repository获取数据
-                val response = albumRepository.getAlbumDetail(albumId)
-                if (response.status == 0 && response.data != null) {
-                    // 更新为成功状态
-                    _uiState.update {
-                        it.copy(
+
+            // 假设 Repository 返回的是 Result<AlbumDetail> (包含 album 和 songs)
+            // 或者是你之前定义的 Domain Model
+            val result = albumRepository.getAlbumDetail(AlbumDetailReq(id=albumId))
+
+            _uiState.update { state ->
+                when (result) {
+                    is Result.Success -> {
+                        // [关键] 一次性解构数据
+                        // 假设 result.data 是你定义的聚合 Domain 对象
+                        val detail = result.data
+                        state.copy(
                             isLoading = false,
-                            album = response.data,
+                            album = detail.album, // 拿到专辑信息
+                            songs = detail.songs.items, // 拿到歌曲列表 (如果是 PageResult 取 items)
                             error = null
                         )
                     }
-                } else {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            error = response.message ?: "获取专辑详情失败"
-                        )
-                    }
-                }
-            } catch (e: Exception) {
-                // 更新为失败状态
-                _uiState.update {
-                    it.copy(
+                    is Result.Error -> state.copy(
                         isLoading = false,
-                        error = e.message
+                        error = result.message
                     )
                 }
             }
         }
     }
 
-    fun getSongsByAlbumId(albumId: String) {
-        viewModelScope.launch {
-            try {
-                val response = songRepository.getSongs(
-                    SongPageReq(
-                        albumId = albumId
-                    )
-                )
-                if (response.status == 0 && response.data != null) {
-                    _uiState.update {
-                        it.copy(songs = response.data.list ?: emptyList())
-                    }
-                }
-            } catch (e: Exception) {
-                // Ignore for now, or handle error separately
-            }
-        }
-    }
 
+    /**
+     * 点赞/取消点赞 (优化了代码复用)
+     */
     fun toggleLike(song: Song) {
         viewModelScope.launch {
-            // 乐观更新 UI
-            _uiState.update { currentState ->
-                val updatedSongs = currentState.songs.map {
-                    if (it.id == song.id) it.copy(isLiked = !it.isLiked) else it
+            // 1. 定义局部更新函数：只翻转指定 ID 的 isLiked 状态
+            fun updateLikeState(targetId: String) {
+                _uiState.update { state ->
+                    state.copy(songs = state.songs.map { item ->
+                        if (item.id == targetId) item.copy(isLiked = !item.isLiked) else item
+                    })
                 }
-                currentState.copy(songs = updatedSongs)
             }
 
-            try {
-                val response = likeRepository.likeSong(song.id)
-                if (response.status != 0) {
-                    // 如果失败，回滚状态
-                    _uiState.update { currentState ->
-                        val updatedSongs = currentState.songs.map {
-                            if (it.id == song.id) it.copy(isLiked = !it.isLiked) else it
-                        }
-                        currentState.copy(songs = updatedSongs)
-                    }
-                }
-            } catch (e: Exception) {
-                // 异常处理，回滚状态
-                _uiState.update { currentState ->
-                    val updatedSongs = currentState.songs.map {
-                        if (it.id == song.id) it.copy(isLiked = !it.isLiked) else it
-                    }
-                    currentState.copy(songs = updatedSongs)
-                }
+            // 2. 乐观更新
+            updateLikeState(song.id)
+
+            // 3. 网络请求
+            val result = likeRepository.likeSong(song.id)
+
+            // 4. 如果失败，回滚
+            if (result is Result.Error) {
+                updateLikeState(song.id) // 再翻转一次就回去了
+                // 可选：显示错误提示
+                // _uiState.update { it.copy(error = result.message) }
             }
         }
     }

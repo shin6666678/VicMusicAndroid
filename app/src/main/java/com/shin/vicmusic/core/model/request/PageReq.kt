@@ -13,7 +13,13 @@ data class SongPageReq(
 data class AlbumPageReq(
     val page: Int = 1,
     val size: Int = 20,
-    val artistId: String? = null
+    val artistId: String? = null,
+)
+@Serializable
+data class AlbumDetailReq(
+    val page: Int = 1,
+    val size: Int = 20,
+    val id: String,
 )
 @Serializable
 data class ArtistPageReq(

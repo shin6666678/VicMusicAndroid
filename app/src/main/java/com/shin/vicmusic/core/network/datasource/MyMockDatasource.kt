@@ -2,12 +2,14 @@ package com.shin.vicmusic.core.network.datasource
 
 import com.shin.vicmusic.core.data.mapper.toDomain
 import com.shin.vicmusic.core.domain.Artist
+import com.shin.vicmusic.core.domain.PayType
 import com.shin.vicmusic.core.domain.RankListDetail
 import com.shin.vicmusic.core.domain.RankListPeak
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.model.api.RankListPeakDto
 import com.shin.vicmusic.core.model.api.SongListItemDto
 import com.shin.vicmusic.core.model.response.NetworkPageData
+import com.shin.vicmusic.core.model.response.NetworkPageMeta
 import com.shin.vicmusic.core.model.response.NetworkResponse
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONGS
 import javax.inject.Inject
@@ -46,7 +48,7 @@ class MyMockDatasource @Inject constructor(
         }
 
 
-        return NetworkResponse(status = 0, message = "成功", data = NetworkPageData(filteredData,null))
+        return NetworkResponse(status = 0, message = "成功", data = NetworkPageData(filteredData))
     }
 
     fun getArtistById(artistId: String): NetworkResponse<Artist>{
@@ -83,9 +85,9 @@ class MyMockDatasource @Inject constructor(
                 "热歌榜_23首新歌上榜",
                 "https://via.placeholder.com/150/00FF00/FFFFFF?text=Chart3",
                 listOf(
-                    SongListItemDto("1", "奇迹航线",),
-                    SongListItemDto("2", "爱错",),
-                    SongListItemDto("3", "恋人")
+                    Song("1", "奇迹航线"),
+                    Song("2", "爱错",),
+                    Song("3", "恋人")
                 )
             ),
             RankListPeakDto(
@@ -93,9 +95,9 @@ class MyMockDatasource @Inject constructor(
                 "巅峰潮流榜_QQ音乐 x 微博",
                 "https://via.placeholder.com/150/0000FF/FFFFFF?text=Chart1",
                 listOf(
-                    SongListItemDto("4","不渝", ),
-                    SongListItemDto("5","深海漫游指南", ),
-                    SongListItemDto("6","全世界下雨", )
+                    Song("4","不渝", ),
+                    Song("5","深海漫游指南", ),
+                    Song("6","全世界下雨", )
                 )
             ),
             RankListPeakDto(
@@ -103,9 +105,9 @@ class MyMockDatasource @Inject constructor(
                 "飙升榜_21首新歌上榜",
                 "https://via.placeholder.com/150/FF0000/FFFFFF?text=Chart2",
                 listOf(
-                    SongListItemDto("7","恒星不忘 Forever Forever"),
-                    SongListItemDto("8","奇迹航线", ),
-                    SongListItemDto("9","爱与欠", )
+                    Song("7","恒星不忘 Forever Forever"),
+                    Song("8","奇迹航线", ),
+                    Song("9","爱与欠", )
                 )
             )
         )

@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.ArtistRepository
 import com.shin.vicmusic.core.data.repository.UserRepository
 import com.shin.vicmusic.core.domain.Artist
-import com.shin.vicmusic.core.domain.Song
+import com.shin.vicmusic.core.domain.Result
 import com.shin.vicmusic.core.model.request.ArtistPageReq
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,14 +42,19 @@ class ArtistListViewModel @Inject constructor(
         viewModelScope.launch {
             val filter = _filterState.value
             // 发起网络请求
-            val artistsResp = artistRepository.getArtists(
+            val artistsResult = artistRepository.getArtists(
                 ArtistPageReq(
                     region = filter.region,
                     type = filter.type,
                     style = filter.style
                 )
             )
-            _artists.value = artistsResp.data?.list?: emptyList()
+            when(artistsResult){
+                is Result.Success->{
+                    _artists.value = artistsResult.data.list?: emptyList()
+                }
+                is Result.Error->{}
+            }
         }
     }
 
@@ -71,14 +76,19 @@ class ArtistListViewModel @Inject constructor(
     fun followArtist(artistId: String){
         Log.d("follow","follow${artistId}")
         viewModelScope.launch {
-            val response=userRepository.follow(artistId, 1)
-            if (response.status==0){
-                // 更新 artist
-                val artist=_artists.value.find { it.id==artistId }
-                if (artist!=null){
-                    _artists.value=_artists.value.map {
-                        if (it.id==artistId) artist.copy(isFollowing=true) else it
+            val result=userRepository.follow(artistId, 1)
+            when(result){
+                is Result.Success->{
+                    // 更新 artist
+                    val artist=_artists.value.find { it.id==artistId }
+                    if (artist!=null){
+                        _artists.value=_artists.value.map {
+                            if (it.id==artistId) artist.copy(isFollowing=true) else it
+                        }
                     }
+                }
+                is Result.Error->{
+                    Log.d("follow","error")
                 }
             }
         }

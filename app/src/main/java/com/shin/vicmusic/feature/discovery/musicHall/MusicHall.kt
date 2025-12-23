@@ -17,22 +17,24 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.QueueMusic
 import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.BarChart
-import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Radio
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -56,7 +58,6 @@ import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONGS
 import com.shin.vicmusic.feature.discovery.DiscoveryViewModel
 import com.shin.vicmusic.feature.song.ItemSong
-import kotlin.collections.List
 
 @Preview
 @Composable
@@ -72,8 +73,33 @@ fun MusicHall(
     onQuickAccessClick: (String) -> Unit = {}
 ) {
     val playerManager = LocalPlayerManager.current
+    val listState = rememberLazyListState()
+
+    // 监听列表滚动到底部，触发加载更多
+    val isAtBottom by remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val totalItems = layoutInfo.totalItemsCount
+            val visibleItemsInfo = layoutInfo.visibleItemsInfo
+            if (visibleItemsInfo.isEmpty()) {
+                false
+            } else {
+                val lastVisibleItem = visibleItemsInfo.last()
+                // 如果最后一个可见项的索引等于总项数-1（或者是倒数第几个），则认为到底部了
+                // 这里的预加载阈值设为 2，表示倒数第2项出现时就开始加载
+                lastVisibleItem.index >= totalItems - 2
+            }
+        }
+    }
+
+    LaunchedEffect(isAtBottom) {
+        if (isAtBottom) {
+            viewModel.loadData()
+        }
+    }
 
     LazyColumn(
+        state = listState,
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
@@ -104,6 +130,15 @@ fun MusicHall(
                 onAddToQueueClick = { playerManager.addSongToQueue(song) },
                 onLikeClick = onLikeClick
             )
+        }
+
+        // 6. 底部加载指示器 (可选)
+        item {
+           Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+               // 这里可以根据 loading 状态显示/隐藏
+               // 由于 loading 状态在 VM 内部控制，这里暂时简单放置占位
+               // 若要精确控制，需从 VM 暴露 isLoading State
+           }
         }
     }
 }

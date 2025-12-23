@@ -7,9 +7,9 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class NetworkPageMeta(
-    val total:Int?=null,
-    val pages:Int?=null,
-    val size:Int?=null,
-    val page:Int?=null,
-    val next:Int?=null
+    val total:Int=-1,
+    val pages:Int=-1,
+    val size:Int=-1,
+    val page:Int=-1,
+    val next:Int=-1
 )

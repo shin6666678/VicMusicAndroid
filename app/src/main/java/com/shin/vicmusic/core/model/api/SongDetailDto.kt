@@ -8,20 +8,17 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SongDetailDto(
     val id: String,
-    val title: String,
-    val artist: ArtistDto,
-    val album: AlbumDto,
-    val payType: PayTypeDto,
-    val uri: String? = null,
-    val icon: String? = null,
-    val genre: String? = null,
-    val lyric: String? = null,
-    val lyricStyle: Int? = null,
-    val likesCount: Int? = null,
-    val clicksCount: Int? = null,
-    val commentsCount: Int? = null,
-    val uploaderUserId: String? = null,
-    val createdAt: String? = null,
-    val updatedAt: String? = null,
-    val isLiked: Boolean = false
+    val title: String?=null,
+    val artist: ArtistDto?=null,
+    val album: AlbumDto?=null,
+    val payType: PayTypeDto?=null,
+    val uri: String?=null,
+    val icon: String?=null,
+    val genre: String?=null,
+    val lyric: String?=null,
+    val lyricStyle: Int?=null,
+    val likesCount: Int?=null,
+    val clicksCount: Int?=null,
+    val commentsCount: Int?=null,
+    val isLiked: Boolean?=null
 )
