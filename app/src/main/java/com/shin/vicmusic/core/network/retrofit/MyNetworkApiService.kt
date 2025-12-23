@@ -1,7 +1,6 @@
 package com.shin.vicmusic.core.network.retrofit
 
 import com.shin.vicmusic.core.domain.Artist
-import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.model.api.AlbumDto
 import com.shin.vicmusic.core.model.api.SongDetailDto
@@ -24,13 +23,9 @@ import retrofit2.http.Query
  * 修改：将 Song 实体替换为 API 层的 DTO (SongListItemDTO, SongDetailDTO)
  */
 interface MyNetworkApiService {
-
-    @GET("/api/songs/v1/page")
-    suspend fun songs(): NetworkResponse<NetworkPageData<SongListItemDto>>
-
-    @GET("/api/songs/v1/{id}")
-    suspend fun songDetail(@Path(value = "id") id: String): NetworkResponse<SongDetailDto>
-
+    /*
+    用户
+     */
     @GET("/api/notify/v1/send_code")
     suspend fun mailCode(
         @Query(value = "to") to: String,
@@ -40,15 +35,35 @@ interface MyNetworkApiService {
     @POST("/api/user/v1/register")
     suspend fun register(@Body req: UserRegisterReq): NetworkResponse<User>
 
-    // [新增] 登录接口
+    // 登录接口
     @POST("/api/user/v1/login")
     suspend fun login(@Body req: UserLoginReq): NetworkResponse<String>
 
-    // [新增] 获取用户信息接口 (Info Interface)
+    // 获取用户信息接口 (Info Interface)
     @GET("/api/user/v1/info")
     suspend fun userInfo(): NetworkResponse<UserInfoDto>
 
-    // [新增] 获取喜欢歌曲列表接口
+    /*
+    song
+     */
+    @GET("/api/songs/v1/page")
+    suspend fun songs(
+        @Query("artistId") artistId: String?,
+        @Query("albumId") albumId: String?,
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): NetworkResponse<NetworkPageData<SongListItemDto>>
+
+    @GET("/api/songs/v1/{id}")
+    suspend fun songDetail(@Path(value = "id") id: String): NetworkResponse<SongDetailDto>
+
+    @GET("/api/songs/v1/page")
+    suspend fun getSongsByAlbumId(@Query("albumId") albumId: String): NetworkResponse<NetworkPageData<SongListItemDto>>
+
+    /*
+    喜欢
+     */
+    // 获取喜欢歌曲列表接口
     @GET("/api/like/v1/listSong")
     suspend fun getLikedSongs(): NetworkResponse<NetworkPageData<SongListItemDto>>
 
@@ -56,31 +71,39 @@ interface MyNetworkApiService {
     @POST("/api/like/v1/likeSong")
     suspend fun likeSong(@Body req: LikeSongReq): NetworkResponse<Unit>
 
+    /*
+    Artist艺术家
+     */
     @GET("/api/artist/v1/page")
     suspend fun getArtists(
+        @Query("page") page: Int,
+        @Query("size") size: Int,
         @Query(value = "region") region: String,
-        @Query(value = "type")type: String,
-        @Query(value = "style")style: String
+        @Query(value = "type") type: String,
+        @Query(value = "style") style: String
     ): NetworkResponse<NetworkPageData<Artist>>
 
     @GET("/api/artist/v1/{id}")
     suspend fun getArtistById(@Path(value = "id") id: String): NetworkResponse<Artist>
 
-    @POST("/api/relationship/v1/follow")
-    suspend fun follow(@Body req: FollowReq): NetworkResponse<String>
 
-    @GET("/api/songs/v1/page")
-    suspend fun getSongsByArtistId(@Query(value = "artistId") artistId: String):
-            NetworkResponse<NetworkPageData<SongListItemDto>>
-    
-    // Album
+    /*
+    Album专辑
+    */
     @GET("/api/albums/v1/page")
-    suspend fun getAlbums(): NetworkResponse<NetworkPageData<AlbumDto>>
+    suspend fun getAlbums(
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): NetworkResponse<NetworkPageData<AlbumDto>>
 
     @GET("/api/albums/v1/{id}")
     suspend fun getAlbumById(@Path("id") id: String): NetworkResponse<AlbumDto>
 
-    @GET("/api/songs/v1/page")
-    suspend fun getSongsByAlbumId(@Query("albumId") albumId: String): NetworkResponse<NetworkPageData<SongListItemDto>>
+    /*
+    社交关系
+     */
+    @POST("/api/relationship/v1/follow")
+    suspend fun follow(@Body req: FollowReq): NetworkResponse<String>
+
 
 }

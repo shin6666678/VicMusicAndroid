@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.AlbumRepository
 import com.shin.vicmusic.core.domain.Album
+import com.shin.vicmusic.core.model.request.AlbumPageReq
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,7 +31,7 @@ class AlbumListViewModel @Inject constructor(
     private fun getAlbums() {
         viewModelScope.launch {
             _uiState.value = AlbumListUiState.Loading
-            val response = albumRepository.getAlbums()
+            val response = albumRepository.getAlbums(AlbumPageReq())
             if (response.status == 0 && response.data != null) {
                 _uiState.value = AlbumListUiState.Success(response.data.list ?: emptyList())
             } else {

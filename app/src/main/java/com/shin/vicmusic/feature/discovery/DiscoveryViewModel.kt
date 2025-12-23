@@ -4,10 +4,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.SongRepository
-import com.shin.vicmusic.core.domain.Song // [修改] 引用 Domain Model
+import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.domain.User
-import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import com.shin.vicmusic.core.manager.AuthManager
+import com.shin.vicmusic.core.model.request.SongPageReq
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,7 +33,7 @@ class DiscoveryViewModel @Inject constructor(
 
     private fun loadData() {
         viewModelScope.launch {
-            val songs= songRepository.getSongs()
+            val songs= songRepository.getSongs(SongPageReq())
             Log.d(TAG, "Fetched songs: ${songs.data?.list?.size}")
             _datum.value=songs.data?.list?:emptyList()
         }

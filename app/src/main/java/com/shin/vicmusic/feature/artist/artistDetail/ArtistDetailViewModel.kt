@@ -7,6 +7,7 @@ import com.shin.vicmusic.core.data.repository.ArtistRepository
 import com.shin.vicmusic.core.data.repository.SongRepository
 import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.domain.Song
+import com.shin.vicmusic.core.model.request.SongPageReq
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -39,7 +40,7 @@ class ArtistDetailViewModel @Inject constructor(
             if (artistResponse.status == 0) {
                 _artist.value = artistResponse.data
 
-                val songsResponse = songRepository.getSongsByArtistId(artistId)
+                val songsResponse = songRepository.getSongsByArtistId(SongPageReq(artistId=artistId))
                 if (songsResponse.status == 0 && songsResponse.data!= null && songsResponse.data.list != null) {
                     _songs.value = songsResponse.data.list
                 }

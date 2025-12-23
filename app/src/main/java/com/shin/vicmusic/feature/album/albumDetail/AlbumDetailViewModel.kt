@@ -7,6 +7,7 @@ import com.shin.vicmusic.core.data.repository.AlbumRepository
 import com.shin.vicmusic.core.data.repository.SongRepository
 import com.shin.vicmusic.core.domain.Album
 import com.shin.vicmusic.core.domain.Song
+import com.shin.vicmusic.core.model.request.SongPageReq
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -80,7 +81,11 @@ class AlbumDetailViewModel @Inject constructor(
     fun getSongsByAlbumId(albumId: String) {
         viewModelScope.launch {
             try {
-                val response = albumRepository.getSongsByAlbumId(albumId)
+                val response = albumRepository.getSongsByAlbumId(
+                    SongPageReq(
+                        albumId = albumId
+                    )
+                )
                 if (response.status == 0 && response.data != null) {
                     _uiState.update {
                         it.copy(songs = response.data.list ?: emptyList())
