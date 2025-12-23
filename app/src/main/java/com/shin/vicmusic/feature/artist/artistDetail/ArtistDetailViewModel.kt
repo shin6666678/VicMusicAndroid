@@ -40,7 +40,7 @@ class ArtistDetailViewModel @Inject constructor(
             if (artistResponse.status == 0) {
                 _artist.value = artistResponse.data
 
-                val songsResponse = songRepository.getSongsByArtistId(SongPageReq(artistId=artistId))
+                val songsResponse = songRepository.getSongs(SongPageReq(artistId=artistId))
                 if (songsResponse.status == 0 && songsResponse.data!= null && songsResponse.data.list != null) {
                     _songs.value = songsResponse.data.list
                 }

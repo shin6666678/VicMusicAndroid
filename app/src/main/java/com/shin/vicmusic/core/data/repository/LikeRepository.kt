@@ -1,20 +1,19 @@
 package com.shin.vicmusic.core.data.repository
 
 import com.shin.vicmusic.core.data.mapper.toDomain
-import com.shin.vicmusic.core.domain.Album
 import com.shin.vicmusic.core.domain.Song
-import com.shin.vicmusic.core.model.request.AlbumPageReq
-import com.shin.vicmusic.core.model.request.SongPageReq
+import com.shin.vicmusic.core.model.request.LikeSongReq
 import com.shin.vicmusic.core.model.response.NetworkPageData
 import com.shin.vicmusic.core.model.response.NetworkResponse
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import javax.inject.Inject
 
-class AlbumRepository @Inject constructor(
+class LikeRepository @Inject constructor(
     private val datasource: MyRetrofitDatasource
-) {
-    suspend fun getAlbums(pageReq: AlbumPageReq): NetworkResponse<NetworkPageData<Album>>{
-        val dtoResponse=datasource.getAlbums(pageReq)
+)  {
+    suspend fun likedSongs(): NetworkResponse<NetworkPageData<Song>>{
+        val dtoResponse =datasource.likedSongs()
+
         if (dtoResponse.status == 0 && dtoResponse.data != null) {
             val dtoList = dtoResponse.data.list ?: emptyList()
             val domainList = dtoList.map { it.toDomain() }
@@ -27,13 +26,7 @@ class AlbumRepository @Inject constructor(
         return NetworkResponse(status = dtoResponse.status, message = dtoResponse.message, data = null)
     }
 
-
-    suspend fun getAlbumDetail(albumId: String): NetworkResponse<Album> {
-        val dtoResponse= datasource.getAlbumById(albumId)
-        if (dtoResponse.status == 0 && dtoResponse.data != null) {
-            return NetworkResponse(status = 0, message = dtoResponse.message, data = dtoResponse.data.toDomain())
-        }
-        return NetworkResponse(status = dtoResponse.status, message = dtoResponse.message, data = null)
+    suspend fun likeSong(id: String):NetworkResponse<Unit> {
+        return datasource.likeSong(LikeSongReq(id))
     }
-
 }

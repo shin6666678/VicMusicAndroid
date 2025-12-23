@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.AlbumRepository
+import com.shin.vicmusic.core.data.repository.LikeRepository
 import com.shin.vicmusic.core.data.repository.SongRepository
 import com.shin.vicmusic.core.domain.Album
 import com.shin.vicmusic.core.domain.Song
@@ -22,7 +23,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AlbumDetailViewModel @Inject constructor(
     private val albumRepository: AlbumRepository,
-    private val songRepository: SongRepository, // 注入 SongRepository 以处理喜欢的逻辑
+    private val songRepository: SongRepository,
+    private val likeRepository: LikeRepository,
     savedStateHandle: SavedStateHandle // 获取传递的参数
 ) : ViewModel() {
 
@@ -81,7 +83,7 @@ class AlbumDetailViewModel @Inject constructor(
     fun getSongsByAlbumId(albumId: String) {
         viewModelScope.launch {
             try {
-                val response = albumRepository.getSongsByAlbumId(
+                val response = songRepository.getSongs(
                     SongPageReq(
                         albumId = albumId
                     )
@@ -108,7 +110,7 @@ class AlbumDetailViewModel @Inject constructor(
             }
 
             try {
-                val response = songRepository.likeSong(song.id)
+                val response = likeRepository.likeSong(song.id)
                 if (response.status != 0) {
                     // 如果失败，回滚状态
                     _uiState.update { currentState ->

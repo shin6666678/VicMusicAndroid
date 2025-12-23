@@ -2,10 +2,11 @@ package com.shin.vicmusic.core.network.datasource
 
 import android.util.Log
 import com.shin.vicmusic.core.data.mapper.toDomain
-import com.shin.vicmusic.core.domain.Album
 import com.shin.vicmusic.core.domain.Artist
-import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.domain.User
+import com.shin.vicmusic.core.model.api.AlbumDto
+import com.shin.vicmusic.core.model.api.SongDetailDto
+import com.shin.vicmusic.core.model.api.SongListItemDto
 import com.shin.vicmusic.core.model.request.AlbumPageReq
 import com.shin.vicmusic.core.model.request.ArtistPageReq
 import com.shin.vicmusic.core.model.request.FollowReq
@@ -74,39 +75,18 @@ class MyRetrofitDatasource @Inject constructor(
     /*
     Song歌曲
      */
-    suspend fun songs(req: SongPageReq = SongPageReq()): NetworkResponse<NetworkPageData<Song>>{
-        val dtoResponse = safeApiCall { service.songs(
+    suspend fun songs(req: SongPageReq = SongPageReq()): NetworkResponse<NetworkPageData<SongListItemDto>>{
+        return safeApiCall { service.songs(
             page = req.page,
             size = req.size,
             artistId = req.artistId,
             albumId = req.albumId
         ) }
-
-        // 如果成功，进行数据转换
-        if (dtoResponse.status == 0 && dtoResponse.data != null) {
-            val dtoList = dtoResponse.data.list ?: emptyList()
-            // 使用 Mapper 扩展函数转换
-            val domainList = dtoList.map { it.toDomain() }
-
-            val domainData = NetworkPageData(
-                list = domainList,
-                pagination = dtoResponse.data.pagination
-            )
-            return NetworkResponse(status = 0, message = dtoResponse.message, data = domainData)
-        }
-
-        // 失败则原样返回错误信息
-        return NetworkResponse(status = dtoResponse.status, message = dtoResponse.message, data = null)
     }
 
     // 获取详情：DTO -> Domain
-    suspend fun songDetail(@Query(value = "id") id:String,): NetworkResponse<Song>{
-        val dtoResponse = safeApiCall { service.songDetail(id) }
-
-        if (dtoResponse.status == 0 && dtoResponse.data != null) {
-            return NetworkResponse(status = 0, message = dtoResponse.message, data = dtoResponse.data.toDomain())
-        }
-        return NetworkResponse(status = dtoResponse.status, message = dtoResponse.message, data = null)
+    suspend fun songDetail(@Query(value = "id") id:String,): NetworkResponse<SongDetailDto>{
+       return safeApiCall { service.songDetail(id) }
     }
 
 
@@ -134,47 +114,22 @@ class MyRetrofitDatasource @Inject constructor(
      */
     suspend fun getAlbums(
         albumPageReq: AlbumPageReq
-    ): NetworkResponse<NetworkPageData<Album>>{
-        val dtoResponse = safeApiCall { service.getAlbums(
+    ): NetworkResponse<NetworkPageData<AlbumDto>>{
+        return safeApiCall { service.getAlbums(
             page = albumPageReq.page,
             size = albumPageReq.size
         ) }
-        if (dtoResponse.status == 0 && dtoResponse.data != null) {
-            val dtoList = dtoResponse.data.list ?: emptyList()
-            val domainList = dtoList.map { it.toDomain() }
-            val domainData = NetworkPageData(
-                list = domainList,
-                pagination = dtoResponse.data.pagination
-            )
-            return NetworkResponse(status = 0, message = dtoResponse.message, data = domainData)
-        }
-        return NetworkResponse(status = dtoResponse.status, message = dtoResponse.message, data = null)
     }
 
-    suspend fun getAlbumById(id: String): NetworkResponse<Album> {
-        val dtoResponse = safeApiCall { service.getAlbumById(id) }
-        if (dtoResponse.status == 0 && dtoResponse.data != null) {
-            return NetworkResponse(status = 0, message = dtoResponse.message, data = dtoResponse.data.toDomain())
-        }
-        return NetworkResponse(status = dtoResponse.status, message = dtoResponse.message, data = null)
+    suspend fun getAlbumById(id: String): NetworkResponse<AlbumDto> {
+        return safeApiCall { service.getAlbumById(id) }
     }
 
     /*
     喜欢
     */
-    suspend fun likedSongs(): NetworkResponse<NetworkPageData<Song>>{
-        val dtoResponse = safeApiCall { service.getLikedSongs() }
-
-        if (dtoResponse.status == 0 && dtoResponse.data != null) {
-            val dtoList = dtoResponse.data.list ?: emptyList()
-            val domainList = dtoList.map { it.toDomain() }
-            val domainData = NetworkPageData(
-                list = domainList,
-                pagination = dtoResponse.data.pagination
-            )
-            return NetworkResponse(status = 0, message = dtoResponse.message, data = domainData)
-        }
-        return NetworkResponse(status = dtoResponse.status, message = dtoResponse.message, data = null)
+    suspend fun likedSongs(): NetworkResponse<NetworkPageData<SongListItemDto>>{
+        return safeApiCall { service.getLikedSongs() }
     }
 
     // 喜欢歌曲
@@ -188,6 +143,5 @@ class MyRetrofitDatasource @Inject constructor(
     suspend fun follow(followReq: FollowReq): NetworkResponse<String>{
         return safeApiCall { service.follow(followReq) }
     }
-
 
 }
