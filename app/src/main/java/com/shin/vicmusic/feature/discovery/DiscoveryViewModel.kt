@@ -3,6 +3,7 @@ package com.shin.vicmusic.feature.discovery
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.shin.vicmusic.core.data.repository.LikeRepository
 import com.shin.vicmusic.core.data.repository.SongRepository
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.domain.User
@@ -19,6 +20,7 @@ import javax.inject.Inject
 class DiscoveryViewModel @Inject constructor(
     private val songRepository: SongRepository,
     private val authManager: AuthManager,
+    private val likeRepository: LikeRepository,
 ) : ViewModel(){
     private val _datum = MutableStateFlow<List<Song>>(emptyList())
     val datum: StateFlow<List<Song>> = _datum
@@ -42,7 +44,7 @@ class DiscoveryViewModel @Inject constructor(
     // 处理喜欢/取消喜欢
     fun toggleLike(song: Song) {
         viewModelScope.launch {
-            val response = songRepository.likeSong(song.id)
+            val response = likeRepository.likeSong(song.id)
             if (response.status == 0) {
                 _datum.update { list ->
                     list.map { item ->
