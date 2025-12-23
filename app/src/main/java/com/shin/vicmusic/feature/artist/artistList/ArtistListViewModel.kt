@@ -7,6 +7,7 @@ import com.shin.vicmusic.core.data.repository.ArtistRepository
 import com.shin.vicmusic.core.data.repository.UserRepository
 import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.domain.Song
+import com.shin.vicmusic.core.model.request.ArtistPageReq
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -42,9 +43,11 @@ class ArtistListViewModel @Inject constructor(
             val filter = _filterState.value
             // 发起网络请求
             val artistsResp = artistRepository.getArtists(
-                region = filter.region,
-                type = filter.type,
-                style = filter.style
+                ArtistPageReq(
+                    region = filter.region,
+                    type = filter.type,
+                    style = filter.style
+                )
             )
             _artists.value = artistsResp.data?.list?: emptyList()
         }
