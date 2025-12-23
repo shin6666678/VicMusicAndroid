@@ -19,14 +19,6 @@ fun ArtistDto.toDomain(): Artist {
     )
 }
 
-fun AlbumDto.toDomain(): Album {
-    return Album(
-        id = this.id,
-        title = this.title,
-        icon = this.icon
-    )
-}
-
 // --- Song 转换函数 ---
 
 /**

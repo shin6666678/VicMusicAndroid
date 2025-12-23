@@ -2,6 +2,7 @@ package com.shin.vicmusic.core.network.datasource
 
 import android.util.Log
 import com.shin.vicmusic.core.data.mapper.toDomain
+import com.shin.vicmusic.core.domain.Album
 import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.domain.User
@@ -148,4 +149,39 @@ class MyRetrofitDatasource @Inject constructor(
         return NetworkResponse(status = dtoResponse.status, message = dtoResponse.message, data = null)
     }
 
+    suspend fun getAlbums(): NetworkResponse<NetworkPageData<Album>>{
+        val dtoResponse = safeApiCall { service.getAlbums() }
+        if (dtoResponse.status == 0 && dtoResponse.data != null) {
+            val dtoList = dtoResponse.data.list ?: emptyList()
+            val domainList = dtoList.map { it.toDomain() }
+            val domainData = NetworkPageData(
+                list = domainList,
+                pagination = dtoResponse.data.pagination
+            )
+            return NetworkResponse(status = 0, message = dtoResponse.message, data = domainData)
+        }
+        return NetworkResponse(status = dtoResponse.status, message = dtoResponse.message, data = null)
+    }
+
+    suspend fun getAlbumById(id: String): NetworkResponse<Album> {
+        val dtoResponse = safeApiCall { service.getAlbumById(id) }
+        if (dtoResponse.status == 0 && dtoResponse.data != null) {
+            return NetworkResponse(status = 0, message = dtoResponse.message, data = dtoResponse.data.toDomain())
+        }
+        return NetworkResponse(status = dtoResponse.status, message = dtoResponse.message, data = null)
+    }
+
+    suspend fun getSongsByAlbumId(albumId: String): NetworkResponse<NetworkPageData<Song>> {
+        val dtoResponse = safeApiCall { service.getSongsByAlbumId(albumId) }
+        if (dtoResponse.status == 0 && dtoResponse.data != null) {
+            val dtoList = dtoResponse.data.list ?: emptyList()
+            val domainList = dtoList.map { it.toDomain() }
+            val domainData = NetworkPageData(
+                list = domainList,
+                pagination = dtoResponse.data.pagination
+            )
+            return NetworkResponse(status = 0, message = dtoResponse.message, data = domainData)
+        }
+        return NetworkResponse(status = dtoResponse.status, message = dtoResponse.message, data = null)
+    }
 }

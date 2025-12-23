@@ -8,4 +8,3 @@ data class AlbumDto(
     val title: String,
     val icon: String? = null
 )
-// 列表展示通常只需要 id, title, icon

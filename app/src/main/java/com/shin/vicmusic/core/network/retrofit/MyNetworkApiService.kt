@@ -3,6 +3,7 @@ package com.shin.vicmusic.core.network.retrofit
 import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.domain.User
+import com.shin.vicmusic.core.model.api.AlbumDto
 import com.shin.vicmusic.core.model.api.SongDetailDto
 import com.shin.vicmusic.core.model.api.SongListItemDto
 import com.shin.vicmusic.core.model.api.UserInfoDto
@@ -71,5 +72,15 @@ interface MyNetworkApiService {
     @GET("/api/songs/v1/page")
     suspend fun getSongsByArtistId(@Query(value = "artistId") artistId: String):
             NetworkResponse<NetworkPageData<SongListItemDto>>
+    
+    // Album
+    @GET("/api/albums/v1/page")
+    suspend fun getAlbums(): NetworkResponse<NetworkPageData<AlbumDto>>
+
+    @GET("/api/albums/v1/{id}")
+    suspend fun getAlbumById(@Path("id") id: String): NetworkResponse<AlbumDto>
+
+    @GET("/api/songs/v1/page")
+    suspend fun getSongsByAlbumId(@Query("albumId") albumId: String): NetworkResponse<NetworkPageData<SongListItemDto>>
 
 }
