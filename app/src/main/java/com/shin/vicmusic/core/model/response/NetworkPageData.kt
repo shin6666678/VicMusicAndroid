@@ -14,5 +14,5 @@ data class NetworkPageData<T>(
     /**
      * 分页数据
      */
-    val pagination: NetworkPageMeta?=null
+    val pagination: NetworkPageMeta=NetworkPageMeta()
 )

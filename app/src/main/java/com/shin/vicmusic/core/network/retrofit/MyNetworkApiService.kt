@@ -2,7 +2,9 @@ package com.shin.vicmusic.core.network.retrofit
 
 import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.domain.User
+import com.shin.vicmusic.core.model.api.AlbumDetailResp
 import com.shin.vicmusic.core.model.api.AlbumDto
+import com.shin.vicmusic.core.model.api.ArtistDto
 import com.shin.vicmusic.core.model.api.SongDetailDto
 import com.shin.vicmusic.core.model.api.SongListItemDto
 import com.shin.vicmusic.core.model.api.UserInfoDto
@@ -57,9 +59,6 @@ interface MyNetworkApiService {
     @GET("/api/songs/v1/{id}")
     suspend fun songDetail(@Path(value = "id") id: String): NetworkResponse<SongDetailDto>
 
-    @GET("/api/songs/v1/page")
-    suspend fun getSongsByAlbumId(@Query("albumId") albumId: String): NetworkResponse<NetworkPageData<SongListItemDto>>
-
     /*
     喜欢
      */
@@ -81,29 +80,34 @@ interface MyNetworkApiService {
         @Query(value = "region") region: String,
         @Query(value = "type") type: String,
         @Query(value = "style") style: String
-    ): NetworkResponse<NetworkPageData<Artist>>
+    ): NetworkResponse<NetworkPageData<ArtistDto>>
 
     @GET("/api/artist/v1/{id}")
-    suspend fun getArtistById(@Path(value = "id") id: String): NetworkResponse<Artist>
+    suspend fun getArtistById(@Path(value = "id") id: String): NetworkResponse<ArtistDto>
 
 
     /*
     Album专辑
     */
-    @GET("/api/albums/v1/page")
+    @GET("/api/album/v1/page")
     suspend fun getAlbums(
-        @Query("page") page: Int,
-        @Query("size") size: Int
+        @Query("page") page: Int?=null,
+        @Query("size") size: Int?=null,
+        @Query("artistId") artistId:String?=null,
     ): NetworkResponse<NetworkPageData<AlbumDto>>
 
-    @GET("/api/albums/v1/{id}")
-    suspend fun getAlbumById(@Path("id") id: String): NetworkResponse<AlbumDto>
+    @GET("/api/album/v1/detail")
+    suspend fun getAlbumById(
+        @Query("id") id: String,
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): NetworkResponse<AlbumDetailResp>
 
     /*
     社交关系
      */
     @POST("/api/relationship/v1/follow")
-    suspend fun follow(@Body req: FollowReq): NetworkResponse<String>
+    suspend fun follow(@Body req: FollowReq): NetworkResponse<Unit>
 
 
 }

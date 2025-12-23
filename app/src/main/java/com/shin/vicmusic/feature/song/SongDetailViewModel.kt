@@ -3,7 +3,9 @@ package com.shin.vicmusic.feature.song
 import androidx.lifecycle.SavedStateHandle // 导入 SavedStateHandle 用于获取导航参数
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.shin.vicmusic.core.data.repository.LikeRepository
 import com.shin.vicmusic.core.data.repository.SongRepository
+import com.shin.vicmusic.core.domain.Result
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,6 +32,7 @@ sealed class SongUiState {
 class SongDetailViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle, // 用于获取导航参数
     private val songRepository: SongRepository,
+    private val likeRepository: LikeRepository,
 ) : ViewModel() {
 
 
@@ -62,14 +65,19 @@ class SongDetailViewModel @Inject constructor(
             _songUiState.value = SongUiState.Loading
             try {
                 // 2. 发起网络请求获取歌曲详情
-                val response = songRepository.getSongDetail(id)
-                response.data?.let {
-                    // 3. 网络请求成功且数据不为空
-                    _songUiState.value = SongUiState.Success(it) // 更新UI状态为成功 // 命令全局 PlayerViewModel 播放这首歌
-                } ?: run {
-                    // 4. 网络请求成功但数据为空
-                    _songUiState.value = SongUiState.Error("未获取到歌曲数据")
+                val result = songRepository.getSongDetail(id)
+                when(result){
+                    is Result.Success->{
+                        result.data.let {
+                            // 3. 网络请求成功且数据不为空
+                            _songUiState.value = SongUiState.Success(it) // 更新UI状态为成功 // 命令全局 PlayerViewModel 播放这首歌
+                        }
+                    }
+                    is Result.Error->{
+
+                    }
                 }
+
             } catch (e: Exception) {
                 // 5. 网络请求或处理过程中发生异常
                 _songUiState.value = SongUiState.Error("加载失败：${e.message ?: "未知错误"}")
@@ -87,19 +95,20 @@ class SongDetailViewModel @Inject constructor(
 
             viewModelScope.launch {
                 // 发送网络请求
-                val response = songRepository.likeSong(currentSong.id)
-
-                if (response.status == 0) {
-                    // 请求成功，更新本地 UI 状态 (翻转 isLiked)
-                    _songUiState.update {
-                        if (it is SongUiState.Success) {
-                            it.copy(song = it.song.copy(isLiked = !it.song.isLiked))
-                        } else {
-                            it
+                val result = likeRepository.likeSong(currentSong.id)
+                when (result) {
+                    is Result.Success -> {
+                        _songUiState.update {
+                            if (it is SongUiState.Success) {
+                                it.copy(song = it.song.copy(isLiked = !it.song.isLiked))
+                            } else {
+                                it
+                            }
                         }
                     }
-                } else {
-                    // 可以选择处理错误，例如显示 Toast
+                    is Result.Error -> {
+
+                    }
                 }
             }
         }

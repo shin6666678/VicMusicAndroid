@@ -1,10 +1,10 @@
 package com.shin.vicmusic.core.data.repository
 
 import com.shin.vicmusic.core.data.mapper.toDomain
+import com.shin.vicmusic.core.domain.Result
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.model.request.SongPageReq
 import com.shin.vicmusic.core.model.response.NetworkPageData
-import com.shin.vicmusic.core.model.response.NetworkResponse
 import com.shin.vicmusic.core.network.datasource.MyMockDatasource
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import javax.inject.Inject
@@ -15,8 +15,7 @@ class SongRepository @Inject constructor(
     private val datasource: MyRetrofitDatasource,
     private val mockDatasource: MyMockDatasource
 ) {
-    // 发现页数据
-    suspend fun getSongs(pageReq: SongPageReq = SongPageReq()) : NetworkResponse<NetworkPageData<Song>>{
+    suspend fun getSongs(pageReq: SongPageReq) : Result<NetworkPageData<Song>>{
         val dtoResponse=datasource.songs(pageReq)
 
         // 如果成功，进行数据转换
@@ -29,20 +28,20 @@ class SongRepository @Inject constructor(
                 list = domainList,
                 pagination = dtoResponse.data.pagination
             )
-            return NetworkResponse(status = 0, message = dtoResponse.message, data = domainData)
+            return Result.Success(domainData)
         }
         // 失败则原样返回错误信息
-        return NetworkResponse(status = dtoResponse.status, message = dtoResponse.message, data = null)
+        return Result.Error(dtoResponse.message ?: "未知错误")
     }
 
     // 歌曲详情
-    suspend fun getSongDetail(id: String) : NetworkResponse<Song>{
+    suspend fun getSongDetail(id: String) : Result<Song>{
         val dtoResponse=datasource.songDetail(id)
 
         if (dtoResponse.status == 0 && dtoResponse.data != null) {
-            return NetworkResponse(status = 0, message = dtoResponse.message, data = dtoResponse.data.toDomain())
+            return Result.Success(dtoResponse.data.toDomain())
         }
-        return NetworkResponse(status = dtoResponse.status, message = dtoResponse.message, data = null)
+        return Result.Error(dtoResponse.message ?: "未知错误")
     }
 
 

@@ -1,17 +1,17 @@
 package com.shin.vicmusic.core.data.repository
 
 import com.shin.vicmusic.core.data.mapper.toDomain
+import com.shin.vicmusic.core.domain.Result
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.model.request.LikeSongReq
 import com.shin.vicmusic.core.model.response.NetworkPageData
-import com.shin.vicmusic.core.model.response.NetworkResponse
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import javax.inject.Inject
 
 class LikeRepository @Inject constructor(
     private val datasource: MyRetrofitDatasource
 )  {
-    suspend fun likedSongs(): NetworkResponse<NetworkPageData<Song>>{
+    suspend fun likedSongs(): Result<NetworkPageData<Song>> {
         val dtoResponse =datasource.likedSongs()
 
         if (dtoResponse.status == 0 && dtoResponse.data != null) {
@@ -21,12 +21,16 @@ class LikeRepository @Inject constructor(
                 list = domainList,
                 pagination = dtoResponse.data.pagination
             )
-            return NetworkResponse(status = 0, message = dtoResponse.message, data = domainData)
+            return Result.Success(domainData)
         }
-        return NetworkResponse(status = dtoResponse.status, message = dtoResponse.message, data = null)
+        return Result.Error(dtoResponse.message ?: "未知错误")
     }
 
-    suspend fun likeSong(id: String):NetworkResponse<Unit> {
-        return datasource.likeSong(LikeSongReq(id))
+    suspend fun likeSong(id: String): Result<Unit> {
+        val dtoResponse = datasource.likeSong(LikeSongReq(id))
+        if (dtoResponse.status == 0) {
+            return Result.Success(Unit)
+        }
+        return Result.Error(dtoResponse.message ?: "操作失败")
     }
 }

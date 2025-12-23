@@ -11,24 +11,21 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Song (
     val id:String,
-    val title:String,
-    val uri: String?,
-    val icon:String?,
-    val album: Album,          // <<-- 嵌套 Album 领域对象
-    val artist: Artist,        // <<-- 嵌套 Artist 领域对象
-    val payType: PayType,      // <<-- 使用 PayType 枚举
-    val genre:String,
+    val title:String="",
+    val uri: String="",
+    val icon:String="",
+    val album: Album=Album(id = "-1"),
+    val artist: Artist=Artist(id = "-1"),
+    val payType: PayType= PayType.FREE,
+    val genre:String="",
     val lyricStyle:Int= Constant.VALUE0,
-    val lyric:String?,
+    val lyric:String="",
     val lyricList: List<LyricLine> = emptyList(),
     val isLiked: Boolean = false,
     val likesCount: Int=0,
     val clicksCount: Int=0,
     val commentsCount: Int=0,
-    val uploaderUserId: String?=null,
-    val createdAt: String?=null,
-    val updatedAt: String?=null
-
+    val uploaderUserId: String="",
 ){
     /**
      * 将 Song 转换为 ExoPlayer 需要的 MediaItem

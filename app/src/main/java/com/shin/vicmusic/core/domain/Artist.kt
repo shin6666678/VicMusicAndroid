@@ -5,9 +5,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Artist(
     val id: String,
-    val name: String,
-    val image: String? = null,
-    val description: String?=null,
+    val name: String="未知歌手",
+    val image: String = "",
+    val description: String="",
     val followerCount: Int = 0,
     val isFollowing: Boolean = false,
     val region: String = "全部",
