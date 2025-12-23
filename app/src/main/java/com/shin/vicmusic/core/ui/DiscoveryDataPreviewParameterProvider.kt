@@ -183,4 +183,30 @@ object DiscoveryPreviewParameterData {
         ),
         SONG,SONG,SONG,SONG,SONG,SONG,SONG,SONG,SONG,SONG,SONG,SONG,SONG,SONG,SONG,SONG,SONG,SONG
     )
+    val ALBUMS = listOf(
+        Album(
+            id = "1",
+            title = "和自己对话",
+            icon = "album_和自己对话_4e6d491d-10b6-4db8-90d6-a00a1b9f59ce.jpg",
+            artist = Artist(id = "1", name = "林俊杰")
+        ),
+        Album(
+            id = "2",
+            title = "魔杰座",
+            icon = "album_魔杰座_020e6c35-b053-49ca-89f6-732d64fcaa60.jpg",
+            artist = Artist(id = "2", name = "周杰伦")
+        ),
+        Album(
+            id = "3",
+            title = "叶惠美",
+            icon = "album_叶惠美_bf1b58c1-ae42-4e8c-8b1a-fb657e202aaf.jpg",
+            artist = Artist(id = "2", name = "周杰伦")
+        ),
+        Album(
+            id = "4",
+            title = "大东北我的家乡",
+            icon = "album_大东北我的家乡_22fb49ef-1b09-4aa6-83bc-97238fa06698.jpg",
+            artist = Artist(id = "3", name = "何玉")
+        )
+    )
 }

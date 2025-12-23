@@ -35,7 +35,7 @@ fun CommonTopBar(
     popBackStack: () -> Unit = {},
     navigateToSearch: () -> Unit = {},
     containerColor: Color = MaterialTheme.colorScheme.surface,
-    contentColor: Color = Color.White
+    contentColor: Color = Color.Black
 ) {
     CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
