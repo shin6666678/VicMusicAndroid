@@ -68,8 +68,6 @@ fun MusicHallPreview() {
 fun MusicHall(
     viewModel: DiscoveryViewModel = hiltViewModel(),
     songs:List<Song>,
-    // [新增] 传递回调
-    onLikeClick: (Song) -> Unit = {},
     onQuickAccessClick: (String) -> Unit = {}
 ) {
     val playerManager = LocalPlayerManager.current
@@ -127,8 +125,6 @@ fun MusicHall(
             ItemSong(
                 song = song,
                 modifier = Modifier.clickable { playerManager.playSong(song)} ,
-                onAddToQueueClick = { playerManager.addSongToQueue(song) },
-                onLikeClick = onLikeClick
             )
         }
 

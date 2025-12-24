@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import com.shin.vicmusic.core.manager.AuthManager
 import com.shin.vicmusic.core.manager.PlaybackQueueManager
 import com.shin.vicmusic.core.manager.PlayerManager
+import com.shin.vicmusic.core.manager.SongActionManager
 import com.shin.vicmusic.core.manager.TokenManager
 
 // 定义一个 CompositionLocal，默认值抛出异常（强制要求上层提供）
@@ -24,4 +25,8 @@ val LocalAuthManager = staticCompositionLocalOf<AuthManager> {
 }
 val LocalTokenManager = staticCompositionLocalOf<TokenManager> {
     error("No TokenManager provided")
+}
+// ... 其他 Local 定义
+val LocalSongActionManager = staticCompositionLocalOf<SongActionManager> {
+    error("No SongActionManager provided")
 }

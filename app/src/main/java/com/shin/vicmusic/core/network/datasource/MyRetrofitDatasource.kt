@@ -5,6 +5,8 @@ import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.model.api.AlbumDetailResp
 import com.shin.vicmusic.core.model.api.AlbumDto
 import com.shin.vicmusic.core.model.api.ArtistDto
+import com.shin.vicmusic.core.model.api.RankListDetailDto
+import com.shin.vicmusic.core.model.api.RankListPeakDto
 import com.shin.vicmusic.core.model.api.SongDetailDto
 import com.shin.vicmusic.core.model.api.SongListItemDto
 import com.shin.vicmusic.core.model.api.UserInfoDto
@@ -157,5 +159,17 @@ class MyRetrofitDatasource @Inject constructor(
     suspend fun follow(followReq: FollowReq): NetworkResponse<Unit> {
         return safeApiCall { service.follow(followReq) }
     }
+
+
+    /*
+    RankList排行榜
+     */
+    suspend fun getRankListPeeks(): NetworkResponse<List<RankListPeakDto>> {
+        return safeApiCall { service.getRankListPeeks() }
+    }
+    suspend fun rankListDetail(id: String): NetworkResponse<RankListDetailDto> {
+        return safeApiCall { service.rankListDetail(id) }
+    }
+
 
 }

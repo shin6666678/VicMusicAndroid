@@ -5,13 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.AlbumRepository
 import com.shin.vicmusic.core.data.repository.LikeRepository
-import com.shin.vicmusic.core.data.repository.SongRepository
 import com.shin.vicmusic.core.domain.Album
-import com.shin.vicmusic.core.domain.AlbumDetail
 import com.shin.vicmusic.core.domain.Result
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.model.request.AlbumDetailReq
-import com.shin.vicmusic.core.model.request.SongPageReq
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

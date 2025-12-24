@@ -24,7 +24,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
-import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.feature.common.CommonTopBar
 import com.shin.vicmusic.feature.common.MyAsyncImage
 import com.shin.vicmusic.feature.song.ItemSong
@@ -38,7 +37,6 @@ fun AlbumDetailRoute(
     AlbumDetailScreen(
         uiState = uiState,
         popBackStack = navController::popBackStack,
-        onLikeClick = viewModel::toggleLike
     )
 }
 
@@ -46,7 +44,6 @@ fun AlbumDetailRoute(
 fun AlbumDetailScreen(
     uiState: AlbumDetailUiState,
     popBackStack: () -> Unit,
-    onLikeClick: (Song) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -100,7 +97,6 @@ fun AlbumDetailScreen(
                     itemsIndexed(uiState.songs) { index, song ->
                         ItemSong(
                             song = song,
-                            onLikeClick = { onLikeClick(song) }
                         )
                     }
                 }

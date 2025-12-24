@@ -9,11 +9,13 @@ import com.shin.vicmusic.core.design.composition.LocalAuthManager
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.composition.LocalPlaybackQueueManager
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
+import com.shin.vicmusic.core.design.composition.LocalSongActionManager
 import com.shin.vicmusic.core.design.composition.LocalTokenManager
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
 import com.shin.vicmusic.core.manager.AuthManager
 import com.shin.vicmusic.core.manager.PlaybackQueueManager
 import com.shin.vicmusic.core.manager.PlayerManager
+import com.shin.vicmusic.core.manager.SongActionManager
 import com.shin.vicmusic.core.manager.TokenManager
 import com.shin.vicmusic.ui.MyApp
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,6 +32,8 @@ class MainActivity : ComponentActivity() {
     lateinit var authManager: AuthManager
     @Inject
     lateinit var tokenManager: TokenManager
+    @Inject
+    lateinit var songActionManager: SongActionManager
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -41,7 +45,8 @@ class MainActivity : ComponentActivity() {
                     LocalNavController provides navController,
                     LocalPlaybackQueueManager provides playbackQueueManager,
                     LocalAuthManager provides authManager,
-                    LocalTokenManager provides tokenManager
+                    LocalTokenManager provides tokenManager,
+                    LocalSongActionManager provides songActionManager
                 ) {
                     MyApp()
                 }

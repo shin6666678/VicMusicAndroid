@@ -29,9 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.shin.vicmusic.core.domain.RankListPeak
-import com.shin.vicmusic.core.domain.Song
-import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONGS
-
+import com.shin.vicmusic.core.domain.RankTopItem // [新增] 引入 RankTopItem
+import com.shin.vicmusic.feature.common.MyAsyncImage
 
 @Composable
 fun RankListItem(
@@ -44,15 +43,14 @@ fun RankListItem(
             .padding(vertical = 8.dp, horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // 封面图区域
         Box(
             modifier = Modifier
                 .size(100.dp)
                 .clip(RoundedCornerShape(8.dp))
         ) {
-            Image(
-                painter = rememberAsyncImagePainter(model = rankListItemInfo.imageUrl),
-                contentDescription = "Rank List Cover",
-                contentScale = ContentScale.Crop,
+            MyAsyncImage(
+                model = rankListItemInfo.imageUrl,
                 modifier = Modifier.fillMaxSize()
             )
             Icon(
@@ -67,6 +65,7 @@ fun RankListItem(
 
         Spacer(modifier = Modifier.width(16.dp))
 
+        // 榜单前三名列表
         Column {
             Text(
                 text = rankListItemInfo.title,
@@ -74,15 +73,29 @@ fun RankListItem(
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp
             )
-            Spacer(modifier = Modifier.height(4.dp))
+
+            // 显示更新频率 (如果 JSON 数据里有这个字段)
+            if (rankListItemInfo.updateFrequency.isNotEmpty()) {
+                Text(
+                    text = rankListItemInfo.updateFrequency,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(vertical = 2.dp)
+                )
+            } else {
+                Spacer(modifier = Modifier.height(4.dp))
+            }
+
+            // [修改] 直接遍历 RankTopItem，不需要判断 "is Song"
             rankListItemInfo.items.forEachIndexed { index, item ->
-                if (item is Song)
-                    Text(
-                        text = "${index + 1}. ${item.title} - ${item.artist.name}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Gray,
-                        fontSize = 14.sp
-                    )
+                // item 是 RankTopItem 类型，直接取 title 和 artist (String)
+                Text(
+                    text = "${index + 1}. ${item.title} - ${item.artist}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray,
+                    fontSize = 14.sp,
+                    maxLines = 1 // 防止过长换行
+                )
             }
         }
     }
@@ -91,12 +104,18 @@ fun RankListItem(
 @Preview
 @Composable
 private fun RankListItemPreview() {
+    // [修改] Preview 数据也要适配新的模型
     RankListItem(
         rankListItemInfo = RankListPeak(
             id = "1",
-            imageUrl = "https://via.placeholder.com/150",
-            title = "巅峰潮流榜_QQ音乐 x 微博",
-            items = SONGS.subList(0,3)
+            imageUrl = "",
+            title = "热歌榜",
+            updateFrequency = "每日更新",
+            items = listOf(
+                RankTopItem("1", "关键词", "林俊杰"),
+                RankTopItem("2", "稻香", "周杰伦"),
+                RankTopItem("3", "晴天", "周杰伦")
+            )
         )
     )
 }

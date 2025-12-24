@@ -101,7 +101,6 @@ fun ArtistDetailScreen(
     onBackClick: () -> Unit = {},
     onFollowClick: (String) -> Unit = {},
     onPlayHotSongsClick: () -> Unit = {},
-    onLikeClick: (Song) -> Unit = {}
 ) {
     val tabs = listOf("百科", "歌曲", "专辑")
     val pagerState = rememberPagerState(pageCount = { tabs.size }, initialPage = 1)
@@ -202,8 +201,6 @@ fun ArtistDetailScreen(
                                     ItemSong(
                                         song = song,
                                         modifier = Modifier.clickable { playerManager?.playSong(song) },
-                                        onAddToQueueClick = { playerManager?.addSongToQueue(song) },
-                                        onLikeClick = onLikeClick
                                     )
                                 }
                             }

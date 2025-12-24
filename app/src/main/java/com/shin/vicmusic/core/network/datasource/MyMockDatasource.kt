@@ -77,43 +77,6 @@ class MyMockDatasource @Inject constructor(
         val songs = SONGS
         return NetworkResponse(status = 0, message = "成功", data = songs)
     }
-    // [新增] 模拟排行榜数据
-    suspend fun getRankListPeeks(): NetworkResponse<List<RankListPeak>> {
-        val peaks = listOf(
-            RankListPeakDto(
-                "1",
-                "热歌榜_23首新歌上榜",
-                "https://via.placeholder.com/150/00FF00/FFFFFF?text=Chart3",
-                listOf(
-                    Song("1", "奇迹航线"),
-                    Song("2", "爱错",),
-                    Song("3", "恋人")
-                )
-            ),
-            RankListPeakDto(
-                "2",
-                "巅峰潮流榜_QQ音乐 x 微博",
-                "https://via.placeholder.com/150/0000FF/FFFFFF?text=Chart1",
-                listOf(
-                    Song("4","不渝", ),
-                    Song("5","深海漫游指南", ),
-                    Song("6","全世界下雨", )
-                )
-            ),
-            RankListPeakDto(
-                "3",
-                "飙升榜_21首新歌上榜",
-                "https://via.placeholder.com/150/FF0000/FFFFFF?text=Chart2",
-                listOf(
-                    Song("7","恒星不忘 Forever Forever"),
-                    Song("8","奇迹航线", ),
-                    Song("9","爱与欠", )
-                )
-            )
-        )
-        val data= peaks.map{item->item.toDomain()}
-        return NetworkResponse(status = 0, message = "成功", data = data)
-    }
 
     fun getRankListById(id: String): NetworkResponse<RankListDetail> {
         return when (id) {

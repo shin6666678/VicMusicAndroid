@@ -29,44 +29,52 @@ fun RankListDetailRoute(
 ){
 
     val playerManager = LocalPlayerManager.current
-
     val rankListDetail by viewModel.rankListDetail.collectAsState()
+
     // 1. 判空处理 (Null Check)
     if (rankListDetail == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator() // 显示加载中 (Loading)
         }
     } else {
-        val songList = rankListDetail!!.items.filterIsInstance<Song>()
-        val artistList = rankListDetail!!.items.filterIsInstance<Artist>()
-        val albumList = rankListDetail!!.items.filterIsInstance<Album>()
+        // [修改] 从 items 中筛选 Song，并提取标题和封面
+        val data = rankListDetail!!
+        val songList = data.items.filterIsInstance<Song>()
 
         RankListDetailScreen(
+            title = data.title,       // [新增] 传递标题
+            coverUrl = data.imageUrl, // [新增] 传递封面
             songs = songList,
-            artists = artistList,
-            albums = albumList,
             popBackStack = { navController.popBackStack() },
-            onSongClick = playerManager::playSong,
+            // [修改] 使用全局播放器播放列表
+            onSongClick = { song ->
+                playerManager.playSong(song, songList) // 点击播放并设置队列
+            },
         )
     }
 }
 @Composable
 fun RankListDetailScreen(
-    songs: List<Song> = emptyList() ,
-    artists: List<Artist> = emptyList(),
-    albums: List<Album> = emptyList(),
+    title: String = "排行榜(Rank List)", // [新增] 参数
+    coverUrl: String = "",            // [新增] 参数
+    songs: List<Song> = emptyList(),
     popBackStack: () -> Unit = {},
     onSongClick: (Song) -> Unit = {},
-    onPlayAllClick: (Artist) -> Unit = {},
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
-        RankListDetailHeader()
+        // [修改] 传递数据给 Header
+        RankListDetailHeader(
+            title = title,
+            coverUrl = coverUrl,
+            popBackStack = popBackStack
+        )
+
         SongListSection(
-            songs=songs,
+            songs = songs,
             onSongClick = onSongClick
         )
     }
