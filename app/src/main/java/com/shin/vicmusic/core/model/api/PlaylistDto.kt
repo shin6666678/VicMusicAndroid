@@ -1,9 +1,9 @@
-package com.shin.vicmusic.core.domain
+package com.shin.vicmusic.core.model.api
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Playlist(
+data class PlaylistDto(
     val id: String,
     val userId: String,
     val name: String,
@@ -12,7 +12,7 @@ data class Playlist(
     val playCount: Int
 )
 @Serializable
-data class PlaylistDetail(
-    val info: Playlist,
-    val songs: List<Song> // 复用现有的 Song Domain
+data class PlaylistDetailDto(
+    val info: PlaylistDto,
+    val songs: List<SongListItemDto>
 )

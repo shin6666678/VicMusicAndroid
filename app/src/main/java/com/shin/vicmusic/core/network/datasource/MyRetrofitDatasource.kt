@@ -5,6 +5,8 @@ import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.model.api.AlbumDetailResp
 import com.shin.vicmusic.core.model.api.AlbumDto
 import com.shin.vicmusic.core.model.api.ArtistDto
+import com.shin.vicmusic.core.model.api.PlaylistDetailDto
+import com.shin.vicmusic.core.model.api.PlaylistDto
 import com.shin.vicmusic.core.model.api.RankListDetailDto
 import com.shin.vicmusic.core.model.api.RankListPeakDto
 import com.shin.vicmusic.core.model.api.SongDetailDto
@@ -15,6 +17,7 @@ import com.shin.vicmusic.core.model.request.AlbumPageReq
 import com.shin.vicmusic.core.model.request.ArtistPageReq
 import com.shin.vicmusic.core.model.request.FollowReq
 import com.shin.vicmusic.core.model.request.LikeSongReq
+import com.shin.vicmusic.core.model.request.PlaylistSongReq
 import com.shin.vicmusic.core.model.request.SongPageReq
 import com.shin.vicmusic.core.model.request.UserLoginReq
 import com.shin.vicmusic.core.model.request.UserRegisterReq
@@ -172,4 +175,26 @@ class MyRetrofitDatasource @Inject constructor(
     }
 
 
+    /*
+    Playlist 歌单
+     */
+    suspend fun getMyPlaylists(): NetworkResponse<List<PlaylistDto>> {
+        return safeApiCall { service.getMyPlaylists() }
+    }
+
+    suspend fun getPlaylistDetail(id: String): NetworkResponse<PlaylistDetailDto> {
+        return safeApiCall { service.getPlaylistDetail(id) }
+    }
+
+    suspend fun addSongToPlaylist(playlistId: String, songId: String): NetworkResponse<Unit> {
+        return safeApiCall { service.addSongToPlaylist(PlaylistSongReq(playlistId, songId)) }
+    }
+
+    suspend fun removeSongFromPlaylist(playlistId: String, songId: String): NetworkResponse<Unit> {
+        return safeApiCall { service.removeSongFromPlaylist(PlaylistSongReq(playlistId, songId)) }
+    }
+
+    suspend fun deletePlaylist(id: String): NetworkResponse<Unit> {
+        return safeApiCall { service.deletePlaylist(id) }
+    }
 }

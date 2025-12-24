@@ -4,6 +4,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.shin.vicmusic.core.domain.Album
 import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.domain.PayType
+import com.shin.vicmusic.core.domain.Playlist
+import com.shin.vicmusic.core.domain.PlaylistDetail
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONGS
 import com.shin.vicmusic.util.Constant
@@ -208,5 +210,34 @@ object DiscoveryPreviewParameterData {
             icon = "album_大东北我的家乡_22fb49ef-1b09-4aa6-83bc-97238fa06698.jpg",
             artist = Artist(id = "3", name = "何玉")
         )
+    )
+
+    /*
+    @Serializable
+data class Playlist(
+    val id: String,
+    val userId: String,
+    val name: String,
+    val cover: String?,
+    val description: String?,
+    val playCount: Int
+)
+@Serializable
+data class PlaylistDetail(
+    val info: Playlist,
+    val songs: List<Song> // 复用现有的 Song Domain
+)
+     */
+    val PLAYLIST = Playlist(
+        id = "1",
+        userId = "1",
+        name = "我收藏的歌单",
+        cover = "playlist_cover.jpg",
+        description = "这是我收藏的歌单，包含一些我喜欢的歌。",
+        playCount = 1000
+    )
+    val PLAYLIST_DETAIL = PlaylistDetail(
+        info = PLAYLIST,
+        songs = SONGS
     )
 }
