@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.RankListRepository
 import com.shin.vicmusic.core.domain.RankListPeak
+import com.shin.vicmusic.core.domain.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,9 +25,15 @@ class RankListViewModel @Inject constructor(
 
     private fun fetchRankData() {
         viewModelScope.launch {
-            val response = repository.getRankListPeeks()
-            if (response.status == 0) {
-                _rankListPeaks.value = response.data
+            // [修改] 处理 Result<List<RankListPeak>>
+            when (val result = repository.getRankListPeeks()) {
+                is Result.Success -> {
+                    _rankListPeaks.value = result.data
+                }
+                is Result.Error -> {
+                    // 这里可以处理错误，例如显示 Toast 或 Error State
+                    // Log.e("RankListViewModel", result.message)
+                }
             }
         }
     }

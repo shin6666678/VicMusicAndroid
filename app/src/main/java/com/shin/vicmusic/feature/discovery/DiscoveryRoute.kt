@@ -25,7 +25,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
 import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.feature.album.albumList.ALBUM_LIST_ROUTE
-import com.shin.vicmusic.feature.discovery.TestList.TestList
 import com.shin.vicmusic.feature.discovery.musicHall.MusicHall
 import com.shin.vicmusic.feature.discovery.recommend.Recommend
 import com.shin.vicmusic.feature.rankList.rankList.RANK_LIST_ROUTE
@@ -106,13 +105,9 @@ fun DiscoveryScreen(
                 0 -> Recommend(user=user)
                 1 -> MusicHall(
                     songs = songs,
-                    onLikeClick = onLikeClick,
                     onQuickAccessClick = onQuickAccessClick
                 )
-                2-> TestList(
-                    songs = songs,
-                    onLikeClick = onLikeClick
-                )
+
             }
         }
     }

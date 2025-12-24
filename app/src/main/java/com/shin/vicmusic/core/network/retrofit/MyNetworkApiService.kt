@@ -5,6 +5,8 @@ import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.model.api.AlbumDetailResp
 import com.shin.vicmusic.core.model.api.AlbumDto
 import com.shin.vicmusic.core.model.api.ArtistDto
+import com.shin.vicmusic.core.model.api.RankListDetailDto
+import com.shin.vicmusic.core.model.api.RankListPeakDto
 import com.shin.vicmusic.core.model.api.SongDetailDto
 import com.shin.vicmusic.core.model.api.SongListItemDto
 import com.shin.vicmusic.core.model.api.UserInfoDto
@@ -109,5 +111,13 @@ interface MyNetworkApiService {
     @POST("/api/relationship/v1/follow")
     suspend fun follow(@Body req: FollowReq): NetworkResponse<Unit>
 
+    /*
+    RankList排行榜
+     */
+    @GET("/api/rankList/v1/peeks")
+    suspend fun getRankListPeeks(): NetworkResponse<List<RankListPeakDto>>
+
+    @GET("/api/rankList/v1/detail")
+    suspend fun rankListDetail(@Query("id") id: String): NetworkResponse<RankListDetailDto>
 
 }
