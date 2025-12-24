@@ -31,22 +31,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.shin.vicmusic.feature.common.MyNavigationBar
-import com.shin.vicmusic.feature.common.SongBar
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
 import com.shin.vicmusic.core.design.theme.SpaceExtraMedium
 import com.shin.vicmusic.feature.album.albumDetail.albumDetailScreen
-import com.shin.vicmusic.feature.album.albumDetail.navigateToAlbumDetail
 import com.shin.vicmusic.feature.album.albumList.albumListScreen
 import com.shin.vicmusic.feature.artist.artistDetail.artistDetailScreen
 import com.shin.vicmusic.feature.artist.artistList.artistListScreen
 import com.shin.vicmusic.feature.auth.loginScreen
 import com.shin.vicmusic.feature.auth.registerScreen
+import com.shin.vicmusic.feature.common.MyNavigationBar
+import com.shin.vicmusic.feature.common.SongBar
 import com.shin.vicmusic.feature.main.MAIN_ROUTE
 import com.shin.vicmusic.feature.main.TopLevelDestination
 import com.shin.vicmusic.feature.main.mainScreen
 import com.shin.vicmusic.feature.playBackQueue.PlaybackQueueSheet
+import com.shin.vicmusic.feature.playlist.detail.playlistDetailScreen
+import com.shin.vicmusic.feature.playlist.myPlaylistScreen
 import com.shin.vicmusic.feature.rankList.rankList.rankListScreen
 import com.shin.vicmusic.feature.rankList.rankListDetail.rankListDetailScreen
 import com.shin.vicmusic.feature.search.searchScreen
@@ -118,6 +119,8 @@ fun MyApp() {
             // Album
             albumListScreen()
             albumDetailScreen()
+            playlistDetailScreen()
+            myPlaylistScreen()
         }
 
         // 底部整体容器 (SongBar + 导航栏)

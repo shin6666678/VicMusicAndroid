@@ -5,6 +5,8 @@ import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.model.api.AlbumDetailResp
 import com.shin.vicmusic.core.model.api.AlbumDto
 import com.shin.vicmusic.core.model.api.ArtistDto
+import com.shin.vicmusic.core.model.api.PlaylistDetailDto
+import com.shin.vicmusic.core.model.api.PlaylistDto
 import com.shin.vicmusic.core.model.api.RankListDetailDto
 import com.shin.vicmusic.core.model.api.RankListPeakDto
 import com.shin.vicmusic.core.model.api.SongDetailDto
@@ -12,6 +14,7 @@ import com.shin.vicmusic.core.model.api.SongListItemDto
 import com.shin.vicmusic.core.model.api.UserInfoDto
 import com.shin.vicmusic.core.model.request.FollowReq
 import com.shin.vicmusic.core.model.request.LikeSongReq
+import com.shin.vicmusic.core.model.request.PlaylistSongReq
 import com.shin.vicmusic.core.model.request.UserLoginReq
 import com.shin.vicmusic.core.model.request.UserRegisterReq
 import com.shin.vicmusic.core.model.response.NetworkPageData
@@ -120,4 +123,21 @@ interface MyNetworkApiService {
     @GET("/api/rankList/v1/detail")
     suspend fun rankListDetail(@Query("id") id: String): NetworkResponse<RankListDetailDto>
 
+    /*
+    Playlist (歌单)
+     */
+    @GET("/api/playlist/v1/my")
+    suspend fun getMyPlaylists(): NetworkResponse<List<PlaylistDto>>
+
+    @GET("/api/playlist/v1/detail/{id}")
+    suspend fun getPlaylistDetail(@Path("id") id: String): NetworkResponse<PlaylistDetailDto>
+
+    @POST("/api/playlist/v1/song/add")
+    suspend fun addSongToPlaylist(@Body req: PlaylistSongReq): NetworkResponse<Unit>
+
+    @POST("/api/playlist/v1/song/remove")
+    suspend fun removeSongFromPlaylist(@Body req: PlaylistSongReq): NetworkResponse<Unit>
+
+    @POST("/api/playlist/v1/delete/{id}")
+    suspend fun deletePlaylist(@Path("id") id: String): NetworkResponse<Unit>
 }
