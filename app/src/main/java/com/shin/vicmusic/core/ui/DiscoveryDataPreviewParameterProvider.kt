@@ -231,13 +231,48 @@ data class PlaylistDetail(
     val PLAYLIST = Playlist(
         id = "1",
         userId = "1",
-        name = "我收藏的歌单",
+        name = "我的歌单1",
         cover = "playlist_cover.jpg",
-        description = "这是我收藏的歌单，包含一些我喜欢的歌。",
+        description = "这是我的歌单，包含一些我喜欢的歌。",
         playCount = 1000
     )
     val PLAYLIST_DETAIL = PlaylistDetail(
         info = PLAYLIST,
         songs = SONGS
+    )
+    val PLAYLISTS = listOf(
+        Playlist(
+            id = "1",
+            userId = "1",
+            name = "我的歌单1",
+            cover = "playlist_cover.jpg",
+            description = "这是我的歌单，包含一些我喜欢的歌。",
+            playCount = 1000
+        ),
+        Playlist(
+            id = "2",
+            userId = "1",
+            name = "我的歌单2",
+            cover = "playlist_cover.jpg",
+            description = "这是我的歌单，包含一些我喜欢的歌。",
+            playCount = 1000
+        ),
+        Playlist(
+            id = "3",
+            userId = "1",
+            name = "我的歌单3",
+            cover = "playlist_cover.jpg",
+            description = "这是我的歌单，包含一些我喜欢的歌。",
+            playCount = 1000
+        ),
+        Playlist(
+            id = "4",
+            userId = "1",
+            name = "我的歌单4",
+            cover = "playlist_cover.jpg",
+            description = "这是我的歌单，包含一些我喜欢的歌。",
+            playCount = 1000
+        ),
+
     )
 }
