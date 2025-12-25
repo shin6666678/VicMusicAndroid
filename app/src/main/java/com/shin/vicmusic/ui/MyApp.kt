@@ -47,7 +47,7 @@ import com.shin.vicmusic.feature.main.TopLevelDestination
 import com.shin.vicmusic.feature.main.mainScreen
 import com.shin.vicmusic.feature.playBackQueue.PlaybackQueueSheet
 import com.shin.vicmusic.feature.playlist.detail.playlistDetailScreen
-import com.shin.vicmusic.feature.playlist.myPlaylistScreen
+import com.shin.vicmusic.feature.playlist.meList.myPlaylistScreen
 import com.shin.vicmusic.feature.rankList.rankList.rankListScreen
 import com.shin.vicmusic.feature.rankList.rankListDetail.rankListDetailScreen
 import com.shin.vicmusic.feature.search.searchScreen

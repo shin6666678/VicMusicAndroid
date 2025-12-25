@@ -1,4 +1,4 @@
-package com.shin.vicmusic.feature.playlist
+package com.shin.vicmusic.feature.playlist.meList
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

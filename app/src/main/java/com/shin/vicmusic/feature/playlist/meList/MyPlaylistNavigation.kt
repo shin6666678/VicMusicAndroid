@@ -1,4 +1,4 @@
-package com.shin.vicmusic.feature.playlist
+package com.shin.vicmusic.feature.playlist.meList
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder

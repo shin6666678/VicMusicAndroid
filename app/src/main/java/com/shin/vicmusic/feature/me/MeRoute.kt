@@ -39,12 +39,11 @@ import coil.compose.AsyncImage
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.Playlist
 import com.shin.vicmusic.core.domain.User
-import com.shin.vicmusic.core.manager.AuthManager
 import com.shin.vicmusic.feature.liked.LikedScreen
 import com.shin.vicmusic.feature.me.component.MeTopBar
 import com.shin.vicmusic.feature.me.component.TopNotifyBar
 import com.shin.vicmusic.feature.me.component.UserInfoCard
-import com.shin.vicmusic.feature.playlist.navigateToMyPlaylists
+import com.shin.vicmusic.feature.playlist.meList.navigateToMyPlaylists
 
 
 @OptIn(ExperimentalMaterial3Api::class)
