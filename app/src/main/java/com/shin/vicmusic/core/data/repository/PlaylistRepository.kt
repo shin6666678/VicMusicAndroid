@@ -5,6 +5,7 @@ import com.shin.vicmusic.core.domain.Playlist
 import com.shin.vicmusic.core.domain.PlaylistDetail
 import com.shin.vicmusic.core.domain.Result
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
+import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -51,5 +52,15 @@ class PlaylistRepository @Inject constructor(
         return if (resp.status == 0) Result.Success(Unit) else Result.Error(
             resp.message ?: "删除失败"
         )
+    }
+
+    suspend fun addPlaylist(name: String, description: String?, cover: File?): Result<Unit> {
+        val resp = datasource.addPlaylist(name, description, cover)
+        return if (resp.status == 0) Result.Success(Unit) else Result.Error(resp.message ?: "创建失败")
+    }
+
+    suspend fun updatePlaylist(id: String, name: String, description: String?, cover: File?): Result<Unit> {
+        val resp = datasource.updatePlaylist(id, name, description, cover)
+        return if (resp.status == 0) Result.Success(Unit) else Result.Error(resp.message ?: "更新失败")
     }
 }

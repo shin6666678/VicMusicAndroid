@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,7 +28,21 @@ class PlaylistViewModel @Inject constructor(
         }
     }
 
-    fun createPlaylist(name: String) {
-        // 需实现创建逻辑，此处略，保持最简
+    fun createPlaylist(name: String, description: String? = null, cover: File? = null) {
+        viewModelScope.launch {
+            val result = repository.addPlaylist(name, description, cover)
+            if (result is Result.Success) {
+                fetchMyPlaylists() // Refresh list
+            }
+        }
+    }
+
+    fun updatePlaylist(id: String, name: String, description: String? = null, cover: File? = null) {
+        viewModelScope.launch {
+            val result = repository.updatePlaylist(id, name, description, cover)
+            if (result is Result.Success) {
+                fetchMyPlaylists() // Refresh list
+            }
+        }
     }
 }

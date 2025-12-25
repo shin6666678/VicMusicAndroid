@@ -24,9 +24,14 @@ import com.shin.vicmusic.core.model.request.UserRegisterReq
 import com.shin.vicmusic.core.model.response.NetworkPageData
 import com.shin.vicmusic.core.model.response.NetworkResponse
 import com.shin.vicmusic.core.network.retrofit.MyNetworkApiService
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.HttpException
 import retrofit2.http.Body
 import retrofit2.http.Query
+import java.io.File
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -196,5 +201,26 @@ class MyRetrofitDatasource @Inject constructor(
 
     suspend fun deletePlaylist(id: String): NetworkResponse<Unit> {
         return safeApiCall { service.deletePlaylist(id) }
+    }
+
+    suspend fun addPlaylist(name: String, description: String?, cover: File?): NetworkResponse<Unit> {
+        val nameBody = name.toRequestBody("text/plain".toMediaTypeOrNull())
+        val descBody = description?.toRequestBody("text/plain".toMediaTypeOrNull())
+        val coverPart = cover?.let {
+            val body = it.asRequestBody("image/*".toMediaTypeOrNull())
+            MultipartBody.Part.createFormData("cover", it.name, body)
+        }
+        return safeApiCall { service.addPlaylist(nameBody, descBody, coverPart) }
+    }
+
+    suspend fun updatePlaylist(id: String, name: String, description: String?, cover: File?): NetworkResponse<Unit> {
+        val idBody = id.toRequestBody("text/plain".toMediaTypeOrNull())
+        val nameBody = name.toRequestBody("text/plain".toMediaTypeOrNull())
+        val descBody = description?.toRequestBody("text/plain".toMediaTypeOrNull())
+        val coverPart = cover?.let {
+            val body = it.asRequestBody("image/*".toMediaTypeOrNull())
+            MultipartBody.Part.createFormData("cover", it.name, body)
+        }
+        return safeApiCall { service.updatePlaylist(idBody, nameBody, descBody, coverPart) }
     }
 }
