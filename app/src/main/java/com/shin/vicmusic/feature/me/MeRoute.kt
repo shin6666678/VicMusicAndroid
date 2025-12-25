@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Headphones
+import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -35,28 +36,37 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.shin.vicmusic.core.design.composition.LocalNavController
+import com.shin.vicmusic.core.domain.Playlist
 import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.manager.AuthManager
 import com.shin.vicmusic.feature.liked.LikedScreen
 import com.shin.vicmusic.feature.me.component.MeTopBar
 import com.shin.vicmusic.feature.me.component.TopNotifyBar
 import com.shin.vicmusic.feature.me.component.UserInfoCard
+import com.shin.vicmusic.feature.playlist.navigateToMyPlaylists
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MeRoute(
     onAvatarClick: () -> Unit = {},
-    onVipClick: () -> Unit = {}, // [新增]
+    onVipClick: () -> Unit = {},
     viewModel: MeViewModel = hiltViewModel()
 ) {
-    val isLoggedIn by viewModel.isLoggedIn.collectAsState()
-    val currentUser by viewModel.currentUser.collectAsState() // [新增] 观察 currentUser
+    val navController = LocalNavController.current
 
-    // [新增] 如果已登录但无用户信息，尝试获取
+    val isLoggedIn by viewModel.isLoggedIn.collectAsState()
+    val currentUser by viewModel.currentUser.collectAsState() //  观察 currentUser
+    val playlists by viewModel.myPlaylists.collectAsState() // 观察歌单列表
+
+    // 如果已登录但无用户信息，尝试获取
     LaunchedEffect(isLoggedIn) {
-        if (isLoggedIn == true && currentUser == null) {
-            viewModel.fetchUserInfo()
+        if (isLoggedIn == true) {
+            if (currentUser == null) {
+                viewModel.fetchUserInfo()
+            }
+            viewModel.fetchMyPlaylists() // [新增] 获取歌单
         }
     }
 
@@ -65,8 +75,10 @@ fun MeRoute(
     MeScreen(
         onAvatarClick = onAvatarClick,
         onVipClick = onVipClick,
-        isLoggedIn = isLoggedIn ?: false ,// [修复] 确保状态为非空Boolean，null时默认为false
-        user = currentUser //传递 user
+        isLoggedIn = isLoggedIn ?: false ,//确保状态为非空Boolean，null时默认为false
+        user = currentUser,
+        playlists = playlists, // [新增] 传递歌单
+        onMorePlaylistsClick = { navController.navigateToMyPlaylists() }
     )
 }
 
@@ -76,13 +88,15 @@ fun MeScreen(
     onAvatarClick: () -> Unit = {},
     onVipClick: () -> Unit = {},
     isLoggedIn: Boolean,
-    user: User? = null
+    user: User? = null,
+    playlists: List<Playlist> = emptyList(),
+    onMorePlaylistsClick: () -> Unit = {}
 ) {
-    // [新增] 控制是否显示“喜欢列表”的状态
+    // 控制是否显示“喜欢列表”的状态
     var showLikedList by remember { mutableStateOf(false) }
 
     if (showLikedList) {
-        // [新增] 显示喜欢列表，传入返回回调
+        //  显示喜欢列表，传入返回回调
         LikedScreen(
             onBack = { showLikedList = false }
         )
@@ -106,10 +120,10 @@ fun MeScreen(
                 Spacer(Modifier.height(16.dp))
                 UserInfoCard(
                     onAvatarClick = onAvatarClick,
-                    onVipClick = onVipClick, // [新增]
+                    onVipClick = onVipClick,
                     isLoggedIn = isLoggedIn,
-                    user = user // [修改] 传入 user
-                )// 传入 onAvatarClick
+                    user = user
+                )
 
                 // Quick Access Icons
                 Spacer(Modifier.height(16.dp))
@@ -117,7 +131,7 @@ fun MeScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
-                    // [修改] 传入 onClick 回调
+                    // 传入 onClick 回调
                     QuickAccessItem(
                         icon = Icons.Filled.Favorite,
                         text = "收藏",
@@ -231,36 +245,59 @@ fun MeScreen(
                     Icon(
                         imageVector = Icons.Filled.KeyboardArrowRight,
                         contentDescription = "More Playlists",
-                        tint = Color.Gray
+                        tint = Color.Gray,
+                        modifier = Modifier.clickable { onMorePlaylistsClick() }
                     )
                 }
                 Spacer(Modifier.height(16.dp))
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F2F5))
-                ) {
-                    Row(
+
+                // 动态显示歌单列表 (最多3条)
+                playlists.take(3).forEach { playlist ->
+                    Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                            .padding(bottom = 8.dp),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F2F5))
                     ) {
-                        AsyncImage(
-                            model = "https://picsum.photos/50/50?random=6",
-                            contentDescription = "Playlist Cover",
+                        Row(
                             modifier = Modifier
-                                .size(48.dp)
-                                .clip(RoundedCornerShape(8.dp)),
-                            contentScale = ContentScale.Crop
-                        )
-                        Spacer(Modifier.width(8.dp))
-                        Column {
-                            Text("sb", style = MaterialTheme.typography.bodyMedium)
-                            Text("0首", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            if (playlist.cover.isNullOrEmpty()) {
+                                Surface(
+                                    modifier = Modifier.size(48.dp),
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = MaterialTheme.colorScheme.surfaceVariant
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.MusicNote,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.padding(12.dp)
+                                    )
+                                }
+                            } else {
+                                AsyncImage(
+                                    model = playlist.cover,
+                                    contentDescription = "Playlist Cover",
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .clip(RoundedCornerShape(8.dp)),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+                            Spacer(Modifier.width(8.dp))
+                            Column {
+                                Text(playlist.name, style = MaterialTheme.typography.bodyMedium)
+                                Text("${playlist.playCount}首", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                            }
                         }
                     }
                 }
+
                 Spacer(Modifier.height(16.dp)) // Add some space at the bottom of the scrollable content
             }
         }
