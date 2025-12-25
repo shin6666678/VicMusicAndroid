@@ -117,6 +117,12 @@ interface MyNetworkApiService {
     @POST("/api/relationship/v1/follow")
     suspend fun follow(@Body req: FollowReq): NetworkResponse<Unit>
 
+    @GET("relationship/v1/users")
+    suspend fun getFollowedUsers(): NetworkResponse<List<UserInfoDto>>
+
+    @GET("relationship/v1/artists")
+    suspend fun getFollowedArtists(): NetworkResponse<List<ArtistDto>>
+
     /*
     RankList排行榜
      */
@@ -152,7 +158,6 @@ interface MyNetworkApiService {
         @Part cover: MultipartBody.Part?
     ): NetworkResponse<Unit>
 
-    // [New] Update Playlist
     @Multipart
     @POST("/api/playlist/v1/update")
     suspend fun updatePlaylist(

@@ -27,6 +27,12 @@ class PlaylistViewModel @Inject constructor(
             }
         }
     }
+    // 放在 PlaylistViewModel 类中
+    fun addSongToPlaylist(playlistId: String, songId: String) {
+        viewModelScope.launch {
+            repository.addSongToPlaylist(playlistId, songId)
+        }
+    }
 
     fun createPlaylist(name: String, description: String? = null, cover: File? = null) {
         viewModelScope.launch {

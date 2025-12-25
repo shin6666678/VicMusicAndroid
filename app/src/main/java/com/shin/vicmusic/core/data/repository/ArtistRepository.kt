@@ -37,4 +37,13 @@ class ArtistRepository@Inject constructor(
         }
         return Result.Error(dtoResponse.message ?: "未知错误")
     }
+
+    suspend fun getFollowedArtists(): Result<List<Artist>> {
+        val res = datasource.getFollowedArtists()
+        if (res.status == 0) {
+            val list = res.data?.map { it.toDomain() } ?: emptyList()
+            return Result.Success(list)
+        }
+        return Result.Error(res.message ?: "未知错误")
+    }
 }
