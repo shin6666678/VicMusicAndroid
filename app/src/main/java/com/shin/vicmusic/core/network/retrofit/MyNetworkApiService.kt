@@ -1,6 +1,5 @@
 package com.shin.vicmusic.core.network.retrofit
 
-import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.model.api.AlbumDetailResp
 import com.shin.vicmusic.core.model.api.AlbumDto
@@ -19,9 +18,13 @@ import com.shin.vicmusic.core.model.request.UserLoginReq
 import com.shin.vicmusic.core.model.request.UserRegisterReq
 import com.shin.vicmusic.core.model.response.NetworkPageData
 import com.shin.vicmusic.core.model.response.NetworkResponse
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -140,4 +143,22 @@ interface MyNetworkApiService {
 
     @POST("/api/playlist/v1/delete/{id}")
     suspend fun deletePlaylist(@Path("id") id: String): NetworkResponse<Unit>
+
+    @Multipart
+    @POST("/api/playlist/v1/add")
+    suspend fun addPlaylist(
+        @Part("name") name: RequestBody,
+        @Part("description") description: RequestBody?,
+        @Part cover: MultipartBody.Part?
+    ): NetworkResponse<Unit>
+
+    // [New] Update Playlist
+    @Multipart
+    @POST("/api/playlist/v1/update")
+    suspend fun updatePlaylist(
+        @Part("id") id: RequestBody,
+        @Part("name") name: RequestBody,
+        @Part("description") description: RequestBody?,
+        @Part cover: MultipartBody.Part?
+    ): NetworkResponse<Unit>
 }
