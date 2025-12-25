@@ -7,12 +7,12 @@ data class PlaylistDto(
     val id: String,
     val userId: String,
     val name: String,
-    val cover: String?,
+    val cover: String?="",
     val description: String?,
     val playCount: Int
 )
 @Serializable
 data class PlaylistDetailDto(
     val info: PlaylistDto,
-    val songs: List<SongListItemDto>
+    val songs: List<SongListItemDto> = emptyList()
 )
