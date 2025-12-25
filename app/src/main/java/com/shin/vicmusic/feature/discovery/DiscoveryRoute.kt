@@ -43,12 +43,7 @@ fun DiscoveryRoute(
     DiscoveryScreen(
         songs = datum,
         user=user,
-        toggleDrawer = {}, // 保持原有的空实现，或者替换为实际逻辑
         toSearch = { navController.navigate("search_route") }, // 点击搜索框时导航到搜索界面
-        onSongClick = { songId -> playerManager::playSong} ,
-        onAddToQueueClick = { song -> playerManager.addSongToQueue(song) },
-        // [新增] 传递 ViewModel 的 toggleLike 方法
-        onLikeClick = viewModel::toggleLike,
         onQuickAccessClick = { label ->
             if (label == "歌手") {
                 navController.navigate("artist_list")
@@ -64,14 +59,9 @@ fun DiscoveryRoute(
 
 @Composable
 fun DiscoveryScreen(
-    toggleDrawer: () -> Unit = {},
     toSearch: () -> Unit = {},
     songs: List<Song> = listOf(),
     user: User?=null,
-    onSongClick: (String) -> Unit = {} ,
-    onAddToQueueClick: (Song) -> Unit = {},
-    // [新增] 接收点击回调
-    onLikeClick: (Song) -> Unit = {},
     onQuickAccessClick: (String) -> Unit = {}
 ) {
     val pagerState = rememberPagerState(pageCount = {3})

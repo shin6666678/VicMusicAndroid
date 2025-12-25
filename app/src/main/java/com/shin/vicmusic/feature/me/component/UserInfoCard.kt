@@ -21,8 +21,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.shin.vicmusic.R
+import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.feature.me.ActionItem // 确保导入了 ActionItem
+import com.shin.vicmusic.feature.me.followList.navigateToFollowList
 import com.shin.vicmusic.feature.vip.VipIcon
 
 @Preview
@@ -43,7 +45,7 @@ fun UserInfoCard(
     onAvatarClick: () -> Unit,
     onVipClick: () -> Unit = {}, // [新增] 接收 VIP 點擊事件
     isLoggedIn: Boolean,
-    user: User? // [新增] 接收 User 对象
+    user: User?,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -163,20 +165,19 @@ private fun LoggedOutHeader(onAvatarClick: () -> Unit) {
 private fun UserStatsRow(
     user: User
 ) {
-    // 定义数据类或直接使用 List<Pair>
-    val stats = listOf(
-        user.followCount to "关注",
-        user.followerCount to "粉丝",
-        user.level to "等级",
-        user.heardCount to "听歌"
-    )
+    val navController = LocalNavController.current // 直接获取控制器
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceAround
     ) {
-        stats.forEach { (count, label) ->
-            StatItem(count, label)
+        // 为关注添加点击事件
+        StatItem(user.followCount, "关注") {
+            navController.navigateToFollowList()
         }
+        StatItem(user.followerCount, "粉丝")
+        StatItem(user.level, "等级")
+        StatItem(user.heardCount, "听歌")
     }
 }
 
@@ -207,10 +208,12 @@ private fun ActionButtonsRow() {
 }
 
 @Composable
-fun StatItem(count: Int?, label: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+fun StatItem(count: Int?, label: String, onClick: () -> Unit = {}) { // 添加 onClick 参数
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.clickable { onClick() } // 绑定点击
+    ) {
         Text(
-            // 修复: 判空并转换为String
             text = (count ?: 0).toString(),
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Bold

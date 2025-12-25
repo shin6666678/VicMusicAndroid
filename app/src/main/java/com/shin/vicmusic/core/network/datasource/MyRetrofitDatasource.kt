@@ -162,11 +162,15 @@ class MyRetrofitDatasource @Inject constructor(
     }
 
     /*
-    用户关系
+    社交关系
      */
     suspend fun follow(followReq: FollowReq): NetworkResponse<Unit> {
         return safeApiCall { service.follow(followReq) }
     }
+
+    suspend fun getFollowedUsers() =service.getFollowedUsers()
+
+    suspend fun getFollowedArtists() = service.getFollowedArtists()
 
 
     /*
