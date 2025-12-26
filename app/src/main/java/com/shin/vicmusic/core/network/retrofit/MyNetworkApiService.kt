@@ -67,8 +67,8 @@ interface MyNetworkApiService {
     @GET("/api/songs/v1/{id}")
     suspend fun songDetail(@Path(value = "id") id: String): NetworkResponse<SongDetailDto>
 
-    @POST("/api/songs/v1/{id}/click")
-    suspend fun clickSong(@Path(value = "id") id: String): NetworkResponse<Unit>
+    @POST("/api/songs/v1/play/{id}")
+    suspend fun playSong(@Path(value = "id") id: String): NetworkResponse<Unit>
 
     /*
     喜欢

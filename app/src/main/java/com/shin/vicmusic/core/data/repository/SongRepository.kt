@@ -44,5 +44,8 @@ class SongRepository @Inject constructor(
         return Result.Error(dtoResponse.message ?: "未知错误")
     }
 
+    suspend fun playSong(id: String) {
+        datasource.playSong(id)
+    }
 
 }

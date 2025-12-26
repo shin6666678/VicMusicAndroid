@@ -101,6 +101,10 @@ class MyRetrofitDatasource @Inject constructor(
     suspend fun songDetail(@Query(value = "id") id: String): NetworkResponse<SongDetailDto> {
         return safeApiCall { service.songDetail(id) }
     }
+    
+    suspend fun playSong(id: String): NetworkResponse<Unit> {
+        return safeApiCall { service.playSong(id) }
+    }
 
 
     /*
