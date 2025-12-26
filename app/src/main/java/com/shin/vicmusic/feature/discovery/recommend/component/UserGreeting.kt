@@ -26,12 +26,13 @@ import com.shin.vicmusic.core.design.theme.SpaceMedium
 import com.shin.vicmusic.core.design.theme.SpaceOuter
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
 import com.shin.vicmusic.core.domain.User
+import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.feature.vip.VipIcon
 import com.shin.vicmusic.util.ResourceUtil
 
 @Composable
 fun UserGreeting(
-    user: User?=null
+    user: UserInfo?=null
 ) {
     // 1. 同步 VIP 解析逻辑
     val vipLevelInt = user?.vipLevel?: 0
@@ -95,7 +96,7 @@ fun UserGreeting(
 fun PreviewUserGreeting() {
     VicMusicTheme {
         UserGreeting(
-            User(
+            UserInfo(
                 name = "发现界面测试用户",
                 vipLevel = 6
             )

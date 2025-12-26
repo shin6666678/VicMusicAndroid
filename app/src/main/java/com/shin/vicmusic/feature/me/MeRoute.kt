@@ -39,6 +39,7 @@ import coil.compose.AsyncImage
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.Playlist
 import com.shin.vicmusic.core.domain.User
+import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.feature.liked.LikedScreen
 import com.shin.vicmusic.feature.me.component.MeTopBar
 import com.shin.vicmusic.feature.me.component.TopNotifyBar
@@ -87,7 +88,7 @@ fun MeScreen(
     onAvatarClick: () -> Unit = {},
     onVipClick: () -> Unit = {},
     isLoggedIn: Boolean,
-    user: User? = null,
+    user: UserInfo? = null,
     playlists: List<Playlist> = emptyList(),
     onMorePlaylistsClick: () -> Unit = {}
 ) {

@@ -172,6 +172,8 @@ class MyRetrofitDatasource @Inject constructor(
 
     suspend fun getFollowedArtists() = service.getFollowedArtists()
 
+    suspend fun getFans() = service.getFans()
+
 
     /*
     RankList排行榜
@@ -227,4 +229,10 @@ class MyRetrofitDatasource @Inject constructor(
         }
         return safeApiCall { service.updatePlaylist(idBody, nameBody, descBody, coverPart) }
     }
+    /*
+    history历史记录
+     */
+    suspend fun addHistory(songId: String) = service.addHistory(mapOf("songId" to songId))
+
+    suspend fun getHistory() = service.getHistory()
 }

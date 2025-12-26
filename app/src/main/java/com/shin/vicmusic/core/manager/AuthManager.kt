@@ -4,6 +4,7 @@ import com.shin.vicmusic.core.config.AppGlobalData
 import com.shin.vicmusic.core.data.repository.AuthRepository
 import com.shin.vicmusic.core.domain.Result
 import com.shin.vicmusic.core.domain.User
+import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -25,8 +26,8 @@ class AuthManager @Inject constructor(
     val isLoggedIn: StateFlow<Boolean?> = _isLoggedIn
 
     // [新增] 当前用户信息状态 (Current User State)
-    private val _currentUser = MutableStateFlow<User?>(null)
-    val currentUser: StateFlow<User?> = _currentUser
+    private val _currentUser = MutableStateFlow<UserInfo?>(null)
+    val currentUser: StateFlow<UserInfo?> = _currentUser
 
     init {
         // [修改2] 初始化时监听 Token，如果有则自动恢复登录

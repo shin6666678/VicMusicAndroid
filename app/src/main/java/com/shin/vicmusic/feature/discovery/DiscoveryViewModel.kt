@@ -8,6 +8,7 @@ import com.shin.vicmusic.core.data.repository.SongRepository
 import com.shin.vicmusic.core.domain.Result
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.domain.User
+import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.core.manager.AuthManager
 import com.shin.vicmusic.core.model.request.SongPageReq
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,7 +35,7 @@ class DiscoveryViewModel @Inject constructor(
 
     //直接链接到 AuthViewModel 的 currentUser，实现由于单一数据源(Single Source of Truth)
     // 这样当 AuthViewModel 登录/登出或更新用户信息时，这里会自动同步
-    val user: StateFlow<User?> = authManager.currentUser
+    val user: StateFlow<UserInfo?> = authManager.currentUser
 
     init{
         loadData()

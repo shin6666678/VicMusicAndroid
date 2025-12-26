@@ -27,7 +27,6 @@ import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Radio
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -57,7 +56,7 @@ import com.shin.vicmusic.core.design.composition.LocalPlayerManager
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONGS
 import com.shin.vicmusic.feature.discovery.DiscoveryViewModel
-import com.shin.vicmusic.feature.song.ItemSong
+import com.shin.vicmusic.feature.common.ItemSong
 
 @Preview
 @Composable

@@ -4,22 +4,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class User(
-    val id: Long?=null, // 主键ID
-    val name: String?=null,
-    val pwd: String?=null,
-    val headImg: String?=null,
-    val slogan: String?=null,
-    val sex: Int?=null,
-    val points: Int?=null,
-    val mail: String?=null,
-    val followCount: Int? = null,
-    val followerCount: Int? = null,
-    val level: Int? = null,
-    val vipLevel: Int? = null,
-    val heardCount: Int? = null
-
-){
-    fun isVip(): Boolean {
-        return vipLevel != null && vipLevel != 0
-    }
-}
+    val id: String="",
+    val name: String="未命名用户",
+    val pwd: String="",
+    val headImg: String="",
+    val mail: String="",
+)

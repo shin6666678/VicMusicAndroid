@@ -1,4 +1,4 @@
-package com.shin.vicmusic.feature.song
+package com.shin.vicmusic.feature.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -34,8 +34,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
 import com.shin.vicmusic.core.design.composition.LocalSongActionManager
-import com.shin.vicmusic.feature.common.MyAsyncImage
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
+import com.shin.vicmusic.core.domain.Album
+import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.domain.PayType
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONG
@@ -224,8 +225,8 @@ fun PreView() {
             song = SONG.copy(
                 payType = PayType.PAY,
                 title = "这是一首名字非常非常长的歌曲测试溢出效果",
-                artist = com.shin.vicmusic.core.domain.Artist("1", "周杰伦"),
-                album = com.shin.vicmusic.core.domain.Album("1", "最伟大的作品")
+                artist = Artist("1", "周杰伦"),
+                album = Album("1", "最伟大的作品")
             ),
             onPlayClick = {},
             onLikeClick = {},
