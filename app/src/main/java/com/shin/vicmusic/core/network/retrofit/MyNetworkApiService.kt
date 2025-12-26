@@ -67,6 +67,9 @@ interface MyNetworkApiService {
     @GET("/api/songs/v1/{id}")
     suspend fun songDetail(@Path(value = "id") id: String): NetworkResponse<SongDetailDto>
 
+    @POST("/api/songs/v1/{id}/click")
+    suspend fun clickSong(@Path(value = "id") id: String): NetworkResponse<Unit>
+
     /*
     喜欢
      */
@@ -117,11 +120,14 @@ interface MyNetworkApiService {
     @POST("/api/relationship/v1/follow")
     suspend fun follow(@Body req: FollowReq): NetworkResponse<Unit>
 
-    @GET("relationship/v1/users")
+    @GET("/api/relationship/v1/users")
     suspend fun getFollowedUsers(): NetworkResponse<List<UserInfoDto>>
 
-    @GET("relationship/v1/artists")
+    @GET("/api/relationship/v1/artists")
     suspend fun getFollowedArtists(): NetworkResponse<List<ArtistDto>>
+
+    @GET("/api/relationship/v1/fans")
+    suspend fun getFans(): NetworkResponse<List<UserInfoDto>>
 
     /*
     RankList排行榜
@@ -166,4 +172,13 @@ interface MyNetworkApiService {
         @Part("description") description: RequestBody?,
         @Part cover: MultipartBody.Part?
     ): NetworkResponse<Unit>
+
+    /*
+    history历史
+     */
+    @POST("/api/history/v1/add")
+    suspend fun addHistory(@Body body: Map<String, String>): NetworkResponse<Unit>
+
+    @GET("/api/history/v1/list")
+    suspend fun getHistory(): NetworkResponse<List<SongListItemDto>>
 }

@@ -20,8 +20,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.ARTISTS
+import com.shin.vicmusic.feature.common.ItemArtist
 import com.shin.vicmusic.feature.artist.artistDetail.navigateToArtistDetail
-import com.shin.vicmusic.feature.artist.artistList.component.ArtistListItem
 import com.shin.vicmusic.feature.artist.artistList.component.FilterSection
 import com.shin.vicmusic.feature.artist.artistList.component.TopArtistSection
 import com.shin.vicmusic.feature.common.CommonTopBar
@@ -99,10 +99,11 @@ fun ArtistListScreen(
                     )
                 }
                 items(artists) { artist ->
-                    ArtistListItem(
+                    ItemArtist(
                         artist = artist,
                         onClick = onItemClick,
-                        onFollowClick=onFollowClick
+                        onFollowClick=onFollowClick,
+                        showFollowStatus = true
                     )
                 }
             }
