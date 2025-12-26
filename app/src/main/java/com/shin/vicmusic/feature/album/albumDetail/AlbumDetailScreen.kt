@@ -26,7 +26,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.feature.common.CommonTopBar
 import com.shin.vicmusic.feature.common.MyAsyncImage
-import com.shin.vicmusic.feature.song.ItemSong
+import com.shin.vicmusic.feature.common.ItemSong
 
 @Composable
 fun AlbumDetailRoute(
@@ -56,7 +56,7 @@ fun AlbumDetailScreen(
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             CommonTopBar(
-                midText = "专辑详情",
+                midText = "专辑",
                 popBackStack = popBackStack,
                 containerColor = Color.Transparent
             )
