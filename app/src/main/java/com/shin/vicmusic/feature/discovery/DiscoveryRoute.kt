@@ -24,6 +24,7 @@ import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterProvider
 import androidx.compose.runtime.rememberCoroutineScope
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
 import com.shin.vicmusic.core.domain.User
+import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.feature.album.albumList.ALBUM_LIST_ROUTE
 import com.shin.vicmusic.feature.discovery.musicHall.MusicHall
 import com.shin.vicmusic.feature.discovery.recommend.Recommend
@@ -61,7 +62,7 @@ fun DiscoveryRoute(
 fun DiscoveryScreen(
     toSearch: () -> Unit = {},
     songs: List<Song> = listOf(),
-    user: User?=null,
+    user: UserInfo?=null,
     onQuickAccessClick: (String) -> Unit = {}
 ) {
     val pagerState = rememberPagerState(pageCount = {3})

@@ -1,12 +1,30 @@
 package com.shin.vicmusic.feature.me.component
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.* // 导入常用的布局组件
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Key
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,8 +40,9 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.shin.vicmusic.R
 import com.shin.vicmusic.core.design.composition.LocalNavController
-import com.shin.vicmusic.core.domain.User
-import com.shin.vicmusic.feature.me.ActionItem // 确保导入了 ActionItem
+import com.shin.vicmusic.core.domain.UserInfo
+import com.shin.vicmusic.feature.me.ActionItem
+import com.shin.vicmusic.feature.me.fanList.navigateToFanList
 import com.shin.vicmusic.feature.me.followList.navigateToFollowList
 import com.shin.vicmusic.feature.vip.VipIcon
 
@@ -33,7 +52,7 @@ fun UserInfoCardPreview() {
     UserInfoCard(
         onAvatarClick = {},
         isLoggedIn = true,
-        user = User(
+        user = UserInfo(
             name = "登录情况测试用户",
             vipLevel = 0,
         )
@@ -45,7 +64,7 @@ fun UserInfoCard(
     onAvatarClick: () -> Unit,
     onVipClick: () -> Unit = {}, // [新增] 接收 VIP 點擊事件
     isLoggedIn: Boolean,
-    user: User?,
+    user: UserInfo?,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -80,7 +99,7 @@ fun UserInfoCard(
 private fun LoggedInHeader(
     onAvatarClick: () -> Unit,
     onVipClick: () -> Unit, // [新增] 參數
-    user: User?
+    user: UserInfo?
 ) {
     // 1. 解析 VIP 等级 (默认为 0)
     val vipLevelInt = user?.vipLevel ?: -1
@@ -163,7 +182,7 @@ private fun LoggedOutHeader(onAvatarClick: () -> Unit) {
 
 @Composable
 private fun UserStatsRow(
-    user: User
+    user: UserInfo
 ) {
     val navController = LocalNavController.current // 直接获取控制器
 
@@ -175,7 +194,9 @@ private fun UserStatsRow(
         StatItem(user.followCount, "关注") {
             navController.navigateToFollowList()
         }
-        StatItem(user.followerCount, "粉丝")
+        StatItem(user.followerCount, "粉丝"){
+            navController.navigateToFanList()
+        }
         StatItem(user.level, "等级")
         StatItem(user.heardCount, "听歌")
     }

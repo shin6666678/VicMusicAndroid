@@ -31,7 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.shin.vicmusic.core.domain.Song
-import com.shin.vicmusic.feature.song.ItemSong
+import com.shin.vicmusic.feature.common.ItemSong
 
 @Composable
 fun LikedSong(

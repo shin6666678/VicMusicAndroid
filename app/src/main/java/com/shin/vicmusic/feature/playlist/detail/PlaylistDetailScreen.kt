@@ -17,7 +17,7 @@ import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.PlaylistDetail
 import com.shin.vicmusic.feature.common.CommonTopBar
 import com.shin.vicmusic.feature.playlist.detail.component.PlaylistHeader
-import com.shin.vicmusic.feature.song.ItemSong
+import com.shin.vicmusic.feature.common.ItemSong
 
 @Composable
 fun PlaylistDetailRoute(

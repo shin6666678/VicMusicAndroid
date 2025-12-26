@@ -1,4 +1,4 @@
-package com.shin.vicmusic.feature.me.followList
+package com.shin.vicmusic.feature.me.fanList
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -16,12 +16,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class FollowListViewModel @Inject constructor(
+class FanListViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    private val artistRepository: ArtistRepository
 ) : ViewModel() {
 
-    var tabIndex by mutableIntStateOf(0)
     var userList by mutableStateOf<List<UserInfo>>(emptyList())
     var artistList by mutableStateOf<List<Artist>>(emptyList())
     var isLoading by mutableStateOf(false)
@@ -29,19 +27,9 @@ class FollowListViewModel @Inject constructor(
     fun loadData() {
         viewModelScope.launch {
             isLoading = true
-            if (tabIndex == 0) {
-                val res = userRepository.getFollowedUsers()
+                val res = userRepository.getFans()
                 if (res is Result.Success) userList = res.data
-            } else {
-                val res = artistRepository.getFollowedArtists()
-                if (res is Result.Success) artistList = res.data
-            }
             isLoading = false
         }
-    }
-
-    fun switchTab(index: Int) {
-        tabIndex = index
-        loadData()
     }
 }

@@ -1,4 +1,4 @@
-package com.shin.vicmusic.feature.artist.artistList.component
+package com.shin.vicmusic.feature.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,14 +28,14 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.shin.vicmusic.feature.common.MyAsyncImage
 import com.shin.vicmusic.core.domain.Artist
 
 @Composable
-fun ArtistListItem(
+fun ItemArtist(
     artist: Artist,
     onClick: (String) -> Unit = {},
     onFollowClick: (String) -> Unit = {},
+    showFollowStatus: Boolean = false,
 ) {
     Row(
         modifier = Modifier
@@ -60,41 +60,42 @@ fun ArtistListItem(
         )
 
         // 关注按钮
-        if (artist.isFollowing) {
-            OutlinedButton(
-                onClick = { onFollowClick(artist.id)},
-                shape = RoundedCornerShape(50),
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
-                modifier = Modifier.height(32.dp),
-                border = ButtonDefaults.outlinedButtonBorder.copy(brush = SolidColor(Color.LightGray))
+        if (showFollowStatus)
+            if (artist.isFollowing) {
+                OutlinedButton(
+                    onClick = { onFollowClick(artist.id) },
+                    shape = RoundedCornerShape(50),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+                    modifier = Modifier.height(32.dp),
+                    border = ButtonDefaults.outlinedButtonBorder.copy(brush = SolidColor(Color.LightGray))
 
-            ) {
-                Text(
-                    text = "已关注",
-                    fontSize = 12.sp,
-                    color = Color.Gray
-                )
+                ) {
+                    Text(
+                        text = "已关注",
+                        fontSize = 12.sp,
+                        color = Color.Gray
+                    )
+                }
+            } else {
+                OutlinedButton(
+                    onClick = { onFollowClick(artist.id) },
+                    shape = RoundedCornerShape(50),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+                    modifier = Modifier.height(32.dp),
+                    border = ButtonDefaults.outlinedButtonBorder.copy(brush = SolidColor(Color.Gray))
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null,
+                        modifier = Modifier.size(12.dp),
+                        tint = Color.Black
+                    )
+                    Text(
+                        text = "关注",
+                        fontSize = 12.sp,
+                        color = Color.Black
+                    )
+                }
             }
-        } else {
-            OutlinedButton(
-                onClick = { onFollowClick(artist.id) },
-                shape = RoundedCornerShape(50),
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
-                modifier = Modifier.height(32.dp),
-                border = ButtonDefaults.outlinedButtonBorder.copy(brush = SolidColor(Color.Gray))
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = null,
-                    modifier = Modifier.size(12.dp),
-                    tint = Color.Black
-                )
-                Text(
-                    text = "关注",
-                    fontSize = 12.sp,
-                    color = Color.Black
-                )
-            }
-        }
     }
 }

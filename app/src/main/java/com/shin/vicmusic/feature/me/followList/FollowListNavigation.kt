@@ -3,8 +3,6 @@ package com.shin.vicmusic.feature.me.followList
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.shin.vicmusic.feature.me.ME_ROUTE
-import com.shin.vicmusic.feature.me.MeRoute
 
 const val FOLLOW_LIST_ROUTE = "follow_list"
 

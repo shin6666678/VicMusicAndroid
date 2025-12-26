@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.shin.vicmusic.R
 import com.shin.vicmusic.core.domain.User
+import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.feature.vip.VipGold
 import com.shin.vicmusic.feature.vip.VipSubText
 
@@ -40,13 +41,13 @@ import com.shin.vicmusic.feature.vip.VipSubText
 @Composable
 fun VipUserCardPreview() {
     VipUserCard(
-        user = User(
+        user = UserInfo(
         )
     )
 }
 @Composable
 fun VipUserCard(
-    user: User?
+    user: UserInfo?
 ) {
     Box(
         modifier = Modifier

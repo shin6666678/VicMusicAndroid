@@ -23,6 +23,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.shin.vicmusic.core.design.composition.LocalAuthManager
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.User
+import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.feature.vip.component.VipBottomBar
 import com.shin.vicmusic.feature.vip.component.VipPrivilegesSection
 import com.shin.vicmusic.feature.vip.component.VipProductList
@@ -72,7 +73,7 @@ val VipSubText = Color(0xFF9E9E9E)
 @Composable
 fun VipScreen(
     onBackClick: () -> Unit,
-    user: User?,
+    user: UserInfo?,
     viewModel: VipViewModel = viewModel()
 ) {
     val vipProducts by viewModel.vipProducts.collectAsState()
