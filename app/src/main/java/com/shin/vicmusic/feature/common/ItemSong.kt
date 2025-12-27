@@ -88,13 +88,13 @@ fun ItemSong(
 // 2. 纯 UI 组件 (Stateless) - 供预览和ItemSong调用
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ItemSongContent(
+fun ItemSongContent(
     song: Song,
     modifier: Modifier = Modifier,
-    onPlayClick: () -> Unit,
-    onLikeClick: () -> Unit,
-    onAddToQueueClick: () -> Unit,
-    onAddToPlaylistClick: () -> Unit
+    onPlayClick: () -> Unit={},
+    onLikeClick: () -> Unit={},
+    onAddToQueueClick: () -> Unit={},
+    onAddToPlaylistClick: () -> Unit={}
 ) {
     var showSheet by remember { mutableStateOf(false) } // 控制弹窗显示(Show Sheet)
 

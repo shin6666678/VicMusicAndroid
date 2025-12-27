@@ -23,11 +23,13 @@ import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterProvider
 import androidx.compose.runtime.rememberCoroutineScope
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
-import com.shin.vicmusic.core.domain.User
+import com.shin.vicmusic.core.domain.RecommendCard
 import com.shin.vicmusic.core.domain.UserInfo
+import com.shin.vicmusic.core.model.api.SongListItemDto
 import com.shin.vicmusic.feature.album.albumList.ALBUM_LIST_ROUTE
 import com.shin.vicmusic.feature.discovery.musicHall.MusicHall
-import com.shin.vicmusic.feature.discovery.recommend.Recommend
+import com.shin.vicmusic.feature.discovery.recommend.RecommendRoute
+import com.shin.vicmusic.feature.discovery.recommend.RecommendScreen
 import com.shin.vicmusic.feature.rankList.rankList.RANK_LIST_ROUTE
 import kotlinx.coroutines.launch
 
@@ -39,11 +41,13 @@ fun DiscoveryRoute(
 ) {
     val playerManager = LocalPlayerManager.current
     val datum by viewModel.datum.collectAsState()
-    val user by viewModel.user.collectAsState() // [新增] 收集用户状态
+    val user by viewModel.user.collectAsState() // 用户状态
+    val alsoListeningCard by viewModel.alsoListeningCard.collectAsState()
 
     DiscoveryScreen(
         songs = datum,
         user=user,
+        alsoListeningCard = alsoListeningCard,
         toSearch = { navController.navigate("search_route") }, // 点击搜索框时导航到搜索界面
         onQuickAccessClick = { label ->
             if (label == "歌手") {
@@ -53,7 +57,6 @@ fun DiscoveryRoute(
             }else if(label=="专辑"){
                 navController.navigate(ALBUM_LIST_ROUTE)
             }
-            // 可以繼續處理其他點擊，例如 "每日推薦"
         }
     )
 }
@@ -63,6 +66,7 @@ fun DiscoveryScreen(
     toSearch: () -> Unit = {},
     songs: List<Song> = listOf(),
     user: UserInfo?=null,
+    alsoListeningCard: RecommendCard = RecommendCard(title = "", songs = emptyList()),
     onQuickAccessClick: (String) -> Unit = {}
 ) {
     val pagerState = rememberPagerState(pageCount = {3})
@@ -93,7 +97,10 @@ fun DiscoveryScreen(
         ) { page ->
             // 6. 根据 page 索引渲染对应的内容
             when (page) {
-                0 -> Recommend(user=user)
+                0 -> RecommendRoute(
+                    user = user,
+                    recommendCard = alsoListeningCard
+                )
                 1 -> MusicHall(
                     songs = songs,
                     onQuickAccessClick = onQuickAccessClick

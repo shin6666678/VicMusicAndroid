@@ -1,25 +1,22 @@
 package com.shin.vicmusic.feature.discovery.recommend
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.shin.vicmusic.core.design.theme.SpaceExtraMedium
 import com.shin.vicmusic.core.design.theme.SpaceOuter
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
-import com.shin.vicmusic.core.domain.User
+import com.shin.vicmusic.core.domain.RecommendCard
 import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.feature.discovery.recommend.component.AlsoListeningSection
 import com.shin.vicmusic.feature.discovery.recommend.component.HorizontalMediaCards
-import com.shin.vicmusic.feature.discovery.recommend.component.RecommendSongItem
 import com.shin.vicmusic.feature.discovery.recommend.component.UserGreeting
 
-// Placeholder Data Classes
+// UI Data Classes
 data class MediaCardData(
     val id: String,
     val title: String,
@@ -28,31 +25,43 @@ data class MediaCardData(
     val isDaily: Boolean = false
 )
 
+// 这个数据类被 RecommendSongItem 引用
 data class RecommendSongData(
     val songId: String,
     val coverUrl: String,
     val title: String,
     val artist: String,
     val playCount: String? = null,
-    val isPlaying: Boolean = false // For the current playing bar
+    val isPlaying: Boolean = false
 )
-
 @Composable
-fun Recommend(
+fun RecommendRoute(
     user: UserInfo?=null,
-    onSongClick: (String) -> Unit = {},
-    onSearchClick: () -> Unit = {},
+    recommendCard: RecommendCard,
+){
+    RecommendScreen(
+        user = user,
+        recommendCard=recommendCard
+    )
+}
+@Composable
+fun RecommendScreen(
+    user: UserInfo? = null,
+    recommendCard: RecommendCard = RecommendCard(title = "", songs = emptyList()),
     onMediaCardClick: (String) -> Unit = {}
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = SpaceOuter), // Add some bottom padding to avoid overlap with bottom navigation
+        contentPadding = PaddingValues(bottom = SpaceOuter),
         verticalArrangement = Arrangement.spacedBy(SpaceExtraMedium)
     ) {
 
+        // 1. 用户问候区
         item {
-            UserGreeting(user=user)
+            UserGreeting(user = user)
         }
+
+        // 2. 横向卡片区 (这里可以保留静态或根据需求改为动态)
         item {
             HorizontalMediaCards(
                 mediaCards = listOf(
@@ -79,53 +88,15 @@ fun Recommend(
                 onMediaCardClick = onMediaCardClick
             )
         }
+
+        // 3. "也在听" 区块 (静态示例，可根据需求动态化)
         item {
             AlsoListeningSection(
-                title = "听「梁静茹」的也在听",
-                onPlayClick = { /* Handle play click */ },
-                onCloseClick = { /* Handle close click */ }
+                title = recommendCard.title,
+                songs = recommendCard.songs,
             )
         }
-        items(
-            listOf(
-                RecommendSongData(
-                    songId = "s1",
-                    coverUrl = "https://picsum.photos/80/80?random=1",
-                    title = "爱协",
-                    artist = "蔡依林-花蝴蝶",
-                    playCount = "1个好友关注歌手"
-                ),
-                RecommendSongData(
-                    songId = "s2",
-                    coverUrl = "https://picsum.photos/80/80?random=2",
-                    title = "再见",
-                    artist = "G.E.M. 邓紫棋-新的心跳",
-                    playCount = "7k人在听"
-                ),
-                RecommendSongData(
-                    songId = "s3",
-                    coverUrl = "https://picsum.photos/80/80?random=3",
-                    title = "手心的蔷薇",
-                    artist = "林俊杰-新地球",
-                    playCount = "570w+"
-                ),
-                RecommendSongData(
-                    songId = "s4",
-                    coverUrl = "https://picsum.photos/80/80?random=4",
-                    title = "约定",
-                    artist = "周蕙-周蕙精选",
-                    playCount = "昨日热播"
-                )
-            )
-        ) { song ->
-            RecommendSongItem(
-                data = song,
-                modifier = Modifier.clickable { onSongClick(song.songId) }
-            )
-        }
-        // TODO: Add the current playing bar at the bottom if needed.
-        // For now, it's out of the scope of this specific `RecommendedPage` composable
-        // as it looks like a global player component.
+
     }
 }
 
@@ -133,14 +104,9 @@ fun Recommend(
 @Composable
 fun PreviewRecommendedPage() {
     VicMusicTheme {
-        Recommend()
+        // 预览时提供一些假数据
+        RecommendScreen(
+
+        )
     }
 }
-
-
-
-
-
-
-
-
