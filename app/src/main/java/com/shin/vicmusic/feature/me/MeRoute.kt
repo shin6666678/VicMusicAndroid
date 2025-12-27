@@ -40,6 +40,7 @@ import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.Playlist
 import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.domain.UserInfo
+import com.shin.vicmusic.feature.auth.navigateToLogin
 import com.shin.vicmusic.feature.common.CreatePlaylistDialog
 import com.shin.vicmusic.feature.liked.LikedScreen
 import com.shin.vicmusic.feature.liked.navigateToLikedList
@@ -49,14 +50,14 @@ import com.shin.vicmusic.feature.me.component.SongListsSection
 import com.shin.vicmusic.feature.me.component.TopNotifyBar
 import com.shin.vicmusic.feature.me.component.UserInfoCard
 import com.shin.vicmusic.feature.me.recentPlay.navigateToRecentPlay
+import com.shin.vicmusic.feature.myInfo.navigateToMyInfo
 import com.shin.vicmusic.feature.playlist.meList.navigateToMyPlaylists
+import com.shin.vicmusic.feature.vip.navigateToVip
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MeRoute(
-    onAvatarClick: () -> Unit = {},
-    onVipClick: () -> Unit = {},
     viewModel: MeViewModel = hiltViewModel()
 ) {
     val navController = LocalNavController.current
@@ -76,10 +77,10 @@ fun MeRoute(
     }
 
     // 添加 onAvatarClick 参数
-    Log.d("MeRoute", "isLoggedIn: $isLoggedIn")
     MeScreen(
-        onAvatarClick = onAvatarClick,
-        onVipClick = onVipClick,
+        onAvatarClick = navController::navigateToMyInfo,
+        onLoginClick=navController::navigateToLogin,
+        onVipClick = navController::navigateToVip,
         isLoggedIn = isLoggedIn ?: false,//确保状态为非空Boolean，null时默认为false
         user = currentUser,
         myPlaylists = playlists,
@@ -96,6 +97,7 @@ fun MeRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MeScreen(
+    onLoginClick: () -> Unit = {},
     onAvatarClick: () -> Unit = {},
     onVipClick: () -> Unit = {},
     onLikedClick: () -> Unit = {},
@@ -126,6 +128,7 @@ fun MeScreen(
             // User Info Card
             Spacer(Modifier.height(16.dp))
             UserInfoCard(
+                onLoginClick = onLoginClick,
                 onAvatarClick = onAvatarClick,
                 onVipClick = onVipClick,
                 isLoggedIn = isLoggedIn,
@@ -142,8 +145,8 @@ fun MeScreen(
                 QuickAccessItem(
                     icon = Icons.Filled.Favorite,
                     text = "收藏",
-                    count = "2", // 这里的数据后续可以绑定 ViewModel
-                    onClick = { onLikedClick }
+                    count = "2",
+                    onClick = onLikedClick
                 )
                 QuickAccessItem(icon = Icons.Filled.Download, text = "本地", count = "29")
                 QuickAccessItem(icon = Icons.Filled.Headphones, text = "有声", count = "6")
@@ -187,23 +190,6 @@ fun QuickAccessItem(
     }
 }
 
-@Composable
-fun ActionItem(
-    icon: ImageVector,
-    text: String,
-    iconTint: Color
-) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Icon(
-            imageVector = icon,
-            contentDescription = text,
-            modifier = Modifier.size(24.dp),
-            tint = iconTint
-        )
-        Spacer(Modifier.height(4.dp))
-        Text(text = text, style = MaterialTheme.typography.bodySmall)
-    }
-}
 
 
 @Preview

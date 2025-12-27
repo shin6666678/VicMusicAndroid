@@ -50,10 +50,7 @@ fun MainRoute(
                 when (page) {
                     0 -> DiscoveryRoute(navController)
                     1 -> ShortVideoRoute()
-                    2 -> MeRoute(
-                        onAvatarClick = { navController.navigateToLogin() },
-                        onVipClick = { navController.navigateToVip() }
-                    )
+                    2 -> MeRoute()
                     3 -> FeedRoute()
                 }
             }
