@@ -3,12 +3,14 @@ package com.shin.vicmusic.core.network.retrofit
 import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.model.api.AlbumDetailResp
 import com.shin.vicmusic.core.model.api.AlbumDto
+import com.shin.vicmusic.core.model.api.AppUpdateDto
 import com.shin.vicmusic.core.model.api.ArtistDto
 import com.shin.vicmusic.core.model.api.PlaylistDetailDto
 import com.shin.vicmusic.core.model.api.PlaylistDto
 import com.shin.vicmusic.core.model.api.RankListDetailDto
 import com.shin.vicmusic.core.model.api.RankListPeakDto
 import com.shin.vicmusic.core.model.api.RecommendCardDto
+import com.shin.vicmusic.core.model.api.SearchComprehensiveDto
 import com.shin.vicmusic.core.model.api.SongDetailDto
 import com.shin.vicmusic.core.model.api.SongListItemDto
 import com.shin.vicmusic.core.model.api.UserInfoDto
@@ -144,6 +146,8 @@ interface MyNetworkApiService {
      */
     @GET("/api/playlist/v1/my")
     suspend fun getMyPlaylists(): NetworkResponse<List<PlaylistDto>>
+    @GET("/api/playlist/v1/public")
+    suspend fun getPublicPlaylists(): NetworkResponse<List<PlaylistDto>>
 
     @GET("/api/playlist/v1/detail/{id}")
     suspend fun getPlaylistDetail(@Path("id") id: String): NetworkResponse<PlaylistDetailDto>
@@ -189,4 +193,59 @@ interface MyNetworkApiService {
 
     @GET("api/v1/recommend")
     suspend fun getAlsoListening(): NetworkResponse<RecommendCardDto>
+
+    /*
+    Search搜索
+     */
+    @GET("api/search/v1")
+    suspend fun searchComprehensive(
+        @Query("keyword") keyword: String,
+        @Query("type") type: String = "comprehensive"
+    ): NetworkResponse<SearchComprehensiveDto>
+
+    @GET("api/search/v1")
+    suspend fun searchSongs(
+        @Query("keyword") keyword: String,
+        @Query("type") type: String = "song",
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): NetworkResponse<NetworkPageData<SongListItemDto>>
+
+    @GET("api/search/v1")
+    suspend fun searchPlaylists(
+        @Query("keyword") keyword: String,
+        @Query("type") type: String = "playlist",
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): NetworkResponse<NetworkPageData<PlaylistDto>>
+
+    @GET("api/search/v1")
+    suspend fun searchAlbums(
+        @Query("keyword") keyword: String,
+        @Query("type") type: String = "album",
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): NetworkResponse<NetworkPageData<AlbumDto>>
+
+    @GET("api/search/v1")
+    suspend fun searchArtists(
+        @Query("keyword") keyword: String,
+        @Query("type") type: String = "artist",
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): NetworkResponse<NetworkPageData<ArtistDto>>
+
+    @GET("api/search/v1")
+    suspend fun searchUsers(
+        @Query("keyword") keyword: String,
+        @Query("type") type: String = "user",
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): NetworkResponse<NetworkPageData<UserInfoDto>>
+
+
+    @GET("/api/common/v1/check_update")
+    suspend fun checkUpdate(
+        @Query("versionCode") versionCode: Int
+    ): NetworkResponse<AppUpdateDto>
 }

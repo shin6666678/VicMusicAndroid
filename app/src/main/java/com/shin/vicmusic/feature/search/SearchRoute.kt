@@ -4,31 +4,38 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.flowlayout.FlowRow
 import com.shin.vicmusic.R
 import com.shin.vicmusic.core.design.composition.LocalNavController
-import com.shin.vicmusic.core.design.theme.VicMusicTheme
-
+import com.shin.vicmusic.core.domain.*
+import com.shin.vicmusic.feature.common.ItemArtist
+import com.shin.vicmusic.feature.common.ItemPlaylist
+import com.shin.vicmusic.feature.common.ItemSong
+import com.shin.vicmusic.feature.common.ItemUser
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,23 +43,165 @@ fun SearchRoute(
     viewModel: SearchViewModel = hiltViewModel()
 ) {
     val navController = LocalNavController.current
-    var searchText by remember { mutableStateOf("") }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
             SearchTopBar(
-                searchText = searchText,
-                onSearchTextChange = { searchText = it },
+                searchText = uiState.query,
+                onSearchTextChange = { viewModel.onEvent(SearchEvent.QueryChanged(it)) },
                 onBackClick = { navController.popBackStack() },
-                onMicClick = { /* Handle mic click */ }
+                onMicClick = { /* Handle mic click */ },
+                onSearch = { viewModel.onEvent(SearchEvent.Search) },
+                onClear = { viewModel.onEvent(SearchEvent.ClearQuery) }
             )
         },
         content = { paddingValues ->
-            SearchScreenContent(
-                modifier = Modifier.padding(paddingValues),
-                onSearchTagClick = { tag -> searchText = tag }
-            )
+            Column(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+            ) {
+                // Search Tabs
+                if (uiState.query.isNotBlank() || uiState.hasSearched) {
+                    ScrollableTabRow(
+                        selectedTabIndex = uiState.selectedTab.ordinal,
+                        containerColor = MaterialTheme.colorScheme.background,
+                        contentColor = MaterialTheme.colorScheme.primary,
+                        edgePadding = 16.dp,
+                        indicator = { tabPositions ->
+                            TabRowDefaults.SecondaryIndicator(
+                                Modifier.tabIndicatorOffset(tabPositions[uiState.selectedTab.ordinal]),
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        },
+                        divider = {}
+                    ) {
+                        SearchTab.values().forEach { tab ->
+                            Tab(
+                                selected = uiState.selectedTab == tab,
+                                onClick = { viewModel.onEvent(SearchEvent.TabChanged(tab)) },
+                                text = { Text(text = tab.title) }
+                            )
+                        }
+                    }
+                }
+
+                if (uiState.isLoading) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                } else if (uiState.error != null) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(text = uiState.error ?: "Error", color = Color.Red)
+                    }
+                } else if (!uiState.hasSearched && uiState.query.isBlank()) {
+                    // Default Content (History, Hot Search)
+                    SearchDefaultContent(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        onSearchTagClick = { tag ->
+                            viewModel.onEvent(SearchEvent.QueryChanged(tag))
+                            viewModel.onEvent(SearchEvent.Search)
+                        }
+                    )
+                } else {
+                    // Search Results
+                    SearchResultContent(
+                        uiState = uiState,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
         }
+    )
+}
+
+@Composable
+fun SearchResultContent(
+    uiState: SearchUiState,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = PaddingValues(bottom = 80.dp)
+    ) {
+        if (uiState.selectedTab == SearchTab.COMPREHENSIVE) {
+            uiState.comprehensiveResult?.let { result ->
+                if (result.songs.isNotEmpty()) {
+                    item { SectionTitle("单曲") }
+                    items(result.songs) { song ->
+                        ItemSong(song = song)
+                    }
+                }
+                if (result.playlists.isNotEmpty()) {
+                    item { SectionTitle("歌单") }
+                    items(result.playlists) { playlist ->
+                        // 修正参数名，假设为 playList (参考之前上传的 PlayList.kt 风格) 或 playlist
+                        ItemPlaylist(playlist = playlist, onClick = {})
+                    }
+                }
+                if (result.albums.isNotEmpty()) {
+                    item { SectionTitle("专辑") }
+                    items(result.albums) { album ->
+                        // Album 复用 ItemPlaylist 样式
+                        ItemPlaylist(
+                            playlist = Playlist(album.id, "", album.title, album.icon, "", 0),
+                            onClick = {}
+                        )
+                    }
+                }
+                if (result.artists.isNotEmpty()) {
+                    item { SectionTitle("歌手") }
+                    items(result.artists) { artist ->
+                        ItemArtist(artist = artist, onClick = {})
+                    }
+                }
+                if (result.users.isNotEmpty()) {
+                    item { SectionTitle("用户") }
+                    items(result.users) { user ->
+                        ItemUser(user = user, onClick = {})
+                    }
+                }
+
+                if (result.songs.isEmpty() && result.playlists.isEmpty() && result.albums.isEmpty() && result.artists.isEmpty() && result.users.isEmpty()) {
+                    item { EmptyState() }
+                }
+            }
+        } else {
+            // Specific Lists
+            if (uiState.listResult.isEmpty()) {
+                item { EmptyState() }
+            } else {
+                items(uiState.listResult) { item ->
+                    when (item) {
+                        is Song -> ItemSong(song = item)
+                        is Playlist -> ItemPlaylist(playlist = item, onClick = {})
+                        is Album -> ItemPlaylist(playlist = Playlist(item.id, "", item.title, item.icon, "", 0), onClick = {})
+                        is Artist -> ItemArtist(artist = item, onClick = {})
+                        is UserInfo -> ItemUser(user = item, onClick = {})
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun EmptyState() {
+    Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
+        Text("未找到相关内容", color = Color.Gray)
+    }
+}
+
+// ... SectionTitle, SearchTopBar, SearchDefaultContent, etc. (保持不变) ...
+@Composable
+fun SectionTitle(title: String) {
+    Text(
+        text = title,
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp)
     )
 }
 
@@ -62,7 +211,9 @@ fun SearchTopBar(
     searchText: String,
     onSearchTextChange: (String) -> Unit,
     onBackClick: () -> Unit,
-    onMicClick: () -> Unit
+    onMicClick: () -> Unit,
+    onSearch: () -> Unit,
+    onClear: () -> Unit
 ) {
     TopAppBar(
         title = {
@@ -76,33 +227,14 @@ fun SearchTopBar(
                         contentDescription = "Back"
                     )
                 }
-                Spacer(modifier = Modifier.width(8.dp))
-                // AI助手 button
-                Button(
-                    onClick = { /* Handle AI assistant click */ },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE0F7FA)), // Light blue
-                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                    modifier = Modifier.wrapContentWidth(),
-                    shape = RoundedCornerShape(20.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_video_comment), // Placeholder icon
-                        contentDescription = "AI Assistant",
-                        tint = Color(0xFF00BCD4), // Cyan
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = "AI助手", color = Color(0xFF00BCD4), fontSize = 12.sp)
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                // Search Input Field
+
                 OutlinedTextField(
                     value = searchText,
                     onValueChange = onSearchTextChange,
                     modifier = Modifier
                         .weight(1f)
-                        .height(40.dp),
-                    placeholder = { Text("周杰伦新歌 前天发布", fontSize = 14.sp) },
+                        .height(50.dp),
+                    placeholder = { Text("搜索歌曲、歌单、歌手...", fontSize = 14.sp) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Search,
@@ -111,16 +243,22 @@ fun SearchTopBar(
                         )
                     },
                     trailingIcon = {
-                        IconButton(onClick = onMicClick) {
-                            Icon(
-                                imageVector = Icons.Default.Mic,
-                                contentDescription = "Microphone",
-                                modifier = Modifier.size(20.dp)
-                            )
+                        if (searchText.isNotEmpty()) {
+                            IconButton(onClick = onClear) {
+                                Icon(Icons.Default.Close, contentDescription = "Clear", tint = Color.Gray)
+                            }
+                        } else {
+                            IconButton(onClick = onMicClick) {
+                                Icon(
+                                    imageVector = Icons.Default.Mic,
+                                    contentDescription = "Microphone",
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
                         }
                     },
                     singleLine = true,
-                    shape = RoundedCornerShape(20.dp),
+                    shape = RoundedCornerShape(25.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color.Transparent,
                         unfocusedBorderColor = Color.Transparent,
@@ -128,8 +266,14 @@ fun SearchTopBar(
                         focusedContainerColor = Color(0xFFF0F0F0),
                         unfocusedContainerColor = Color(0xFFF0F0F0)
                     ),
-                    textStyle = LocalTextStyle.current.copy(fontSize = 14.sp)
+                    textStyle = LocalTextStyle.current.copy(fontSize = 14.sp),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                    keyboardActions = KeyboardActions(onSearch = { onSearch() })
                 )
+
+                TextButton(onClick = onSearch) {
+                    Text("搜索", color = MaterialTheme.colorScheme.primary)
+                }
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
@@ -137,15 +281,12 @@ fun SearchTopBar(
 }
 
 @Composable
-fun SearchScreenContent(
+fun SearchDefaultContent(
     modifier: Modifier = Modifier,
     onSearchTagClick: (String) -> Unit
 ) {
     LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 16.dp),
+        modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(vertical = 8.dp)
     ) {
         item {
@@ -155,7 +296,7 @@ fun SearchScreenContent(
 
         item {
             SearchHistorySection(
-                historyTags = listOf("Baby dont cry", "关键词", "龙卷风", "莫扎特钢琴曲k448 jaycd"),
+                historyTags = listOf("Baby dont cry", "关键词", "龙卷风"),
                 onSearchTagClick = onSearchTagClick,
                 onClearHistory = { /* Handle clear history */ }
             )
@@ -164,7 +305,7 @@ fun SearchScreenContent(
 
         item {
             SearchDiscoverySection(
-                discoveryTags = listOf("周杰伦新歌", "baby", "雨的印记 jaycd", "莫扎特钢琴曲k448 jaycd", "exo"),
+                discoveryTags = listOf("周杰伦新歌", "baby", "雨的印记 jaycd"),
                 onSearchTagClick = onSearchTagClick
             )
             Spacer(modifier = Modifier.height(24.dp))
@@ -177,6 +318,7 @@ fun SearchScreenContent(
     }
 }
 
+// 辅助组件 (CategoryButtons, SearchHistorySection等) 保持原样...
 @Composable
 fun CategoryButtons() {
     Row(
@@ -303,71 +445,12 @@ fun HotAndTrendingSection() {
             }
             Spacer(modifier = Modifier.height(8.dp))
             Column {
-                repeat(7) { index ->
+                repeat(3) { index ->
                     HotSearchItem(
                         rank = index + 1,
-                        title = when (index) {
-                            0 -> "恒星不忘 forever forever"
-                            1 -> "易烊千玺 玺鹭"
-                            2 -> "预约年度听歌报告"
-                            3 -> "恋人"
-                            4 -> "王源跨年演唱会盲盒"
-                            5 -> "刘宇CD听雨"
-                            else -> "疯狂动物城2"
-                        },
-                        subtitle = when (index) {
-                            0 -> "宇宙级阵容引爆情怀"
-                            1 -> "开启「密语」之旅"
-                            2 -> "测试你的2025音乐温度"
-                            3 -> "李荣浩的《恋人》为何因事件"
-                            4 -> "送门票！15款绝美皮肤解锁"
-                            5 -> "扑海商品热销中"
-                            else -> "79%的人听完"
-                        },
-                        isRedRank = index < 3 // Ranks 1-3 are red
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.width(16.dp))
-
-        // My Trending Section
-        Column(modifier = Modifier.weight(1f)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "我的热搜", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                Spacer(modifier = Modifier.width(4.dp))
-                Icon(
-                    imageVector = Icons.Default.PlayArrow,
-                    contentDescription = "Play",
-                    tint = Color.Gray,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            Column {
-                repeat(7) { index ->
-                    HotSearchItem(
-                        rank = index + 1,
-                        title = when (index) {
-                            0 -> "王心凌 我会好"
-                            1 -> "周杰伦 明明就"
-                            2 -> "cici_把回忆拼"
-                            3 -> "G.E.M. 邓紫棋"
-                            4 -> "弦子 舍不得"
-                            5 -> "汪苏泷 还给你"
-                            else -> "李荣浩 恋人"
-                        },
-                        subtitle = when (index) {
-                            0 -> "你「最近在听」的热搜"
-                            1 -> "你怀念的都还在那里"
-                            2 -> "请你听她的热搜歌曲"
-                            3 -> "从「龙卷风」开始探索"
-                            4 -> "请你听她的热搜歌曲"
-                            5 -> "你可能喜欢的热门歌曲"
-                            else -> "根据你听的「李荣"
-                        },
-                        isRedRank = index < 3 // Ranks 1-3 are red
+                        title = "热门歌曲 ${index + 1}",
+                        subtitle = "副标题 ${index + 1}",
+                        isRedRank = index < 3
                     )
                 }
             }
@@ -401,77 +484,5 @@ fun HotSearchItem(
             Text(text = title, fontSize = 14.sp, color = Color.Black)
             Text(text = subtitle, fontSize = 11.sp, color = Color.Gray)
         }
-    }
-}
-
-
-
-
-// Previews
-@Preview(showBackground = true, widthDp = 360)
-@Composable
-fun PreviewSearchRoute() {
-    VicMusicTheme {
-        SearchRoute()
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewSearchTopBar() {
-    VicMusicTheme {
-        SearchTopBar(
-            searchText = "周杰伦新歌",
-            onSearchTextChange = {},
-            onBackClick = {},
-            onMicClick = {}
-        )
-    }
-}
-
-@Preview(showBackground = true, widthDp = 360)
-@Composable
-fun PreviewSearchScreenContent() {
-    VicMusicTheme {
-        SearchScreenContent(onSearchTagClick = {})
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewCategoryButtons() {
-    VicMusicTheme {
-        CategoryButtons()
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewSearchHistorySection() {
-    VicMusicTheme {
-        SearchHistorySection(
-            historyTags = listOf("Baby dont cry", "关键词", "龙卷风"),
-            onSearchTagClick = {},
-            onClearHistory = {}
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewSearchDiscoverySection() {
-    VicMusicTheme {
-        SearchDiscoverySection(
-            discoveryTags = listOf("周杰伦新歌", "baby", "雨的印记 jaycd"),
-            onSearchTagClick = {}
-        )
-    }
-}
-
-@Preview(showBackground = true, widthDp = 360)
-@Composable
-fun PreviewHotAndTrendingSection() {
-    VicMusicTheme {
-        HotAndTrendingSection()
     }
 }

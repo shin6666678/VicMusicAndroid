@@ -23,6 +23,15 @@ class PlaylistRepository @Inject constructor(
             Result.Error(resp.message ?: "获取歌单失败")
         }
     }
+    suspend fun getPublicPlaylists(): Result<List<Playlist>> {
+        val resp = datasource.getPublicPlaylists()
+        return if (resp.status == 0) {
+            val domainList = resp.data?.map { it.toDomain() } ?: emptyList()
+            Result.Success(domainList)
+        } else {
+            Result.Error(resp.message ?: "获取歌单失败")
+        }
+    }
 
     suspend fun getPlaylistDetail(id: String): Result<PlaylistDetail> {
         val resp = datasource.getPlaylistDetail(id)

@@ -28,11 +28,10 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.domain.UserInfo
 
 @Composable
-fun itemUser(
+fun ItemUser(
     user: UserInfo,
     onClick: (String) -> Unit = {},
     onFollowClick: (String) -> Unit = {},
