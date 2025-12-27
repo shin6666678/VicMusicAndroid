@@ -8,6 +8,7 @@ import com.shin.vicmusic.core.model.api.PlaylistDetailDto
 import com.shin.vicmusic.core.model.api.PlaylistDto
 import com.shin.vicmusic.core.model.api.RankListDetailDto
 import com.shin.vicmusic.core.model.api.RankListPeakDto
+import com.shin.vicmusic.core.model.api.RecommendCardDto
 import com.shin.vicmusic.core.model.api.SongDetailDto
 import com.shin.vicmusic.core.model.api.SongListItemDto
 import com.shin.vicmusic.core.model.api.UserInfoDto
@@ -179,4 +180,13 @@ interface MyNetworkApiService {
 
     @GET("/api/history/v1/list")
     suspend fun getHistory(): NetworkResponse<List<SongListItemDto>>
+
+    /*
+    recommend推荐
+     */
+    @GET("api/v1/recommend/daily_songs")
+    suspend fun getDailyRecommendSongs(): NetworkResponse<List<SongListItemDto>>
+
+    @GET("api/v1/recommend")
+    suspend fun getAlsoListening(): NetworkResponse<RecommendCardDto>
 }

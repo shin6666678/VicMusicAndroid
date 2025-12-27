@@ -55,8 +55,13 @@ fun SongDetailDto.toDomain(): Song {
     )
 }
 
-// --- 列表转换扩展函数 ---
 
 fun List<SongListItemDto>.toDomainList(): List<Song> {
     return this.map { it.toDomain() }
+}
+fun RecommendCardDto.toDomain(): RecommendCard {
+    return RecommendCard(
+        title = this.title,
+        songs = this.songs.map { it.toDomain() }
+    )
 }

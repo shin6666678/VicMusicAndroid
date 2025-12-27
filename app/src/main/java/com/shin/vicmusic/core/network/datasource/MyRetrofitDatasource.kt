@@ -9,6 +9,7 @@ import com.shin.vicmusic.core.model.api.PlaylistDetailDto
 import com.shin.vicmusic.core.model.api.PlaylistDto
 import com.shin.vicmusic.core.model.api.RankListDetailDto
 import com.shin.vicmusic.core.model.api.RankListPeakDto
+import com.shin.vicmusic.core.model.api.RecommendCardDto
 import com.shin.vicmusic.core.model.api.SongDetailDto
 import com.shin.vicmusic.core.model.api.SongListItemDto
 import com.shin.vicmusic.core.model.api.UserInfoDto
@@ -236,5 +237,16 @@ class MyRetrofitDatasource @Inject constructor(
     /*
     history历史记录
      */
-    suspend fun getHistory() = service.getHistory()
+    suspend fun getHistory() = safeApiCall { service.getHistory()}
+
+    /*
+    Recommend推荐
+     */
+    suspend fun getDailyRecommendSongs() : NetworkResponse<List<SongListItemDto>>{
+        return service.getDailyRecommendSongs()
+    }
+
+    suspend fun getAlsoListening() : NetworkResponse<RecommendCardDto>{
+        return safeApiCall { service.getAlsoListening()}
+    }
 }
