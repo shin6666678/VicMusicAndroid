@@ -30,6 +30,7 @@ import com.shin.vicmusic.feature.album.albumList.ALBUM_LIST_ROUTE
 import com.shin.vicmusic.feature.discovery.musicHall.MusicHall
 import com.shin.vicmusic.feature.discovery.recommend.RecommendRoute
 import com.shin.vicmusic.feature.discovery.recommend.RecommendScreen
+import com.shin.vicmusic.feature.playlist.publicList.PUBLIC_PLAYLISTS_ROUTE
 import com.shin.vicmusic.feature.rankList.rankList.RANK_LIST_ROUTE
 import kotlinx.coroutines.launch
 
@@ -56,6 +57,8 @@ fun DiscoveryRoute(
                 navController.navigate(RANK_LIST_ROUTE)
             }else if(label=="专辑"){
                 navController.navigate(ALBUM_LIST_ROUTE)
+            }else if(label=="歌单"){
+                navController.navigate(PUBLIC_PLAYLISTS_ROUTE)
             }
         }
     )

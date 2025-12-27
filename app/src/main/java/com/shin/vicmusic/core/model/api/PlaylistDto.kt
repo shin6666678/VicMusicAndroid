@@ -9,7 +9,9 @@ data class PlaylistDto(
     val name: String,
     val cover: String?="",
     val description: String?,
-    val playCount: Int
+    val playCount: Int,
+    val creator: UserInfoDto? = null,
+    val isPublic: Int? = 0
 )
 @Serializable
 data class PlaylistDetailDto(

@@ -9,7 +9,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,34 +19,11 @@ class PublicPlaylistViewModel @Inject constructor(
     private val _playlists = MutableStateFlow<List<Playlist>>(emptyList())
     val playlists = _playlists.asStateFlow()
 
-    fun fetchMyPlaylists() {
+    fun fetchPublicPlaylists() {
         viewModelScope.launch {
-            if (repository.getMyPlaylists() is com.shin.vicmusic.core.domain.Result.Success) {
-                _playlists.value = (repository.getMyPlaylists() as com.shin.vicmusic.core.domain.Result.Success).data
-            }
-        }
-    }
-    // 放在 PlaylistViewModel 类中
-    fun addSongToPlaylist(playlistId: String, songId: String) {
-        viewModelScope.launch {
-            repository.addSongToPlaylist(playlistId, songId)
-        }
-    }
-
-    fun createPlaylist(name: String, description: String? = null, cover: File? = null) {
-        viewModelScope.launch {
-            val result = repository.addPlaylist(name, description, cover)
-            if (result is com.shin.vicmusic.core.domain.Result.Success) {
-                fetchMyPlaylists() // Refresh list
-            }
-        }
-    }
-
-    fun updatePlaylist(id: String, name: String, description: String? = null, cover: File? = null) {
-        viewModelScope.launch {
-            val result = repository.updatePlaylist(id, name, description, cover)
-            if (result is Result.Success) {
-                fetchMyPlaylists() // Refresh list
+            val resp=repository.getPublicPlaylists()
+            if (resp is Result.Success) {
+                _playlists.value = resp.data
             }
         }
     }

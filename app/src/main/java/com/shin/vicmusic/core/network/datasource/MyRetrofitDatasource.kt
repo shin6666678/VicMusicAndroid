@@ -4,6 +4,7 @@ import android.util.Log
 import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.model.api.AlbumDetailResp
 import com.shin.vicmusic.core.model.api.AlbumDto
+import com.shin.vicmusic.core.model.api.AppUpdateDto
 import com.shin.vicmusic.core.model.api.ArtistDto
 import com.shin.vicmusic.core.model.api.PlaylistDetailDto
 import com.shin.vicmusic.core.model.api.PlaylistDto
@@ -197,6 +198,9 @@ class MyRetrofitDatasource @Inject constructor(
     suspend fun getMyPlaylists(): NetworkResponse<List<PlaylistDto>> {
         return safeApiCall { service.getMyPlaylists() }
     }
+    suspend fun getPublicPlaylists(): NetworkResponse<List<PlaylistDto>> {
+        return safeApiCall { service.getPublicPlaylists() }
+    }
 
     suspend fun getPlaylistDetail(id: String): NetworkResponse<PlaylistDetailDto> {
         return safeApiCall { service.getPlaylistDetail(id) }
@@ -248,5 +252,9 @@ class MyRetrofitDatasource @Inject constructor(
 
     suspend fun getAlsoListening() : NetworkResponse<RecommendCardDto>{
         return safeApiCall { service.getAlsoListening()}
+    }
+
+    suspend fun checkUpdate(currentCode: Int) : NetworkResponse<AppUpdateDto>{
+        return safeApiCall {  service.checkUpdate(currentCode)}
     }
 }

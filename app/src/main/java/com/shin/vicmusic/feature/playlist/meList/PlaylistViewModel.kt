@@ -22,8 +22,9 @@ class PlaylistViewModel @Inject constructor(
 
     fun fetchMyPlaylists() {
         viewModelScope.launch {
-            if (repository.getMyPlaylists() is Result.Success) {
-                _playlists.value = (repository.getMyPlaylists() as Result.Success).data
+            val resp=repository.getMyPlaylists()
+            if (resp is Result.Success) {
+                _playlists.value = resp.data
             }
         }
     }
