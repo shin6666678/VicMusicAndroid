@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import com.shin.vicmusic.core.data.repository.HistoryRepository
 import com.shin.vicmusic.core.data.repository.PlayerRepository
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.domain.usecase.CheckVipPermissionUseCase
@@ -26,6 +27,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * 播放器状态数据类。
@@ -47,7 +49,8 @@ class PlayerManager @Inject constructor(
     @ApplicationContext private val context: Context, // Hilt 注入应用上下文
     private val queueManager: PlaybackQueueManager,
     private val playerRepository: PlayerRepository,          // [注入] 仓库
-    private val checkVipPermission: CheckVipPermissionUseCase // [注入] UseCase
+    private val checkVipPermission: CheckVipPermissionUseCase, // [注入] UseCase
+    private val historyRepository: HistoryRepository
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private val TAG = "PlayerManager"
@@ -68,6 +71,8 @@ class PlayerManager @Inject constructor(
 
     // 用于管理播放进度更新协程的 Job
     private var progressJob: Job? = null
+    //用于控制上报任务的 Job
+    private var reportJob: Job? = null
 
     init {
         setupPlayerListener()
@@ -93,7 +98,6 @@ class PlayerManager @Inject constructor(
 
         //更新当前歌曲状态，否则UI不刷新
         _currentPlayingSong.value = song
-        Log.d("Mana111",song.toString())
         loadLyric(song)
         performPlay()
         playerRepository.saveLastPlayedSong(song)
@@ -102,7 +106,28 @@ class PlayerManager @Inject constructor(
         exoPlayer.playWhenReady = true
         _playerState.update { it.copy(isPlaying = true) }
         startProgressUpdate()
+
+        reportJob?.cancel()
+
+        // 启动新的上报任务 (Start new reporting task)
+        reportJob = scope.launch(Dispatchers.IO) {
+            try {
+                // 设置有效播放阈值，10秒 只有听完10秒，才会往下执行。如果中途切歌，这个协程会被 cancel() 杀掉
+                delay(10000)
+
+                // 时间到了，确认为有效播放，触发接口
+                historyRepository.addHistory(song.id)
+                Log.d("PlayerManager", "Valid play recorded: ${song.title}")
+            } catch (e: Exception) {
+                // 如果是 CancellationException (被切歌取消)，属于预期行为，无需处理
+                if (e !is CancellationException) {
+                    e.printStackTrace()
+                }
+            }
+        }
     }
+
+
     /**
      * 播放指定的歌曲（通常用于点击列表中的某首歌开始播放新列表）
      */
