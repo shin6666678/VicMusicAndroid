@@ -49,9 +49,11 @@ import com.shin.vicmusic.feature.main.mainScreen
 import com.shin.vicmusic.feature.me.fanList.fanListScreen
 import com.shin.vicmusic.feature.me.followList.followListScreen
 import com.shin.vicmusic.feature.me.recentPlay.recentPlayScreen
+import com.shin.vicmusic.feature.myInfo.myInfoScreen
 import com.shin.vicmusic.feature.playBackQueue.PlaybackQueueSheet
 import com.shin.vicmusic.feature.playlist.detail.playlistDetailScreen
 import com.shin.vicmusic.feature.playlist.meList.myPlaylistScreen
+import com.shin.vicmusic.feature.playlist.publicList.publicPlaylistScreen
 import com.shin.vicmusic.feature.rankList.rankList.rankListScreen
 import com.shin.vicmusic.feature.rankList.rankListDetail.rankListDetailScreen
 import com.shin.vicmusic.feature.search.searchScreen
@@ -129,6 +131,8 @@ fun MyApp() {
             fanListScreen()
             likedListScreen()
             recentPlayScreen()
+            myInfoScreen()
+            publicPlaylistScreen()
         }
 
         // 底部整体容器 (SongBar + 导航栏)

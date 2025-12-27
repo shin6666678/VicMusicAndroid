@@ -41,10 +41,10 @@ import coil.compose.AsyncImage
 import com.shin.vicmusic.R
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.UserInfo
-import com.shin.vicmusic.feature.me.ActionItem
 import com.shin.vicmusic.feature.me.fanList.navigateToFanList
 import com.shin.vicmusic.feature.me.followList.navigateToFollowList
 import com.shin.vicmusic.feature.vip.VipIcon
+import com.shin.vicmusic.feature.vip.navigateToVip
 
 @Preview
 @Composable
@@ -61,6 +61,7 @@ fun UserInfoCardPreview() {
 
 @Composable
 fun UserInfoCard(
+    onLoginClick: () -> Unit={},
     onAvatarClick: () -> Unit,
     onVipClick: () -> Unit = {}, // [新增] 接收 VIP 點擊事件
     isLoggedIn: Boolean,
@@ -77,7 +78,7 @@ fun UserInfoCard(
             if (isLoggedIn && user != null) {
                 LoggedInHeader(onAvatarClick, onVipClick, user)
             } else {
-                LoggedOutHeader(onAvatarClick)
+                LoggedOutHeader(onLoginClick)
             }
 
             // 2. 统计数据区域 (仅登录显示)
@@ -127,7 +128,7 @@ private fun LoggedInHeader(
         Spacer(Modifier.width(16.dp))
         Column(verticalArrangement = Arrangement.Center) {
             Text(
-                text = user?.name ?: "未登录用户",
+                text = user?.name ?: "未知用户",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -144,14 +145,14 @@ private fun LoggedInHeader(
 }
 
 @Composable
-private fun LoggedOutHeader(onAvatarClick: () -> Unit) {
+private fun LoggedOutHeader(onLoginClick: () -> Unit) {
     val VdGreen = Color(0xFF1AAD19)
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Button(
-            onClick = onAvatarClick,
+            onClick = onLoginClick,
             modifier = Modifier
                 .weight(0.5f) // 使用 weight 而不是写死宽度比例
                 .height(40.dp), // 稍微调整高度使其更紧凑
@@ -204,27 +205,20 @@ private fun UserStatsRow(
 
 @Composable
 private fun ActionButtonsRow() {
-    // 定义按钮数据
-    data class ActionBtn(val icon: ImageVector, val text: String, val color: Color)
-
-    val actions = listOf(
-        ActionBtn(Icons.Filled.Star, "提现", Color(0xFFFF9800)),
-        ActionBtn(Icons.Filled.Favorite, "会员", Color(0xFF00BFA5)),
-        ActionBtn(Icons.Filled.ShoppingCart, "装扮", Color(0xFF2196F3)),
-        ActionBtn(Icons.Filled.DateRange, "日签", Color(0xFFF44336))
-    )
+    val navController = LocalNavController.current // 直接获取控制器
 
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceAround
     ) {
-        actions.forEach { item ->
-            ActionItem(
-                icon = item.icon,
-                text = item.text,
-                iconTint = item.color
-            )
-        }
+        ActionItem(icon = Icons.Filled.Star, text = "提现", iconTint = Color(0xFFFF9800))
+        ActionItem(icon = Icons.Filled.Favorite,
+            text = "会员",
+            iconTint = Color(0xFF00BFA5),
+            onClick = navController::navigateToVip
+        )
+        ActionItem(icon = Icons.Filled.ShoppingCart, text = "装扮", iconTint = Color(0xFF2196F3))
+        ActionItem(icon = Icons.Filled.DateRange, text = "日签", iconTint = Color(0xFFF44336))
     }
 }
 
@@ -244,5 +238,25 @@ fun StatItem(count: Int?, label: String, onClick: () -> Unit = {}) { // 添加 o
             style = MaterialTheme.typography.labelSmall,
             color = Color.Gray
         )
+    }
+}
+@Composable
+fun ActionItem(
+    icon: ImageVector,
+    text: String,
+    iconTint: Color,
+    onClick: () -> Unit = {}
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.clickable { onClick() }
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = text,
+            modifier = Modifier.size(24.dp),
+            tint = iconTint
+        )
+        Spacer(Modifier.height(4.dp))
+        Text(text = text, style = MaterialTheme.typography.bodySmall)
     }
 }
