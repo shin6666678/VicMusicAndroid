@@ -4,8 +4,8 @@ import android.content.Context
 import android.util.Log
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
-import com.shin.vicmusic.core.data.repository.HistoryRepository
 import com.shin.vicmusic.core.data.repository.PlayerRepository
+import com.shin.vicmusic.core.data.repository.SongRepository
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.domain.usecase.CheckVipPermissionUseCase
 import com.shin.vicmusic.util.LrcHelper
@@ -50,7 +50,7 @@ class PlayerManager @Inject constructor(
     private val queueManager: PlaybackQueueManager,
     private val playerRepository: PlayerRepository,          // [注入] 仓库
     private val checkVipPermission: CheckVipPermissionUseCase, // [注入] UseCase
-    private val historyRepository: HistoryRepository
+    private val songRepository: SongRepository
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private val TAG = "PlayerManager"
@@ -116,7 +116,7 @@ class PlayerManager @Inject constructor(
                 delay(10000)
 
                 // 时间到了，确认为有效播放，触发接口
-                historyRepository.addHistory(song.id)
+                songRepository.playSong(song.id)
                 Log.d("PlayerManager", "Valid play recorded: ${song.title}")
             } catch (e: Exception) {
                 // 如果是 CancellationException (被切歌取消)，属于预期行为，无需处理

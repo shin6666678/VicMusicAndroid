@@ -40,10 +40,15 @@ import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.Playlist
 import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.domain.UserInfo
+import com.shin.vicmusic.feature.common.CreatePlaylistDialog
 import com.shin.vicmusic.feature.liked.LikedScreen
+import com.shin.vicmusic.feature.liked.navigateToLikedList
 import com.shin.vicmusic.feature.me.component.MeTopBar
+import com.shin.vicmusic.feature.me.component.RecentBar
+import com.shin.vicmusic.feature.me.component.SongListsSection
 import com.shin.vicmusic.feature.me.component.TopNotifyBar
 import com.shin.vicmusic.feature.me.component.UserInfoCard
+import com.shin.vicmusic.feature.me.recentPlay.navigateToRecentPlay
 import com.shin.vicmusic.feature.playlist.meList.navigateToMyPlaylists
 
 
@@ -75,10 +80,16 @@ fun MeRoute(
     MeScreen(
         onAvatarClick = onAvatarClick,
         onVipClick = onVipClick,
-        isLoggedIn = isLoggedIn ?: false ,//确保状态为非空Boolean，null时默认为false
+        isLoggedIn = isLoggedIn ?: false,//确保状态为非空Boolean，null时默认为false
         user = currentUser,
-        playlists = playlists, // [新增] 传递歌单
-        onMorePlaylistsClick = { navController.navigateToMyPlaylists() }
+        myPlaylists = playlists,
+        onMorePlaylistsClick = { navController.navigateToMyPlaylists() },
+        onLikedClick = {navController.navigateToLikedList()},
+
+        recentPlayList = playlists,
+        recentNum = 2,
+        recentIcon = playlists.firstOrNull()?.cover ?: "",
+        onRecentOrMoreClick = navController::navigateToRecentPlay
     )
 }
 
@@ -87,220 +98,73 @@ fun MeRoute(
 fun MeScreen(
     onAvatarClick: () -> Unit = {},
     onVipClick: () -> Unit = {},
+    onLikedClick: () -> Unit = {},
     isLoggedIn: Boolean,
     user: UserInfo? = null,
-    playlists: List<Playlist> = emptyList(),
-    onMorePlaylistsClick: () -> Unit = {}
+    onMorePlaylistsClick: () -> Unit = {},
+    myPlaylists: List<Playlist> = emptyList(), // 歌单列表
+
+    recentPlayList: List<Playlist> = emptyList(),
+    recentNum: Int = 0,                      // 最近播放歌曲数量
+    recentIcon: String = "",                 // 最近播放歌曲封面
+    onRecentOrMoreClick: () -> Unit = {},    // 点击"全部已播"或"更多"
 ) {
-    // 控制是否显示“喜欢列表”的状态
-    var showLikedList by remember { mutableStateOf(false) }
 
-    if (showLikedList) {
-        //  显示喜欢列表，传入返回回调
-        LikedScreen(
-            onBack = { showLikedList = false }
-        )
-    }else{
-        Scaffold(
-            topBar = {
-                MeTopBar()
-            }
-        ) { paddingValues ->
-            Column(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp)
-            ) {
-                //通知栏
-                Spacer(Modifier.height(8.dp))
-                TopNotifyBar()
 
-                // User Info Card
-                Spacer(Modifier.height(16.dp))
-                UserInfoCard(
-                    onAvatarClick = onAvatarClick,
-                    onVipClick = onVipClick,
-                    isLoggedIn = isLoggedIn,
-                    user = user
-                )
-
-                // Quick Access Icons
-                Spacer(Modifier.height(16.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround
-                ) {
-                    // 传入 onClick 回调
-                    QuickAccessItem(
-                        icon = Icons.Filled.Favorite,
-                        text = "收藏",
-                        count = "2", // 这里的数据后续可以绑定 ViewModel
-                        onClick = { showLikedList = true }
-                    )
-                    QuickAccessItem(icon = Icons.Filled.Download, text = "本地", count = "29")
-                    QuickAccessItem(icon = Icons.Filled.Headphones, text = "有声", count = "6")
-                    QuickAccessItem(icon = Icons.Filled.ReceiptLong, text = "已购", count = "1")
-                }
-
-                // Recently Played Section
-                Spacer(Modifier.height(24.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "最近播放",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = "更多",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color.Gray
-                        )
-                        Icon(
-                            imageVector = Icons.Filled.KeyboardArrowRight,
-                            contentDescription = "More",
-                            tint = Color.Gray
-                        )
-                    }
-                }
-                Spacer(Modifier.height(8.dp))
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(listOf("1", "2", "3", "4", "5")) { index ->
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            AsyncImage(
-                                model = "https://picsum.photos/100/100?random=$index",
-                                contentDescription = "Album Cover",
-                                modifier = Modifier
-                                    .size(100.dp)
-                                    .clip(RoundedCornerShape(8.dp)),
-                                contentScale = ContentScale.Crop
-                            )
-                            Spacer(Modifier.height(4.dp))
-                            Text("已播放歌曲", style = MaterialTheme.typography.bodySmall)
-                            Text(
-                                "2245首",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = Color.Gray
-                            )
-                        }
-                    }
-                }
-
-                // Song Lists Section
-                Spacer(Modifier.height(24.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.Bottom
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.clickable { /* Handle tab click */ }
-                    ) {
-                        Text(
-                            text = "自建歌单",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        Divider(
-                            modifier = Modifier
-                                .width(60.dp)
-                                .height(2.dp)
-                                .background(Color(0xFF00BFA5))
-                        )
-                    }
-                    Spacer(Modifier.width(16.dp))
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.clickable { /* Handle tab click */ }
-                    ) {
-                        Text(
-                            text = "收藏歌单",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = Color.Gray
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        Divider(
-                            modifier = Modifier
-                                .width(60.dp)
-                                .height(2.dp)
-                                .background(Color.Transparent)
-                        )
-                    }
-                    Spacer(Modifier.weight(1f))
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = "Add Playlist",
-                        tint = Color.Gray
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Icon(
-                        imageVector = Icons.Filled.KeyboardArrowRight,
-                        contentDescription = "More Playlists",
-                        tint = Color.Gray,
-                        modifier = Modifier.clickable { onMorePlaylistsClick() }
-                    )
-                }
-                Spacer(Modifier.height(16.dp))
-
-                // 动态显示歌单列表 (最多3条)
-                playlists.take(3).forEach { playlist ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 8.dp),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F2F5))
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            if (playlist.cover.isNullOrEmpty()) {
-                                Surface(
-                                    modifier = Modifier.size(48.dp),
-                                    shape = RoundedCornerShape(8.dp),
-                                    color = MaterialTheme.colorScheme.surfaceVariant
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.MusicNote,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.padding(12.dp)
-                                    )
-                                }
-                            } else {
-                                AsyncImage(
-                                    model = playlist.cover,
-                                    contentDescription = "Playlist Cover",
-                                    modifier = Modifier
-                                        .size(48.dp)
-                                        .clip(RoundedCornerShape(8.dp)),
-                                    contentScale = ContentScale.Crop
-                                )
-                            }
-                            Spacer(Modifier.width(8.dp))
-                            Column {
-                                Text(playlist.name, style = MaterialTheme.typography.bodyMedium)
-                                Text("${playlist.playCount}首", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
-                            }
-                        }
-                    }
-                }
-
-                Spacer(Modifier.height(16.dp)) // Add some space at the bottom of the scrollable content
-            }
+    Scaffold(
+        topBar = {
+            MeTopBar()
         }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp)
+        ) {
+
+            // User Info Card
+            Spacer(Modifier.height(16.dp))
+            UserInfoCard(
+                onAvatarClick = onAvatarClick,
+                onVipClick = onVipClick,
+                isLoggedIn = isLoggedIn,
+                user = user
+            )
+
+            // Quick Access Icons
+            Spacer(Modifier.height(16.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                // 传入 onClick 回调
+                QuickAccessItem(
+                    icon = Icons.Filled.Favorite,
+                    text = "收藏",
+                    count = "2", // 这里的数据后续可以绑定 ViewModel
+                    onClick = { onLikedClick }
+                )
+                QuickAccessItem(icon = Icons.Filled.Download, text = "本地", count = "29")
+                QuickAccessItem(icon = Icons.Filled.Headphones, text = "有声", count = "6")
+                QuickAccessItem(icon = Icons.Filled.ReceiptLong, text = "已购", count = "1")
+            }
+
+            // Recently Played Section
+            RecentBar(
+                playlists = recentPlayList,
+                recentNum = recentNum,
+                recentIcon = recentIcon,
+                onRecentOrMoreClick = onRecentOrMoreClick,
+            )
+
+            // Song Lists Section
+            Spacer(Modifier.height(24.dp))
+            SongListsSection(playlists = myPlaylists, onMorePlaylistsClick = onMorePlaylistsClick)
+
+            Spacer(Modifier.height(16.dp)) // Add some space at the bottom of the scrollable content
+        }
+
     }
 
 }

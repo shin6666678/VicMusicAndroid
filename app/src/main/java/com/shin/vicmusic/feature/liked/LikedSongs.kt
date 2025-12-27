@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.feature.liked.component.LikedAlbum
 import com.shin.vicmusic.feature.liked.component.LikedPlayList
 import com.shin.vicmusic.feature.liked.component.LikedSong
@@ -24,16 +25,25 @@ import com.shin.vicmusic.feature.liked.component.LikedSong
 fun LikedScreenPreview() {
     LikedScreen(onBack = {})
 }
+@Composable
+fun LikedRoute(
+    viewModel: LikedSongsViewModel = hiltViewModel()
+) {
+    val navController= LocalNavController.current
+    val uiState by viewModel.uiState.collectAsState()
+    LikedScreen(
+        onBack = navController::popBackStack,
+        uiState = uiState
+    )
+}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LikedScreen(
-    onBack: () -> Unit, // 返回回调
-    viewModel: LikedSongsViewModel = hiltViewModel()
+    onBack: () -> Unit={},
+    uiState: LikedSongsUiState = LikedSongsUiState.Loading,
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+
     var selectedTabIndex by remember { mutableIntStateOf(0) } // 0 for 歌曲, 1 for 专辑
-
-
 
     // 拦截系统返回键
     BackHandler(onBack = onBack)

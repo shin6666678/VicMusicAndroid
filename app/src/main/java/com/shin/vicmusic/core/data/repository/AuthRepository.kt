@@ -2,7 +2,6 @@ package com.shin.vicmusic.core.data.repository
 
 import com.shin.vicmusic.core.data.mapper.toDomain
 import com.shin.vicmusic.core.domain.Result
-import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.core.model.request.UserLoginReq
 import com.shin.vicmusic.core.model.request.UserRegisterReq

@@ -236,7 +236,5 @@ class MyRetrofitDatasource @Inject constructor(
     /*
     history历史记录
      */
-    suspend fun addHistory(songId: String) = service.addHistory(mapOf("songId" to songId))
-
     suspend fun getHistory() = service.getHistory()
 }

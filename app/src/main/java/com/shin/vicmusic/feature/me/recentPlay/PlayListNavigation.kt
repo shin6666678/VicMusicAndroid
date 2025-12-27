@@ -10,9 +10,9 @@ fun NavController.navigateToRecentPlay() {
     navigate(RECENT_PLAY_ROUTE)
 }
 
-fun NavGraphBuilder.playListScreen() {
+fun NavGraphBuilder.recentPlayScreen() {
 
     composable(RECENT_PLAY_ROUTE) {
-        RecentPlayScreen()
+        RecentPlayRoute()
     }
 }

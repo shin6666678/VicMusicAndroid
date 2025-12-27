@@ -176,8 +176,6 @@ interface MyNetworkApiService {
     /*
     history历史
      */
-    @POST("/api/history/v1/add")
-    suspend fun addHistory(@Body body: Map<String, String>): NetworkResponse<Unit>
 
     @GET("/api/history/v1/list")
     suspend fun getHistory(): NetworkResponse<List<SongListItemDto>>

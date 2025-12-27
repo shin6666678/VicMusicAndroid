@@ -40,7 +40,6 @@ import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.domain.PayType
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONG
-import com.shin.vicmusic.feature.playlist.meList.PlaylistItem
 import com.shin.vicmusic.feature.playlist.meList.PlaylistViewModel
 import com.shin.vicmusic.feature.songAuth.PayTypeIcon
 
@@ -66,7 +65,7 @@ fun ItemSong(
                     Text("收藏到歌单(Add to Playlist)", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(bottom = 12.dp))
                 }
                 items(playlists) { playlist ->
-                    PlaylistItem(playlist = playlist, onClick = {
+                    ItemPlaylist(playlist = playlist, onClick = {
                         viewModel.addSongToPlaylist(playlist.id, song.id)
                         showPlaylistSheet = false
                     })
