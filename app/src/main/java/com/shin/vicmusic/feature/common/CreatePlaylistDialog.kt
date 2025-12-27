@@ -1,6 +1,5 @@
-package com.shin.vicmusic.feature.playlist.meList.component
+package com.shin.vicmusic.feature.common
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,13 +27,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.shin.vicmusic.feature.playlist.meList.PlaylistViewModel
 
 @Preview
 @Composable
 fun Preview() {
     CreatePlaylistDialog(
         onDismiss = {},
-        onConfirm = { _, _ -> }
     )
 }
 
@@ -42,7 +42,7 @@ fun Preview() {
 @Composable
 fun CreatePlaylistDialog(
     onDismiss: () -> Unit,
-    onConfirm: (String, String) -> Unit
+    viewModel: PlaylistViewModel = hiltViewModel()
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var name by remember { mutableStateOf("") }
@@ -83,7 +83,7 @@ fun CreatePlaylistDialog(
                 TextButton(
                     onClick = {
                         if (name.isNotBlank()) {
-                            onConfirm(name, description)
+                            viewModel.createPlaylist(name, description)
                             onDismiss()
                         }
                     },
