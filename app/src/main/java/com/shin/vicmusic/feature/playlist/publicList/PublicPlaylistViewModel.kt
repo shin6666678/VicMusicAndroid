@@ -23,7 +23,7 @@ class PublicPlaylistViewModel @Inject constructor(
         viewModelScope.launch {
             val resp=repository.getPublicPlaylists()
             if (resp is Result.Success) {
-                _playlists.value = resp.data
+                _playlists.value = resp.data.list?:emptyList()
             }
         }
     }

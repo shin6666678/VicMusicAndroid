@@ -4,6 +4,7 @@ import com.shin.vicmusic.core.data.mapper.toDomain
 import com.shin.vicmusic.core.domain.Playlist
 import com.shin.vicmusic.core.domain.PlaylistDetail
 import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.model.response.NetworkPageData
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import java.io.File
 import javax.inject.Inject
@@ -23,11 +24,16 @@ class PlaylistRepository @Inject constructor(
             Result.Error(resp.message ?: "获取歌单失败")
         }
     }
-    suspend fun getPublicPlaylists(): Result<List<Playlist>> {
+    suspend fun getPublicPlaylists(): Result<NetworkPageData<Playlist>> {
         val resp = datasource.getPublicPlaylists()
-        return if (resp.status == 0) {
-            val domainList = resp.data?.map { it.toDomain() } ?: emptyList()
-            Result.Success(domainList)
+        return if (resp.status == 0 && resp.data != null) {
+            val dtoList = resp.data.list ?: emptyList()
+            val domainList=dtoList.map { it.toDomain() }
+            val domainData=NetworkPageData(
+                list = domainList,
+                pagination = resp.data.pagination
+            )
+            Result.Success(domainData)
         } else {
             Result.Error(resp.message ?: "获取歌单失败")
         }

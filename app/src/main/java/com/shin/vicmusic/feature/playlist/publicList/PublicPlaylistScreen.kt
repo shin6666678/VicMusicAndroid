@@ -57,6 +57,7 @@ fun PublicPlaylistRoute(
     PublicPlaylistScreen(
         playlists = playlists,
         onPlaylistClick = navController::navigateToPlaylistDetail,
+        popBackClick = navController::popBackStack
     )
 }
 
@@ -65,12 +66,16 @@ fun PublicPlaylistRoute(
 fun PublicPlaylistScreen(
     playlists: List<Playlist>,
     onPlaylistClick: (String) -> Unit,
+    popBackClick: () -> Unit = {},
 ) {
 
     Scaffold(
         topBar = {
             Column(modifier = Modifier.fillMaxWidth()) {
-                CommonTopBar(midText = "公开歌单")
+                CommonTopBar(
+                    midText = "公开歌单",
+                    popBackStack = popBackClick
+                )
             }
         }
     ) { paddingValues ->
