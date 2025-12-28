@@ -36,4 +36,13 @@ class PlaylistDetailViewModel @Inject constructor(
             }
         }
     }
+
+     fun changePublicStatus(id:String){
+        viewModelScope.launch {
+            val res = repository.changePublicStatus(id)
+            if (res is Result.Success) {
+                fetchDetail()
+            }
+        }
+    }
 }

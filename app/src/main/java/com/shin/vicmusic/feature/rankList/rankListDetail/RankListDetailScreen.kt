@@ -16,8 +16,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
-import com.shin.vicmusic.core.domain.Album
-import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.feature.rankList.rankListDetail.component.RankListDetailHeader
 import com.shin.vicmusic.feature.rankList.rankListDetail.component.SongListSection

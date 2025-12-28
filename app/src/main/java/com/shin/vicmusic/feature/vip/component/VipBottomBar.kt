@@ -19,7 +19,9 @@ import com.shin.vicmusic.feature.vip.VipBlackBg
 import com.shin.vicmusic.feature.vip.VipGold
 
 @Composable
-fun VipBottomBar(price: String) {
+fun VipBottomBar(
+    onPurchaseClick: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -27,7 +29,7 @@ fun VipBottomBar(price: String) {
             .padding(horizontal = 20.dp, vertical = 12.dp)
     ) {
         Button(
-            onClick = { /* TODO: 支付逻辑 */ },
+            onClick = onPurchaseClick,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
@@ -37,7 +39,7 @@ fun VipBottomBar(price: String) {
             shape = RoundedCornerShape(25.dp)
         ) {
             Text(
-                text = "立即开通 $price",
+                text = "限时免费开通VIP 1",
                 color = Color(0xFF4E342E),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold

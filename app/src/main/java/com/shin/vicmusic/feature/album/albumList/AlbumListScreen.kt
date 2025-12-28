@@ -29,6 +29,7 @@ import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.ALBUMS
 import com.shin.vicmusic.feature.album.albumDetail.navigateToAlbumDetail
 import com.shin.vicmusic.feature.common.CommonTopBar
+import com.shin.vicmusic.feature.common.ItemAlbum
 import com.shin.vicmusic.feature.common.MyAsyncImage
 
 
@@ -90,17 +91,7 @@ fun AlbumListScreen(
                             modifier = Modifier.fillMaxSize().padding(8.dp)
                         ) {
                             items(state.albums) { album ->
-                                Column(modifier = Modifier
-                                    .padding(8.dp)
-                                    .clickable { onAlbumClick(album.id) }
-                                ) {
-                                    MyAsyncImage(
-                                        model = album.icon,
-                                        modifier = Modifier.fillMaxWidth().aspectRatio(1f), // 建议给图片指定固定高度或宽高比
-                                    )
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Text(text = album.title)
-                                }
+                                ItemAlbum(album,onAlbumClick)
                             }
                         }
                     }

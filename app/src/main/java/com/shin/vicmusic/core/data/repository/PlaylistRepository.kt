@@ -78,4 +78,10 @@ class PlaylistRepository @Inject constructor(
         val resp = datasource.updatePlaylist(id, name, description, cover)
         return if (resp.status == 0) Result.Success(Unit) else Result.Error(resp.message ?: "更新失败")
     }
+
+    suspend fun changePublicStatus(id:String):Result<Unit>{
+        val resp = datasource.changePublicStatus(id)
+        return if (resp.status == 0) Result.Success(Unit) else Result.Error(resp.message ?: "更新失败")
+    }
 }
+

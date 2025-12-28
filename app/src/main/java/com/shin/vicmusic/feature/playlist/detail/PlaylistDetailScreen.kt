@@ -16,8 +16,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.PlaylistDetail
 import com.shin.vicmusic.feature.common.CommonTopBar
-import com.shin.vicmusic.feature.playlist.detail.component.PlaylistHeader
 import com.shin.vicmusic.feature.common.ItemSong
+import com.shin.vicmusic.feature.playlist.detail.component.PlaySongActionHeader
+import com.shin.vicmusic.feature.playlist.detail.component.PlaylistHeader
 
 @Composable
 fun PlaylistDetailRoute(
@@ -30,6 +31,7 @@ fun PlaylistDetailRoute(
         PlaylistDetailScreen(
             detail = detail!!,
             onBackClick = navController::popBackStack,
+            onChangePublicStatus = viewModel::changePublicStatus
         )
     } else {
         // Loading state
@@ -43,6 +45,7 @@ fun PlaylistDetailRoute(
 fun PlaylistDetailScreen(
     detail: PlaylistDetail,
     onBackClick: () -> Unit,
+    onChangePublicStatus:(String)->Unit={}
 ) {
     Scaffold(
         topBar = {
@@ -54,12 +57,19 @@ fun PlaylistDetailScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Header 部分
+
             item {
                 PlaylistHeader(detail)
             }
 
-            // 歌曲列表部分
+            item {
+                PlaySongActionHeader(
+                    playListId = detail.info.id,
+                    songCount = detail.info.songCount,
+                    onChangePublicStatus=onChangePublicStatus
+                )
+            }
+
             itemsIndexed(detail.songs) { index, song ->
                 ItemSong(
                     song = song,
