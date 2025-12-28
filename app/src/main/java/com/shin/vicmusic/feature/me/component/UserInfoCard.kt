@@ -41,6 +41,7 @@ import coil.compose.AsyncImage
 import com.shin.vicmusic.R
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.UserInfo
+import com.shin.vicmusic.feature.checkIn.navigateToCheckIn
 import com.shin.vicmusic.feature.me.fanList.navigateToFanList
 import com.shin.vicmusic.feature.me.followList.navigateToFollowList
 import com.shin.vicmusic.feature.me.recentPlay.navigateToRecentPlay
@@ -64,7 +65,7 @@ fun UserInfoCardPreview() {
 fun UserInfoCard(
     onLoginClick: () -> Unit={},
     onAvatarClick: () -> Unit,
-    onVipClick: () -> Unit = {}, // [新增] 接收 VIP 點擊事件
+    onVipClick: () -> Unit = {},
     isLoggedIn: Boolean,
     user: UserInfo?,
 ) {
@@ -106,13 +107,6 @@ private fun LoggedInHeader(
     // 1. 解析 VIP 等级 (默认为 0)
     val vipLevelInt = user?.vipLevel ?: -1
 
-    // 2. 根据等级定义 UI 样式 (颜色和文字)
-    // 这里是一个简单的示例逻辑，你可以根据需求调整颜色和等级划分
-    val (vipTagText, vipBgColor, vipTextColor) = when {
-        vipLevelInt >= 6 -> Triple("VIP $vipLevelInt", Color(0xFF000000), Color(0xFFFFD700)) // 黑金配色
-        vipLevelInt >= 1 -> Triple("VIP $vipLevelInt", Color(0xFFD4AF37), Color.White) // 普通 VIP 金色
-        else -> Triple("普通用户", Color.LightGray, Color.White) // 非 VIP 灰色
-    }
 
     Row(verticalAlignment = Alignment.CenterVertically) {
         AsyncImage(
@@ -136,9 +130,7 @@ private fun LoggedInHeader(
             Spacer(modifier = Modifier.height(6.dp))
             // VIP 标签
             VipIcon(
-                vipTagText = vipTagText,
-                vipBgColor = vipBgColor,
-                vipTextColor = vipTextColor,
+                vipLevelInt=vipLevelInt,
                 onClick = onVipClick
             )
         }
@@ -221,7 +213,11 @@ private fun ActionButtonsRow() {
             onClick = navController::navigateToVip
         )
         ActionItem(icon = Icons.Filled.ShoppingCart, text = "装扮", iconTint = Color(0xFF2196F3))
-        ActionItem(icon = Icons.Filled.DateRange, text = "日签", iconTint = Color(0xFFF44336))
+        ActionItem(icon = Icons.Filled.DateRange,
+            text = "日签",
+            iconTint = Color(0xFFF44336),
+            onClick = navController::navigateToCheckIn
+        )
     }
 }
 

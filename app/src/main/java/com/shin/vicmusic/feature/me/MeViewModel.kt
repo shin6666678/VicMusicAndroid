@@ -1,13 +1,17 @@
 package com.shin.vicmusic.feature.me
 
+import android.R.id.message
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.PlaylistRepository
+import com.shin.vicmusic.core.data.repository.UserRepository
 import com.shin.vicmusic.core.domain.Playlist
 import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.core.manager.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -15,12 +19,16 @@ import javax.inject.Inject
 @HiltViewModel
 class MeViewModel @Inject constructor(
     private val authManager: AuthManager, // ✅ 这里可以正常注入你的单例 Manager
-    private val playlistRepository: PlaylistRepository
+    private val playlistRepository: PlaylistRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
-    // 直接透传 Manager 的状态给 UI 使用
     val isLoggedIn = authManager.isLoggedIn
     val currentUser = authManager.currentUser
+
+    // 用于 UI 显示 Toast 提示
+    private val _toastMessage = MutableStateFlow<String?>(null)
+    val toastMessage = _toastMessage.asStateFlow()
     //  暴露获取用户信息的方法
     fun fetchUserInfo() {
         authManager.fetchUserInfo()
@@ -42,5 +50,28 @@ class MeViewModel @Inject constructor(
                 }
             }
         }
+    }
+    // --- 新增：签到逻辑 ---
+    fun checkIn() {
+        viewModelScope.launch {
+            // 1. 调用 Repository 执行签到请求
+            when (val result = userRepository.checkIn()) {
+                is Result.Success -> {
+                    _toastMessage.value = result.data // "签到成功..."
+
+                    // 2. 关键步骤：签到成功后，通知 AuthManager 刷新用户信息
+                    // 这样 UI 上的积分、经验条、等级才会立即更新
+                    authManager.fetchUserInfo()
+                }
+                is Result.Error -> {
+                    _toastMessage.value = result.message
+                }
+                else -> {}
+            }
+        }
+    }
+
+    fun clearToastMessage() {
+        _toastMessage.value = null
     }
 }

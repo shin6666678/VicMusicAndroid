@@ -18,6 +18,10 @@ data class UserInfo(
     val heardCount: Int = 0,
     val isFollowing: Boolean = false,
     val isFollowingMe: Boolean = false,
+
+    val experience: Int=0,
+    val nextLevelExp: Int=0,
+    val totalListenTime: Long=0
 ){
     fun isVip(): Boolean {
         return vipLevel != 0

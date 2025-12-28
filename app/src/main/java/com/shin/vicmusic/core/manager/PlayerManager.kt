@@ -6,6 +6,7 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import com.shin.vicmusic.core.data.repository.PlayerRepository
 import com.shin.vicmusic.core.data.repository.SongRepository
+import com.shin.vicmusic.core.data.repository.UserRepository
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.domain.usecase.CheckVipPermissionUseCase
 import com.shin.vicmusic.util.LrcHelper
@@ -50,10 +51,11 @@ class PlayerManager @Inject constructor(
     private val queueManager: PlaybackQueueManager,
     private val playerRepository: PlayerRepository,          // [注入] 仓库
     private val checkVipPermission: CheckVipPermissionUseCase, // [注入] UseCase
-    private val songRepository: SongRepository
+    private val songRepository: SongRepository,
+    private val userRepository: UserRepository
 ) {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private val TAG = "PlayerManager"
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var exoPlayer: ExoPlayer = ExoPlayer.Builder(context).build()
 
     private val _currentPlayingSong = MutableStateFlow<Song?>(null)
@@ -65,14 +67,16 @@ class PlayerManager @Inject constructor(
     private val _playerState = MutableStateFlow(PlayerState())
     val playerState: StateFlow<PlayerState> = _playerState.asStateFlow()
 
-    // [新增] UI 事件流，用于通知 UI 层显示 Toast 或 Dialog
-    private val _uiEvent = MutableSharedFlow<String>()
+    private val _uiEvent = MutableSharedFlow<String>()//UI 事件流，用于通知 UI 层显示 Toast 或 Dialog
     val uiEvent: SharedFlow<String> = _uiEvent.asSharedFlow()
 
-    // 用于管理播放进度更新协程的 Job
+    // Jobs
     private var progressJob: Job? = null
-    //用于控制上报任务的 Job
-    private var reportJob: Job? = null
+    private var reportPlayJob: Job? = null // 有效播放计数
+    private var reportTimeJob: Job? = null // 听歌时长上报
+
+    private val REPORT_INTERVAL = 60000L // 60秒上报一次
+    private val REPORT_SECONDS = 60      // 实际上报的秒数
 
     init {
         setupPlayerListener()
@@ -85,8 +89,6 @@ class PlayerManager @Inject constructor(
             }
         }
     }
-
-
 
     // 核心播放入口：处理权限与播放
     private suspend fun tryPlaySong(song: Song?, performPlay: () -> Unit) {
@@ -106,25 +108,8 @@ class PlayerManager @Inject constructor(
         exoPlayer.playWhenReady = true
         _playerState.update { it.copy(isPlaying = true) }
         startProgressUpdate()
-
-        reportJob?.cancel()
-
-        // 启动新的上报任务 (Start new reporting task)
-        reportJob = scope.launch(Dispatchers.IO) {
-            try {
-                // 设置有效播放阈值，10秒 只有听完10秒，才会往下执行。如果中途切歌，这个协程会被 cancel() 杀掉
-                delay(10000)
-
-                // 时间到了，确认为有效播放，触发接口
-                songRepository.playSong(song.id)
-                Log.d("PlayerManager", "Valid play recorded: ${song.title}")
-            } catch (e: Exception) {
-                // 如果是 CancellationException (被切歌取消)，属于预期行为，无需处理
-                if (e !is CancellationException) {
-                    e.printStackTrace()
-                }
-            }
-        }
+        // startProgressUpdate 和 startReportTimeJob 由监听器 onIsPlayingChanged 触发,这里只启动“有效播放计数”任务
+        startReportPlayJob(song=song)
     }
 
 
@@ -136,7 +121,6 @@ class PlayerManager @Inject constructor(
             val newQueue = queue ?: listOf(song)
             val index = newQueue.indexOfFirst { it.id == song.id }
 
-            // [修复] 必须设置队列数据
             queueManager.setQueue(newQueue, index)
 
             tryPlaySong(song) {
@@ -179,17 +163,29 @@ class PlayerManager @Inject constructor(
         }
     }
 
-    private fun restoreSession() {
-        scope.launch {
-            playerRepository.getLastPlayedSong()?.let { song ->
-                queueManager.setQueue(listOf(song), 0)
-                _currentPlayingSong.value = song // [必须补上] 更新UI状态
-                Log.d("Mana111",song.toString())
-                loadLyric(song)
-                exoPlayer.setMediaItem(song.toMediaItem())
-                exoPlayer.prepare()
+    fun addSongToQueue(song: Song) {
+        queueManager.addSong(song)
+        exoPlayer.addMediaItem(song.toMediaItem())
+    }
+
+    // --- 监听与任务调度 ---
+    private fun setupPlayerListener() {
+        exoPlayer.addListener(object : Player.Listener {
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                // 统一管理：播放时开启任务，暂停/停止时关闭任务
+                if (isPlaying) {
+                    startProgressUpdate()
+                    startReportTimeJob() // 只有正在播放时才计时
+                } else {
+                    stopProgressUpdate()
+                    stopReportingDuration()  // 暂停/停止 -> 停止时长上报
+                }
             }
-        }
+
+            override fun onPlaybackStateChanged(state: Int) {
+                if (state == Player.STATE_ENDED) skipToNext()
+            }
+        })
     }
     private fun startProgressUpdate() {
         progressJob?.cancel()
@@ -217,36 +213,84 @@ class PlayerManager @Inject constructor(
         progressJob?.cancel()
         _playerState.update { it.copy(isPlaying = false) }
     }
-    /**
-     * 添加歌曲到队尾
+
+
+    /*
+    业务上报
      */
-    fun addSongToQueue(song: Song) {
-        queueManager.addSong(song)
-        exoPlayer.addMediaItem(song.toMediaItem())
-    }
-    private fun setupPlayerListener() {
-        exoPlayer.addListener(object : Player.Listener {
-            override fun onIsPlayingChanged(isPlaying: Boolean) {
-                if (isPlaying) startProgressUpdate() else stopProgressUpdate()
-            }
+    /**
+     * 记录有效播放 (Play Count)
+     * 规则：切歌重置，当前歌曲播放超过10秒后上报一次
+     */
+    private fun startReportPlayJob(song: Song){
+        reportPlayJob?.cancel()
+        reportPlayJob = scope.launch(Dispatchers.IO) {
+            try {
+                // 设置有效播放阈值，10秒 只有听完10秒，才会往下执行。如果中途切歌，这个协程会被 cancel() 杀掉
+                delay(10000)
 
-            override fun onPlaybackStateChanged(state: Int) {
-                if (state == Player.STATE_ENDED) skipToNext() // 自动下一首
+                // 时间到了，确认为有效播放，触发接口
+                songRepository.playSong(song.id)
+                Log.d("PlayerManager", "Valid play recorded: ${song.title}")
+            } catch (e: Exception) {
+                // 如果是 CancellationException (被切歌取消)，属于预期行为，无需处理
+                if (e !is CancellationException) {
+                    e.printStackTrace()
+                }
             }
-        })
+        }
+    }
+    /**
+     * 听歌时长上报 (Listening Duration)
+     * 规则：每播放60秒上报一次
+     */
+    private fun startReportTimeJob() {
+        stopReportingDuration()
+        reportTimeJob = CoroutineScope(Dispatchers.IO).launch {
+            while (isActive) {
+                delay(REPORT_INTERVAL)
+                try {
+                    // 调用 Repository 上报
+                    userRepository.reportDuration(REPORT_SECONDS)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
     }
 
-    // 新增：异步加载歌词方法
+    // 当播放器暂停或停止时调用 (onPause, onStop)
+    private fun stopReportingDuration() {
+        reportTimeJob?.cancel()
+        reportTimeJob = null
+    }
+
+
+    /*
+    辅助方法
+     */
+    private fun restoreSession() {
+        scope.launch {
+            playerRepository.getLastPlayedSong()?.let { song ->
+                queueManager.setQueue(listOf(song), 0)
+                _currentPlayingSong.value = song // [必须补上] 更新UI状态
+                Log.d("Mana111", song.toString())
+                loadLyric(song)
+                exoPlayer.setMediaItem(song.toMediaItem())
+                exoPlayer.prepare()
+            }
+        }
+    }
     private fun loadLyric(song: Song) {
-        song.lyric?.let { Log.d("Mana111",it) }
-        if (song.lyric.isNullOrEmpty()) return
+        if (song.lyric.isEmpty()|| song.lyric == "") return
         scope.launch(Dispatchers.IO) {
             try {
                 val text = java.net.URL(ResourceUtil.r2(song.lyric)).readText()
-                Log.d("Mana111",text)
                 val list = LrcHelper.parse(text)
                 // 校验ID防止切歌后覆盖错误
-                _currentPlayingSong.update { if (it?.id == song.id) it.copy(lyricList = list) else it }
+                _currentPlayingSong.update {
+                    if (it?.id == song.id) it.copy(lyricList = list) else it
+                }
             } catch (e: Exception) { e.printStackTrace() }
         }
     }
@@ -254,5 +298,7 @@ class PlayerManager @Inject constructor(
     fun release() {
         exoPlayer.release()
         progressJob?.cancel()
+        reportPlayJob?.cancel()
+        reportTimeJob?.cancel()
     }
 }

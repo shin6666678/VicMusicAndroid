@@ -19,4 +19,8 @@ data class UserInfoDto(
     val isFollowing: Boolean? = null,
     val isFollowingMe: Boolean? = null,
 
+    val experience: Int? = 0,
+    val nextLevelExp: Int? = 100,
+    val totalListenTime: Long? = 0L
+
 )

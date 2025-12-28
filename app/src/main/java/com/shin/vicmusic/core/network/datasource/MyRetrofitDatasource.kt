@@ -82,9 +82,17 @@ class MyRetrofitDatasource @Inject constructor(
         return safeApiCall { service.register(req) }
     }
 
-    suspend fun userInfo(): NetworkResponse<UserInfoDto> {
-        return safeApiCall { service.userInfo() }
+    suspend fun getUserInfo(): NetworkResponse<UserInfoDto> {
+        return safeApiCall { service.getUserInfo() }
     }
+    suspend fun checkIn() :NetworkResponse<Unit>{
+        return safeApiCall { service.checkIn()}
+    }
+
+    suspend fun reportDuration(seconds: Int):NetworkResponse<Unit> {
+        return safeApiCall { service.reportDuration(seconds) }
+    }
+
     suspend fun changeVIPLevel(req:ChangeVIPLevelReq=ChangeVIPLevelReq()): NetworkResponse<Unit> {
         return safeApiCall { service.changeVIPLevel(req) }
     }
