@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.SearchRepository
 import com.shin.vicmusic.core.domain.*
 import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.manager.SearchHistoryManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -16,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val searchRepository: SearchRepository
+    private val searchRepository: SearchRepository,
+    private val searchHistoryManager: SearchHistoryManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchUiState())
@@ -24,18 +25,22 @@ class SearchViewModel @Inject constructor(
 
     private var searchJob: Job? = null
 
+    init {
+        // 初始化时监听历史记录
+        viewModelScope.launch {
+            searchHistoryManager.historyFlow.collect { history ->
+                _uiState.update { it.copy(searchHistory = history) }
+            }
+        }
+    }
+
     fun onEvent(event: SearchEvent) {
         when (event) {
             is SearchEvent.QueryChanged -> {
                 _uiState.update { it.copy(query = event.query) }
-                searchJob?.cancel()
-                if (event.query.isNotBlank()) {
-                    searchJob = viewModelScope.launch {
-                        delay(500) // 防抖
-                        performSearch()
-                    }
-                } else {
-                    _uiState.update { it.copy(
+                // 仅更新文字，不触发搜索
+                if (event.query.isBlank()) {
+                     _uiState.update { it.copy(
                         comprehensiveResult = null,
                         listResult = emptyList(),
                         hasSearched = false
@@ -62,6 +67,11 @@ class SearchViewModel @Inject constructor(
                     hasSearched = false
                 ) }
             }
+            is SearchEvent.ClearHistory -> {
+                viewModelScope.launch {
+                    searchHistoryManager.clearHistory()
+                }
+            }
         }
     }
 
@@ -71,6 +81,11 @@ class SearchViewModel @Inject constructor(
         val tab = currentState.selectedTab
 
         if (query.isBlank()) return
+
+        // 保存到历史记录
+        viewModelScope.launch {
+            searchHistoryManager.addSearchTerm(query)
+        }
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null, hasSearched = true) }
@@ -125,7 +140,8 @@ data class SearchUiState(
     val hasSearched: Boolean = false,
     val selectedTab: SearchTab = SearchTab.COMPREHENSIVE,
     val comprehensiveResult: SearchComprehensiveResult? = null,
-    val listResult: List<Any> = emptyList()
+    val listResult: List<Any> = emptyList(),
+    val searchHistory: List<String> = emptyList() // 添加历史记录状态
 )
 
 enum class SearchTab(val title: String) {
@@ -142,4 +158,5 @@ sealed class SearchEvent {
     data class TabChanged(val tab: SearchTab) : SearchEvent()
     object Search : SearchEvent()
     object ClearQuery : SearchEvent()
+    object ClearHistory : SearchEvent()
 }

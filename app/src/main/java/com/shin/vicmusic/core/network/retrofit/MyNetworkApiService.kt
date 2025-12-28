@@ -14,6 +14,7 @@ import com.shin.vicmusic.core.model.api.SearchComprehensiveDto
 import com.shin.vicmusic.core.model.api.SongDetailDto
 import com.shin.vicmusic.core.model.api.SongListItemDto
 import com.shin.vicmusic.core.model.api.UserInfoDto
+import com.shin.vicmusic.core.model.request.ChangeVIPLevelReq
 import com.shin.vicmusic.core.model.request.FollowReq
 import com.shin.vicmusic.core.model.request.LikeSongReq
 import com.shin.vicmusic.core.model.request.PlaylistSongReq
@@ -48,13 +49,14 @@ interface MyNetworkApiService {
     @POST("/api/user/v1/register")
     suspend fun register(@Body req: UserRegisterReq): NetworkResponse<User>
 
-    // 登录接口
     @POST("/api/user/v1/login")
     suspend fun login(@Body req: UserLoginReq): NetworkResponse<String>
 
-    // 获取用户信息接口 (Info Interface)
     @GET("/api/user/v1/info")
     suspend fun userInfo(): NetworkResponse<UserInfoDto>
+
+    @POST("/api/user/v1/VIP")
+    suspend fun changeVIPLevel(@Body req: ChangeVIPLevelReq): NetworkResponse<Unit>
 
     /*
     song
@@ -169,6 +171,11 @@ interface MyNetworkApiService {
         @Part cover: MultipartBody.Part?
     ): NetworkResponse<Unit>
 
+    @POST("/api/playlist/v1/changePublicStatus/{id}")
+    suspend fun changePublicStatus(
+        @Path("id") id: String,
+    ): NetworkResponse<Unit>
+
     @Multipart
     @POST("/api/playlist/v1/update")
     suspend fun updatePlaylist(
@@ -248,4 +255,6 @@ interface MyNetworkApiService {
     suspend fun checkUpdate(
         @Query("versionCode") versionCode: Int
     ): NetworkResponse<AppUpdateDto>
+
+
 }

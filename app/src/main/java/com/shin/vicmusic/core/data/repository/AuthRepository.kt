@@ -3,6 +3,7 @@ package com.shin.vicmusic.core.data.repository
 import com.shin.vicmusic.core.data.mapper.toDomain
 import com.shin.vicmusic.core.domain.Result
 import com.shin.vicmusic.core.domain.UserInfo
+import com.shin.vicmusic.core.model.request.ChangeVIPLevelReq
 import com.shin.vicmusic.core.model.request.UserLoginReq
 import com.shin.vicmusic.core.model.request.UserRegisterReq
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
@@ -28,5 +29,14 @@ class AuthRepository @Inject constructor(
             return Result.Success(domainUser)
         }
         return Result.Error(dtoResponse.message ?: "未知错误")
+    }
+
+    // 修改VIP等级
+    suspend fun changeVipLevel(level: Int): Result<Unit> {
+        val dtoResponse = datasource.changeVIPLevel(ChangeVIPLevelReq(level))
+        if(dtoResponse.status == 0){
+            return Result.Success(Unit)
+        }
+        return Result.Error(dtoResponse.message ?: "修改VIP失败")
     }
 }

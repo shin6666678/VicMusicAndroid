@@ -43,6 +43,7 @@ import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.feature.me.fanList.navigateToFanList
 import com.shin.vicmusic.feature.me.followList.navigateToFollowList
+import com.shin.vicmusic.feature.me.recentPlay.navigateToRecentPlay
 import com.shin.vicmusic.feature.vip.VipIcon
 import com.shin.vicmusic.feature.vip.navigateToVip
 
@@ -199,7 +200,9 @@ private fun UserStatsRow(
             navController.navigateToFanList()
         }
         StatItem(user.level, "等级")
-        StatItem(user.heardCount, "听歌")
+        StatItem(user.heardCount, "听歌"){
+            navController.navigateToRecentPlay()
+        }
     }
 }
 

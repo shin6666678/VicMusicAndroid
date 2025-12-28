@@ -17,6 +17,7 @@ import com.shin.vicmusic.core.model.api.UserInfoDto
 import com.shin.vicmusic.core.model.request.AlbumDetailReq
 import com.shin.vicmusic.core.model.request.AlbumPageReq
 import com.shin.vicmusic.core.model.request.ArtistPageReq
+import com.shin.vicmusic.core.model.request.ChangeVIPLevelReq
 import com.shin.vicmusic.core.model.request.FollowReq
 import com.shin.vicmusic.core.model.request.LikeSongReq
 import com.shin.vicmusic.core.model.request.PlaylistSongReq
@@ -83,6 +84,9 @@ class MyRetrofitDatasource @Inject constructor(
 
     suspend fun userInfo(): NetworkResponse<UserInfoDto> {
         return safeApiCall { service.userInfo() }
+    }
+    suspend fun changeVIPLevel(req:ChangeVIPLevelReq=ChangeVIPLevelReq()): NetworkResponse<Unit> {
+        return safeApiCall { service.changeVIPLevel(req) }
     }
 
     /*
@@ -237,6 +241,10 @@ class MyRetrofitDatasource @Inject constructor(
             MultipartBody.Part.createFormData("cover", it.name, body)
         }
         return safeApiCall { service.updatePlaylist(idBody, nameBody, descBody, coverPart) }
+    }
+
+    suspend fun changePublicStatus( id : String):NetworkResponse<Unit> {
+        return safeApiCall { service.changePublicStatus(id) }
     }
     /*
     history历史记录

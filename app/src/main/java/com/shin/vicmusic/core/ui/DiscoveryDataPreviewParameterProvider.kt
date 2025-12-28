@@ -230,11 +230,14 @@ data class PlaylistDetail(
      */
     val PLAYLIST = Playlist(
         id = "1",
-        userId = "1",
         name = "我的歌单1",
         cover = "playlist_cover.jpg",
         description = "这是我的歌单，包含一些我喜欢的歌。",
-        playCount = 1000
+        playCount = 0,
+        songCount = 0,
+        likeCount = 0,
+        isPublic = 0,
+        ownerName = "ownerName",
     )
     val PLAYLIST_DETAIL = PlaylistDetail(
         info = PLAYLIST,
@@ -243,35 +246,47 @@ data class PlaylistDetail(
     val PLAYLISTS = listOf(
         Playlist(
             id = "1",
-            userId = "1",
             name = "我的歌单1",
             cover = "playlist_cover.jpg",
             description = "这是我的歌单，包含一些我喜欢的歌。",
-            playCount = 1000
+            playCount = 0,
+            songCount = 0,
+            likeCount = 0,
+            isPublic = 0,
+            ownerName = "ownerName",
         ),
         Playlist(
             id = "2",
-            userId = "1",
             name = "我的歌单2",
             cover = "playlist_cover.jpg",
             description = "这是我的歌单，包含一些我喜欢的歌。",
-            playCount = 1000
+            playCount = 0,
+            songCount = 0,
+            likeCount = 0,
+            isPublic = 0,
+            ownerName = "ownerName",
         ),
         Playlist(
             id = "3",
-            userId = "1",
             name = "我的歌单3",
             cover = "playlist_cover.jpg",
             description = "这是我的歌单，包含一些我喜欢的歌。",
-            playCount = 1000
+            playCount = 0,
+            songCount = 0,
+            likeCount = 0,
+            isPublic = 0,
+            ownerName = "ownerName",
         ),
         Playlist(
             id = "4",
-            userId = "1",
             name = "我的歌单4",
             cover = "playlist_cover.jpg",
             description = "这是我的歌单，包含一些我喜欢的歌。",
-            playCount = 1000
+            playCount = 0,
+            songCount = 0,
+            likeCount = 0,
+            isPublic = 0,
+            ownerName = "ownerName",
         ),
 
     )

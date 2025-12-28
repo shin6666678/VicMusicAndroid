@@ -1,5 +1,6 @@
 package com.shin.vicmusic.feature.vip
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,15 +16,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalAuthManager
 import com.shin.vicmusic.core.design.composition.LocalNavController
-import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.domain.UserInfo
+import com.shin.vicmusic.core.domain.VipProduct
 import com.shin.vicmusic.feature.vip.component.VipBottomBar
 import com.shin.vicmusic.feature.vip.component.VipPrivilegesSection
 import com.shin.vicmusic.feature.vip.component.VipProductList
@@ -33,32 +35,45 @@ import com.shin.vicmusic.feature.vip.component.VipUserCard
 @Preview
 @Composable
 fun VipRoutePreview() {
-    VipScreen(onBackClick = {}, user = null)
+    VipScreen(
+        onBackClick = {},
+        user = null,
+        onPurchaseClick = {}
+    )
 }
 
 @Composable
-fun VipRoute() {
+fun VipRoute(
+    viewModel: VipViewModel = hiltViewModel()
+) {
     val navController = LocalNavController.current
     val authManager = LocalAuthManager.current
+    val context = LocalContext.current
 
     // 收集 StateFlow 状态
     val isLoggedIn by authManager.isLoggedIn.collectAsState()
-    // 检查登录状态 (假设 AuthManager 有 isLogin 属性，根据实际情况修改)
+    
+    // 检查登录状态
     if (isLoggedIn != true) {
         LaunchedEffect(Unit) {
-            navController.navigate("login_route") { // 请确保这是你的登录路由名称
-                // 可选：弹出当前栈，防止返回
-                // popUpTo("vip_route") { inclusive = true }
-            }
+            navController.navigate("login_route")
         }
-        // 未登录时不显示内容或显示Loading
         return
     }
 
     val loginUser by authManager.currentUser.collectAsState()
+
+    // 监听 Toast 消息
+    LaunchedEffect(Unit) {
+        viewModel.message.collect { msg ->
+            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     VipScreen(
         onBackClick = navController::popBackStack,
-        user = loginUser
+        user = loginUser,
+        onPurchaseClick = viewModel::purchaseVip
     )
 }
 
@@ -74,11 +89,8 @@ val VipSubText = Color(0xFF9E9E9E)
 fun VipScreen(
     onBackClick: () -> Unit,
     user: UserInfo?,
-    viewModel: VipViewModel = viewModel()
+    onPurchaseClick: () -> Unit
 ) {
-    val vipProducts by viewModel.vipProducts.collectAsState()
-    val selectedIndex by viewModel.selectedProductIndex.collectAsState()
-
     Scaffold(
         containerColor = VipBlackBg,
         topBar = {
@@ -86,7 +98,7 @@ fun VipScreen(
         },
         bottomBar = {
             VipBottomBar(
-                price = vipProducts.getOrNull(selectedIndex)?.price ?: "--"
+                onPurchaseClick = onPurchaseClick
             )
         }
     ) { padding ->
@@ -97,27 +109,9 @@ fun VipScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             // 用户信息卡片
-            VipUserCard(user=user)
+            VipUserCard(user = user)
 
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // 会员套餐选择
-            Text(
-                text = "会员套餐",
-                color = VipLightText,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 20.dp)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            VipProductList(
-                products = vipProducts,
-                selectedIndex = selectedIndex,
-                onSelect = { viewModel.selectProduct(it) }
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(46.dp))
 
             // 会员权益
             Text(
@@ -130,15 +124,6 @@ fun VipScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             VipPrivilegesSection()
-
-            Spacer(modifier = Modifier.height(100.dp)) // 底部留白
         }
     }
 }
-
-
-
-
-
-
-
