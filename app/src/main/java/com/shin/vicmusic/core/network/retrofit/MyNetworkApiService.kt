@@ -53,7 +53,14 @@ interface MyNetworkApiService {
     suspend fun login(@Body req: UserLoginReq): NetworkResponse<String>
 
     @GET("/api/user/v1/info")
-    suspend fun userInfo(): NetworkResponse<UserInfoDto>
+    suspend fun getUserInfo(): NetworkResponse<UserInfoDto>
+
+    @POST("api/user/v1/check_in")
+    suspend fun checkIn(): NetworkResponse<Unit>
+
+    // 上报听歌时长(秒)
+    @POST("api/user/v1/report_duration")
+    suspend fun reportDuration(@Query("seconds") seconds: Int): NetworkResponse<Unit>
 
     @POST("/api/user/v1/VIP")
     suspend fun changeVIPLevel(@Body req: ChangeVIPLevelReq): NetworkResponse<Unit>

@@ -23,7 +23,7 @@ class AuthRepository @Inject constructor(
 
     // 获取用户信息(Get User Info)
     suspend fun getUserInfo(): Result<UserInfo> {
-        val dtoResponse = datasource.userInfo()
+        val dtoResponse = datasource.getUserInfo()
         if(dtoResponse.status == 0 && dtoResponse.data != null){
             val domainUser = dtoResponse.data.toDomain()
             return Result.Success(domainUser)
