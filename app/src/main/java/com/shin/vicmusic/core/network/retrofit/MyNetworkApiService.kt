@@ -147,7 +147,7 @@ interface MyNetworkApiService {
     @GET("/api/playlist/v1/my")
     suspend fun getMyPlaylists(): NetworkResponse<List<PlaylistDto>>
     @GET("/api/playlist/v1/public")
-    suspend fun getPublicPlaylists(): NetworkResponse<List<PlaylistDto>>
+    suspend fun getPublicPlaylists(): NetworkResponse<NetworkPageData<PlaylistDto>>
 
     @GET("/api/playlist/v1/detail/{id}")
     suspend fun getPlaylistDetail(@Path("id") id: String): NetworkResponse<PlaylistDetailDto>

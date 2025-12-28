@@ -198,7 +198,7 @@ class MyRetrofitDatasource @Inject constructor(
     suspend fun getMyPlaylists(): NetworkResponse<List<PlaylistDto>> {
         return safeApiCall { service.getMyPlaylists() }
     }
-    suspend fun getPublicPlaylists(): NetworkResponse<List<PlaylistDto>> {
+    suspend fun getPublicPlaylists(): NetworkResponse<NetworkPageData<PlaylistDto>> {
         return safeApiCall { service.getPublicPlaylists() }
     }
 

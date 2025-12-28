@@ -5,8 +5,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PlaylistDto(
     val id: String,
-    val userId: String,
-    val name: String,
+    val userId: String="",
+    val name: String="",
     val cover: String?="",
     val description: String?,
     val playCount: Int,
