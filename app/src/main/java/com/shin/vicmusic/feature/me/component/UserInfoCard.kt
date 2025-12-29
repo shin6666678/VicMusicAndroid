@@ -39,21 +39,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.shin.vicmusic.R
-import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.UserInfo
-import com.shin.vicmusic.feature.checkIn.navigateToCheckIn
-import com.shin.vicmusic.feature.me.fanList.navigateToFanList
-import com.shin.vicmusic.feature.me.followList.navigateToFollowList
-import com.shin.vicmusic.feature.me.recentPlay.navigateToRecentPlay
-import com.shin.vicmusic.feature.vip.VipIcon
-import com.shin.vicmusic.feature.vip.navigateToVip
+import com.shin.vicmusic.feature.common.level.UserLevelIcon
+import com.shin.vicmusic.feature.common.level.VipIcon
 
 @Preview
 @Composable
 fun UserInfoCardPreview() {
     UserInfoCard(
         onAvatarClick = {},
-        isLoggedIn = true,
+        isLoggedIn = false,
         user = UserInfo(
             name = "登录情况测试用户",
             vipLevel = 0,
@@ -68,6 +63,13 @@ fun UserInfoCard(
     onVipClick: () -> Unit = {},
     isLoggedIn: Boolean,
     user: UserInfo?,
+
+    onFollowClick: () -> Unit = {},
+    onFansClick: () -> Unit = {},
+    onLevelClick:() -> Unit = {},
+    onHeardClick: () -> Unit = {},
+
+    onCheckInClick: () -> Unit = {}
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -86,12 +88,16 @@ fun UserInfoCard(
             // 2. 统计数据区域 (仅登录显示)
             if (isLoggedIn && user != null) {
                 Spacer(modifier = Modifier.height(20.dp))
-                UserStatsRow(user = user)
+                UserStatsRow(
+                    user = user,
+                    onFollowClick = onFollowClick,
+                    onFansClick = onFansClick,
+                    onLevelClick = onLevelClick,
+                    onHeardClick = onHeardClick,
+                    onCheckInClick = onCheckInClick,
+                    onVipClick = onVipClick
+                )
             }
-
-            // 3. 底部功能按钮区域 (使用循环减少代码)
-            Spacer(Modifier.height(16.dp))
-            ActionButtonsRow()
         }
     }
 }
@@ -102,15 +108,15 @@ fun UserInfoCard(
 private fun LoggedInHeader(
     onAvatarClick: () -> Unit,
     onVipClick: () -> Unit, // [新增] 參數
-    user: UserInfo?
+    user: UserInfo
 ) {
     // 1. 解析 VIP 等级 (默认为 0)
-    val vipLevelInt = user?.vipLevel ?: -1
+    val vipLevelInt = user.vipLevel
 
 
     Row(verticalAlignment = Alignment.CenterVertically) {
         AsyncImage(
-            model = user?.headImg ?: "https://picsum.photos/200",
+            model = user.headImg,
             contentDescription = "Avatar",
             modifier = Modifier
                 .size(60.dp)
@@ -123,16 +129,20 @@ private fun LoggedInHeader(
         Spacer(Modifier.width(16.dp))
         Column(verticalArrangement = Arrangement.Center) {
             Text(
-                text = user?.name ?: "未知用户",
+                text = user.name,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(6.dp))
-            // VIP 标签
-            VipIcon(
-                vipLevelInt=vipLevelInt,
-                onClick = onVipClick
-            )
+            Row {
+                UserLevelIcon(level = user.level)
+                Spacer(modifier = Modifier.width(8.dp))
+                // VIP 标签
+                VipIcon(
+                    vipLevelInt=vipLevelInt,
+                    onClick = onVipClick
+                )
+            }
         }
     }
 }
@@ -144,63 +154,72 @@ private fun LoggedOutHeader(onLoginClick: () -> Unit) {
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // 1. 按钮：移除 weight，让它根据内容自适应宽度
         Button(
             onClick = onLoginClick,
             modifier = Modifier
-                .weight(0.5f) // 使用 weight 而不是写死宽度比例
-                .height(40.dp), // 稍微调整高度使其更紧凑
+                .height(40.dp), // 保持高度，移除 weight(0.5f)
             colors = ButtonDefaults.buttonColors(
                 containerColor = VdGreen,
                 contentColor = Color.White
             ),
-            shape = RoundedCornerShape(50)
+            shape = RoundedCornerShape(50),
+            // 2. 显式设置内边距，防止默认边距过大挤压文字
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp, vertical = 0.dp)
         ) {
-            Icon(Icons.Filled.Key, contentDescription = null)
+            Icon(
+                imageVector = Icons.Filled.Key,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp) // 稍微调小图标以防万一
+            )
             Spacer(modifier = Modifier.width(6.dp))
             Text(
                 text = "立即登录",
                 style = MaterialTheme.typography.titleMedium,
                 fontSize = 14.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                maxLines = 1 // 强制单行
             )
         }
+
         Spacer(modifier = Modifier.width(12.dp))
+
+        // 3. 提示文字：使用 weight(1f) 填满剩余空间
         Text(
             text = "登录体验更多精彩内容",
             style = MaterialTheme.typography.bodySmall,
             color = Color.Gray,
-            modifier = Modifier.weight(0.6f)
+            modifier = Modifier.weight(1f) // 占据剩下的所有宽度
         )
     }
 }
 
 @Composable
 private fun UserStatsRow(
-    user: UserInfo
+    user: UserInfo,
+    onFollowClick: () -> Unit = {},
+    onFansClick: () -> Unit = {},
+    onLevelClick:() -> Unit = {},
+    onHeardClick: () -> Unit = {},
+
+
+    onVipClick: () -> Unit = {},
+    onCheckInClick: () -> Unit = {}
+    
 ) {
-    val navController = LocalNavController.current // 直接获取控制器
 
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceAround
     ) {
         // 为关注添加点击事件
-        StatItem(user.followCount, "关注") {
-            navController.navigateToFollowList()
-        }
-        StatItem(user.followerCount, "粉丝"){
-            navController.navigateToFanList()
-        }
-        StatItem(user.level, "等级")
-        StatItem(user.heardCount, "听歌"){
-            navController.navigateToRecentPlay()
-        }
+        StatItem(user.followCount, "关注", onClick = onFollowClick)
+        StatItem(user.followerCount, "粉丝", onClick = onFansClick)
+        StatItem(user.level, "等级", onClick = onLevelClick)
+        StatItem(user.heardCount, "听歌", onClick = onHeardClick)
     }
-}
 
-@Composable
-private fun ActionButtonsRow() {
-    val navController = LocalNavController.current // 直接获取控制器
+    Spacer(Modifier.height(16.dp))
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -210,13 +229,13 @@ private fun ActionButtonsRow() {
         ActionItem(icon = Icons.Filled.Favorite,
             text = "会员",
             iconTint = Color(0xFF00BFA5),
-            onClick = navController::navigateToVip
+            onClick = onVipClick
         )
         ActionItem(icon = Icons.Filled.ShoppingCart, text = "装扮", iconTint = Color(0xFF2196F3))
         ActionItem(icon = Icons.Filled.DateRange,
             text = "日签",
             iconTint = Color(0xFFF44336),
-            onClick = navController::navigateToCheckIn
+            onClick = onCheckInClick
         )
     }
 }

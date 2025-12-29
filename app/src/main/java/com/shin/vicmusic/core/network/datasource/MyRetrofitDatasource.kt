@@ -85,7 +85,7 @@ class MyRetrofitDatasource @Inject constructor(
     suspend fun getUserInfo(): NetworkResponse<UserInfoDto> {
         return safeApiCall { service.getUserInfo() }
     }
-    suspend fun checkIn() :NetworkResponse<Unit>{
+    suspend fun checkIn() :NetworkResponse<String>{
         return safeApiCall { service.checkIn()}
     }
 

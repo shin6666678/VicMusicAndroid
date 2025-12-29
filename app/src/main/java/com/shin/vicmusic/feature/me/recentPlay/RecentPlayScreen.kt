@@ -41,7 +41,7 @@ fun RecentPlayRoute(
                 CircularProgressIndicator()
             }
         } else {
-            RecentPlayScreen(viewModel.songList)
+            RecentPlayScreen(viewModel.songList,padding=padding)
         }
     }
 }
