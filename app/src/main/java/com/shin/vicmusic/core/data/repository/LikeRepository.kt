@@ -14,7 +14,7 @@ class LikeRepository @Inject constructor(
     suspend fun likedSongs(): Result<NetworkPageData<Song>> {
         val dtoResponse =datasource.likedSongs()
 
-        if (dtoResponse.status == 0 && dtoResponse.data != null) {
+        if (dtoResponse.code == 0 && dtoResponse.data != null) {
             val dtoList = dtoResponse.data.list ?: emptyList()
             val domainList = dtoList.map { it.toDomain() }
             val domainData = NetworkPageData(
@@ -28,7 +28,7 @@ class LikeRepository @Inject constructor(
 
     suspend fun likeSong(id: String): Result<Unit> {
         val dtoResponse = datasource.likeSong(LikeSongReq(id))
-        if (dtoResponse.status == 0) {
+        if (dtoResponse.code == 0) {
             return Result.Success(Unit)
         }
         return Result.Error(dtoResponse.message ?: "操作失败")

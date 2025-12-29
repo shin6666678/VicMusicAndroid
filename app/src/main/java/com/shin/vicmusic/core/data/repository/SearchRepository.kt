@@ -13,7 +13,7 @@ class SearchRepository @Inject constructor(
     suspend fun searchComprehensive(keyword: String): Result<SearchComprehensiveResult> {
         return try {
             val response = api.searchComprehensive(keyword)
-            if (response.status == 0 && response.data != null) {
+            if (response.code == 0 && response.data != null) {
                 Result.Success(response.data!!.toDomain())
             } else {
                 // [Fix] 传入 String
@@ -29,7 +29,7 @@ class SearchRepository @Inject constructor(
     suspend fun searchSongs(keyword: String, page: Int, size: Int = 20): Result<PageResult<Song>> {
         return try {
             val response = api.searchSongs(keyword = keyword, page = page, size = size)
-            if (response.status == 0 && response.data != null) {
+            if (response.code == 0 && response.data != null) {
                 val pageData = response.data!!
                 val total = pageData.pagination.total
                 // [Fix] 计算 hasMore
@@ -55,7 +55,7 @@ class SearchRepository @Inject constructor(
     suspend fun searchPlaylists(keyword: String, page: Int, size: Int = 20): Result<PageResult<Playlist>> {
         return try {
             val response = api.searchPlaylists(keyword = keyword, page = page, size = size)
-            if (response.status == 0 && response.data != null) {
+            if (response.code == 0 && response.data != null) {
                 val pageData = response.data!!
                 val total = pageData.pagination.total
                 val hasMore = (page * size) < total
@@ -80,7 +80,7 @@ class SearchRepository @Inject constructor(
     suspend fun searchAlbums(keyword: String, page: Int, size: Int = 20): Result<PageResult<Album>> {
         return try {
             val response = api.searchAlbums(keyword = keyword, page = page, size = size)
-            if (response.status == 0 && response.data != null) {
+            if (response.code == 0 && response.data != null) {
                 val pageData = response.data!!
                 val total = pageData.pagination.total
                 val hasMore = (page * size) < total
@@ -105,7 +105,7 @@ class SearchRepository @Inject constructor(
     suspend fun searchArtists(keyword: String, page: Int, size: Int = 20): Result<PageResult<Artist>> {
         return try {
             val response = api.searchArtists(keyword = keyword, page = page, size = size)
-            if (response.status == 0 && response.data != null) {
+            if (response.code == 0 && response.data != null) {
                 val pageData = response.data!!
                 val total = pageData.pagination.total
                 val hasMore = (page * size) < total
@@ -130,7 +130,7 @@ class SearchRepository @Inject constructor(
     suspend fun searchUsers(keyword: String, page: Int, size: Int = 20): Result<PageResult<UserInfo>> {
         return try {
             val response = api.searchUsers(keyword = keyword, page = page, size = size)
-            if (response.status == 0 && response.data != null) {
+            if (response.code == 0 && response.data != null) {
                 val pageData = response.data!!
                 val total = pageData.pagination.total
                 val hasMore = (page * size) < total

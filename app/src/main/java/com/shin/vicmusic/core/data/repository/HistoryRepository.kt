@@ -13,7 +13,7 @@ class HistoryRepository @Inject constructor(
 ) {
     suspend fun getHistory(): Result<List<Song>> {
         val res = datasource.getHistory()
-        if (res.status == 0) {
+        if (res.code == 0) {
             val list = res.data?.map { it.toDomain() } ?: emptyList()
             return Result.Success(list)
         }

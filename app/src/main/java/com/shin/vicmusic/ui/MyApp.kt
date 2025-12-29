@@ -86,7 +86,7 @@ fun MyApp() {
     val isSplashScreen = currentRoute == SPLASH_ROUTE
     val isSongDetail = currentRoute?.contains("songDetail") == true
     val isVipScreen= currentRoute == VIP_ROUTE
-    val showBottomContainer = !isSplashScreen&&!isSongDetail&&!isVipScreen
+    val showBottomContainer = currentRoute != null && !isSplashScreen && !isSongDetail && !isVipScreen
 
     val playQueue by playerManager.playbackQueue.collectAsState()
     val currentQueueIndex by playerManager.currentQueueIndex.collectAsState()

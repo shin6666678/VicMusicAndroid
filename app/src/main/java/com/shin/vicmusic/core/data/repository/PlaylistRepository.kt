@@ -17,7 +17,7 @@ class PlaylistRepository @Inject constructor(
 
     suspend fun getMyPlaylists(): Result<List<Playlist>> {
         val resp = datasource.getMyPlaylists()
-        return if (resp.status == 0) {
+        return if (resp.code == 0) {
             val domainList = resp.data?.map { it.toDomain() } ?: emptyList()
             Result.Success(domainList)
         } else {
@@ -26,7 +26,7 @@ class PlaylistRepository @Inject constructor(
     }
     suspend fun getPublicPlaylists(): Result<NetworkPageData<Playlist>> {
         val resp = datasource.getPublicPlaylists()
-        return if (resp.status == 0 && resp.data != null) {
+        return if (resp.code == 0 && resp.data != null) {
             val dtoList = resp.data.list ?: emptyList()
             val domainList=dtoList.map { it.toDomain() }
             val domainData=NetworkPageData(
@@ -41,7 +41,7 @@ class PlaylistRepository @Inject constructor(
 
     suspend fun getPlaylistDetail(id: String): Result<PlaylistDetail> {
         val resp = datasource.getPlaylistDetail(id)
-        return if (resp.status == 0 && resp.data != null) {
+        return if (resp.code == 0 && resp.data != null) {
             Result.Success(resp.data.toDomain())
         } else {
             Result.Error(resp.message ?: "获取详情失败")
@@ -50,38 +50,38 @@ class PlaylistRepository @Inject constructor(
 
     suspend fun addSongToPlaylist(playlistId: String, songId: String): Result<Unit> {
         val resp = datasource.addSongToPlaylist(playlistId, songId)
-        return if (resp.status == 0) Result.Success(Unit) else Result.Error(
+        return if (resp.code == 0) Result.Success(Unit) else Result.Error(
             resp.message ?: "添加失败"
         )
     }
 
     suspend fun removeSongFromPlaylist(playlistId: String, songId: String): Result<Unit> {
         val resp = datasource.removeSongFromPlaylist(playlistId, songId)
-        return if (resp.status == 0) Result.Success(Unit) else Result.Error(
+        return if (resp.code == 0) Result.Success(Unit) else Result.Error(
             resp.message ?: "移除失败"
         )
     }
 
     suspend fun deletePlaylist(id: String): Result<Unit> {
         val resp = datasource.deletePlaylist(id)
-        return if (resp.status == 0) Result.Success(Unit) else Result.Error(
+        return if (resp.code == 0) Result.Success(Unit) else Result.Error(
             resp.message ?: "删除失败"
         )
     }
 
     suspend fun addPlaylist(name: String, description: String?, cover: File?): Result<Unit> {
         val resp = datasource.addPlaylist(name, description, cover)
-        return if (resp.status == 0) Result.Success(Unit) else Result.Error(resp.message ?: "创建失败")
+        return if (resp.code == 0) Result.Success(Unit) else Result.Error(resp.message ?: "创建失败")
     }
 
     suspend fun updatePlaylist(id: String, name: String, description: String?, cover: File?): Result<Unit> {
         val resp = datasource.updatePlaylist(id, name, description, cover)
-        return if (resp.status == 0) Result.Success(Unit) else Result.Error(resp.message ?: "更新失败")
+        return if (resp.code == 0) Result.Success(Unit) else Result.Error(resp.message ?: "更新失败")
     }
 
     suspend fun changePublicStatus(id:String):Result<Unit>{
         val resp = datasource.changePublicStatus(id)
-        return if (resp.status == 0) Result.Success(Unit) else Result.Error(resp.message ?: "更新失败")
+        return if (resp.code == 0) Result.Success(Unit) else Result.Error(resp.message ?: "更新失败")
     }
 }
 

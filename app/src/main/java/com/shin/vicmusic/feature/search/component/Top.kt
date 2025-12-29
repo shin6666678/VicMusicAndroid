@@ -1,5 +1,6 @@
 package com.shin.vicmusic.feature.search.component
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,9 +29,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+@Preview
+@Composable
+fun SearchTopBarPreview() {
+    SearchTopBar(
+        searchText = "",
+        onSearchTextChange = {},
+        onBackClick = {},
+        onMicClick = {},
+        onSearch = {},
+        onClear = {}
+    )
+}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchTopBar(
@@ -58,8 +71,7 @@ fun SearchTopBar(
                     value = searchText,
                     onValueChange = onSearchTextChange,
                     modifier = Modifier
-                        .weight(1f)
-                        .height(50.dp),
+                        .weight(1f),
                     placeholder = { Text("搜索歌曲、歌单、歌手...", fontSize = 14.sp) },
                     leadingIcon = {
                         Icon(

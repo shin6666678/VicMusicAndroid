@@ -24,7 +24,7 @@ class AuthRepository @Inject constructor(
     // 获取用户信息(Get User Info)
     suspend fun getUserInfo(): Result<UserInfo> {
         val dtoResponse = datasource.getUserInfo()
-        if(dtoResponse.status == 0 && dtoResponse.data != null){
+        if(dtoResponse.code == 0 && dtoResponse.data != null){
             val domainUser = dtoResponse.data.toDomain()
             return Result.Success(domainUser)
         }
@@ -34,7 +34,7 @@ class AuthRepository @Inject constructor(
     // 修改VIP等级
     suspend fun changeVipLevel(level: Int): Result<Unit> {
         val dtoResponse = datasource.changeVIPLevel(ChangeVIPLevelReq(level))
-        if(dtoResponse.status == 0){
+        if(dtoResponse.code == 0){
             return Result.Success(Unit)
         }
         return Result.Error(dtoResponse.message ?: "修改VIP失败")

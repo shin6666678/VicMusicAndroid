@@ -5,8 +5,6 @@ import com.shin.vicmusic.core.domain.Result
 import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.core.model.request.FollowReq
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,7 +15,7 @@ class UserRepository @Inject constructor(
     //关注/取消关注
     suspend fun follow(targetId:String,targetType:Int):Result<Unit> {
         val dtoResponse = datasource.follow(FollowReq(targetId,targetType))
-        if (dtoResponse.status == 0) {
+        if (dtoResponse.code == 0) {
             return Result.Success(Unit)
         }
         return Result.Error(dtoResponse.message ?: "操作失败")
@@ -25,7 +23,7 @@ class UserRepository @Inject constructor(
 
     suspend fun getFollowedUsers(): Result<List<UserInfo>> {
         val res = datasource.getFollowedUsers()
-        if (res.status == 0) {
+        if (res.code == 0) {
             val list = res.data?.map { it.toDomain() } ?: emptyList()
             return Result.Success(list)
         }
@@ -34,7 +32,7 @@ class UserRepository @Inject constructor(
 
     suspend fun getFans(): Result<List<UserInfo>> {
         val res = datasource.getFans()
-        if (res.status == 0) {
+        if (res.code == 0) {
             val list = res.data?.map { it.toDomain() } ?: emptyList()
             return Result.Success(list)
         }
@@ -44,7 +42,7 @@ class UserRepository @Inject constructor(
     // 签到 (Check-in)
     suspend fun checkIn(): Result<String> {
         val response = datasource.checkIn()
-        return if (response.status == 0) {
+        return if (response.code == 0) {
             // 成功时返回消息 (Return message on success)
             Result.Success(response.data.toString()) // 实际上 data 可能是 null，这里取 msg 更好，但在 Result 封装里通常 Success 携带数据
             // 这里为了简单，我们假设 ViewModel 会重新拉取用户信息
@@ -59,7 +57,7 @@ class UserRepository @Inject constructor(
     // 上报时长 (Report duration)
     suspend fun reportDuration(seconds: Int): Result<Unit> {
         val response = datasource.reportDuration(seconds)
-        return if (response.status == 0) {
+        return if (response.code == 0) {
             Result.Success(Unit)
         } else {
             Result.Error(response.message?:"上报时长失败")

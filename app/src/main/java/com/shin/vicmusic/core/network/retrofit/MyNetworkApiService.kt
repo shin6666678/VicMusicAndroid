@@ -4,6 +4,7 @@ import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.model.api.AlbumDetailResp
 import com.shin.vicmusic.core.model.api.AlbumDto
 import com.shin.vicmusic.core.model.api.AppUpdateDto
+import com.shin.vicmusic.core.model.api.ArtistDetailResp
 import com.shin.vicmusic.core.model.api.ArtistDto
 import com.shin.vicmusic.core.model.api.PlaylistDetailDto
 import com.shin.vicmusic.core.model.api.PlaylistDto
@@ -105,8 +106,12 @@ interface MyNetworkApiService {
         @Query(value = "style") style: String
     ): NetworkResponse<NetworkPageData<ArtistDto>>
 
-    @GET("/api/artist/v1/{id}")
-    suspend fun getArtistById(@Path(value = "id") id: String): NetworkResponse<ArtistDto>
+    @GET("/api/artist/v1/detail")
+    suspend fun getArtistById(
+        @Query("id") id: String,
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): NetworkResponse<ArtistDetailResp>
 
 
     /*
@@ -114,9 +119,9 @@ interface MyNetworkApiService {
     */
     @GET("/api/album/v1/page")
     suspend fun getAlbums(
-        @Query("page") page: Int?=null,
-        @Query("size") size: Int?=null,
-        @Query("artistId") artistId:String?=null,
+        @Query("page") page: Int? = null,
+        @Query("size") size: Int? = null,
+        @Query("artistId") artistId: String? = null,
     ): NetworkResponse<NetworkPageData<AlbumDto>>
 
     @GET("/api/album/v1/detail")
@@ -155,6 +160,7 @@ interface MyNetworkApiService {
      */
     @GET("/api/playlist/v1/my")
     suspend fun getMyPlaylists(): NetworkResponse<List<PlaylistDto>>
+
     @GET("/api/playlist/v1/public")
     suspend fun getPublicPlaylists(): NetworkResponse<NetworkPageData<PlaylistDto>>
 
