@@ -63,10 +63,17 @@ fun ArtistDetailScreenPreview() {
 fun ArtistDetailRoute(
     viewModel: ArtistDetailViewModel = hiltViewModel(),
 ) {
+    // 1. 这里已经收集了 Flow，uiState 是最新的数据对象 (ArtistDetailUiState)
+    val uiState by viewModel.uiState.collectAsState()
+
     val playerManager = LocalPlayerManager.current
-    val artist by viewModel.artist.collectAsState()
-    val songs by viewModel.songs.collectAsState()
     val navController = LocalNavController.current
+
+    // 2. 错误点修复：直接读取属性，不需要 'by' 也不需要 'collectAsState'
+    val artist = uiState.artist
+    val songs = uiState.songs
+
+    // 3. 判空并显示界面
     artist?.let {
         ArtistDetailScreen(
             artist = it,

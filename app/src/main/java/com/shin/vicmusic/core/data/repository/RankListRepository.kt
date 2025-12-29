@@ -16,7 +16,7 @@ class RankListRepository @Inject constructor(
     // 获取排行榜数据
     suspend fun getRankListPeeks(): Result<List<RankListPeak>> {
         val response = datasource.getRankListPeeks()
-        if (response.status == 0 && response.data != null) {
+        if (response.code == 0 && response.data != null) {
             return Result.Success(response.data.map { it.toDomain() })
         }
         return Result.Error(response.message ?: "获取榜单失败")
@@ -25,7 +25,7 @@ class RankListRepository @Inject constructor(
     // 获取排行榜详情
     suspend fun getRankListById(id: String): Result<RankListDetail> {
         val response = datasource.rankListDetail(id)
-        if (response.status == 0 && response.data != null) {
+        if (response.code == 0 && response.data != null) {
             return Result.Success(response.data.toDomain())
         }
         return Result.Error(response.message ?: "请求失败(Request Failed)")

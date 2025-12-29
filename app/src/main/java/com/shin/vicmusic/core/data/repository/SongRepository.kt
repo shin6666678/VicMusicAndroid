@@ -4,16 +4,11 @@ import com.shin.vicmusic.core.data.mapper.toDomain
 import com.shin.vicmusic.core.domain.RecommendCard
 import com.shin.vicmusic.core.domain.Result
 import com.shin.vicmusic.core.domain.Song
-import com.shin.vicmusic.core.model.api.RecommendCardDto
 import com.shin.vicmusic.core.model.api.SongListItemDto
 import com.shin.vicmusic.core.model.request.SongPageReq
 import com.shin.vicmusic.core.model.response.NetworkPageData
 import com.shin.vicmusic.core.network.datasource.MyMockDatasource
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -26,7 +21,7 @@ class SongRepository @Inject constructor(
         val dtoResponse = datasource.songs(pageReq)
 
         // 如果成功，进行数据转换
-        if (dtoResponse.status == 0 && dtoResponse.data != null) {
+        if (dtoResponse.code == 0 && dtoResponse.data != null) {
             val dtoList = dtoResponse.data.list ?: emptyList()
             // 使用 Mapper 扩展函数转换
             val domainList = dtoList.map { it.toDomain() }
@@ -45,7 +40,7 @@ class SongRepository @Inject constructor(
     suspend fun getSongDetail(id: String): Result<Song> {
         val dtoResponse = datasource.songDetail(id)
 
-        if (dtoResponse.status == 0 && dtoResponse.data != null) {
+        if (dtoResponse.code == 0 && dtoResponse.data != null) {
             return Result.Success(dtoResponse.data.toDomain())
         }
         return Result.Error(dtoResponse.message ?: "未知错误")
@@ -60,7 +55,7 @@ class SongRepository @Inject constructor(
      */
     suspend fun getDailyRecommendSongs(): Result<List<SongListItemDto>> {
         val response = datasource.getDailyRecommendSongs()
-        return if (response.status == 0 && response.data != null) {
+        return if (response.code == 0 && response.data != null) {
             Result.Success(response.data)
         } else {
             Result.Error(response.message ?: "未知错误")
@@ -70,7 +65,7 @@ class SongRepository @Inject constructor(
     suspend fun getAlsoListening(): Result<RecommendCard> {
         val response = datasource.getAlsoListening()
         // 2. 判断并转换
-        return if (response.status == 0 && response.data != null) {
+        return if (response.code == 0 && response.data != null) {
             val domainData = response.data.toDomain()
             Result.Success(domainData)
         } else {

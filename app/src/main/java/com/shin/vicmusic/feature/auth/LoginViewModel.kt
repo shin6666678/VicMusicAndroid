@@ -8,7 +8,6 @@ import com.shin.vicmusic.core.data.repository.AuthRepository
 import com.shin.vicmusic.core.manager.AuthManager
 import com.shin.vicmusic.core.manager.TokenManager
 import com.shin.vicmusic.core.model.request.UserLoginReq
-import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -53,7 +52,7 @@ class LoginViewModel @Inject constructor(
                 val req = UserLoginReq(mail = _mail.value, pwd = _password.value)
                 val response = authRepository.login(req)
 
-                if (response.status == 0) { // 假设 0 是成功码，请根据实际后端调整
+                if (response.code == 0) { // 假设 0 是成功码，请根据实际后端调整
                     val token = response.data.toString()
                     AppGlobalData.token = token
                     // [修改2] 持久化保存 Token

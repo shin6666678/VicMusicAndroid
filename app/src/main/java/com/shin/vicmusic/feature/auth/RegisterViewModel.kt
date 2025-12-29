@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.AuthRepository
 import com.shin.vicmusic.core.model.request.UserRegisterReq
-import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -78,7 +77,7 @@ class RegisterViewModel @Inject constructor(
         viewModelScope.launch {
             Log.d(TAG, "发送验证码: ${mail},${code}")
             val sendMailCodeResult = authRepository.mailCode(mail, code)
-            _sendEmailCodeStatus.value = sendMailCodeResult.status == 0
+            _sendEmailCodeStatus.value = sendMailCodeResult.code == 0
         }
     }
 
@@ -95,7 +94,7 @@ class RegisterViewModel @Inject constructor(
                     code = mailCode,
                 )
             )
-            _sendEmailCodeStatus.value = sendMailCodeResult.status == 0
+            _sendEmailCodeStatus.value = sendMailCodeResult.code == 0
         }
     }
 }

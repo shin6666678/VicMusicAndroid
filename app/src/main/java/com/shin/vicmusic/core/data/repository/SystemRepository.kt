@@ -31,7 +31,7 @@ class SystemRepository @Inject constructor(
         val currentCode = getCurrentVersionCode()
         // 调用 Datasource
         val resp = datasource.checkUpdate(currentCode)
-        return if (resp.status == 0 && resp.data != null) {
+        return if (resp.code == 0 && resp.data != null) {
             Result.Success(resp.data)
         } else {
             Result.Error(resp.message ?: "Check update failed")

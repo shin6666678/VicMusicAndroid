@@ -1,15 +1,9 @@
 package com.shin.vicmusic.core.network.datasource
 
-import com.shin.vicmusic.core.data.mapper.toDomain
 import com.shin.vicmusic.core.domain.Artist
-import com.shin.vicmusic.core.domain.PayType
 import com.shin.vicmusic.core.domain.RankListDetail
-import com.shin.vicmusic.core.domain.RankListPeak
 import com.shin.vicmusic.core.domain.Song
-import com.shin.vicmusic.core.model.api.RankListPeakDto
-import com.shin.vicmusic.core.model.api.SongListItemDto
 import com.shin.vicmusic.core.model.response.NetworkPageData
-import com.shin.vicmusic.core.model.response.NetworkPageMeta
 import com.shin.vicmusic.core.model.response.NetworkResponse
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONGS
 import javax.inject.Inject
@@ -48,7 +42,7 @@ class MyMockDatasource @Inject constructor(
         }
 
 
-        return NetworkResponse(status = 0, message = "成功", data = NetworkPageData(filteredData))
+        return NetworkResponse(code = 0, message = "成功", data = NetworkPageData(filteredData))
     }
 
     fun getArtistById(artistId: String): NetworkResponse<Artist>{
@@ -70,18 +64,18 @@ class MyMockDatasource @Inject constructor(
                 image = "https://example.com/jj_lin.jpg",
             )
          }
-        return NetworkResponse(status = 0, message = "成功", data = artist)
+        return NetworkResponse(code = 0, message = "成功", data = artist)
     }
 
     fun getSongsByArtistId(artistId: String): NetworkResponse<List<Song>>{
         val songs = SONGS
-        return NetworkResponse(status = 0, message = "成功", data = songs)
+        return NetworkResponse(code = 0, message = "成功", data = songs)
     }
 
     fun getRankListById(id: String): NetworkResponse<RankListDetail> {
         return when (id) {
             "1" -> NetworkResponse(
-                status = 0,
+                code = 0,
                 message = "成功",
                 data = RankListDetail(
                     id = "1",
@@ -91,7 +85,7 @@ class MyMockDatasource @Inject constructor(
                 )
             )
             else -> NetworkResponse(
-                status = 0,
+                code = 0,
                 message = "成功",
                 data = RankListDetail(
                     id = "2",

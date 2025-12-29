@@ -1,8 +1,7 @@
-// 文件路径: app/src/main/java/com/shin/vicmusic/feature/splash/SplashRoute.kt
 package com.shin.vicmusic.feature.splash
 
-import android.content.Intent
-import android.net.Uri
+// import android.content.Intent // [移除] 不需要 Intent 了
+// import android.net.Uri // [移除] 不需要 Uri 了
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -41,8 +40,6 @@ fun SplashRoute(
     viewModel: SplashViewModel = hiltViewModel(),
 ) {
     val navController = LocalNavController.current
-    val context = LocalContext.current
-
     val timeLeft by viewModel.timeLeft.collectAsStateWithLifecycle()
     val navigateToMain by viewModel.navigateToMain.collectAsState()
     val updateInfo by viewModel.updateState.collectAsStateWithLifecycle()
@@ -67,12 +64,8 @@ fun SplashRoute(
         else if (updateInfo != null) {
             UpdateDialog(
                 updateInfo = updateInfo!!,
-                onUpdate = { url ->
-                    // 跳转浏览器下载
-                    if (!url.isNullOrEmpty()) {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                        context.startActivity(intent)
-                    }
+                onUpdate = { _ ->
+                    viewModel.onConfirmUpdate()
                 },
                 onCancel = {
                     // 暂不更新 -> 进入主页

@@ -45,8 +45,6 @@ class AlbumDetailViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            // 假设 Repository 返回的是 Result<AlbumDetail> (包含 album 和 songs)
-            // 或者是你之前定义的 Domain Model
             val result = albumRepository.getAlbumDetail(AlbumDetailReq(id=albumId))
 
             _uiState.update { state ->

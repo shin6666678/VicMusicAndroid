@@ -29,3 +29,9 @@ data class ArtistPageReq(
     val type:String="全部",
     val style:String="全部"
 )
+@Serializable
+data class ArtistDetailReq(
+    val id: String,
+    val page: Int = 1,
+    val size: Int = 20
+)

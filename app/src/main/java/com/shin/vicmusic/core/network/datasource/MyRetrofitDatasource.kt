@@ -5,6 +5,7 @@ import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.model.api.AlbumDetailResp
 import com.shin.vicmusic.core.model.api.AlbumDto
 import com.shin.vicmusic.core.model.api.AppUpdateDto
+import com.shin.vicmusic.core.model.api.ArtistDetailResp
 import com.shin.vicmusic.core.model.api.ArtistDto
 import com.shin.vicmusic.core.model.api.PlaylistDetailDto
 import com.shin.vicmusic.core.model.api.PlaylistDto
@@ -16,6 +17,7 @@ import com.shin.vicmusic.core.model.api.SongListItemDto
 import com.shin.vicmusic.core.model.api.UserInfoDto
 import com.shin.vicmusic.core.model.request.AlbumDetailReq
 import com.shin.vicmusic.core.model.request.AlbumPageReq
+import com.shin.vicmusic.core.model.request.ArtistDetailReq
 import com.shin.vicmusic.core.model.request.ArtistPageReq
 import com.shin.vicmusic.core.model.request.ChangeVIPLevelReq
 import com.shin.vicmusic.core.model.request.FollowReq
@@ -54,11 +56,11 @@ class MyRetrofitDatasource @Inject constructor(
         val resp = try {
             call()
         } catch (e: IOException) {
-            NetworkResponse(status = -1, message = "网络连接失败: ${e.message}", data = null)
+            NetworkResponse(code = -1, message = "网络连接失败: ${e.message}", data = null)
         } catch (e: HttpException) {
-            NetworkResponse(status = e.code(), message = "HTTP 错误: ${e.message()}", data = null)
+            NetworkResponse(code = e.code(), message = "HTTP 错误: ${e.message()}", data = null)
         } catch (e: Exception) {
-            NetworkResponse(status = -99, message = "未知错误: ${e.message}", data = null)
+            NetworkResponse(code = -99, message = "未知错误: ${e.message}", data = null)
         }
         Log.d("HTTPPPPPPPP", resp.toString())
         return resp as NetworkResponse<T>
@@ -85,15 +87,16 @@ class MyRetrofitDatasource @Inject constructor(
     suspend fun getUserInfo(): NetworkResponse<UserInfoDto> {
         return safeApiCall { service.getUserInfo() }
     }
-    suspend fun checkIn() :NetworkResponse<String>{
-        return safeApiCall { service.checkIn()}
+
+    suspend fun checkIn(): NetworkResponse<String> {
+        return safeApiCall { service.checkIn() }
     }
 
-    suspend fun reportDuration(seconds: Int):NetworkResponse<Unit> {
+    suspend fun reportDuration(seconds: Int): NetworkResponse<Unit> {
         return safeApiCall { service.reportDuration(seconds) }
     }
 
-    suspend fun changeVIPLevel(req:ChangeVIPLevelReq=ChangeVIPLevelReq()): NetworkResponse<Unit> {
+    suspend fun changeVIPLevel(req: ChangeVIPLevelReq = ChangeVIPLevelReq()): NetworkResponse<Unit> {
         return safeApiCall { service.changeVIPLevel(req) }
     }
 
@@ -115,7 +118,7 @@ class MyRetrofitDatasource @Inject constructor(
     suspend fun songDetail(@Query(value = "id") id: String): NetworkResponse<SongDetailDto> {
         return safeApiCall { service.songDetail(id) }
     }
-    
+
     suspend fun playSong(id: String): NetworkResponse<Unit> {
         return safeApiCall { service.playSong(id) }
     }
@@ -138,8 +141,14 @@ class MyRetrofitDatasource @Inject constructor(
         }
     }
 
-    suspend fun getArtistById(artistId: String): NetworkResponse<ArtistDto> {
-        return safeApiCall { service.getArtistById(artistId) }
+    suspend fun getArtistById(artistDetailReq: ArtistDetailReq): NetworkResponse<ArtistDetailResp> {
+        return safeApiCall {
+            service.getArtistById(
+                id = artistDetailReq.id,
+                page = artistDetailReq.page,
+                size = artistDetailReq.size
+            )
+        }
     }
 
     /*
@@ -186,7 +195,7 @@ class MyRetrofitDatasource @Inject constructor(
         return safeApiCall { service.follow(followReq) }
     }
 
-    suspend fun getFollowedUsers() =service.getFollowedUsers()
+    suspend fun getFollowedUsers() = service.getFollowedUsers()
 
     suspend fun getFollowedArtists() = service.getFollowedArtists()
 
@@ -199,6 +208,7 @@ class MyRetrofitDatasource @Inject constructor(
     suspend fun getRankListPeeks(): NetworkResponse<List<RankListPeakDto>> {
         return safeApiCall { service.getRankListPeeks() }
     }
+
     suspend fun rankListDetail(id: String): NetworkResponse<RankListDetailDto> {
         return safeApiCall { service.rankListDetail(id) }
     }
@@ -210,6 +220,7 @@ class MyRetrofitDatasource @Inject constructor(
     suspend fun getMyPlaylists(): NetworkResponse<List<PlaylistDto>> {
         return safeApiCall { service.getMyPlaylists() }
     }
+
     suspend fun getPublicPlaylists(): NetworkResponse<NetworkPageData<PlaylistDto>> {
         return safeApiCall { service.getPublicPlaylists() }
     }
@@ -230,7 +241,11 @@ class MyRetrofitDatasource @Inject constructor(
         return safeApiCall { service.deletePlaylist(id) }
     }
 
-    suspend fun addPlaylist(name: String, description: String?, cover: File?): NetworkResponse<Unit> {
+    suspend fun addPlaylist(
+        name: String,
+        description: String?,
+        cover: File?
+    ): NetworkResponse<Unit> {
         val nameBody = name.toRequestBody("text/plain".toMediaTypeOrNull())
         val descBody = description?.toRequestBody("text/plain".toMediaTypeOrNull())
         val coverPart = cover?.let {
@@ -240,7 +255,12 @@ class MyRetrofitDatasource @Inject constructor(
         return safeApiCall { service.addPlaylist(nameBody, descBody, coverPart) }
     }
 
-    suspend fun updatePlaylist(id: String, name: String, description: String?, cover: File?): NetworkResponse<Unit> {
+    suspend fun updatePlaylist(
+        id: String,
+        name: String,
+        description: String?,
+        cover: File?
+    ): NetworkResponse<Unit> {
         val idBody = id.toRequestBody("text/plain".toMediaTypeOrNull())
         val nameBody = name.toRequestBody("text/plain".toMediaTypeOrNull())
         val descBody = description?.toRequestBody("text/plain".toMediaTypeOrNull())
@@ -251,26 +271,27 @@ class MyRetrofitDatasource @Inject constructor(
         return safeApiCall { service.updatePlaylist(idBody, nameBody, descBody, coverPart) }
     }
 
-    suspend fun changePublicStatus( id : String):NetworkResponse<Unit> {
+    suspend fun changePublicStatus(id: String): NetworkResponse<Unit> {
         return safeApiCall { service.changePublicStatus(id) }
     }
+
     /*
     history历史记录
      */
-    suspend fun getHistory() = safeApiCall { service.getHistory()}
+    suspend fun getHistory() = safeApiCall { service.getHistory() }
 
     /*
     Recommend推荐
      */
-    suspend fun getDailyRecommendSongs() : NetworkResponse<List<SongListItemDto>>{
+    suspend fun getDailyRecommendSongs(): NetworkResponse<List<SongListItemDto>> {
         return service.getDailyRecommendSongs()
     }
 
-    suspend fun getAlsoListening() : NetworkResponse<RecommendCardDto>{
-        return safeApiCall { service.getAlsoListening()}
+    suspend fun getAlsoListening(): NetworkResponse<RecommendCardDto> {
+        return safeApiCall { service.getAlsoListening() }
     }
 
-    suspend fun checkUpdate(currentCode: Int) : NetworkResponse<AppUpdateDto>{
-        return safeApiCall {  service.checkUpdate(currentCode)}
+    suspend fun checkUpdate(currentCode: Int): NetworkResponse<AppUpdateDto> {
+        return safeApiCall { service.checkUpdate(currentCode) }
     }
 }

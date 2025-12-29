@@ -14,3 +14,8 @@ data class Artist(
     val type: String = "全部",
     val style: String = "全部"
 )
+@Serializable
+data class ArtistDetail(
+    val artist: Artist,
+    val songs: PageResult<Song>
+)

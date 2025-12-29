@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.SystemRepository
 import com.shin.vicmusic.core.manager.VersionManager
 import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.manager.ApkInstaller
 import com.shin.vicmusic.core.model.api.AppUpdateDto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class SplashViewModel @Inject constructor(
     private val systemRepository: SystemRepository,
-    private val versionManager: VersionManager
+    private val versionManager: VersionManager,
+    private val apkInstaller: ApkInstaller
 ) : ViewModel() {
 
     private val _timeLeft = MutableStateFlow(0L)
@@ -110,5 +112,19 @@ class SplashViewModel @Inject constructor(
     fun onIgnoreUpdate() {
         _updateState.value = null
         toNext() // 直接进入
+    }
+
+    fun onConfirmUpdate() {
+        // 获取当前的更新信息
+        val updateInfo = _updateState.value
+        if (updateInfo?.downloadUrl != null) {
+            // 调用工具类下载
+            apkInstaller.downloadAndInstall(updateInfo.downloadUrl)
+
+            // 如果是强制更新，保持弹窗不关闭；如果是非强制，可以关闭弹窗或显示下载中
+            if (!updateInfo.isForce) {
+                // _updateState.value = null // 可选：关闭弹窗
+            }
+        }
     }
 }
