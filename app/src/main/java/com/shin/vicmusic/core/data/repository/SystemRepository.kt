@@ -14,7 +14,7 @@ class SystemRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     // 获取当前APP版本号
-    private fun getCurrentVersionCode(): Int {
+    fun getCurrentVersionCode(): Int {
         return try {
             val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {

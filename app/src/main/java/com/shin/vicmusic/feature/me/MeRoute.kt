@@ -41,6 +41,7 @@ import com.shin.vicmusic.core.domain.Playlist
 import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.feature.auth.navigateToLogin
+import com.shin.vicmusic.feature.checkIn.navigateToCheckIn
 import com.shin.vicmusic.feature.common.CreatePlaylistDialog
 import com.shin.vicmusic.feature.liked.LikedScreen
 import com.shin.vicmusic.feature.liked.navigateToLikedList
@@ -49,6 +50,8 @@ import com.shin.vicmusic.feature.me.component.RecentBar
 import com.shin.vicmusic.feature.me.component.SongListsSection
 import com.shin.vicmusic.feature.me.component.TopNotifyBar
 import com.shin.vicmusic.feature.me.component.UserInfoCard
+import com.shin.vicmusic.feature.me.fanList.navigateToFanList
+import com.shin.vicmusic.feature.me.followList.navigateToFollowList
 import com.shin.vicmusic.feature.me.recentPlay.navigateToRecentPlay
 import com.shin.vicmusic.feature.myInfo.navigateToMyInfo
 import com.shin.vicmusic.feature.playlist.meList.navigateToMyPlaylists
@@ -91,6 +94,13 @@ fun MeRoute(
         recentNum = 2,
         recentIcon = playlists.firstOrNull()?.cover ?: "",
         onRecentOrMoreClick = navController::navigateToRecentPlay
+
+        ,
+        onFollowClick = { navController.navigateToFollowList() },
+        onFansClick = { navController.navigateToFanList() },
+        onLevelClick = { navController.navigateToMyInfo() },
+        onHeardClick = { navController.navigateToRecentPlay() },
+        onCheckInClick = { navController.navigateToCheckIn() }
     )
 }
 
@@ -110,6 +120,13 @@ fun MeScreen(
     recentNum: Int = 0,                      // 最近播放歌曲数量
     recentIcon: String = "",                 // 最近播放歌曲封面
     onRecentOrMoreClick: () -> Unit = {},    // 点击"全部已播"或"更多"
+
+    onFollowClick: () -> Unit = {},
+    onFansClick: () -> Unit = {},
+    onLevelClick:() -> Unit = {},
+    onHeardClick: () -> Unit = {},
+
+    onCheckInClick: () -> Unit = {}
 ) {
 
 
@@ -132,7 +149,12 @@ fun MeScreen(
                 onAvatarClick = onAvatarClick,
                 onVipClick = onVipClick,
                 isLoggedIn = isLoggedIn,
-                user = user
+                user = user,
+                onFollowClick = onFollowClick,
+                onFansClick = onFansClick,
+                onLevelClick = onLevelClick,
+                onHeardClick = onHeardClick,
+                onCheckInClick = onCheckInClick
             )
 
             // Quick Access Icons

@@ -1,3 +1,4 @@
+// 文件路径: app/src/main/java/com/shin/vicmusic/feature/splash/SplashRoute.kt
 package com.shin.vicmusic.feature.splash
 
 import android.content.Intent
@@ -45,6 +46,7 @@ fun SplashRoute(
     val timeLeft by viewModel.timeLeft.collectAsStateWithLifecycle()
     val navigateToMain by viewModel.navigateToMain.collectAsState()
     val updateInfo by viewModel.updateState.collectAsStateWithLifecycle()
+    val releaseNotes by viewModel.releaseNoteState.collectAsStateWithLifecycle()
 
     Box(modifier = Modifier.fillMaxSize()) {
         // 背景页面
@@ -54,8 +56,15 @@ fun SplashRoute(
             onSkipAdClick = viewModel::onSkipAdClick
         )
 
-        // 弹窗逻辑：当有更新信息时显示
-        if (updateInfo != null) {
+        // 优先级1：本次更新内容说明（首次进入时显示）
+        if (releaseNotes != null) {
+            ReleaseNoteDialog(
+                content = releaseNotes!!,
+                onConfirm = viewModel::onReleaseNoteConfirm
+            )
+        }
+        // 优先级2：检查是否有更新的版本（UpdateInfo）
+        else if (updateInfo != null) {
             UpdateDialog(
                 updateInfo = updateInfo!!,
                 onUpdate = { url ->
@@ -127,6 +136,25 @@ fun SplashScreen(
             )
         }
     }
+}
+
+@Composable
+fun ReleaseNoteDialog(
+    content: String,
+    onConfirm: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = { /* 强制用户点击确认，不允许点击外部关闭 */ },
+        title = { Text(text = "更新说明") },
+        text = {
+            Text(text = content)
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(text = "知道了")
+            }
+        }
+    )
 }
 
 @Composable
