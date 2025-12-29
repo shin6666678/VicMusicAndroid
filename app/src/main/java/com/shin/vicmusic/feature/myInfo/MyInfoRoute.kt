@@ -29,7 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.feature.common.MyAsyncImage
-import com.shin.vicmusic.feature.vip.VipIcon
+import com.shin.vicmusic.feature.common.level.VipIcon
 
 @Preview
 @Composable

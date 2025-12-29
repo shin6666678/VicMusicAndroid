@@ -56,7 +56,7 @@ interface MyNetworkApiService {
     suspend fun getUserInfo(): NetworkResponse<UserInfoDto>
 
     @POST("api/user/v1/check_in")
-    suspend fun checkIn(): NetworkResponse<Unit>
+    suspend fun checkIn(): NetworkResponse<String>
 
     // 上报听歌时长(秒)
     @POST("api/user/v1/report_duration")

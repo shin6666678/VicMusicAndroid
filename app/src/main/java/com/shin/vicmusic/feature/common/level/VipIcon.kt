@@ -1,4 +1,4 @@
-package com.shin.vicmusic.feature.vip
+package com.shin.vicmusic.feature.common.level
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,12 +23,6 @@ fun VipIcon(
         vipLevelInt >= 1 -> Triple("VIP $vipLevelInt", Color(0xFFD4AF37), Color.White) // 普通 VIP 金色
         else -> Triple("普通用户", Color.LightGray, Color.White) // 非 VIP 灰色
     }
-
-//    val (vipTagText, vipBgColor, vipTextColor) = when {
-//        vipLevelInt >= 6 -> Triple("VIP $vipLevelInt", Color(0xFF000000), Color(0xFFFFD700)) // 黑金配色
-//        vipLevelInt >= 1 -> Triple("VIP $vipLevelInt", Color(0xFFD4AF37), Color.White) // 普通 VIP 金色
-//        else -> Triple("普通用户", Color.LightGray, Color.White) // 非 VIP 灰色
-//    }
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(4.dp))

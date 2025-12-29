@@ -25,9 +25,9 @@ import com.shin.vicmusic.core.design.theme.SpaceExtraMedium
 import com.shin.vicmusic.core.design.theme.SpaceMedium
 import com.shin.vicmusic.core.design.theme.SpaceOuter
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
-import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.domain.UserInfo
-import com.shin.vicmusic.feature.vip.VipIcon
+import com.shin.vicmusic.feature.common.level.UserLevelIcon
+import com.shin.vicmusic.feature.common.level.VipIcon
 import com.shin.vicmusic.util.ResourceUtil
 
 @Composable
@@ -66,14 +66,7 @@ fun UserGreeting(
             )
             Spacer(modifier = Modifier.width(SpaceExtraMedium))
             // Another badge - Simplified
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(Color.LightGray)
-                    .padding(horizontal = 6.dp, vertical = 2.dp)
-            ) {
-                Text(text = "LV1", style = MaterialTheme.typography.labelSmall, color = Color.DarkGray)
-            }
+            UserLevelIcon(user.level)
         }
         Spacer(modifier = Modifier.weight(1f)) // Pushes content to the right
         Text(

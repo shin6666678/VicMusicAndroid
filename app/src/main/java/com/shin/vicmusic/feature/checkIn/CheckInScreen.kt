@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.feature.common.CommonTopBar
 
 @Preview
@@ -37,6 +38,7 @@ fun CheckInRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val currentUser by viewModel.currentUser.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val navController= LocalNavController.current
 
     LaunchedEffect(uiState) {
         when (val state = uiState) {
@@ -55,7 +57,8 @@ fun CheckInRoute(
     CheckInScreen(
         onCheckInClick = viewModel::checkIn,
         points = currentUser?.points ?: 0,
-        isLoading = uiState is CheckInUiState.Loading
+        isLoading = uiState is CheckInUiState.Loading,
+        onBackClick = navController::popBackStack
     )
 }
 
