@@ -1,20 +1,23 @@
 package com.shin.vicmusic.feature.common
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -26,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,65 +41,91 @@ import com.shin.vicmusic.core.domain.Album
 import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.domain.PayType
 import com.shin.vicmusic.core.domain.Song
-import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONG
+import com.shin.vicmusic.feature.common.icon.PayTypeIcon
+import com.shin.vicmusic.feature.common.icon.PlayCountIcon
+import com.shin.vicmusic.feature.common.sheet.PlaylistSelectionSheet
+import com.shin.vicmusic.feature.common.sheet.SongActionSheet
 import com.shin.vicmusic.feature.playlist.meList.PlaylistViewModel
-import com.shin.vicmusic.feature.songAuth.PayTypeIcon
 
 // 1. 对外使用的有状态组件 (Stateful)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemSong(
     song: Song,
     modifier: Modifier = Modifier,
-    viewModel: PlaylistViewModel = hiltViewModel()
+    viewModel: PlaylistViewModel = hiltViewModel(),
+    showPlayCount: Boolean = false,
+    showDeleteFromPlaylist: Boolean = false,
+    onDeleteClick: () -> Unit = {}
 ) {
     val playerManager = LocalPlayerManager.current
     val actionManager = LocalSongActionManager.current
+
+    // 状态管理：控制两个弹窗的显示
     var showPlaylistSheet by remember { mutableStateOf(false) }
+    var showMoreSheet by remember { mutableStateOf(false) }
 
-    if (showPlaylistSheet) {
-        val playlists by viewModel.playlists.collectAsState()
-        LaunchedEffect(Unit) { viewModel.fetchMyPlaylists() }
+    val playlists by viewModel.playlists.collectAsState()
 
-        ModalBottomSheet(onDismissRequest = { showPlaylistSheet = false }) {
-            LazyColumn(contentPadding = PaddingValues(16.dp)) {
-                item {
-                    Text("收藏到歌单(Add to Playlist)", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(bottom = 12.dp))
-                }
-                items(playlists) { playlist ->
-                    ItemPlaylist(playlist = playlist, onClick = {
-                        viewModel.addSongToPlaylist(playlist.id, song.id)
-                        showPlaylistSheet = false
-                    })
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-            }
+    LaunchedEffect(Unit) {
+        if (playlists.isEmpty()) {
+            viewModel.fetchMyPlaylists()
         }
     }
 
+    // 更多操作弹窗逻辑
+    if (showMoreSheet) {
+        SongActionSheet(
+            song = song,
+            onDismissRequest = { showMoreSheet = false },
+            onAddToQueueClick = {
+                playerManager.addSongToQueue(song)
+                showMoreSheet = false
+            },
+            onAddToPlaylistClick = {
+                showMoreSheet = false
+                showPlaylistSheet = true
+            },
+            showDeleteFromPlaylist = showDeleteFromPlaylist,
+            onDeleteClick = {
+                showMoreSheet = false
+                onDeleteClick()
+            },
+
+        )
+    }
+
+    // 歌单选择弹窗逻辑
+    if (showPlaylistSheet) {
+        PlaylistSelectionSheet(
+            playlists = playlists,
+            onDismissRequest = { showPlaylistSheet = false },
+            onPlaylistSelected = { playlist ->
+                viewModel.addSongToPlaylist(playlist.id, song.id)
+            }
+        )
+    }
+
+    // C. 核心列表项 UI (纯展示)
     ItemSongContent(
         song = song,
         modifier = modifier,
         onPlayClick = { playerManager.playSong(song) },
         onLikeClick = { actionManager.toggleLike(song) },
-        onAddToQueueClick = { playerManager.addSongToQueue(song) },
-        onAddToPlaylistClick = { showPlaylistSheet = true }
+        // 点击"更多"图标时，只负责改变状态
+        onMoreClick = { showMoreSheet = true },
+        showPlayCount = showPlayCount
     )
 }
 
-// 2. 纯 UI 组件 (Stateless) - 供预览和ItemSong调用
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemSongContent(
     song: Song,
     modifier: Modifier = Modifier,
-    onPlayClick: () -> Unit={},
-    onLikeClick: () -> Unit={},
-    onAddToQueueClick: () -> Unit={},
-    onAddToPlaylistClick: () -> Unit={}
+    onPlayClick: () -> Unit = {},
+    onLikeClick: () -> Unit = {},
+    onMoreClick: () -> Unit = {},
+    showPlayCount: Boolean = false,
 ) {
-    var showSheet by remember { mutableStateOf(false) } // 控制弹窗显示(Show Sheet)
-
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -125,7 +153,6 @@ fun ItemSongContent(
             )
             Spacer(modifier = Modifier.height(2.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                PayTypeIcon(song = song)
                 Text(
                     text = "${song.artist.name} - ${song.album.title}",
                     style = MaterialTheme.typography.bodySmall,
@@ -133,6 +160,9 @@ fun ItemSongContent(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
+                PayTypeIcon(song = song)
+                if (showPlayCount)
+                    PlayCountIcon(playCount = song.playCount)
             }
         }
 
@@ -148,89 +178,46 @@ fun ItemSongContent(
                     modifier = Modifier.size(20.dp)
                 )
             }
-            // 点击触发底部弹窗
-            IconButton(onClick = { showSheet = true }, modifier = Modifier.size(32.dp)) {
-                Icon(Icons.Default.MoreVert, "更多(More)", tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f), modifier = Modifier.size(20.dp))
-            }
-        }
-    }
-
-    if (showSheet) {
-        ModalBottomSheet(onDismissRequest = { showSheet = false }, containerColor = Color.White) {
-            Column(modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp)) {
-                // 1. 顶部歌曲信息(Header Info)
-                Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    MyAsyncImage(model = song.icon, modifier = Modifier.size(50.dp).clip(RoundedCornerShape(4.dp)))
-                    Spacer(Modifier.width(12.dp))
-                    Column {
-                        Text(" ${song.title}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        Text(song.artist.name, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
-                    }
-                }
-                HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray.copy(alpha = 0.5f))
-
-                // 2. 功能图标网格(Action Grid)
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 20.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    BottomSheetActionItem(Icons.Default.PlayArrow, "下一首播放",
-                        modifier = Modifier.clickable {
-                            showSheet = false
-                            onAddToQueueClick()
-                        })
-                    BottomSheetActionItem(Icons.Default.FavoriteBorder, "收藏")
-                    BottomSheetActionItem(Icons.Default.Add, "加入歌单",
-                        modifier = Modifier.clickable {
-                            showSheet = false // 关闭当前菜单
-                            onAddToPlaylistClick() // 触发歌单选择弹窗
-                        })
-                    BottomSheetActionItem(Icons.Default.Share, "分享")
-                    BottomSheetActionItem(Icons.Default.ArrowDropDown, "下载")
-                }
-
-                // 3. 列表选项(List Options)
-                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                    Text("设置铃声", modifier = Modifier.padding(vertical = 12.dp).fillMaxWidth())
-                    Text("单曲购买", modifier = Modifier.padding(vertical = 12.dp).fillMaxWidth())
-                }
+            // 点击触发回调，由父组件决定怎么处理
+            IconButton(onClick = onMoreClick, modifier = Modifier.size(32.dp)) {
+                Icon(
+                    Icons.Default.MoreVert,
+                    "更多",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                    modifier = Modifier.size(20.dp)
+                )
             }
         }
     }
 }
-// 辅助组件(Helper Composable)
-@Composable
-fun BottomSheetActionItem(icon: ImageVector, text: String, modifier: Modifier = Modifier) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-    ) {
-        Box(
-            modifier = Modifier.size(48.dp).clip(RoundedCornerShape(12.dp)).background(Color(0xFFF5F5F5)),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(icon, null, tint = Color.Black)
-        }
-        Spacer(Modifier.height(8.dp))
-        Text(text, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
-    }
-}
-// 3. 预览时调用 Stateless 组件
+
+
+// 5. 辅助组件 (Helper Composable)
+
+
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
 fun PreView() {
+    val testSong = Song(
+        id = "test_id",
+        title = "测试歌曲",
+        uri = "",
+        icon = "",
+        album = Album("1", "测试专辑"),
+        artist = Artist("1", "测试歌手"),
+        payType = PayType.VIP,
+        genre = "Pop",
+        lyricStyle = 0,
+        lyric = "",
+        playCount = 5
+    )
     VicMusicTheme {
         ItemSongContent(
-            song = SONG.copy(
-                payType = PayType.PAY,
-                title = "这是一首名字非常非常长的歌曲测试溢出效果",
-                artist = Artist("1", "周杰伦"),
-                album = Album("1", "最伟大的作品")
-            ),
+            song = testSong,
             onPlayClick = {},
             onLikeClick = {},
-            onAddToQueueClick = {},
-            onAddToPlaylistClick = {}
+            onMoreClick = {},
+            showPlayCount = true
         )
     }
 }

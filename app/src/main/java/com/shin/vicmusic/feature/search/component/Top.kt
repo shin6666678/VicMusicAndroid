@@ -32,6 +32,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+
 @Preview
 @Composable
 fun SearchTopBarPreview() {
@@ -44,6 +45,7 @@ fun SearchTopBarPreview() {
         onClear = {}
     )
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchTopBar(
@@ -72,7 +74,13 @@ fun SearchTopBar(
                     onValueChange = onSearchTextChange,
                     modifier = Modifier
                         .weight(1f),
-                    placeholder = { Text("搜索歌曲、歌单、歌手...", fontSize = 14.sp) },
+                    placeholder = {
+                        Text(
+                            "搜索歌曲、歌单、歌手...",
+                            fontSize = 14.sp,
+                            maxLines = 1 // 防止提示文案换行
+                        )
+                    },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Search,
@@ -83,7 +91,11 @@ fun SearchTopBar(
                     trailingIcon = {
                         if (searchText.isNotEmpty()) {
                             IconButton(onClick = onClear) {
-                                Icon(Icons.Default.Close, contentDescription = "Clear", tint = Color.Gray)
+                                Icon(
+                                    Icons.Default.Close,
+                                    contentDescription = "Clear",
+                                    tint = Color.Gray
+                                )
                             }
                         } else {
                             IconButton(onClick = onMicClick) {

@@ -50,6 +50,7 @@ import com.shin.vicmusic.feature.main.mainScreen
 import com.shin.vicmusic.feature.me.fanList.fanListScreen
 import com.shin.vicmusic.feature.me.followList.followListScreen
 import com.shin.vicmusic.feature.me.recentPlay.recentPlayScreen
+import com.shin.vicmusic.feature.me.setting.settingScreen
 import com.shin.vicmusic.feature.myInfo.myInfoScreen
 import com.shin.vicmusic.feature.playBackQueue.PlaybackQueueSheet
 import com.shin.vicmusic.feature.playlist.detail.playlistDetailScreen
@@ -135,6 +136,7 @@ fun MyApp() {
             myInfoScreen()
             publicPlaylistScreen()
             checkInScreen()
+            settingScreen()
         }
 
         // 底部整体容器 (SongBar + 导航栏)
@@ -175,7 +177,6 @@ fun MyApp() {
                         song = currentSong!!,
                         playerState = playerState,
                         onTogglePlayPause = playerManager::togglePlayPause,
-                        onLikeClick = { /* Like */ },
                         onPlaylistClick = {showPlaylistSheet=true},
                         onBarClick = { navController.navigateToSongDetail(currentSong!!.id) },
                         modifier = Modifier

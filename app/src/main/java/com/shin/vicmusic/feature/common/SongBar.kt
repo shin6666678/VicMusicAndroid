@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.shin.vicmusic.core.design.composition.LocalSongActionManager
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
 import com.shin.vicmusic.core.domain.PayType
 import com.shin.vicmusic.core.domain.Song
@@ -45,7 +46,7 @@ import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONG // 导入示
 @Composable
 fun SongBarPreView() {
     VicMusicTheme() {
-        SongBar(
+        SongBarScreen(
             song = SONG, // 使用示例歌曲数据
             playerState = PlayerState(
                 isPlaying = false,
@@ -62,6 +63,29 @@ fun SongBarPreView() {
 
 @Composable
 fun SongBar(
+    song: Song?, // 接收 Song 对象
+    playerState: PlayerState,
+    onTogglePlayPause: () -> Unit,
+    onPlaylistClick: () -> Unit,
+    onBarClick: () -> Unit, // 添加整个bar的点击事件
+    modifier: Modifier = Modifier
+) {
+    if(song == null)
+         return
+    val actionManager = LocalSongActionManager.current
+    SongBarScreen(
+        song = song, // 使用接收的 Song 对象
+        playerState = playerState,
+        onTogglePlayPause = onTogglePlayPause,
+        onLikeClick = {actionManager.toggleLike(song)},
+        onPlaylistClick = onPlaylistClick,
+        onBarClick = onBarClick,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun SongBarScreen(
     song: Song?, // 接收 Song 对象
     playerState: PlayerState,
     onTogglePlayPause: () -> Unit,
@@ -118,8 +142,8 @@ fun SongBar(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     // VIP 标签
-                    if(song != null && song.payType != PayType.FREE){
-                        if(song.payType== PayType.VIP){
+                    if (song != null && song.payType != PayType.FREE) {
+                        if (song.payType == PayType.VIP) {
                             Surface(
                                 shape = RoundedCornerShape(4.dp),
                                 color = Color(0xFFD4AF37), // 模拟VIP金色
@@ -133,7 +157,7 @@ fun SongBar(
                                     modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
                                 )
                             }
-                        }else if(song.payType== PayType.PAY){
+                        } else if (song.payType == PayType.PAY) {
                             Surface(
                                 shape = RoundedCornerShape(4.dp),
                                 color = Color(0xFFD4AF37), // 模拟VIP金色
@@ -154,7 +178,7 @@ fun SongBar(
                 }
             }
 
-            // 点赞按钮
+            // 喜欢按钮
             IconButton(onClick = onLikeClick) {
                 Icon(
                     imageVector = Icons.Default.FavoriteBorder,

@@ -56,6 +56,7 @@ fun RecentPlayScreen(
         items(songList) { song ->
             ItemSong(
                 song = song,
+                showPlayCount = true
             )
         }
     }

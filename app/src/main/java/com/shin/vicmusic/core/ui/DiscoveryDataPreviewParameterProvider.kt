@@ -156,6 +156,7 @@ object DiscoveryPreviewParameterData {
             genre = "Classical",
             lyricStyle = 1, // 假设 1 代表“注释样式”
             lyric = "曲式: A-B-A' 三段体; 情绪: 庄重而平和...",
+            isLiked = true
         ),
         // 场景三：无歌词的电子音乐曲目（过渡曲目，lyric为空字符串）
         Song(

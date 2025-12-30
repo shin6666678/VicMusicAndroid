@@ -21,11 +21,13 @@ data class Song (
     val lyricStyle:Int= Constant.VALUE0,
     val lyric:String="",
     val lyricList: List<LyricLine> = emptyList(),
-    val isLiked: Boolean = false,
     val likesCount: Int=0,
     val clicksCount: Int=0,
     val commentsCount: Int=0,
     val uploaderUserId: String="",
+
+    val isLiked: Boolean = false,
+    val playCount:Int=0
 ){
     /**
      * 将 Song 转换为 ExoPlayer 需要的 MediaItem

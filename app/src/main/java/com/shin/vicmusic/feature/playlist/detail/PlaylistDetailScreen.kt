@@ -31,7 +31,10 @@ fun PlaylistDetailRoute(
         PlaylistDetailScreen(
             detail = detail!!,
             onBackClick = navController::popBackStack,
-            onChangePublicStatus = viewModel::changePublicStatus
+            onChangePublicStatus = viewModel::changePublicStatus,
+            onRemoveSong = { songId ->
+                viewModel.removeSongFromPlaylist(songId)
+            }
         )
     } else {
         // Loading state
@@ -45,7 +48,8 @@ fun PlaylistDetailRoute(
 fun PlaylistDetailScreen(
     detail: PlaylistDetail,
     onBackClick: () -> Unit,
-    onChangePublicStatus:(String)->Unit={}
+    onChangePublicStatus: (String) -> Unit = {},
+    onRemoveSong: (String) -> Unit = {} // 新增回调参数
 ) {
     Scaffold(
         topBar = {
@@ -66,13 +70,17 @@ fun PlaylistDetailScreen(
                 PlaySongActionHeader(
                     playListId = detail.info.id,
                     songCount = detail.info.songCount,
-                    onChangePublicStatus=onChangePublicStatus
+                    onChangePublicStatus = onChangePublicStatus
                 )
             }
 
             itemsIndexed(detail.songs) { index, song ->
                 ItemSong(
                     song = song,
+                    // 开启删除选项
+                    showDeleteFromPlaylist = true,
+                    // 传递删除回调
+                    onDeleteClick = { onRemoveSong(song.id) }
                 )
             }
         }

@@ -1,4 +1,4 @@
-package com.shin.vicmusic.feature.common.level
+package com.shin.vicmusic.feature.common.icon
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

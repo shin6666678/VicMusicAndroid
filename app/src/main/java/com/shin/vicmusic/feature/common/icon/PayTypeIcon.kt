@@ -1,4 +1,4 @@
-package com.shin.vicmusic.feature.songAuth
+package com.shin.vicmusic.feature.common.icon
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box

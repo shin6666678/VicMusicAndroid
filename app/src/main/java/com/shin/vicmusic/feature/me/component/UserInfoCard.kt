@@ -40,8 +40,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.shin.vicmusic.R
 import com.shin.vicmusic.core.domain.UserInfo
-import com.shin.vicmusic.feature.common.level.UserLevelIcon
-import com.shin.vicmusic.feature.common.level.VipIcon
+import com.shin.vicmusic.feature.common.icon.UserLevelIcon
+import com.shin.vicmusic.feature.common.icon.VipIcon
 
 @Preview
 @Composable

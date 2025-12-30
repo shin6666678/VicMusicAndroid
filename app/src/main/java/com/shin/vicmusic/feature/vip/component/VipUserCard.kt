@@ -2,7 +2,6 @@ package com.shin.vicmusic.feature.vip.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.shin.vicmusic.R
-import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.feature.vip.VipGold
 import com.shin.vicmusic.feature.vip.VipSubText
@@ -41,14 +39,16 @@ import com.shin.vicmusic.feature.vip.VipSubText
 @Composable
 fun VipUserCardPreview() {
     VipUserCard(
-        user = UserInfo(
-        )
+        user = UserInfo()
     )
 }
+
 @Composable
 fun VipUserCard(
     user: UserInfo?
 ) {
+    val isVip = user?.isVip() == true
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -86,7 +86,12 @@ fun VipUserCard(
                 contentDescription = "Avatar",
                 modifier = Modifier
                     .size(60.dp)
-                    .clip(CircleShape),
+                    .clip(CircleShape)
+                    .border(
+                        width = if (isVip) 2.dp else 0.dp,
+                        color = if (isVip) VipGold else Color.Transparent,
+                        shape = CircleShape
+                    ),
                 placeholder = painterResource(id = R.drawable.ic_launcher),
                 error = painterResource(id = R.drawable.ic_launcher),
                 contentScale = ContentScale.Crop
@@ -98,14 +103,14 @@ fun VipUserCard(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = user?.name ?: "未登录用户",
+                    text = if (isVip) "尊贵的 VIP ${user?.vipLevel ?: 1}" else (user?.name ?: "未登录用户"),
                     color = VipGold,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "开通会员，畅听千万高品质曲库",
+                    text = if (isVip) "您的会员身份正在生效中" else "开通会员，畅听千万高品质曲库",
                     color = VipSubText,
                     fontSize = 12.sp
                 )

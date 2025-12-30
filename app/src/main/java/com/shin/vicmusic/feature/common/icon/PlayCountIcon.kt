@@ -1,5 +1,6 @@
-package com.shin.vicmusic.feature.common.level
+package com.shin.vicmusic.feature.common.icon
 
+import android.R.attr.level
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -11,10 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-
 @Composable
-fun UserLevelIcon(
-    level:Int
+fun PlayCountIcon(
+    playCount:Int
 ){
     Box(
         modifier = Modifier
@@ -22,6 +22,6 @@ fun UserLevelIcon(
             .background(Color.LightGray)
             .padding(horizontal = 6.dp, vertical = 2.dp)
     ) {
-        Text(text = "LV${level}", style = MaterialTheme.typography.labelSmall, color = Color.DarkGray)
+        Text(text = "${playCount} Times", style = MaterialTheme.typography.labelSmall, color = Color.DarkGray)
     }
 }

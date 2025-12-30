@@ -53,6 +53,7 @@ import com.shin.vicmusic.feature.me.component.UserInfoCard
 import com.shin.vicmusic.feature.me.fanList.navigateToFanList
 import com.shin.vicmusic.feature.me.followList.navigateToFollowList
 import com.shin.vicmusic.feature.me.recentPlay.navigateToRecentPlay
+import com.shin.vicmusic.feature.me.setting.navigateToSetting
 import com.shin.vicmusic.feature.myInfo.navigateToMyInfo
 import com.shin.vicmusic.feature.playlist.meList.navigateToMyPlaylists
 import com.shin.vicmusic.feature.vip.navigateToVip
@@ -81,6 +82,8 @@ fun MeRoute(
 
     // 添加 onAvatarClick 参数
     MeScreen(
+        onSettingsClick = navController::navigateToSetting,
+
         onAvatarClick = navController::navigateToMyInfo,
         onLoginClick=navController::navigateToLogin,
         onVipClick = navController::navigateToVip,
@@ -107,6 +110,10 @@ fun MeRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MeScreen(
+    onDrawerClick: () -> Unit = {},
+    onSearchClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {},
+
     onLoginClick: () -> Unit = {},
     onAvatarClick: () -> Unit = {},
     onVipClick: () -> Unit = {},
@@ -132,7 +139,9 @@ fun MeScreen(
 
     Scaffold(
         topBar = {
-            MeTopBar()
+            MeTopBar(
+                onSettingsClick=onSettingsClick
+            )
         }
     ) { paddingValues ->
         Column(
