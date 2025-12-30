@@ -11,14 +11,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -55,6 +61,48 @@ fun SongDetailRoute(
     val playerManager = LocalPlayerManager.current
     val songUiState by viewModel.songUiState.collectAsState()
     val currentPlayingSong by playerManager.currentPlayingSong.collectAsState()
+
+    // 状态：是否显示VIP弹窗
+    var showVipDialog by remember { mutableStateOf(false) }
+
+    // 核心逻辑：监听进入和离开 SongDetail 界面，更新 PlayerManager 中的标志位
+    DisposableEffect(Unit) {
+        playerManager.isSongDetailVisible = true
+        onDispose {
+            playerManager.isSongDetailVisible = false
+        }
+    }
+
+    // 核心逻辑：监听 PlayerManager 发出的事件
+    LaunchedEffect(playerManager.uiEvent) {
+        playerManager.uiEvent.collect { event ->
+            if (event == "SHOW_VIP_DIALOG") {
+                showVipDialog = true
+            }
+        }
+    }
+
+    // 弹窗UI
+    if (showVipDialog) {
+        AlertDialog(
+            onDismissRequest = { showVipDialog = false },
+            title = { Text("VIP 试听结束") },
+            text = { Text("本歌曲为 VIP 专享，试听已结束。请开通 VIP 继续收听。") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showVipDialog = false
+                    // 这里可以添加跳转到VIP购买页面的逻辑
+                }) {
+                    Text("确定")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showVipDialog = false }) {
+                    Text("取消")
+                }
+            }
+        )
+    }
 
     LaunchedEffect(songUiState) {
         if (songUiState is SongUiState.Success) {

@@ -1,9 +1,11 @@
 package com.shin.vicmusic.feature.me
 
+import android.R.attr.bottom
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -142,7 +144,7 @@ fun MeScreen(
             MeTopBar(
                 onSettingsClick=onSettingsClick
             )
-        }
+        },
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -196,7 +198,7 @@ fun MeScreen(
             Spacer(Modifier.height(24.dp))
             SongListsSection(playlists = myPlaylists, onMorePlaylistsClick = onMorePlaylistsClick)
 
-            Spacer(Modifier.height(16.dp)) // Add some space at the bottom of the scrollable content
+            Spacer(Modifier.height(100.dp))
         }
 
     }
