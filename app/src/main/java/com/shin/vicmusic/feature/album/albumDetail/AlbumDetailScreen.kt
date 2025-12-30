@@ -24,9 +24,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
-import com.shin.vicmusic.feature.common.CommonTopBar
+import com.shin.vicmusic.feature.common.bar.CommonTopBar
 import com.shin.vicmusic.feature.common.MyAsyncImage
 import com.shin.vicmusic.feature.common.ItemSong
+import com.shin.vicmusic.feature.common.ItemSongNumbered
 
 @Composable
 fun AlbumDetailRoute(
@@ -95,8 +96,9 @@ fun AlbumDetailScreen(
 
                     // Song List
                     itemsIndexed(uiState.songs) { index, song ->
-                        ItemSong(
+                        ItemSongNumbered(
                             song = song,
+                            num = index,
                         )
                     }
                 }

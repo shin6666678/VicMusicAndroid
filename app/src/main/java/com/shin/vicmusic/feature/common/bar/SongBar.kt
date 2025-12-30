@@ -1,4 +1,4 @@
-package com.shin.vicmusic.feature.common
+package com.shin.vicmusic.feature.common.bar
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -41,6 +41,7 @@ import com.shin.vicmusic.core.domain.PayType
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.manager.PlayerState
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONG // 导入示例歌曲数据
+import com.shin.vicmusic.feature.common.MyAsyncImage
 
 @Preview
 @Composable

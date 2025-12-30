@@ -15,10 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.Song
-import com.shin.vicmusic.feature.common.CommonTopBar
+import com.shin.vicmusic.feature.common.bar.CommonTopBar
 import com.shin.vicmusic.feature.common.ItemSong
 @Preview
 @Composable

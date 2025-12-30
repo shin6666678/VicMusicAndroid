@@ -26,7 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.shin.vicmusic.feature.common.CommonTopBar
+import com.shin.vicmusic.feature.common.bar.CommonTopBar
 import com.shin.vicmusic.feature.common.MyAsyncImage
 
 @Preview

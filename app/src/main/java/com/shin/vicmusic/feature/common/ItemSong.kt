@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,11 +53,28 @@ import com.shin.vicmusic.feature.playlist.meList.PlaylistViewModel
 fun ItemSong(
     song: Song,
     modifier: Modifier = Modifier,
-    viewModel: PlaylistViewModel = hiltViewModel(),
+    //将默认值为 null，以便在逻辑中控制 Hilt 的注入
+    viewModel: PlaylistViewModel? = null,
     showPlayCount: Boolean = false,
     showDeleteFromPlaylist: Boolean = false,
     onDeleteClick: () -> Unit = {}
 ) {
+    // 检查是否处于预览模式 (Preview Mode)
+    if (LocalInspectionMode.current) {
+        // 如果是预览模式，直接渲染纯UI内容，跳过 ViewModel 和 Local 获取
+        ItemSongContent(
+            song = song,
+            modifier = modifier,
+            onPlayClick = {},
+            onLikeClick = {},
+            onMoreClick = {},
+            showPlayCount = showPlayCount
+        )
+        return
+    }
+
+    // 正常模式：获取 ViewModel (如果参数为null则注入) 和 CompositionLocal
+    val actualViewModel = viewModel ?: hiltViewModel()
     val playerManager = LocalPlayerManager.current
     val actionManager = LocalSongActionManager.current
 
@@ -64,11 +82,11 @@ fun ItemSong(
     var showPlaylistSheet by remember { mutableStateOf(false) }
     var showMoreSheet by remember { mutableStateOf(false) }
 
-    val playlists by viewModel.playlists.collectAsState()
+    val playlists by actualViewModel.playlists.collectAsState()
 
     LaunchedEffect(Unit) {
         if (playlists.isEmpty()) {
-            viewModel.fetchMyPlaylists()
+            actualViewModel.fetchMyPlaylists()
         }
     }
 
@@ -91,7 +109,7 @@ fun ItemSong(
                 onDeleteClick()
             },
 
-        )
+            )
     }
 
     // 歌单选择弹窗逻辑
@@ -100,7 +118,7 @@ fun ItemSong(
             playlists = playlists,
             onDismissRequest = { showPlaylistSheet = false },
             onPlaylistSelected = { playlist ->
-                viewModel.addSongToPlaylist(playlist.id, song.id)
+                actualViewModel.addSongToPlaylist(playlist.id, song.id)
             }
         )
     }
@@ -194,7 +212,6 @@ fun ItemSongContent(
 
 // 5. 辅助组件 (Helper Composable)
 
-
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
 fun PreView() {
@@ -212,11 +229,9 @@ fun PreView() {
         playCount = 5
     )
     VicMusicTheme {
-        ItemSongContent(
+        // 现在可以直接预览 ItemSong 了
+        ItemSong(
             song = testSong,
-            onPlayClick = {},
-            onLikeClick = {},
-            onMoreClick = {},
             showPlayCount = true
         )
     }

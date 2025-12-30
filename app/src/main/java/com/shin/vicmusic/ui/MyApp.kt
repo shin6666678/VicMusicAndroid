@@ -44,7 +44,7 @@ import com.shin.vicmusic.feature.auth.registerScreen
 import com.shin.vicmusic.feature.checkIn.CHECK_IN_ROUTE
 import com.shin.vicmusic.feature.checkIn.checkInScreen
 import com.shin.vicmusic.feature.common.MyNavigationBar
-import com.shin.vicmusic.feature.common.SongBar
+import com.shin.vicmusic.feature.common.bar.SongBar
 import com.shin.vicmusic.feature.liked.likedListScreen
 import com.shin.vicmusic.feature.main.MAIN_ROUTE
 import com.shin.vicmusic.feature.main.TopLevelDestination

@@ -29,7 +29,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.RankListPeak
-import com.shin.vicmusic.feature.common.CommonTopBar
+import com.shin.vicmusic.feature.common.bar.CommonTopBar
 import com.shin.vicmusic.feature.rankList.rankList.component.RankListItem
 import com.shin.vicmusic.feature.rankList.rankList.component.RecommendedRankListInfo
 import com.shin.vicmusic.feature.rankList.rankList.component.RecommendedRankListItem
