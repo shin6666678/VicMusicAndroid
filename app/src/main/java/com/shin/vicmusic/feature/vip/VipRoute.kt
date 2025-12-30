@@ -25,10 +25,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalAuthManager
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.UserInfo
-import com.shin.vicmusic.core.domain.VipProduct
 import com.shin.vicmusic.feature.vip.component.VipBottomBar
 import com.shin.vicmusic.feature.vip.component.VipPrivilegesSection
-import com.shin.vicmusic.feature.vip.component.VipProductList
 import com.shin.vicmusic.feature.vip.component.VipTopBar
 import com.shin.vicmusic.feature.vip.component.VipUserCard
 
@@ -37,7 +35,7 @@ import com.shin.vicmusic.feature.vip.component.VipUserCard
 fun VipRoutePreview() {
     VipScreen(
         onBackClick = {},
-        user = null,
+        user = UserInfo(),
         onPurchaseClick = {}
     )
 }
@@ -52,7 +50,7 @@ fun VipRoute(
 
     // 收集 StateFlow 状态
     val isLoggedIn by authManager.isLoggedIn.collectAsState()
-    
+
     // 检查登录状态
     if (isLoggedIn != true) {
         LaunchedEffect(Unit) {
@@ -91,15 +89,20 @@ fun VipScreen(
     user: UserInfo?,
     onPurchaseClick: () -> Unit
 ) {
+    val isVip = user?.isVip() == true
+
     Scaffold(
         containerColor = VipBlackBg,
         topBar = {
             VipTopBar(onBackClick)
         },
         bottomBar = {
-            VipBottomBar(
-                onPurchaseClick = onPurchaseClick
-            )
+            // 只有非VIP用户才显示购买栏
+            if (!isVip) {
+                VipBottomBar(
+                    onPurchaseClick = onPurchaseClick
+                )
+            }
         }
     ) { padding ->
         Column(
@@ -113,9 +116,9 @@ fun VipScreen(
 
             Spacer(modifier = Modifier.height(46.dp))
 
-            // 会员权益
+            // 会员权益/我的特权
             Text(
-                text = "会员权益",
+                text = if (isVip) "我的特权" else "会员权益",
                 color = VipLightText,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,

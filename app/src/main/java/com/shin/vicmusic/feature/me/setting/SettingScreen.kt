@@ -1,0 +1,60 @@
+package com.shin.vicmusic.feature.me.setting
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.shin.vicmusic.feature.common.CommonTopBar
+
+@Composable
+fun SettingRoute() {
+    SettingScreen(
+        onBackClick = { /*TODO*/ }
+    )
+}
+@Composable
+fun SettingScreen(
+    onBackClick: () -> Unit
+) {
+    Scaffold(
+        topBar = {
+            CommonTopBar(midText = "设置", popBackStack = onBackClick)
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxWidth()
+        ) {
+            // 简单示例条目
+            SettingItem(title = "账号安全")
+            SettingItem(title = "消息通知")
+            SettingItem(title = "隐私设置")
+            SettingItem(title = "通用")
+            HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp), thickness = 8.dp, color = Color.LightGray.copy(0.2f))
+            SettingItem(title = "切换账号")
+            SettingItem(title = "退出登录", textColor = Color.Red)
+        }
+    }
+}
+
+@Composable
+fun SettingItem(title: String, textColor: Color = Color.Unspecified, onClick: () -> Unit = {}) {
+    Text(
+        text = title,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 16.dp),
+        fontSize = 16.sp,
+        color = textColor
+    )
+}

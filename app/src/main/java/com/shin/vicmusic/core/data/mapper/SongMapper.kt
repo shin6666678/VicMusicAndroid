@@ -30,6 +30,8 @@ fun SongListItemDto.toDomain(): Song {
         likesCount = 0,
         clicksCount = 0,
         commentsCount = 0,
+
+        playCount = playCount ?: 0,
     )
 }
 

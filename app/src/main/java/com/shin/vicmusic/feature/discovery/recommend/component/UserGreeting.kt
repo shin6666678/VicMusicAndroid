@@ -1,7 +1,6 @@
 package com.shin.vicmusic.feature.discovery.recommend.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,8 +24,8 @@ import com.shin.vicmusic.core.design.theme.SpaceMedium
 import com.shin.vicmusic.core.design.theme.SpaceOuter
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
 import com.shin.vicmusic.core.domain.UserInfo
-import com.shin.vicmusic.feature.common.level.UserLevelIcon
-import com.shin.vicmusic.feature.common.level.VipIcon
+import com.shin.vicmusic.feature.common.icon.UserLevelIcon
+import com.shin.vicmusic.feature.common.icon.VipIcon
 import com.shin.vicmusic.util.ResourceUtil
 
 @Composable

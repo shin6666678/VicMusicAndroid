@@ -38,7 +38,8 @@ class SplashViewModel @Inject constructor(
     // 硬编码本次更新的内容，实际开发中也可以放在资源文件或服务端配置
     private val currentReleaseNotes = """
         本次更新内容：
-        1. 修复已知问题
+        1. 修复搜索框问题
+        2. 修复VIP界面展示问题
     """.trimIndent()
 
     init {
