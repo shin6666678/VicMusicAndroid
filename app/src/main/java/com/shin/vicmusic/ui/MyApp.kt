@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -107,7 +108,11 @@ fun MyApp() {
     )
     val songBarHalfHeight = 27.dp // 决定背景覆盖多少，通常是 SongBar 高度的一半左右
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    // [全局修复] 在根容器添加 navigationBarsPadding，确保整个 App 的所有页面（包括 NavHost 和悬浮组件）都不会被底部导航栏遮挡
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .navigationBarsPadding()
+    ) {
         NavHost(
             navController = navController,
             startDestination = SPLASH_ROUTE,

@@ -53,10 +53,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
+import com.shin.vicmusic.core.design.theme.PremiumDarkBlue
+import com.shin.vicmusic.core.design.theme.VividIndigo
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONGS
-import com.shin.vicmusic.feature.discovery.DiscoveryViewModel
 import com.shin.vicmusic.feature.common.ItemSong
+import com.shin.vicmusic.feature.discovery.DiscoveryViewModel
 
 @Preview
 @Composable
@@ -138,7 +140,11 @@ fun MusicHall(
     }
 }
 
-// --- 子组件实现 ---
+@Preview
+@Composable
+fun QuickAccessSection() {
+    BannerSection()
+}
 
 @Composable
 fun BannerSection() {
@@ -155,8 +161,10 @@ fun BannerSection() {
             modifier = Modifier
                 .fillMaxSize()
                 .background(
-                    Brush.horizontalGradient(
-                        colors = listOf(Color(0xFF6200EE), Color(0xFFBB86FC))
+                    brush = Brush.linearGradient(
+                        colors = listOf(PremiumDarkBlue, VividIndigo),
+                        start = Offset(0f, 0f),
+                        end = Offset(1000f, 1000f)
                     )
                 )
         ) {

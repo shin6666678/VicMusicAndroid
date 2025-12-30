@@ -3,6 +3,7 @@ package com.shin.vicmusic
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge // [新增导包]
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.navigation.compose.rememberNavController
 import com.shin.vicmusic.core.design.composition.LocalAuthManager
@@ -36,7 +37,7 @@ class MainActivity : ComponentActivity() {
     lateinit var songActionManager: SongActionManager
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        enableEdgeToEdge() // [全局修复] 开启边对边显示，允许Compose控制系统栏区域
         setContent {
             val navController = rememberNavController()
             VicMusicTheme {

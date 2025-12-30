@@ -38,8 +38,14 @@ class SplashViewModel @Inject constructor(
     // 硬编码本次更新的内容，实际开发中也可以放在资源文件或服务端配置
     private val currentReleaseNotes = """
         本次更新内容：
-        1. 修复搜索框问题
-        2. 修复VIP界面展示问题
+        1. 底部播放器可收藏音乐
+        2. 非VIP用户可收听VIP歌曲10s
+        3. 优化签到界面
+        4. 适配全面屏设计
+        5. 历史播放界面显示历史播放次数
+        6. 增加设置界面
+        7. 歌单详情界面可移除歌曲
+        8. 修复已知问题,提升用户体验
     """.trimIndent()
 
     init {

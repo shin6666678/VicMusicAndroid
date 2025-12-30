@@ -58,6 +58,9 @@ class PlayerManager @Inject constructor(
     private val TAG = "PlayerManager"
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
+    // 用于判断当前是否在 SongDetail 界面
+    var isSongDetailVisible: Boolean = false
+
     companion object {
         private var simpleCache: SimpleCache? = null
 
@@ -140,11 +143,6 @@ class PlayerManager @Inject constructor(
 
     private suspend fun tryPlaySong(song: Song?, performPlay: () -> Unit) {
         if (song == null) return
-        if (!checkVipPermission(song)) {
-            _uiEvent.emit("VIP专享歌曲，请开通VIP(VIP Only)")
-            return
-        }
-
         _currentPlayingSong.value = song
         loadLyric(song)
         performPlay()
@@ -262,6 +260,28 @@ class PlayerManager @Inject constructor(
     private fun updatePlayerState() {
         val currentPos = exoPlayer.currentPosition
         val lines = currentPlayingSong.value?.lyricList ?: emptyList()
+
+        // 新增：VIP 试听逻辑判断
+        val currentSong = _currentPlayingSong.value
+        if (currentSong != null && !checkVipPermission(currentSong)) {
+            // 如果非 VIP 且播放时间超过 10000ms (10秒)
+            if (currentPos >= 10000) {
+                if (exoPlayer.isPlaying) {
+                    exoPlayer.pause() // 暂停播放
+                    if (isSongDetailVisible) {
+                        // 如果在详情页，弹窗提示
+                        scope.launch { _uiEvent.emit("SHOW_VIP_DIALOG") }
+                    } else {
+                        // 如果在其他界面，自动下一首
+                        skipToNext()
+                    }
+                }
+                // 强制将进度限制在10秒，防止拖动进度条绕过
+                if (currentPos > 10000) {
+                    // 仅在非拖动状态下修正，或者直接修正UI显示
+                }
+            }
+        }
 
         val isUiPlaying = exoPlayer.isPlaying ||
                 (exoPlayer.playbackState == Player.STATE_BUFFERING && exoPlayer.playWhenReady)
