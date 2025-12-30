@@ -1,10 +1,12 @@
 package com.shin.vicmusic.feature.vip
 
 import android.widget.Toast
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -99,9 +101,11 @@ fun VipScreen(
         bottomBar = {
             // 只有非VIP用户才显示购买栏
             if (!isVip) {
-                VipBottomBar(
-                    onPurchaseClick = onPurchaseClick
-                )
+                Box(modifier = Modifier.navigationBarsPadding()) {
+                    VipBottomBar(
+                        onPurchaseClick = onPurchaseClick
+                    )
+                }
             }
         }
     ) { padding ->
@@ -127,6 +131,11 @@ fun VipScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             VipPrivilegesSection()
+
+            // 如果是VIP(没有底部栏)，添加一个底部间距，防止内容贴底太紧
+            if (isVip) {
+                Spacer(modifier = Modifier.height(20.dp))
+            }
         }
     }
 }
