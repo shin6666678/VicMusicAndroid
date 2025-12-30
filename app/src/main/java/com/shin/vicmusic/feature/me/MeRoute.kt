@@ -1,56 +1,52 @@
 package com.shin.vicmusic.feature.me
 
-import android.R.attr.bottom
-import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Headphones
-import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.MailOutline
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.ReceiptLong
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.AsyncImage
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.Playlist
-import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.feature.auth.navigateToLogin
 import com.shin.vicmusic.feature.checkIn.navigateToCheckIn
-import com.shin.vicmusic.feature.common.CreatePlaylistDialog
-import com.shin.vicmusic.feature.liked.LikedScreen
+import com.shin.vicmusic.feature.common.bar.BarActionItem
+import com.shin.vicmusic.feature.common.bar.BarTabItem
+import com.shin.vicmusic.feature.common.bar.UniversalTopBar
 import com.shin.vicmusic.feature.liked.navigateToLikedList
-import com.shin.vicmusic.feature.me.component.MeTopBar
 import com.shin.vicmusic.feature.me.component.RecentBar
 import com.shin.vicmusic.feature.me.component.SongListsSection
-import com.shin.vicmusic.feature.me.component.TopNotifyBar
 import com.shin.vicmusic.feature.me.component.UserInfoCard
 import com.shin.vicmusic.feature.me.fanList.navigateToFanList
 import com.shin.vicmusic.feature.me.followList.navigateToFollowList
@@ -60,8 +56,6 @@ import com.shin.vicmusic.feature.myInfo.navigateToMyInfo
 import com.shin.vicmusic.feature.playlist.meList.navigateToMyPlaylists
 import com.shin.vicmusic.feature.vip.navigateToVip
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MeRoute(
     viewModel: MeViewModel = hiltViewModel()
@@ -69,8 +63,8 @@ fun MeRoute(
     val navController = LocalNavController.current
 
     val isLoggedIn by viewModel.isLoggedIn.collectAsState()
-    val currentUser by viewModel.currentUser.collectAsState() //  观察 currentUser
-    val playlists by viewModel.myPlaylists.collectAsState() // 观察歌单列表
+    val currentUser by viewModel.currentUser.collectAsState()
+    val playlists by viewModel.myPlaylists.collectAsState()
 
     // 如果已登录但无用户信息，尝试获取
     LaunchedEffect(isLoggedIn) {
@@ -78,33 +72,52 @@ fun MeRoute(
             if (currentUser == null) {
                 viewModel.fetchUserInfo()
             }
-            viewModel.fetchMyPlaylists() // [新增] 获取歌单
+            viewModel.fetchMyPlaylists()
         }
     }
 
-    // 添加 onAvatarClick 参数
+    val topBarTabs = listOf(
+        BarTabItem(
+            name = "我的",
+            isSelected = true,
+            onClick = {}
+        )
+    )
+
+    val topBarActions = listOf(
+        BarActionItem(
+            icon = Icons.Default.MailOutline,
+            onClick = { }
+        ),
+        BarActionItem(
+            icon = Icons.Filled.Tune,
+            onClick = { navController.navigateToSetting() }
+        )
+    )
+
     MeScreen(
-        onSettingsClick = navController::navigateToSetting,
+        topBarTabs = topBarTabs,
+        topBarActions = topBarActions,
 
         onAvatarClick = navController::navigateToMyInfo,
-        onLoginClick=navController::navigateToLogin,
+        onLoginClick = navController::navigateToLogin,
         onVipClick = navController::navigateToVip,
-        isLoggedIn = isLoggedIn ?: false,//确保状态为非空Boolean，null时默认为false
+        isLoggedIn = isLoggedIn ?: false,
         user = currentUser,
         myPlaylists = playlists,
         onMorePlaylistsClick = { navController.navigateToMyPlaylists() },
-        onLikedClick = {navController.navigateToLikedList()},
+        onLikedClick = { navController.navigateToLikedList() },
 
         recentPlayList = playlists,
         recentNum = 2,
         recentIcon = playlists.firstOrNull()?.cover ?: "",
-        onRecentOrMoreClick = navController::navigateToRecentPlay
+        onRecentOrMoreClick = navController::navigateToRecentPlay,
 
-        ,
         onFollowClick = { navController.navigateToFollowList() },
         onFansClick = { navController.navigateToFanList() },
         onLevelClick = { navController.navigateToMyInfo() },
         onHeardClick = { navController.navigateToRecentPlay() },
+
         onCheckInClick = { navController.navigateToCheckIn() }
     )
 }
@@ -112,9 +125,8 @@ fun MeRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MeScreen(
-    onDrawerClick: () -> Unit = {},
-    onSearchClick: () -> Unit = {},
-    onSettingsClick: () -> Unit = {},
+    topBarTabs: List<BarTabItem>,
+    topBarActions: List<BarActionItem>,
 
     onLoginClick: () -> Unit = {},
     onAvatarClick: () -> Unit = {},
@@ -132,17 +144,17 @@ fun MeScreen(
 
     onFollowClick: () -> Unit = {},
     onFansClick: () -> Unit = {},
-    onLevelClick:() -> Unit = {},
+    onLevelClick: () -> Unit = {},
     onHeardClick: () -> Unit = {},
 
     onCheckInClick: () -> Unit = {}
 ) {
-
-
     Scaffold(
         topBar = {
-            MeTopBar(
-                onSettingsClick=onSettingsClick
+            UniversalTopBar(
+                tabs = topBarTabs,
+                actions = topBarActions,
+                backgroundColor = MaterialTheme.colorScheme.surface
             )
         },
     ) { paddingValues ->
@@ -152,7 +164,6 @@ fun MeScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp)
         ) {
-
             // User Info Card
             Spacer(Modifier.height(16.dp))
             UserInfoCard(
@@ -174,7 +185,6 @@ fun MeScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
-                // 传入 onClick 回调
                 QuickAccessItem(
                     icon = Icons.Filled.Favorite,
                     text = "收藏",
@@ -200,9 +210,7 @@ fun MeScreen(
 
             Spacer(Modifier.height(100.dp))
         }
-
     }
-
 }
 
 @Composable
@@ -210,7 +218,7 @@ fun QuickAccessItem(
     icon: ImageVector,
     text: String,
     count: String,
-    onClick: () -> Unit = {} // [新增] 默认为空
+    onClick: () -> Unit = {}
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -223,12 +231,13 @@ fun QuickAccessItem(
     }
 }
 
-
-
 @Preview
 @Composable
 fun MeScreenPreview() {
     MeScreen(
+        // 预览时需要提供假数据
+        topBarTabs = listOf(BarTabItem("我的", true, {})),
+        topBarActions = listOf(BarActionItem(Icons.Default.Search, onClick = {}), BarActionItem(Icons.Default.Menu, onClick = {})),
         isLoggedIn = false
     )
 }

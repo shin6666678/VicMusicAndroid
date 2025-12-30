@@ -24,7 +24,7 @@ import com.shin.vicmusic.feature.common.ItemArtist
 import com.shin.vicmusic.feature.artist.artistDetail.navigateToArtistDetail
 import com.shin.vicmusic.feature.artist.artistList.component.FilterSection
 import com.shin.vicmusic.feature.artist.artistList.component.TopArtistSection
-import com.shin.vicmusic.feature.common.CommonTopBar
+import com.shin.vicmusic.feature.common.bar.CommonTopBar
 import com.shin.vicmusic.feature.search.navigateToSearch
 
 @Preview

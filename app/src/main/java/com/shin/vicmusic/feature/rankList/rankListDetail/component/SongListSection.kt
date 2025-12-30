@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONGS
 import com.shin.vicmusic.feature.common.ItemSong
+import com.shin.vicmusic.feature.common.ItemSongNumbered
 
 @Preview
 @Composable
@@ -40,7 +41,6 @@ fun SongListSectionPreview() {
 @Composable
 fun SongListSection(
     songs: List<Song>,
-    onSongClick: (Song) -> Unit = {}, // [新增] 传递式点击回调
     onPlayAllClick: () -> Unit = {}   // [新增] 全部播放点击回调
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -85,26 +85,11 @@ fun SongListSection(
             modifier = Modifier.fillMaxWidth()
         ) {
             itemsIndexed(songs) { index, song ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onSongClick(song) } // [修改] 外层容器处理点击并传递 song
-                        .padding(vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "${index + 1}",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = if (index < 3) Color.Red else Color.Gray, // 前三名红色突出
-                        modifier = Modifier.padding(start = 16.dp, end = 8.dp)
-                    )
-
-                    ItemSong(
-                        song = song,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
+                ItemSongNumbered(
+                    song = song,
+                    num = index,
+                    isRank = true
+                )
             }
         }
     }

@@ -15,8 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.PlaylistDetail
-import com.shin.vicmusic.feature.common.CommonTopBar
+import com.shin.vicmusic.feature.common.bar.CommonTopBar
 import com.shin.vicmusic.feature.common.ItemSong
+import com.shin.vicmusic.feature.common.ItemSongNumbered
 import com.shin.vicmusic.feature.playlist.detail.component.PlaySongActionHeader
 import com.shin.vicmusic.feature.playlist.detail.component.PlaylistHeader
 
@@ -75,12 +76,11 @@ fun PlaylistDetailScreen(
             }
 
             itemsIndexed(detail.songs) { index, song ->
-                ItemSong(
+                ItemSongNumbered(
                     song = song,
-                    // 开启删除选项
+                    num = index,
                     showDeleteFromPlaylist = true,
-                    // 传递删除回调
-                    onDeleteClick = { onRemoveSong(song.id) }
+                    onDeleteClick = {onRemoveSong(song.id)}
                 )
             }
         }
