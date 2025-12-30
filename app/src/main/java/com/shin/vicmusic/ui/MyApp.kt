@@ -41,6 +41,7 @@ import com.shin.vicmusic.feature.artist.artistDetail.artistDetailScreen
 import com.shin.vicmusic.feature.artist.artistList.artistListScreen
 import com.shin.vicmusic.feature.auth.loginScreen
 import com.shin.vicmusic.feature.auth.registerScreen
+import com.shin.vicmusic.feature.checkIn.CHECK_IN_ROUTE
 import com.shin.vicmusic.feature.checkIn.checkInScreen
 import com.shin.vicmusic.feature.common.MyNavigationBar
 import com.shin.vicmusic.feature.common.SongBar
@@ -88,7 +89,8 @@ fun MyApp() {
     val isSplashScreen = currentRoute == SPLASH_ROUTE
     val isSongDetail = currentRoute?.contains("songDetail") == true
     val isVipScreen= currentRoute == VIP_ROUTE
-    val showBottomContainer = currentRoute != null && !isSplashScreen && !isSongDetail && !isVipScreen
+    val isCheckInScreen = currentRoute == CHECK_IN_ROUTE
+    val showBottomContainer = currentRoute != null && !isSplashScreen && !isSongDetail && !isVipScreen && !isCheckInScreen
 
     val playQueue by playerManager.playbackQueue.collectAsState()
     val currentQueueIndex by playerManager.currentQueueIndex.collectAsState()
@@ -108,11 +110,7 @@ fun MyApp() {
     )
     val songBarHalfHeight = 27.dp // 决定背景覆盖多少，通常是 SongBar 高度的一半左右
 
-    // [全局修复] 在根容器添加 navigationBarsPadding，确保整个 App 的所有页面（包括 NavHost 和悬浮组件）都不会被底部导航栏遮挡
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .navigationBarsPadding()
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         NavHost(
             navController = navController,
             startDestination = SPLASH_ROUTE,
@@ -163,6 +161,7 @@ fun MyApp() {
                         .align(Alignment.BottomCenter)
                         .padding(top = songBarHalfHeight)
                         .background(MaterialTheme.colorScheme.surface)
+                        .navigationBarsPadding()
                 ) {
                     // 一个"隐形垫片"，高度等于 Padding 的高度。
                     Spacer(modifier = Modifier.height(songBarHalfHeight))
@@ -172,7 +171,7 @@ fun MyApp() {
                         destinations = TopLevelDestination.entries,
                         currentDestination = TopLevelDestination.entries[mainTabState.intValue].route,
                         onNavigateToDestination = { index -> mainTabState.intValue = index },
-                        modifier = Modifier.fillMaxWidth().height(70.dp)
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
 

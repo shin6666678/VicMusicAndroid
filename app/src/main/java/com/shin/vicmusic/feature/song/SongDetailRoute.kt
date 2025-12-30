@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.AlertDialog
@@ -169,6 +170,7 @@ fun SongDetailScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF1C1C1E))
+            .navigationBarsPadding()
     ) {
         SongDetailTopBar(onBackClick = onBackClick)
 

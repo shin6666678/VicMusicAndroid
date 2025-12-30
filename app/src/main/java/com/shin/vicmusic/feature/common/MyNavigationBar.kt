@@ -47,7 +47,6 @@ fun MyNavigationBar(
                     },
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // [修改] 使用 Icon 组件代替 Image，支持 ImageVector 和 Tint
                 Icon(
                     imageVector = if (selected) destination.selectedIcon else destination.unselectedIcon,
                     contentDescription = stringResource(id = destination.titleTextId),
