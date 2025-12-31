@@ -12,17 +12,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.feature.common.bar.CommonTopBar
 
 @Composable
-fun SettingRoute() {
+fun SettingRoute(
+    viewModel: SettingViewModel= hiltViewModel(),
+) {
+    val navController= LocalNavController.current
     SettingScreen(
-        onBackClick = { /*TODO*/ }
+        onBackClick = navController::popBackStack,
+        onLogoutClick = viewModel::logout
     )
 }
 @Composable
 fun SettingScreen(
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit={},
+    onLogoutClick: ()->Unit={}
 ) {
     Scaffold(
         topBar = {
@@ -41,7 +48,7 @@ fun SettingScreen(
             SettingItem(title = "通用")
             HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp), thickness = 8.dp, color = Color.LightGray.copy(0.2f))
             SettingItem(title = "切换账号")
-            SettingItem(title = "退出登录", textColor = Color.Red)
+            SettingItem(title = "退出登录", textColor = Color.Red, onClick = onLogoutClick)
         }
     }
 }

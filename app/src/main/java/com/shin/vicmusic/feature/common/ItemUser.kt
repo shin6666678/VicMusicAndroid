@@ -26,21 +26,79 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.domain.UserInfo
+import com.shin.vicmusic.feature.relationship.RelationshipViewModel
+
+@Preview
+@Composable
+fun ItemUserPreview() {
+    ItemUserContent(
+        user = UserInfo(
+            id = "1",
+            name = "张三",
+            headImg = "https://picsum.photos/200/300",
+            slogan = "Hello World",
+            sex = 1,
+            points = 100,
+            mail = "zhangsan@example.com",
+            followCount = 10,
+            followerCount = 5,
+            level = 1,
+            vipLevel = 5,
+            heardCount = 20,
+            isFollowing = false,
+            isFollowingMe = true
+        ),
+        showFollowStatus = true
+    )
+}
 
 @Composable
 fun ItemUser(
     user: UserInfo,
+    showFollowStatus: Boolean = false,
+    viewModel: RelationshipViewModel? = null,
+) {
+    // 检查是否处于预览模式 (Preview Mode)
+    if (LocalInspectionMode.current) {
+        ItemUserContent(
+            user = user,
+            onClick = {},
+            onFollowClick = {},
+            showFollowStatus = showFollowStatus,
+        )
+        return
+    }
+
+    val actualViewModel = viewModel ?: hiltViewModel()
+    ItemUserContent(
+        user = user,
+        onClick = {},
+        onFollowClick ={
+            actualViewModel.toggleFollow(user.id,0)
+        },
+        showFollowStatus = showFollowStatus
+    )
+
+}
+
+@Composable
+fun ItemUserContent(
+    user: UserInfo,
     onClick: (String) -> Unit = {},
     onFollowClick: (String) -> Unit = {},
     showFollowStatus: Boolean = false,
-){
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick(user.id) }
+            .background(Color.White)
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

@@ -14,7 +14,7 @@ import com.shin.vicmusic.core.model.api.RankListPeakDto
 import com.shin.vicmusic.core.model.api.RecommendCardDto
 import com.shin.vicmusic.core.model.api.SongDetailDto
 import com.shin.vicmusic.core.model.api.SongListItemDto
-import com.shin.vicmusic.core.model.api.UserInfoDto
+import com.shin.vicmusic.core.model.api.UserDetailDto
 import com.shin.vicmusic.core.model.request.AlbumDetailReq
 import com.shin.vicmusic.core.model.request.AlbumPageReq
 import com.shin.vicmusic.core.model.request.ArtistDetailReq
@@ -84,7 +84,7 @@ class MyRetrofitDatasource @Inject constructor(
         return safeApiCall { service.register(req) }
     }
 
-    suspend fun getUserInfo(): NetworkResponse<UserInfoDto> {
+    suspend fun getUserInfo(): NetworkResponse<UserDetailDto> {
         return safeApiCall { service.getUserInfo() }
     }
 

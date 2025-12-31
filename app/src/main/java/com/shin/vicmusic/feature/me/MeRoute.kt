@@ -48,12 +48,12 @@ import com.shin.vicmusic.feature.liked.navigateToLikedList
 import com.shin.vicmusic.feature.me.component.RecentBar
 import com.shin.vicmusic.feature.me.component.SongListsSection
 import com.shin.vicmusic.feature.me.component.UserInfoCard
-import com.shin.vicmusic.feature.me.fanList.navigateToFanList
-import com.shin.vicmusic.feature.me.followList.navigateToFollowList
 import com.shin.vicmusic.feature.me.recentPlay.navigateToRecentPlay
 import com.shin.vicmusic.feature.me.setting.navigateToSetting
 import com.shin.vicmusic.feature.myInfo.navigateToMyInfo
 import com.shin.vicmusic.feature.playlist.meList.navigateToMyPlaylists
+import com.shin.vicmusic.feature.relationship.RelationshipTab
+import com.shin.vicmusic.feature.relationship.navigateToRelationship
 import com.shin.vicmusic.feature.vip.navigateToVip
 
 @Composable
@@ -113,8 +113,8 @@ fun MeRoute(
         recentIcon = playlists.firstOrNull()?.cover ?: "",
         onRecentOrMoreClick = navController::navigateToRecentPlay,
 
-        onFollowClick = { navController.navigateToFollowList() },
-        onFansClick = { navController.navigateToFanList() },
+        onFollowClick = { navController.navigateToRelationship(RelationshipTab.FOLLOWING) },
+        onFansClick = { navController.navigateToRelationship(RelationshipTab.FAN)},
         onLevelClick = { navController.navigateToMyInfo() },
         onHeardClick = { navController.navigateToRecentPlay() },
 

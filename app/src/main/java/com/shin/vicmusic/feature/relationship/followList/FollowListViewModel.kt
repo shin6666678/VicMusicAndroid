@@ -1,4 +1,4 @@
-package com.shin.vicmusic.feature.me.followList
+package com.shin.vicmusic.feature.relationship.followList
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -6,8 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.shin.vicmusic.core.data.repository.ArtistRepository
-import com.shin.vicmusic.core.data.repository.UserRepository
+import com.shin.vicmusic.core.data.repository.RelationshipRepository
 import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.domain.Result
 import com.shin.vicmusic.core.domain.UserInfo
@@ -17,8 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FollowListViewModel @Inject constructor(
-    private val userRepository: UserRepository,
-    private val artistRepository: ArtistRepository
+    private val relationshipRepository: RelationshipRepository
 ) : ViewModel() {
 
     var tabIndex by mutableIntStateOf(0)
@@ -30,11 +28,11 @@ class FollowListViewModel @Inject constructor(
         viewModelScope.launch {
             isLoading = true
             if (tabIndex == 0) {
-                val res = userRepository.getFollowedUsers()
-                if (res is Result.Success) userList = res.data
+                val res = relationshipRepository.getFollowedUser(0,99)
+                if (res is Result.Success) userList = res.data.items
             } else {
-                val res = artistRepository.getFollowedArtists()
-                if (res is Result.Success) artistList = res.data
+                val res = relationshipRepository.getFollowedArtists(0,99)
+                if (res is Result.Success) artistList = res.data.items
             }
             isLoading = false
         }
