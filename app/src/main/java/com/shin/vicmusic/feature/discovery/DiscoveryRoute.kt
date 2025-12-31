@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
@@ -29,7 +27,6 @@ import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterProvider
 import com.shin.vicmusic.feature.album.albumList.ALBUM_LIST_ROUTE
-import com.shin.vicmusic.feature.common.bar.BarActionItem
 import com.shin.vicmusic.feature.common.bar.BarTabItem
 import com.shin.vicmusic.feature.common.bar.SearchBar
 import com.shin.vicmusic.feature.common.bar.UniversalTopBar
@@ -45,7 +42,6 @@ fun DiscoveryRoute(
     navController: NavController,
     viewModel: DiscoveryViewModel = hiltViewModel(),
 ) {
-    val playerManager = LocalPlayerManager.current
     val datum by viewModel.datum.collectAsState()
     val user by viewModel.user.collectAsState()
     val alsoListeningCard by viewModel.alsoListeningCard.collectAsState()

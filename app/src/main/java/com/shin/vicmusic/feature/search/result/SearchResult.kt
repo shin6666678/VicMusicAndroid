@@ -70,7 +70,7 @@ fun SearchResultContent(
                 if (result.users.isNotEmpty()) {
                     item { SectionTitle("用户") }
                     items(result.users) { user ->
-                        ItemUser(user = user, onClick = {})
+                        ItemUser(user = user)
                     }
                 }
 
@@ -92,7 +92,7 @@ fun SearchResultContent(
                             onAlbumClick = {}
                         )
                         is Artist -> ItemArtist(artist = item, onClick = {})
-                        is UserInfo -> ItemUser(user = item, onClick = {})
+                        is UserInfo -> ItemUser(user = item)
                     }
                 }
             }

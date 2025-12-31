@@ -50,7 +50,6 @@ fun MyInfoPreview() {
             heardCount = 100
         ),
         onBackClick = {},
-        onLogoutClick = {}
     )
 }
 @Composable
@@ -70,10 +69,6 @@ fun MyInfoRoute(
     MyInfoScreen(
         userInfo = currentUser,
         onBackClick = { navController.popBackStack() },
-        onLogoutClick = {
-            viewModel.logout()
-            navController.popBackStack()
-        }
     )
 }
 
@@ -82,7 +77,6 @@ fun MyInfoRoute(
 fun MyInfoScreen(
     userInfo: UserInfo?,
     onBackClick: () -> Unit,
-    onLogoutClick: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -126,20 +120,6 @@ fun MyInfoScreen(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // 4. 退出登录按钮
-                Button(
-                    onClick = onLogoutClick,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer,
-                        contentColor = MaterialTheme.colorScheme.onErrorContainer
-                    )
-                ) {
-                    Text("退出登录", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                }
             }
         }
     }

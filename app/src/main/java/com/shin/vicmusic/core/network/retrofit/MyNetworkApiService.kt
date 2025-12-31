@@ -14,7 +14,8 @@ import com.shin.vicmusic.core.model.api.RecommendCardDto
 import com.shin.vicmusic.core.model.api.SearchComprehensiveDto
 import com.shin.vicmusic.core.model.api.SongDetailDto
 import com.shin.vicmusic.core.model.api.SongListItemDto
-import com.shin.vicmusic.core.model.api.UserInfoDto
+import com.shin.vicmusic.core.model.api.UserDetailDto
+import com.shin.vicmusic.core.model.api.UserDto
 import com.shin.vicmusic.core.model.request.ChangeVIPLevelReq
 import com.shin.vicmusic.core.model.request.FollowReq
 import com.shin.vicmusic.core.model.request.LikeSongReq
@@ -54,7 +55,7 @@ interface MyNetworkApiService {
     suspend fun login(@Body req: UserLoginReq): NetworkResponse<String>
 
     @GET("/api/user/v1/info")
-    suspend fun getUserInfo(): NetworkResponse<UserInfoDto>
+    suspend fun getUserInfo(): NetworkResponse<UserDetailDto>
 
     @POST("api/user/v1/check_in")
     suspend fun checkIn(): NetworkResponse<String>
@@ -138,13 +139,13 @@ interface MyNetworkApiService {
     suspend fun follow(@Body req: FollowReq): NetworkResponse<Unit>
 
     @GET("/api/relationship/v1/users")
-    suspend fun getFollowedUsers(): NetworkResponse<List<UserInfoDto>>
+    suspend fun getFollowedUsers(): NetworkResponse<NetworkPageData<UserDto>>
 
     @GET("/api/relationship/v1/artists")
-    suspend fun getFollowedArtists(): NetworkResponse<List<ArtistDto>>
+    suspend fun getFollowedArtists(): NetworkResponse<NetworkPageData<ArtistDto>>
 
     @GET("/api/relationship/v1/fans")
-    suspend fun getFans(): NetworkResponse<List<UserInfoDto>>
+    suspend fun getFans(): NetworkResponse<NetworkPageData<UserDto>>
 
     /*
     RankList排行榜
@@ -261,7 +262,7 @@ interface MyNetworkApiService {
         @Query("type") type: String = "user",
         @Query("page") page: Int,
         @Query("size") size: Int
-    ): NetworkResponse<NetworkPageData<UserInfoDto>>
+    ): NetworkResponse<NetworkPageData<UserDetailDto>>
 
 
     @GET("/api/common/v1/check_update")

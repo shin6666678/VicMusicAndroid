@@ -1,0 +1,107 @@
+package com.shin.vicmusic.feature.common.bar
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
+@Composable
+fun CommonTopBarSelect(
+    onBackClick: () -> Unit,      // [新增] 返回点击回调
+    tabs: List<BarTabItem>,       // 中部 Tab 列表
+    actions: List<BarActionItem> = emptyList(), // 右侧图标列表
+    backgroundColor: Color = MaterialTheme.colorScheme.surface,
+    contentColor: Color = MaterialTheme.colorScheme.onSurface,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .statusBarsPadding()
+            .background(backgroundColor)
+            .padding(horizontal = 4.dp, vertical = 12.dp), // 调整了一下 padding，给左侧返回按钮留空间
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // --- 左侧区域 (Fixed Back Icon) ---
+        IconButton(
+            onClick = onBackClick,
+            modifier = Modifier.size(48.dp) // 标准触摸区域大小
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack, // 使用镜像图标以适配RTL布局
+                contentDescription = "Back",
+                tint = contentColor,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+
+        // --- 中间区域 (Center Tabs) ---
+        // 使用 weight(1f) 占据中间所有空间，并设置居中对齐
+        LazyRow(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(
+                space = 24.dp,
+                alignment = Alignment.CenterHorizontally // [修改] 让内容在水平方向居中
+            ),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            items(tabs) { tab ->
+                Text(
+                    text = tab.name,
+                    fontSize = if (tab.isSelected) 20.sp else 16.sp,
+                    fontWeight = if (tab.isSelected) FontWeight.Bold else FontWeight.Normal,
+                    color = if (tab.isSelected) contentColor else contentColor.copy(alpha = 0.6f),
+                    modifier = Modifier.clickable(
+                        interactionSource = null,
+                        indication = null
+                    ) { tab.onClick() }
+                )
+            }
+        }
+
+        // --- 右侧区域 (Actions) ---
+        // 为了保持视觉平衡，如果右侧没有图标，中间的文字可能会看起来稍微偏右（因为它在 返回键 和 屏幕边缘 之间居中）。
+        // 如果需要严格的屏幕绝对居中，通常需要用 Box 布局，但目前的 Row 结构在有右侧图标时效果最好。
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            if (actions.isNotEmpty()) {
+                actions.forEach { action ->
+                    IconButton(
+                        onClick = action.onClick,
+                        modifier = Modifier.size(40.dp)
+                    ) {
+                        Icon(
+                            imageVector = action.icon,
+                            contentDescription = action.contentDescription,
+                            tint = contentColor,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
+            } else {
+                Spacer(modifier = Modifier.size(48.dp))
+            }
+        }
+    }
+}

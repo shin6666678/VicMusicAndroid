@@ -1,9 +1,10 @@
 package com.shin.vicmusic.core.data.mapper
 
 import com.shin.vicmusic.core.domain.UserInfo
-import com.shin.vicmusic.core.model.api.UserInfoDto
+import com.shin.vicmusic.core.model.api.UserDetailDto
+import com.shin.vicmusic.core.model.api.UserDto
 
-fun UserInfoDto.toDomain(): UserInfo {
+fun UserDetailDto.toDomain(): UserInfo {
     return UserInfo(
         id = this.id ?: "",
         name = this.name ?: "未命名用户",
@@ -22,5 +23,17 @@ fun UserInfoDto.toDomain(): UserInfo {
         experience = experience ?: 0,
         nextLevelExp = nextLevelExp ?: 100,
         totalListenTime = totalListenTime ?: 0L
+    )
+}
+fun UserDto.toDomain(): UserInfo {
+     return UserInfo(
+        id = this.id ?: "",
+        name = this.name ?: "未命名用户",
+        headImg = this.headImg ?: "",
+        slogan = this.slogan ?: "",
+        level = this.level ?: 0,
+        vipLevel = this.vipLevel ?: 0,
+        isFollowing = this.isFollowing ?: false,
+        isFollowingMe = this.isFollowingMe ?: false,
     )
 }

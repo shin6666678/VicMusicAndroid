@@ -8,10 +8,8 @@ import com.shin.vicmusic.core.data.repository.SongRepository
 import com.shin.vicmusic.core.domain.RecommendCard
 import com.shin.vicmusic.core.domain.Result
 import com.shin.vicmusic.core.domain.Song
-import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.core.manager.AuthManager
-import com.shin.vicmusic.core.model.api.RecommendCardDto
 import com.shin.vicmusic.core.model.api.SongListItemDto
 import com.shin.vicmusic.core.model.request.SongPageReq
 import dagger.hilt.android.lifecycle.HiltViewModel

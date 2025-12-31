@@ -49,8 +49,6 @@ import com.shin.vicmusic.feature.liked.likedListScreen
 import com.shin.vicmusic.feature.main.MAIN_ROUTE
 import com.shin.vicmusic.feature.main.TopLevelDestination
 import com.shin.vicmusic.feature.main.mainScreen
-import com.shin.vicmusic.feature.me.fanList.fanListScreen
-import com.shin.vicmusic.feature.me.followList.followListScreen
 import com.shin.vicmusic.feature.me.recentPlay.recentPlayScreen
 import com.shin.vicmusic.feature.me.setting.settingScreen
 import com.shin.vicmusic.feature.myInfo.myInfoScreen
@@ -60,6 +58,7 @@ import com.shin.vicmusic.feature.playlist.meList.myPlaylistScreen
 import com.shin.vicmusic.feature.playlist.publicList.publicPlaylistScreen
 import com.shin.vicmusic.feature.rankList.rankList.rankListScreen
 import com.shin.vicmusic.feature.rankList.rankListDetail.rankListDetailScreen
+import com.shin.vicmusic.feature.relationship.relationshipScreen
 import com.shin.vicmusic.feature.search.searchScreen
 import com.shin.vicmusic.feature.song.navigateToSongDetail
 import com.shin.vicmusic.feature.song.songDetailScreen
@@ -132,14 +131,13 @@ fun MyApp() {
             albumDetailScreen()
             playlistDetailScreen()
             myPlaylistScreen()
-            followListScreen()
-            fanListScreen()
             likedListScreen()
             recentPlayScreen()
             myInfoScreen()
             publicPlaylistScreen()
             checkInScreen()
             settingScreen()
+            relationshipScreen()
         }
 
         // 底部整体容器 (SongBar + 导航栏)

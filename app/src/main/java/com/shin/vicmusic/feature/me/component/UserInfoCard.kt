@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Key
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
@@ -225,7 +226,11 @@ private fun UserStatsRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceAround
     ) {
-        ActionItem(icon = Icons.Filled.Star, text = "提现", iconTint = Color(0xFFFF9800))
+        ActionItem(
+            icon = Icons.Filled.People,
+            text = "好友",
+            iconTint = Color(0xFFFF9800)
+        )
         ActionItem(icon = Icons.Filled.Favorite,
             text = "会员",
             iconTint = Color(0xFF00BFA5),

@@ -8,5 +8,5 @@ data class SearchComprehensiveDto(
     val playlists: List<PlaylistDto>? = null,
     val albums: List<AlbumDto>? = null,
     val artists: List<ArtistDto>? = null,
-    val users: List<UserInfoDto>? = null
+    val users: List<UserDetailDto>? = null
 )

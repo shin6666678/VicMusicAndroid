@@ -19,7 +19,4 @@ class MyInfoViewModel @Inject constructor(
         authManager.fetchUserInfo()
     }
 
-    fun logout() {
-        authManager.setLoginStatus(false)
-    }
 }

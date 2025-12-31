@@ -15,7 +15,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.shin.vicmusic.core.design.composition.LocalNavController
-import com.shin.vicmusic.core.design.composition.LocalPlayerManager
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.feature.rankList.rankListDetail.component.RankListDetailHeader
 import com.shin.vicmusic.feature.rankList.rankListDetail.component.SongListSection
@@ -26,7 +25,6 @@ fun RankListDetailRoute(
     viewModel: RankListDetailViewModel = hiltViewModel()
 ){
 
-    val playerManager = LocalPlayerManager.current
     val rankListDetail by viewModel.rankListDetail.collectAsState()
 
     // 1. 判空处理 (Null Check)
@@ -44,10 +42,6 @@ fun RankListDetailRoute(
             coverUrl = data.imageUrl, // [新增] 传递封面
             songs = songList,
             popBackStack = { navController.popBackStack() },
-            // [修改] 使用全局播放器播放列表
-            onSongClick = { song ->
-                playerManager.playSong(song, songList) // 点击播放并设置队列
-            },
         )
     }
 }
@@ -57,7 +51,6 @@ fun RankListDetailScreen(
     coverUrl: String = "",            // [新增] 参数
     songs: List<Song> = emptyList(),
     popBackStack: () -> Unit = {},
-    onSongClick: (Song) -> Unit = {},
 ) {
     Column(
         modifier = Modifier
@@ -73,7 +66,6 @@ fun RankListDetailScreen(
 
         SongListSection(
             songs = songs,
-            onSongClick = onSongClick
         )
     }
 }
