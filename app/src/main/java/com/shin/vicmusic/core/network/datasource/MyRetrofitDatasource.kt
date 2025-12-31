@@ -201,6 +201,8 @@ class MyRetrofitDatasource @Inject constructor(
 
     suspend fun getFans() = service.getFans()
 
+    suspend fun getFriends() = service.getFriends()
+
 
     /*
     RankList排行榜

@@ -87,7 +87,28 @@ class RelationshipRepository @Inject constructor(
         }
     }
     suspend fun getFriends(page: Int, size: Int): Result<PageResult<UserInfo>> {
-        return Result.Success(PageResult(emptyList(), 0, 1, false))
+        return try {
+            val response = datasource.getFriends()
+            if (response.code == 0 && response.data != null) {
+                val pageData = response.data
+                val total = pageData.pagination.total
+                // [Fix] 计算 hasMore
+                val hasMore = (page * size) < total
+
+                Result.Success(
+                    PageResult(
+                        items = pageData.list?.map { it.toDomain() } ?: emptyList(),
+                        total = total,
+                        page = pageData.pagination.page,
+                        hasMore = hasMore
+                    )
+                )
+            } else {
+                Result.Error(response.message ?: "Unknown error")
+            }
+        } catch (e: Exception) {
+            Result.Error(e.message ?: "Network error")
+        }
     }
 
     suspend fun follow(targetId:String,targetType:Int):Result<Unit> {
