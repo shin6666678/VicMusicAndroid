@@ -70,6 +70,7 @@ fun UserInfoCard(
     onLevelClick:() -> Unit = {},
     onHeardClick: () -> Unit = {},
 
+    onFriendClick: () -> Unit = {},
     onCheckInClick: () -> Unit = {}
 ) {
     Card(
@@ -96,7 +97,8 @@ fun UserInfoCard(
                     onLevelClick = onLevelClick,
                     onHeardClick = onHeardClick,
                     onCheckInClick = onCheckInClick,
-                    onVipClick = onVipClick
+                    onVipClick = onVipClick,
+                    onFriendClick = onFriendClick
                 )
             }
         }
@@ -204,6 +206,7 @@ private fun UserStatsRow(
     onHeardClick: () -> Unit = {},
 
 
+    onFriendClick: () -> Unit,
     onVipClick: () -> Unit = {},
     onCheckInClick: () -> Unit = {}
     
@@ -229,7 +232,8 @@ private fun UserStatsRow(
         ActionItem(
             icon = Icons.Filled.People,
             text = "好友",
-            iconTint = Color(0xFFFF9800)
+            iconTint = Color(0xFFFF9800),
+            onClick = onFriendClick
         )
         ActionItem(icon = Icons.Filled.Favorite,
             text = "会员",

@@ -45,12 +45,13 @@ import com.shin.vicmusic.feature.common.bar.BarActionItem
 import com.shin.vicmusic.feature.common.bar.BarTabItem
 import com.shin.vicmusic.feature.common.bar.UniversalTopBar
 import com.shin.vicmusic.feature.liked.navigateToLikedList
+import com.shin.vicmusic.feature.me.component.PlaylistsSection
 import com.shin.vicmusic.feature.me.component.RecentBar
-import com.shin.vicmusic.feature.me.component.SongListsSection
 import com.shin.vicmusic.feature.me.component.UserInfoCard
 import com.shin.vicmusic.feature.me.recentPlay.navigateToRecentPlay
 import com.shin.vicmusic.feature.me.setting.navigateToSetting
 import com.shin.vicmusic.feature.myInfo.navigateToMyInfo
+import com.shin.vicmusic.feature.playlist.detail.navigateToPlaylistDetail
 import com.shin.vicmusic.feature.playlist.meList.navigateToMyPlaylists
 import com.shin.vicmusic.feature.relationship.RelationshipTab
 import com.shin.vicmusic.feature.relationship.navigateToRelationship
@@ -118,7 +119,11 @@ fun MeRoute(
         onLevelClick = { navController.navigateToMyInfo() },
         onHeardClick = { navController.navigateToRecentPlay() },
 
-        onCheckInClick = { navController.navigateToCheckIn() }
+        onFriendClick = { navController.navigateToRelationship(RelationshipTab.FRIEND) },
+        onCheckInClick = { navController.navigateToCheckIn() },
+
+        onPlayListClick=  navController::navigateToPlaylistDetail,
+
     )
 }
 
@@ -147,7 +152,10 @@ fun MeScreen(
     onLevelClick: () -> Unit = {},
     onHeardClick: () -> Unit = {},
 
-    onCheckInClick: () -> Unit = {}
+    onFriendClick: () -> Unit = {},
+    onCheckInClick: () -> Unit = {},
+
+    onPlayListClick: (String) -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -176,6 +184,7 @@ fun MeScreen(
                 onFansClick = onFansClick,
                 onLevelClick = onLevelClick,
                 onHeardClick = onHeardClick,
+                onFriendClick = onFriendClick,
                 onCheckInClick = onCheckInClick
             )
 
@@ -206,7 +215,11 @@ fun MeScreen(
 
             // Song Lists Section
             Spacer(Modifier.height(24.dp))
-            SongListsSection(playlists = myPlaylists, onMorePlaylistsClick = onMorePlaylistsClick)
+            PlaylistsSection(
+                playlists = myPlaylists,
+                onPlaylistClick = onPlayListClick,
+                onMorePlaylistsClick = onMorePlaylistsClick
+            )
 
             Spacer(Modifier.height(100.dp))
         }

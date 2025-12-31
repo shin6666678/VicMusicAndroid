@@ -147,6 +147,9 @@ interface MyNetworkApiService {
     @GET("/api/relationship/v1/fans")
     suspend fun getFans(): NetworkResponse<NetworkPageData<UserDto>>
 
+    @GET("/api/relationship/v1/friends")
+    suspend fun getFriends(): NetworkResponse<NetworkPageData<UserDto>>
+
     /*
     RankList排行榜
      */

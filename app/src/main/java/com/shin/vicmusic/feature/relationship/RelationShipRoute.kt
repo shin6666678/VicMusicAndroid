@@ -17,6 +17,7 @@ import com.shin.vicmusic.feature.common.bar.CommonTopBarSelect
 import com.shin.vicmusic.feature.common.bar.UniversalTopBar
 import com.shin.vicmusic.feature.relationship.fanList.FanListScreen
 import com.shin.vicmusic.feature.relationship.followList.FollowListScreen
+import com.shin.vicmusic.feature.relationship.friendList.FriendListScreen
 import kotlinx.coroutines.launch
 
 
@@ -76,16 +77,12 @@ fun RelationshipScreen(
             when (page) {
                 0 -> FollowListScreen()
                 1 -> FanListScreen()
-                2 -> FriendRoute()
+                2 -> FriendListScreen()
             }
         }
     }
 }
 
-@Composable
-fun FriendRoute() {
-    Column { /* Friend Screen Content */ }
-}
 @Preview
 @Composable
 fun RelationshipScreenPreview() {
