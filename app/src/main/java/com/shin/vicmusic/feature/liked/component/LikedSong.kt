@@ -29,9 +29,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.feature.common.ItemSong
+import com.shin.vicmusic.feature.common.bar.CommonSearchBar
+
+@Preview
+@Composable
+fun LikedSongPreview() {
+    LikedSong(songs = emptyList())
+}
 
 @Composable
 fun LikedSong(
@@ -39,26 +47,10 @@ fun LikedSong(
 ){
     var searchQuery by remember { mutableStateOf("") }
     Column() {
-        // Search Bar
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
-            placeholder = { Text("搜索我收藏的歌曲") },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = "搜索") },
-            shape = RoundedCornerShape(24.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .background(Color.LightGray.copy(alpha = 0.2f), RoundedCornerShape(24.dp)), // 浅灰色背景
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Transparent,
-                unfocusedBorderColor = Color.Transparent,
-                disabledBorderColor = Color.Transparent,
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent
-            )
+        CommonSearchBar(
+            toSearch = {},
+            placeHolderString = "搜索我收藏的音乐",
         )
-
         // Play All Section
         Row(
             modifier = Modifier

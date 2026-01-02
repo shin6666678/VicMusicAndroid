@@ -7,6 +7,8 @@ import com.shin.vicmusic.core.model.api.AlbumDto
 import com.shin.vicmusic.core.model.api.AppUpdateDto
 import com.shin.vicmusic.core.model.api.ArtistDetailResp
 import com.shin.vicmusic.core.model.api.ArtistDto
+import com.shin.vicmusic.core.model.api.ChatSessionDto
+import com.shin.vicmusic.core.model.api.NotifyDto
 import com.shin.vicmusic.core.model.api.PlaylistDetailDto
 import com.shin.vicmusic.core.model.api.PlaylistDto
 import com.shin.vicmusic.core.model.api.RankListDetailDto
@@ -43,7 +45,7 @@ import javax.inject.Singleton
 
 @Singleton // 标记为单例，全局共享
 class MyRetrofitDatasource @Inject constructor(
-    private val service: MyNetworkApiService // 直接注入 Hilt 提供的接口实例
+    val service: MyNetworkApiService // 直接注入 Hilt 提供的接口实例
 ) {
 
     /**
@@ -295,5 +297,17 @@ class MyRetrofitDatasource @Inject constructor(
 
     suspend fun checkUpdate(currentCode: Int): NetworkResponse<AppUpdateDto> {
         return safeApiCall { service.checkUpdate(currentCode) }
+    }
+
+    suspend fun getNotifyPage(req: PageReq): NetworkResponse<NetworkPageData<NotifyDto>> {
+        return safeApiCall { service.getNotifyPage(req) }
+    }
+
+    suspend fun getUnreadNotifyCount(): NetworkResponse<Int> {
+        return safeApiCall { service.getUnreadNotifyCount() }
+    }
+
+    suspend fun getChatSessions(): NetworkResponse<List<ChatSessionDto>> {
+        return safeApiCall { service.getChatSessions() }
     }
 }

@@ -62,9 +62,11 @@ fun ItemUserPreview() {
 fun ItemUser(
     user: UserInfo,
     showFollowStatus: Boolean = false,
+    showPMButton: Boolean = false,
     viewModel: RelationshipViewModel? = null,
+    onMessageClick: (() -> Unit)? = null
 ) {
-    // 检查是否处于预览模式 (Preview Mode)
+    // 检查是否处于预览模式
     if (LocalInspectionMode.current) {
         ItemUserContent(
             user = user,
@@ -79,10 +81,11 @@ fun ItemUser(
     ItemUserContent(
         user = user,
         onClick = {},
-        onFollowClick ={
-            actualViewModel.toggleFollow(user.id,0)
+        onFollowClick = {
+            actualViewModel.toggleFollow(user.id, 0)
         },
-        showFollowStatus = showFollowStatus
+        showFollowStatus = showFollowStatus,
+        onMessageClick = onMessageClick
     )
 
 }
@@ -92,7 +95,9 @@ fun ItemUserContent(
     user: UserInfo,
     onClick: (String) -> Unit = {},
     onFollowClick: (String) -> Unit = {},
+    showPMButton: Boolean = false,
     showFollowStatus: Boolean = false,
+    onMessageClick: (() -> Unit)? = null
 ) {
     Row(
         modifier = Modifier
@@ -117,6 +122,16 @@ fun ItemUserContent(
             modifier = Modifier.weight(1f)
         )
 
+        if (onMessageClick != null) {
+            OutlinedButton(
+                onClick = onMessageClick,
+                modifier = Modifier.height(32.dp).padding(end = 8.dp),
+                shape = RoundedCornerShape(50),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp)
+            ) {
+                Text(text = "私信", fontSize = 12.sp)
+            }
+        }
         // 关注按钮
         if (showFollowStatus)
             if (user.isFollowing) {

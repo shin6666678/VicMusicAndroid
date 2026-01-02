@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
+import com.shin.vicmusic.feature.chat.navigateToChat
 import com.shin.vicmusic.feature.common.ItemUser
 
 @Composable
@@ -41,6 +42,9 @@ fun FriendListScreen(
                     ItemUser(
                         user = user,
                         showFollowStatus = true,
+                        onMessageClick = { // 实现回调
+                            navController.navigateToChat(user.id, user.name)
+                        }
                     )
                 }
             }

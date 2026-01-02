@@ -22,7 +22,6 @@ import com.shin.vicmusic.feature.common.bar.CommonTopBar
 fun FanListScreen(
     viewModel: FanListViewModel = hiltViewModel()
 ) {
-    val navController = LocalNavController.current
 
     LaunchedEffect(Unit) { viewModel.loadData() }
 
