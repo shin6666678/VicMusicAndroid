@@ -17,8 +17,8 @@ android {
         applicationId = "com.shin.vicmusic"
         minSdk = 24
         targetSdk = 36
-        versionCode = 3
-        versionName = "1.0.3"
+        versionCode = 4
+        versionName = "1.0.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -95,5 +95,8 @@ dependencies {
 
     //数据存储
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+    //GSON
+    implementation("com.google.code.gson:gson:2.10.1")
 
 }

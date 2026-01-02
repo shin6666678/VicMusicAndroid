@@ -1,5 +1,6 @@
 package com.shin.vicmusic.feature.relationship.friendList
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -25,6 +26,7 @@ class FriendListViewModel @Inject constructor(
             isLoading = true
             val res = relationshipRepository.getFriends(1, 10)
             if (res is Result.Success) userList = res.data.items
+            Log.d("FriendListViewModel", "loadData: $res")
             isLoading = false
         }
     }

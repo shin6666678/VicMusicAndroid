@@ -1,11 +1,14 @@
 package com.shin.vicmusic.core.network.retrofit
 
 import com.shin.vicmusic.core.domain.User
+import com.shin.vicmusic.core.model.ChatMessage
 import com.shin.vicmusic.core.model.api.AlbumDetailResp
 import com.shin.vicmusic.core.model.api.AlbumDto
 import com.shin.vicmusic.core.model.api.AppUpdateDto
 import com.shin.vicmusic.core.model.api.ArtistDetailResp
 import com.shin.vicmusic.core.model.api.ArtistDto
+import com.shin.vicmusic.core.model.api.ChatSessionDto
+import com.shin.vicmusic.core.model.api.NotifyDto
 import com.shin.vicmusic.core.model.api.PlaylistDetailDto
 import com.shin.vicmusic.core.model.api.PlaylistDto
 import com.shin.vicmusic.core.model.api.RankListDetailDto
@@ -272,6 +275,31 @@ interface MyNetworkApiService {
     suspend fun checkUpdate(
         @Query("versionCode") versionCode: Int
     ): NetworkResponse<AppUpdateDto>
+
+
+    /*
+    Chat 私信功能
+     */
+    @GET("/api/chat/v1/history")
+    suspend fun getChatHistory(
+        @Query("targetUserId") targetUserId: String,
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): NetworkResponse<List<ChatMessage>>
+
+    @GET("api/chat/v1/sessions")
+    suspend fun getChatSessions(): NetworkResponse<List<ChatSessionDto>>
+
+    /*
+    通知
+     */
+
+    @POST("api/notify/v1/page")
+    suspend fun getNotifyPage(@Body req: PageReq): NetworkResponse<NetworkPageData<NotifyDto>>
+
+    @GET("api/notify/v1/unread_count")
+    suspend fun getUnreadNotifyCount(): NetworkResponse<Int>
+
 
 
 }

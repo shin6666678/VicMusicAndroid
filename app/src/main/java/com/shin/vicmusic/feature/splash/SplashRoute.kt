@@ -1,7 +1,5 @@
 package com.shin.vicmusic.feature.splash
 
-// import android.content.Intent // [移除] 不需要 Intent 了
-// import android.net.Uri // [移除] 不需要 Uri 了
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
