@@ -13,15 +13,12 @@ import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.shin.vicmusic.core.design.composition.LocalNavController
-import com.shin.vicmusic.feature.auth.navigateToLogin
 import com.shin.vicmusic.feature.discovery.DiscoveryRoute
 import com.shin.vicmusic.feature.feed.FeedRoute
 import com.shin.vicmusic.feature.me.MeRoute
 import com.shin.vicmusic.feature.shortVideo.ShortVideoRoute
-import com.shin.vicmusic.feature.vip.navigateToVip
 
 
 @Preview

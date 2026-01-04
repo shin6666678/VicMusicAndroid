@@ -24,6 +24,7 @@ import com.shin.vicmusic.core.model.request.ArtistPageReq
 import com.shin.vicmusic.core.model.request.ChangeVIPLevelReq
 import com.shin.vicmusic.core.model.request.FollowReq
 import com.shin.vicmusic.core.model.request.LikeSongReq
+import com.shin.vicmusic.core.model.request.PageReq
 import com.shin.vicmusic.core.model.request.PlaylistSongReq
 import com.shin.vicmusic.core.model.request.SongPageReq
 import com.shin.vicmusic.core.model.request.UserLoginReq
@@ -303,8 +304,8 @@ class MyRetrofitDatasource @Inject constructor(
         return safeApiCall { service.getNotifyPage(req) }
     }
 
-    suspend fun getUnreadNotifyCount(): NetworkResponse<Int> {
-        return safeApiCall { service.getUnreadNotifyCount() }
+    suspend fun getUnreadCount(): NetworkResponse<Map<String, Int>> {
+        return safeApiCall { service.getUnreadCount() }
     }
 
     suspend fun getChatSessions(): NetworkResponse<List<ChatSessionDto>> {

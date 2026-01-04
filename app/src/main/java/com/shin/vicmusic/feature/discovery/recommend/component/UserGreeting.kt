@@ -1,6 +1,7 @@
 package com.shin.vicmusic.feature.discovery.recommend.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,7 +31,9 @@ import com.shin.vicmusic.util.ResourceUtil
 
 @Composable
 fun UserGreeting(
-    user: UserInfo?=null
+    user: UserInfo?=null,
+    unreadCount: Int = 0,
+    onMessageClick: () -> Unit = {}
 ) {
 
     val vipLevelInt = user?.vipLevel?: 0
@@ -41,9 +44,8 @@ fun UserGreeting(
             .padding(horizontal = SpaceOuter, vertical = SpaceMedium),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // [修改] 使用 MyAsyncImage 加载网络头像
         MyAsyncImage(
-            model = ResourceUtil.r2(user?.headImg?:""), // 传入头像 URL
+            model = ResourceUtil.r2(user?.headImg?:""),
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape)
@@ -63,14 +65,17 @@ fun UserGreeting(
                vipLevelInt=vipLevelInt
             )
             Spacer(modifier = Modifier.width(SpaceExtraMedium))
-            // Another badge - Simplified
             UserLevelIcon(user.level)
         }
-        Spacer(modifier = Modifier.weight(1f)) // Pushes content to the right
+        Spacer(modifier = Modifier.weight(1f))
+
+        val messageText = if (unreadCount > 0) "${unreadCount}条新消息 >" else "信箱 >"
+        val textColor = if (unreadCount > 0) MaterialTheme.colorScheme.primary else Color.Gray
         Text(
-            text = "1条新消息 >",
+            text = messageText,
             style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.primary
+            color = textColor,
+            modifier = Modifier.clickable { onMessageClick() }
         )
     }
 }
@@ -80,10 +85,8 @@ fun UserGreeting(
 fun PreviewUserGreeting() {
     VicMusicTheme {
         UserGreeting(
-            UserInfo(
-                name = "发现界面测试用户",
-                vipLevel = 6
-            )
+            UserInfo(name = "测试用户", vipLevel = 6),
+            unreadCount = 5
         )
     }
 }

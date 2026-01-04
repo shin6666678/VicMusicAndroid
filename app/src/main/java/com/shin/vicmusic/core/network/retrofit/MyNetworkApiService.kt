@@ -22,6 +22,7 @@ import com.shin.vicmusic.core.model.api.UserDto
 import com.shin.vicmusic.core.model.request.ChangeVIPLevelReq
 import com.shin.vicmusic.core.model.request.FollowReq
 import com.shin.vicmusic.core.model.request.LikeSongReq
+import com.shin.vicmusic.core.model.request.PageReq
 import com.shin.vicmusic.core.model.request.PlaylistSongReq
 import com.shin.vicmusic.core.model.request.UserLoginReq
 import com.shin.vicmusic.core.model.request.UserRegisterReq
@@ -298,7 +299,7 @@ interface MyNetworkApiService {
     suspend fun getNotifyPage(@Body req: PageReq): NetworkResponse<NetworkPageData<NotifyDto>>
 
     @GET("api/notify/v1/unread_count")
-    suspend fun getUnreadNotifyCount(): NetworkResponse<Int>
+    suspend fun getUnreadCount(): NetworkResponse<Map<String, Int>>
 
 
 

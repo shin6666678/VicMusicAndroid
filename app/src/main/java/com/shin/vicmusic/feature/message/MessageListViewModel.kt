@@ -44,15 +44,6 @@ class MessageListViewModel @Inject constructor(
     fun loadNotifications() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            // 简单演示第一页
-            when (val result = notifyRepository.getNotifyPage(1, 100)) {
-                is Result.Success -> {
-                    _uiState.update { it.copy(isLoading = false, notifications = result.data.list ?: emptyList()) }
-                }
-                is Result.Error -> {
-                    _uiState.update { it.copy(isLoading = false, error = result.exception) }
-                }
-            }
         }
     }
 

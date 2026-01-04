@@ -2,6 +2,12 @@ package com.shin.vicmusic.core.model.request
 
 import kotlinx.serialization.Serializable
 
+
+@Serializable
+data class PageReq(
+    val page: Int = 1,
+    val size: Int = 20,
+)
 @Serializable
 data class SongPageReq(
     val page: Int = 1,

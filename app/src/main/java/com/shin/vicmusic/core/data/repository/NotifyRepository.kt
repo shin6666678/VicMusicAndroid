@@ -8,11 +8,6 @@ import javax.inject.Inject
 class NotifyRepository @Inject constructor(
     private val network: MyRetrofitDatasource
 ) {
-    suspend fun getNotifyList(): NetworkResponse<List<NotifyDto>> {
-        return network.service.getNotifyList()
-    }
+    fun getNotifyPage(i: Int, i2: Int) {}
 
-    suspend fun getUnreadCount(): NetworkResponse<Int> {
-        return network.service.getUnreadNotifyCount()
-    }
 }

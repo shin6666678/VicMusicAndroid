@@ -37,4 +37,12 @@ class SystemRepository @Inject constructor(
             Result.Error(resp.message ?: "Check update failed")
         }
     }
+
+    suspend fun getGlobalUnreadCount(): Int {
+        val response = datasource.getUnreadCount()
+        if (response.code == 0 && response.data != null) {
+            return response.data["total"] ?: 0
+        }
+        return 0
+    }
 }
