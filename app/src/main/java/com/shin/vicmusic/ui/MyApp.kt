@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.shin.vicmusic.core.design.composition.LocalNavController
@@ -48,10 +49,12 @@ import com.shin.vicmusic.feature.common.MyNavigationBar
 import com.shin.vicmusic.feature.common.bar.SongBar
 import com.shin.vicmusic.feature.liked.likedListScreen
 import com.shin.vicmusic.feature.main.MAIN_ROUTE
+import com.shin.vicmusic.feature.main.MainViewModel
 import com.shin.vicmusic.feature.main.TopLevelDestination
 import com.shin.vicmusic.feature.main.mainScreen
 import com.shin.vicmusic.feature.me.recentPlay.recentPlayScreen
 import com.shin.vicmusic.feature.me.setting.settingScreen
+import com.shin.vicmusic.feature.message.messageListScreen
 import com.shin.vicmusic.feature.myInfo.myInfoScreen
 import com.shin.vicmusic.feature.playBackQueue.PlaybackQueueSheet
 import com.shin.vicmusic.feature.playlist.detail.playlistDetailScreen
@@ -70,7 +73,9 @@ import com.shin.vicmusic.feature.vip.vipScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyApp() {
+fun MyApp(
+    mainViewModel: MainViewModel = hiltViewModel()
+) {
 
     val navController=LocalNavController.current
     val playerManager = LocalPlayerManager.current
@@ -81,11 +86,15 @@ fun MyApp() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val mainTabState = rememberSaveable { mutableIntStateOf(0) }
+    val unreadCount by mainViewModel.unreadCount.collectAsState()
+
+    val badgeCounts = mapOf(
+        TopLevelDestination.ME to unreadCount
+        // TopLevelDestination.FEED to feedUnreadCount // 未来扩展
+    )
 
     // 1. 定义状态
     val isMainScreen = currentRoute == MAIN_ROUTE
-
-
     val isSplashScreen = currentRoute == SPLASH_ROUTE
     val isSongDetail = currentRoute?.contains("songDetail") == true
     val isChatScreen = currentRoute?.contains("chat") == true
@@ -144,6 +153,7 @@ fun MyApp() {
             settingScreen()
             relationshipScreen()
             chatScreen()
+            messageListScreen()
         }
 
         // 底部整体容器 (SongBar + 导航栏)
@@ -175,6 +185,7 @@ fun MyApp() {
                         destinations = TopLevelDestination.entries,
                         currentDestination = TopLevelDestination.entries[mainTabState.intValue].route,
                         onNavigateToDestination = { index -> mainTabState.intValue = index },
+                        badgeCounts = badgeCounts,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
