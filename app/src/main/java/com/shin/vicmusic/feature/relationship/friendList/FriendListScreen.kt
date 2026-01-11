@@ -41,7 +41,9 @@ fun FriendListScreen(
                 } else items(viewModel.userList) { user ->
                     ItemUser(
                         user = user,
+                        showSlogan = true,
                         showFollowStatus = true,
+                        showPMButton = true,
                         onMessageClick = { // 实现回调
                             navController.navigateToChat(user.id, user.name)
                         }

@@ -105,5 +105,6 @@ fun PlaylistsSection(
     // 动态显示歌单列表 (最多3条)
     playlists.take(3).forEach { playlist ->
         ItemPlaylist(playlist = playlist, onClick = { onPlaylistClick(playlist.id) })
+        Spacer(modifier = Modifier.height(12.dp))
     }
 }

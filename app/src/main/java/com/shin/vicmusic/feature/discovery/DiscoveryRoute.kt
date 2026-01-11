@@ -28,6 +28,7 @@ import com.shin.vicmusic.feature.discovery.musicHall.MusicHall
 import com.shin.vicmusic.feature.discovery.recommend.RecommendRoute
 import com.shin.vicmusic.feature.playlist.publicList.PUBLIC_PLAYLISTS_ROUTE
 import com.shin.vicmusic.feature.rankList.rankList.RANK_LIST_ROUTE
+import com.shin.vicmusic.feature.search.navigateToSearch
 import kotlinx.coroutines.launch
 
 @Composable
@@ -40,7 +41,7 @@ fun DiscoveryRoute(
 
     DiscoveryScreen(
         songs = datum,
-        toSearch = { navController.navigate("search") },
+        toSearch = { navController.navigateToSearch() },
         onQuickAccessClick = { label ->
             when(label) {
                 "歌手" -> navController.navigate("artist_list")

@@ -59,9 +59,7 @@ fun ItemSong(
     showDeleteFromPlaylist: Boolean = false,
     onDeleteClick: () -> Unit = {}
 ) {
-    // 检查是否处于预览模式 (Preview Mode)
     if (LocalInspectionMode.current) {
-        // 如果是预览模式，直接渲染纯UI内容，跳过 ViewModel 和 Local 获取
         ItemSongContent(
             song = song,
             modifier = modifier,

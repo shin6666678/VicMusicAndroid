@@ -80,7 +80,7 @@ class DiscoveryViewModel @Inject constructor(
     // 处理喜欢/取消喜欢
     fun toggleLike(song: Song) {
         viewModelScope.launch {
-            val result = likeRepository.likeSong(song.id)
+            val result = likeRepository.likeSong(song.id,1)
             when(result){
                 is Result.Success->{
                     _datum.update { list ->

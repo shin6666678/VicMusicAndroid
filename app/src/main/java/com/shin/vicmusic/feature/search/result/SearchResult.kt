@@ -20,7 +20,7 @@ import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.domain.Playlist
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.domain.UserInfo
-import com.shin.vicmusic.feature.common.ItemAlbum
+import com.shin.vicmusic.feature.common.ItemAlbumSquare
 import com.shin.vicmusic.feature.common.ItemArtist
 import com.shin.vicmusic.feature.common.ItemPlaylist
 import com.shin.vicmusic.feature.common.ItemSong
@@ -55,7 +55,7 @@ fun SearchResultContent(
                 if (result.albums.isNotEmpty()) {
                     item { SectionTitle("专辑") }
                     items(result.albums) { album ->
-                        ItemAlbum(
+                        ItemAlbumSquare(
                             album = album,
                             onAlbumClick = {}
                         )
@@ -87,7 +87,7 @@ fun SearchResultContent(
                     when (item) {
                         is Song -> ItemSong(song = item)
                         is Playlist -> ItemPlaylist(playlist = item, onClick = {})
-                        is Album -> ItemAlbum(
+                        is Album -> ItemAlbumSquare(
                             album = item,
                             onAlbumClick = {}
                         )

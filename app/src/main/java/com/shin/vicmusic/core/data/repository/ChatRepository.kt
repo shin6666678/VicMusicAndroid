@@ -1,10 +1,11 @@
 package com.shin.vicmusic.core.data.repository
 
+import com.shin.vicmusic.core.data.mapper.toDomain
+import com.shin.vicmusic.core.domain.ChatMessage
+import com.shin.vicmusic.core.domain.ChatSession
 import com.shin.vicmusic.core.domain.Result
 import com.shin.vicmusic.core.manager.AuthManager
 import com.shin.vicmusic.core.manager.WebSocketManager
-import com.shin.vicmusic.core.model.ChatMessage
-import com.shin.vicmusic.core.model.api.ChatSessionDto
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import com.shin.vicmusic.core.network.retrofit.MyNetworkApiService
 import kotlinx.coroutines.flow.Flow
@@ -44,13 +45,14 @@ class ChatRepository @Inject constructor(
         }
     }
 
-    suspend fun getChatSessions(): Result<List<ChatSessionDto>> {
-        val response = datasource.getChatSessions()
-        return if (response.code == 0 && response.data != null) {
-            Result.Success(response.data)
-        } else {
-            Result.Error(response.message ?: "获取会话失败")
+    suspend fun getChatSessions(): Result<List<ChatSession>> {
+        val dtoResponse = datasource.getChatSessions()
+        if (dtoResponse.code == 0 && dtoResponse.data != null) {
+            val dtoList = dtoResponse.data
+            val domainList = dtoList.map { it.toDomain()}
+            return Result.Success(domainList)
         }
+        return Result.Error(dtoResponse.message ?: "未知错误")
 
     }
 }

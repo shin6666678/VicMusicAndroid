@@ -23,7 +23,7 @@ import com.shin.vicmusic.core.model.request.ArtistDetailReq
 import com.shin.vicmusic.core.model.request.ArtistPageReq
 import com.shin.vicmusic.core.model.request.ChangeVIPLevelReq
 import com.shin.vicmusic.core.model.request.FollowReq
-import com.shin.vicmusic.core.model.request.LikeSongReq
+import com.shin.vicmusic.core.model.request.LikeReq
 import com.shin.vicmusic.core.model.request.PageReq
 import com.shin.vicmusic.core.model.request.PlaylistSongReq
 import com.shin.vicmusic.core.model.request.SongPageReq
@@ -183,12 +183,16 @@ class MyRetrofitDatasource @Inject constructor(
     喜欢
     */
     suspend fun likedSongs(): NetworkResponse<NetworkPageData<SongListItemDto>> {
-        return safeApiCall { service.getLikedSongs() }
+        return safeApiCall { service.getLikedSong() }
     }
-
-    // 喜欢歌曲
-    suspend fun likeSong(likeSongReq: LikeSongReq): NetworkResponse<Unit> {
-        return safeApiCall { service.likeSong(likeSongReq) }
+    suspend fun likedAlbums(): NetworkResponse<NetworkPageData<AlbumDto>> {
+        return safeApiCall { service.getLikedAlbum() }
+    }
+    suspend fun likedPlaylists(): NetworkResponse<NetworkPageData<PlaylistDto>> {
+        return safeApiCall { service.getLikedPlaylists() }
+    }
+    suspend fun like(likeSongReq: LikeReq): NetworkResponse<Unit> {
+        return safeApiCall { service.like(likeSongReq) }
     }
 
     /*

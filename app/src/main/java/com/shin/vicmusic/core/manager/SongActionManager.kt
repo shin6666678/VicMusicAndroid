@@ -30,7 +30,7 @@ class SongActionManager @Inject constructor(
             _songUpdateEvent.emit(newSong)
 
             // 2. 网络请求
-            val result = likeRepository.likeSong(song.id)
+            val result = likeRepository.likeSong(song.id,1)
 
             // 3. 如果失败，回滚状态
             if (result is Result.Error) {

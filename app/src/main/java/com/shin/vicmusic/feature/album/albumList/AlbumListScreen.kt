@@ -23,8 +23,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.ALBUMS
 import com.shin.vicmusic.feature.album.albumDetail.navigateToAlbumDetail
+import com.shin.vicmusic.feature.common.ItemAlbumSquare
 import com.shin.vicmusic.feature.common.bar.CommonTopBar
-import com.shin.vicmusic.feature.common.ItemAlbum
 
 
 @Composable
@@ -85,7 +85,7 @@ fun AlbumListScreen(
                             modifier = Modifier.fillMaxSize().padding(8.dp)
                         ) {
                             items(state.albums) { album ->
-                                ItemAlbum(album,onAlbumClick)
+                                ItemAlbumSquare(album,onAlbumClick)
                             }
                         }
                     }

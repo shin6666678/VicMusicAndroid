@@ -103,8 +103,6 @@ fun SearchBar(
 fun CommonSearchBar(
     toSearch: () -> Unit,
     placeHolderString: String = "",
-    outModifier: Modifier= Modifier,
-    inModifier: Modifier= Modifier,
     inImageVector: ImageVector=Icons.Default.Search
 ){
     // 搜索框区域

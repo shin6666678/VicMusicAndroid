@@ -45,7 +45,6 @@ fun LikedSongPreview() {
 fun LikedSong(
     songs:List<Song>
 ){
-    var searchQuery by remember { mutableStateOf("") }
     Column() {
         CommonSearchBar(
             toSearch = {},
