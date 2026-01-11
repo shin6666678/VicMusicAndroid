@@ -21,13 +21,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
-import com.shin.vicmusic.feature.common.bar.CommonTopBar
-import com.shin.vicmusic.feature.common.MyAsyncImage
-import com.shin.vicmusic.feature.common.ItemSong
+import com.shin.vicmusic.feature.common.DetailControllerBar
 import com.shin.vicmusic.feature.common.ItemSongNumbered
+import com.shin.vicmusic.feature.common.MyAsyncImage
+import com.shin.vicmusic.feature.common.bar.CommonTopBar
 
 @Composable
 fun AlbumDetailRoute(
@@ -35,9 +37,12 @@ fun AlbumDetailRoute(
 ) {
     val navController = LocalNavController.current
     val uiState by viewModel.uiState.collectAsState()
+
     AlbumDetailScreen(
         uiState = uiState,
         popBackStack = navController::popBackStack,
+        onLikeClick = viewModel::toggleLike,
+        onPlayAllClick = { /* TODO: 绑定播放列表逻辑 */ }
     )
 }
 
@@ -45,6 +50,8 @@ fun AlbumDetailRoute(
 fun AlbumDetailScreen(
     uiState: AlbumDetailUiState,
     popBackStack: () -> Unit,
+    onLikeClick: () -> Unit,
+    onPlayAllClick: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -57,7 +64,7 @@ fun AlbumDetailScreen(
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             CommonTopBar(
-                midText = "专辑",
+                midText = "专辑详情",
                 popBackStack = popBackStack,
                 containerColor = Color.Transparent
             )
@@ -86,19 +93,34 @@ fun AlbumDetailScreen(
                                     .size(200.dp)
                                     .padding(8.dp)
                             )
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(12.dp))
                             Text(
                                 text = uiState.album?.title ?: "未知专辑",
-                                style = MaterialTheme.typography.headlineSmall
+                                style = MaterialTheme.typography.headlineSmall.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 1.sp
+                                ),
+                                color = Color.Black.copy(alpha = 0.8f)
                             )
                         }
                     }
 
-                    // Song List
+                    // Item 2: Controller Bar (Play All + Collect)
+                    item {
+                        // 使用通用组件，替代原有的硬编码按钮
+                        DetailControllerBar(
+                            songCount = uiState.songs.size,
+                            isLiked = uiState.album?.isLiked == true,
+                            onPlayAllClick = onPlayAllClick,
+                            onCollectClick = onLikeClick
+                        )
+                    }
+
+                    // Item 3: Song List
                     itemsIndexed(uiState.songs) { index, song ->
                         ItemSongNumbered(
                             song = song,
-                            num = index,
+                            num = index + 1,
                         )
                     }
                 }

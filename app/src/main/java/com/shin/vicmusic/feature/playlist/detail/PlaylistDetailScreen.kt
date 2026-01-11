@@ -15,9 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.PlaylistDetail
-import com.shin.vicmusic.feature.common.bar.CommonTopBar
-import com.shin.vicmusic.feature.common.ItemSong
+import com.shin.vicmusic.feature.common.DetailControllerBar
 import com.shin.vicmusic.feature.common.ItemSongNumbered
+import com.shin.vicmusic.feature.common.bar.CommonTopBar
 import com.shin.vicmusic.feature.playlist.detail.component.PlaySongActionHeader
 import com.shin.vicmusic.feature.playlist.detail.component.PlaylistHeader
 
@@ -33,12 +33,11 @@ fun PlaylistDetailRoute(
             detail = detail!!,
             onBackClick = navController::popBackStack,
             onChangePublicStatus = viewModel::changePublicStatus,
-            onRemoveSong = { songId ->
-                viewModel.removeSongFromPlaylist(songId)
-            }
+            onRemoveSong = { songId -> viewModel.removeSongFromPlaylist(songId) },
+            onCollectClick = viewModel::toggleCollect,
+            onPlayAllClick = {}
         )
     } else {
-        // Loading state
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text("加载中...")
         }
@@ -50,7 +49,9 @@ fun PlaylistDetailScreen(
     detail: PlaylistDetail,
     onBackClick: () -> Unit,
     onChangePublicStatus: (String) -> Unit = {},
-    onRemoveSong: (String) -> Unit = {} // 新增回调参数
+    onRemoveSong: (String) -> Unit = {},
+    onCollectClick: () -> Unit = {},
+    onPlayAllClick: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -64,7 +65,19 @@ fun PlaylistDetailScreen(
         ) {
 
             item {
-                PlaylistHeader(detail)
+                PlaylistHeader(
+                    detail = detail,
+                )
+            }
+
+            // --- 操作栏区域：全部播放 + 收藏 ---
+            item {
+                DetailControllerBar(
+                    songCount = detail.info.songCount,
+                    isLiked = detail.info.isLiked,
+                    onPlayAllClick = onPlayAllClick,
+                    onCollectClick = onCollectClick
+                )
             }
 
             item {
@@ -78,9 +91,9 @@ fun PlaylistDetailScreen(
             itemsIndexed(detail.songs) { index, song ->
                 ItemSongNumbered(
                     song = song,
-                    num = index,
+                    num = index + 1,
                     showDeleteFromPlaylist = true,
-                    onDeleteClick = {onRemoveSong(song.id)}
+                    onDeleteClick = { onRemoveSong(song.id) }
                 )
             }
         }

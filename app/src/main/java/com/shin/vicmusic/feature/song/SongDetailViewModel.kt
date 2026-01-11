@@ -94,7 +94,7 @@ class SongDetailViewModel @Inject constructor(
 
             viewModelScope.launch {
                 // 发送网络请求
-                val result = likeRepository.likeSong(currentSong.id,1)
+                val result = likeRepository.toggleLike(currentSong.id,1)
                 when (result) {
                     is Result.Success -> {
                         _songUiState.update {

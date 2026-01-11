@@ -101,7 +101,7 @@ interface MyNetworkApiService {
 
     //喜欢接口
     @POST("/api/like/v1/like")
-    suspend fun like(@Body req: LikeReq): NetworkResponse<Unit>
+    suspend fun toggleLike(@Body req: LikeReq): NetworkResponse<Unit>
 
     /*
     Artist艺术家
