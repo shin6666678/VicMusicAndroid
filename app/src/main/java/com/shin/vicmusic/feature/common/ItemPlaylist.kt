@@ -70,7 +70,7 @@ fun ItemPlaylist(playlist: Playlist, onClick: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "${playlist.playCount}首",
+                text = "${playlist.playCount}首 来自 ${playlist.ownerName}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -88,12 +88,12 @@ fun ItemPlaylist(playlist: Playlist, onClick: () -> Unit) {
 @Composable
 fun ItemPlaylistSquare(
     playlist: Playlist,
+    onClick: () -> Unit = {}
 ) {
-    val navController= LocalNavController.current
     Column(
         modifier = Modifier
             .width(100.dp) // 限制宽度，适配横向列表
-            .clickable(onClick = { navController.navigateToPlaylistDetail(playlist.id) }),
+            .clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally // 内容水平居中
     ) {
         Surface(
@@ -121,7 +121,7 @@ fun ItemPlaylistSquare(
         Text(
             text = playlist.name,
             style = MaterialTheme.typography.bodyMedium,
-            maxLines = 1, // 只显示一行
+            maxLines = 1,
             overflow = TextOverflow.Ellipsis, // 超出显示省略号
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )

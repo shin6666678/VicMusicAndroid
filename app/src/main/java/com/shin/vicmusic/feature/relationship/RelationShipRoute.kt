@@ -1,6 +1,5 @@
 package com.shin.vicmusic.feature.relationship
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
@@ -14,7 +13,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.feature.common.bar.BarTabItem
 import com.shin.vicmusic.feature.common.bar.CommonTopBarSelect
-import com.shin.vicmusic.feature.common.bar.UniversalTopBar
 import com.shin.vicmusic.feature.relationship.fanList.FanListScreen
 import com.shin.vicmusic.feature.relationship.followList.FollowListScreen
 import com.shin.vicmusic.feature.relationship.friendList.FriendListScreen

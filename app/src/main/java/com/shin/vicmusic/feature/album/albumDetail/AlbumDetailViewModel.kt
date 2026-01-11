@@ -88,7 +88,7 @@ class AlbumDetailViewModel @Inject constructor(
             updateLikeState(song.id)
 
             // 3. 网络请求
-            val result = likeRepository.likeSong(song.id)
+            val result = likeRepository.likeSong(song.id,1)
 
             // 4. 如果失败，回滚
             if (result is Result.Error) {

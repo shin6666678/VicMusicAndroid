@@ -1,6 +1,5 @@
 package com.shin.vicmusic.core.domain
 
-import com.shin.vicmusic.core.model.response.NetworkPageData
 import kotlinx.serialization.Serializable
 
 
@@ -12,6 +11,7 @@ data class Album (
     val id:String,
     val title:String="未知专辑",
     val artist: Artist=Artist(id = "-1", name = "未知歌手"),
+    val artistName:String="未知歌手",
     val icon:String="",
     val description:String="",
     val company:String="",

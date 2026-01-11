@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.ChatRepository
 import com.shin.vicmusic.core.manager.AuthManager
-import com.shin.vicmusic.core.model.ChatMessage
+import com.shin.vicmusic.core.domain.ChatMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

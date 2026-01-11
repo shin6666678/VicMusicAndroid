@@ -1,7 +1,7 @@
 package com.shin.vicmusic.core.network.retrofit
 
 import com.shin.vicmusic.core.domain.User
-import com.shin.vicmusic.core.model.ChatMessage
+import com.shin.vicmusic.core.domain.ChatMessage
 import com.shin.vicmusic.core.model.api.AlbumDetailResp
 import com.shin.vicmusic.core.model.api.AlbumDto
 import com.shin.vicmusic.core.model.api.AppUpdateDto
@@ -21,7 +21,7 @@ import com.shin.vicmusic.core.model.api.UserDetailDto
 import com.shin.vicmusic.core.model.api.UserDto
 import com.shin.vicmusic.core.model.request.ChangeVIPLevelReq
 import com.shin.vicmusic.core.model.request.FollowReq
-import com.shin.vicmusic.core.model.request.LikeSongReq
+import com.shin.vicmusic.core.model.request.LikeReq
 import com.shin.vicmusic.core.model.request.PageReq
 import com.shin.vicmusic.core.model.request.PlaylistSongReq
 import com.shin.vicmusic.core.model.request.UserLoginReq
@@ -91,13 +91,17 @@ interface MyNetworkApiService {
     /*
     喜欢
      */
-    // 获取喜欢歌曲列表接口
+    // 获取喜欢列表
     @GET("/api/like/v1/listSong")
-    suspend fun getLikedSongs(): NetworkResponse<NetworkPageData<SongListItemDto>>
+    suspend fun getLikedSong(): NetworkResponse<NetworkPageData<SongListItemDto>>
+    @GET("/api/like/v1/listAlbum")
+    suspend fun getLikedAlbum(): NetworkResponse<NetworkPageData<AlbumDto>>
+    @GET("/api/like/v1/listPlaylist")
+    suspend fun getLikedPlaylists(): NetworkResponse<NetworkPageData<PlaylistDto>>
 
-    // [新增] 喜欢歌曲接口
-    @POST("/api/like/v1/likeSong")
-    suspend fun likeSong(@Body req: LikeSongReq): NetworkResponse<Unit>
+    //喜欢接口
+    @POST("/api/like/v1/like")
+    suspend fun like(@Body req: LikeReq): NetworkResponse<Unit>
 
     /*
     Artist艺术家

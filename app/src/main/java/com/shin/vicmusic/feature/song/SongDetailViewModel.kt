@@ -7,7 +7,6 @@ import com.shin.vicmusic.core.data.repository.LikeRepository
 import com.shin.vicmusic.core.data.repository.SongRepository
 import com.shin.vicmusic.core.domain.Result
 import com.shin.vicmusic.core.domain.Song
-import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -95,7 +94,7 @@ class SongDetailViewModel @Inject constructor(
 
             viewModelScope.launch {
                 // 发送网络请求
-                val result = likeRepository.likeSong(currentSong.id)
+                val result = likeRepository.likeSong(currentSong.id,1)
                 when (result) {
                     is Result.Success -> {
                         _songUiState.update {

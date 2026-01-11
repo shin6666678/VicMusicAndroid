@@ -50,6 +50,7 @@ import com.shin.vicmusic.feature.me.component.RecentBar
 import com.shin.vicmusic.feature.me.component.UserInfoCard
 import com.shin.vicmusic.feature.me.recentPlay.navigateToRecentPlay
 import com.shin.vicmusic.feature.me.setting.navigateToSetting
+import com.shin.vicmusic.feature.message.navigateToMessageList
 import com.shin.vicmusic.feature.myInfo.navigateToMyInfo
 import com.shin.vicmusic.feature.playlist.detail.navigateToPlaylistDetail
 import com.shin.vicmusic.feature.playlist.meList.navigateToMyPlaylists
@@ -88,7 +89,7 @@ fun MeRoute(
     val topBarActions = listOf(
         BarActionItem(
             icon = Icons.Default.MailOutline,
-            onClick = { }
+            onClick = { navController.navigateToMessageList()}
         ),
         BarActionItem(
             icon = Icons.Filled.Tune,

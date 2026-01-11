@@ -1,10 +1,10 @@
-package com.shin.vicmusic.core.model.api
+package com.shin.vicmusic.core.domain
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ChatSessionDto(
+data class ChatSession(
     @SerialName("userId")
     val userId: String,
     val username: String,

@@ -1,4 +1,4 @@
-package com.shin.vicmusic.core.model
+package com.shin.vicmusic.core.domain
 
 import kotlinx.serialization.Serializable
 

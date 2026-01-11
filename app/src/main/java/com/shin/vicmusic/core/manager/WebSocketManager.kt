@@ -2,7 +2,7 @@ package com.shin.vicmusic.core.manager
 
 import android.util.Log
 import com.google.gson.Gson
-import com.shin.vicmusic.core.model.ChatMessage
+import com.shin.vicmusic.core.domain.ChatMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

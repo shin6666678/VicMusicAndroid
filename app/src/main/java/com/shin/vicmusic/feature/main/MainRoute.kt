@@ -18,7 +18,6 @@ import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.feature.discovery.DiscoveryRoute
 import com.shin.vicmusic.feature.feed.FeedRoute
 import com.shin.vicmusic.feature.me.MeRoute
-import com.shin.vicmusic.feature.shortVideo.ShortVideoRoute
 
 
 @Preview
@@ -43,12 +42,10 @@ fun MainRoute(
         MainScreen(
             mainTabState = mainTabState,
             pageContent = { page ->
-                // 在这里注入真实的路由
                 when (page) {
                     0 -> DiscoveryRoute(navController)
-                    1 -> ShortVideoRoute()
-                    2 -> MeRoute()
-                    3 -> FeedRoute()
+                    1 -> MeRoute()
+                    2 -> FeedRoute()
                 }
             }
         )
@@ -63,7 +60,7 @@ fun MainScreen(
 ){
 
     val pagerState= rememberPagerState{
-        4
+        3
     }
     // 同步外部 currentTab 到 pagerState
     LaunchedEffect(mainTabState.intValue) {
