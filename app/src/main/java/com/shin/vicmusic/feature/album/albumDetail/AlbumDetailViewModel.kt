@@ -16,21 +16,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/**
- * 专辑详情页的ViewModel
- * @param albumRepository 专辑数据仓库
- */
 @HiltViewModel
 class AlbumDetailViewModel @Inject constructor(
     private val albumRepository: AlbumRepository,
     private val likeRepository: LikeRepository,
-    savedStateHandle: SavedStateHandle // 获取传递的参数
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    // 从路由参数中获取 albumId
     private val albumId: String = checkNotNull(savedStateHandle["albumId"])
 
-    // UI状态
     private val _uiState = MutableStateFlow(AlbumDetailUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -38,75 +32,53 @@ class AlbumDetailViewModel @Inject constructor(
         loadAlbumDetail()
     }
 
-    /**
-     * 获取聚合详情数据 (专辑信息 + 歌曲列表)
-     */
     fun loadAlbumDetail() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-
-            val result = albumRepository.getAlbumDetail(AlbumDetailReq(id=albumId))
-
-            _uiState.update { state ->
-                when (result) {
-                    is Result.Success -> {
-                        // [关键] 一次性解构数据
-                        // 假设 result.data 是你定义的聚合 Domain 对象
-                        val detail = result.data
+            when (val result = albumRepository.getAlbumDetail(AlbumDetailReq(id = albumId))) {
+                is Result.Success -> {
+                    _uiState.update { state ->
                         state.copy(
                             isLoading = false,
-                            album = detail.album, // 拿到专辑信息
-                            songs = detail.songs.items, // 拿到歌曲列表 (如果是 PageResult 取 items)
+                            album = result.data.album,
+                            songs = result.data.songs.items,
                             error = null
                         )
                     }
-                    is Result.Error -> state.copy(
-                        isLoading = false,
-                        error = result.message
-                    )
+                }
+                is Result.Error -> {
+                    _uiState.update { state ->
+                        state.copy(
+                            isLoading = false,
+                            error = result.message
+                        )
+                    }
                 }
             }
         }
     }
 
+    fun toggleLike() {
+        val currentAlbum = _uiState.value.album ?: return
 
-    /**
-     * 点赞/取消点赞 (优化了代码复用)
-     */
-    fun toggleLike(song: Song) {
         viewModelScope.launch {
-            // 1. 定义局部更新函数：只翻转指定 ID 的 isLiked 状态
-            fun updateLikeState(targetId: String) {
-                _uiState.update { state ->
-                    state.copy(songs = state.songs.map { item ->
-                        if (item.id == targetId) item.copy(isLiked = !item.isLiked) else item
-                    })
+            when (val response = likeRepository.toggleLike(currentAlbum.id, 2)) {
+                is Result.Success -> {
+                    val newStatus = response.data
+                    _uiState.update { state ->
+                        state.copy(
+                            album = currentAlbum.copy(isLiked = newStatus)
+                        )
+                    }
                 }
-            }
-
-            // 2. 乐观更新
-            updateLikeState(song.id)
-
-            // 3. 网络请求
-            val result = likeRepository.likeSong(song.id,1)
-
-            // 4. 如果失败，回滚
-            if (result is Result.Error) {
-                updateLikeState(song.id) // 再翻转一次就回去了
-                // 可选：显示错误提示
-                // _uiState.update { it.copy(error = result.message) }
+                is Result.Error -> {
+                    _uiState.update { it.copy(error = response.message) }
+                }
             }
         }
     }
 }
 
-/**
- * 专辑详情页的UI状态
- * @param isLoading 是否正在加载
- * @param album 专辑信息
- * @param songs 专辑内的歌曲列表
- * @param error 错误信息
- */
 data class AlbumDetailUiState(
     val isLoading: Boolean = false,
     val album: Album? = null,

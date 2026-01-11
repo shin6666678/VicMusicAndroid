@@ -3,25 +3,26 @@ package com.shin.vicmusic.feature.playlist.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.shin.vicmusic.core.data.repository.LikeRepository
 import com.shin.vicmusic.core.data.repository.PlaylistRepository
 import com.shin.vicmusic.core.domain.PlaylistDetail
 import com.shin.vicmusic.core.domain.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class PlaylistDetailViewModel @Inject constructor(
     private val repository: PlaylistRepository,
+    private val likeRepository: LikeRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _detail = MutableStateFlow<PlaylistDetail?>(null)
     val detail = _detail.asStateFlow()
-
-    // 从路由参数获取ID
     private val playlistId: String = checkNotNull(savedStateHandle["id"])
 
     init {
@@ -30,17 +31,19 @@ class PlaylistDetailViewModel @Inject constructor(
 
     private fun fetchDetail() {
         viewModelScope.launch {
-            val res = repository.getPlaylistDetail(playlistId)
-            if (res is Result.Success) {
-                _detail.value = res.data
+            when (val res = repository.getPlaylistDetail(playlistId)) {
+                is Result.Success -> {
+                    _detail.value = res.data
+                }
+                is Result.Error -> {
+                }
             }
         }
     }
 
-     fun changePublicStatus(id:String){
+    fun changePublicStatus(id: String) {
         viewModelScope.launch {
-            val res = repository.changePublicStatus(id)
-            if (res is Result.Success) {
+            if (repository.changePublicStatus(id) is Result.Success) {
                 fetchDetail()
             }
         }
@@ -49,6 +52,31 @@ class PlaylistDetailViewModel @Inject constructor(
     fun removeSongFromPlaylist(songId: String) {
         viewModelScope.launch {
             repository.removeSongFromPlaylist(playlistId, songId)
+            fetchDetail()
+        }
+    }
+
+    fun toggleCollect() {
+        val currentDetail = _detail.value ?: return
+        val currentInfo = currentDetail.info
+
+        viewModelScope.launch {
+            // Type 3: Playlist
+            when (val result = likeRepository.toggleLike(currentInfo.id, 3)) {
+                is Result.Success -> {
+                    val newStatus = result.data
+                    // ⚠️ 修正嵌套 Copy 逻辑错误：
+                    // 我们必须更新 _detail (PlaylistDetail)，更新其内部的 info (PlayList)
+                    _detail.update { oldDetail ->
+                        oldDetail?.copy(
+                            info = currentInfo.copy(isLiked = newStatus)
+                        )
+                    }
+                }
+                is Result.Error -> {
+                    println("Collect failed: ${result.message}")
+                }
+            }
         }
     }
 }

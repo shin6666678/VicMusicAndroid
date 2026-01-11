@@ -58,10 +58,10 @@ class LikeRepository @Inject constructor(
         return Result.Error(dtoResponse.message ?: "获取歌单失败")
     }
 
-    suspend fun likeSong(id: String,type:Int): Result<Unit> {
-        val dtoResponse = datasource.like(LikeReq(id,type))
+    suspend fun toggleLike(id: String,type:Int): Result<Boolean> {
+        val dtoResponse = datasource.toggleLike(LikeReq(id,type))
         if (dtoResponse.code == 0) {
-            return Result.Success(Unit)
+            return Result.Success(true)
         }
         return Result.Error(dtoResponse.message ?: "操作失败")
     }

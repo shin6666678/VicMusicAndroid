@@ -106,7 +106,7 @@ class LikedSongsViewModel @Inject constructor(
 
     fun toggleLike(song: Song) {
         viewModelScope.launch {
-            val result = likeRepository.likeSong(song.id, 1)
+            val result = likeRepository.toggleLike(song.id, 1)
             when (result) {
                 is Result.Success -> {
                     _uiState.update { state ->

@@ -12,6 +12,7 @@ data class Playlist(
     val playCount: Int = 0,
     val likeCount: Int = 0,
     val isPublic: Int? = 0,
+    val isLiked: Boolean = false,
 
     val ownerName: String,
 )

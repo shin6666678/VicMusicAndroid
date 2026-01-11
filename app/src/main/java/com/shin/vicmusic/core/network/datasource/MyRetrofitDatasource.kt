@@ -191,8 +191,8 @@ class MyRetrofitDatasource @Inject constructor(
     suspend fun likedPlaylists(): NetworkResponse<NetworkPageData<PlaylistDto>> {
         return safeApiCall { service.getLikedPlaylists() }
     }
-    suspend fun like(likeSongReq: LikeReq): NetworkResponse<Unit> {
-        return safeApiCall { service.like(likeSongReq) }
+    suspend fun toggleLike(likeSongReq: LikeReq): NetworkResponse<Unit> {
+        return safeApiCall { service.toggleLike(likeSongReq) }
     }
 
     /*
