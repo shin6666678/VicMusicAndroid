@@ -48,6 +48,7 @@ import com.shin.vicmusic.feature.checkIn.checkInScreen
 import com.shin.vicmusic.feature.common.MyNavigationBar
 import com.shin.vicmusic.feature.common.bar.SongBar
 import com.shin.vicmusic.feature.liked.likedListScreen
+import com.shin.vicmusic.feature.localMusic.localMusicScreen
 import com.shin.vicmusic.feature.main.MAIN_ROUTE
 import com.shin.vicmusic.feature.main.MainViewModel
 import com.shin.vicmusic.feature.main.TopLevelDestination
@@ -154,6 +155,7 @@ fun MyApp(
             relationshipScreen()
             chatScreen()
             messageListScreen()
+            localMusicScreen()
         }
 
         // 底部整体容器 (SongBar + 导航栏)

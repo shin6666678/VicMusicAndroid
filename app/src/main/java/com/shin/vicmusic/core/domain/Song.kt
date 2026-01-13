@@ -15,7 +15,9 @@ data class Song (
     val uri: String="",
     val icon:String="",
     val album: Album=Album(id = "-1"),
+    val albumName:String="",
     val artist: Artist=Artist(id = "-1"),
+    val artistName:String="",
     val payType: PayType= PayType.FREE,
     val genre:String="",
     val lyricStyle:Int= Constant.VALUE0,
@@ -25,6 +27,7 @@ data class Song (
     val clicksCount: Int=0,
     val commentsCount: Int=0,
     val uploaderUserId: String="",
+    val duration: Long = 0,
 
     val isLiked: Boolean = false,
     val playCount:Int=0

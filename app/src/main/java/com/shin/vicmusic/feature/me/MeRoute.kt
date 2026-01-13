@@ -45,6 +45,7 @@ import com.shin.vicmusic.feature.common.bar.BarActionItem
 import com.shin.vicmusic.feature.common.bar.BarTabItem
 import com.shin.vicmusic.feature.common.bar.UniversalTopBar
 import com.shin.vicmusic.feature.liked.navigateToLikedList
+import com.shin.vicmusic.feature.localMusic.navigateToLocalMusic
 import com.shin.vicmusic.feature.me.component.PlaylistsSection
 import com.shin.vicmusic.feature.me.component.RecentBar
 import com.shin.vicmusic.feature.me.component.UserInfoCard
@@ -109,6 +110,7 @@ fun MeRoute(
         myPlaylists = playlists,
         onMorePlaylistsClick = { navController.navigateToMyPlaylists() },
         onLikedClick = { navController.navigateToLikedList() },
+        onLocalClick = { navController.navigateToLocalMusic() },
 
         recentPlayList = playlists,
         recentNum = 2,
@@ -138,6 +140,7 @@ fun MeScreen(
     onAvatarClick: () -> Unit = {},
     onVipClick: () -> Unit = {},
     onLikedClick: () -> Unit = {},
+    onLocalClick: () -> Unit = {},
     isLoggedIn: Boolean,
     user: UserInfo? = null,
     onMorePlaylistsClick: () -> Unit = {},
@@ -201,7 +204,12 @@ fun MeScreen(
                     count = "2",
                     onClick = onLikedClick
                 )
-                QuickAccessItem(icon = Icons.Filled.Download, text = "本地", count = "29")
+                QuickAccessItem(
+                    icon = Icons.Filled.Download,
+                    text = "本地",
+                    count = "29",
+                    onClick = onLocalClick
+                )
                 QuickAccessItem(icon = Icons.Filled.Headphones, text = "有声", count = "6")
                 QuickAccessItem(icon = Icons.Filled.ReceiptLong, text = "已购", count = "1")
             }
