@@ -1,21 +1,19 @@
 package com.shin.vicmusic.core.manager
 
+import android.content.ComponentName
 import android.content.Context
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.media3.common.Player
-import androidx.media3.database.StandaloneDatabaseProvider
-import androidx.media3.datasource.DefaultHttpDataSource
-import androidx.media3.datasource.cache.CacheDataSource
-import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
-import androidx.media3.datasource.cache.SimpleCache
-import androidx.media3.exoplayer.DefaultLoadControl
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.session.MediaController
+import androidx.media3.session.SessionToken
 import com.shin.vicmusic.core.data.repository.PlayerRepository
 import com.shin.vicmusic.core.data.repository.SongRepository
 import com.shin.vicmusic.core.data.repository.UserRepository
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.domain.usecase.CheckVipPermissionUseCase
+import com.shin.vicmusic.core.service.PlaybackService
 import com.shin.vicmusic.util.LrcHelper
 import com.shin.vicmusic.util.ResourceUtil
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -33,7 +31,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.cancellation.CancellationException
@@ -46,6 +43,7 @@ data class PlayerState(
     val currentLyricLineIndex: Int = -1,
 )
 
+@UnstableApi
 @Singleton
 class PlayerManager @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -58,56 +56,9 @@ class PlayerManager @Inject constructor(
     private val TAG = "PlayerManager"
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-    // 用于判断当前是否在 SongDetail 界面
+    private var mediaController: MediaController? = null
+
     var isSongDetailVisible: Boolean = false
-
-    companion object {
-        private var simpleCache: SimpleCache? = null
-
-        @Synchronized
-        fun getCache(context: Context): SimpleCache {
-            if (simpleCache == null) {
-                val cacheDir = File(context.cacheDir, "media_cache")
-                val evictor = LeastRecentlyUsedCacheEvictor(1024 * 1024 * 512)
-                val dbProvider = StandaloneDatabaseProvider(context)
-                simpleCache = SimpleCache(cacheDir, evictor, dbProvider)
-            }
-            return simpleCache!!
-        }
-    }
-
-    // [核心修复1] 调整 LoadControl
-    // 将 maxBufferMs 设为 20分钟 (1,200,000ms)，确保能缓存整首歌曲，不再中途停止
-    private val loadControl = DefaultLoadControl.Builder()
-        .setBufferDurationsMs(
-            30_000,
-            1_200_000, // maxBufferMs: 20分钟，允许 ExoPlayer 一口气下载整首歌
-            500,
-            0
-        )
-        .setBackBuffer(30_000, true)
-        .setPrioritizeTimeOverSizeThresholds(true)
-        .build()
-
-    private fun buildExoPlayer(): ExoPlayer {
-        val httpDataSourceFactory = DefaultHttpDataSource.Factory()
-            .setAllowCrossProtocolRedirects(true)
-
-        val cacheDataSourceFactory = CacheDataSource.Factory()
-            .setCache(getCache(context))
-            .setUpstreamDataSourceFactory(httpDataSourceFactory)
-            .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
-
-        val mediaSourceFactory = DefaultMediaSourceFactory(context)
-            .setDataSourceFactory(cacheDataSourceFactory)
-
-        return ExoPlayer.Builder(context)
-            .setMediaSourceFactory(mediaSourceFactory)
-            .setLoadControl(loadControl)
-            .build()
-    }
-
-    private var exoPlayer: ExoPlayer = buildExoPlayer()
 
     private val _currentPlayingSong = MutableStateFlow<Song?>(null)
     val currentPlayingSong: StateFlow<Song?> = _currentPlayingSong.asStateFlow()
@@ -131,9 +82,7 @@ class PlayerManager @Inject constructor(
     private var isSeeking = false
 
     init {
-        setupPlayerListener()
-        restoreSession()
-
+        initializeMediaController()
         scope.launch {
             currentPlayingSong.collect { song ->
                 playerRepository.saveLastPlayedSong(song)
@@ -141,170 +90,168 @@ class PlayerManager @Inject constructor(
         }
     }
 
-    private suspend fun tryPlaySong(song: Song?, performPlay: () -> Unit) {
-        if (song == null) return
-        _currentPlayingSong.value = song
-        loadLyric(song)
-        performPlay()
-        playerRepository.saveLastPlayedSong(song)
+    private fun initializeMediaController() {
+        val sessionToken = SessionToken(context, ComponentName(context, PlaybackService::class.java))
+        val controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
 
-        exoPlayer.prepare()
-        exoPlayer.playWhenReady = true
-        startReportPlayJob(song = song)
+        controllerFuture.addListener(
+            {
+                mediaController = controllerFuture.get()
+                mediaController?.addListener(playerListener)
+                syncStateWithController()
+            },
+            ContextCompat.getMainExecutor(context)
+        )
+    }
+
+    private fun syncStateWithController() {
+        val controller = mediaController ?: return
+        val currentMediaItem = controller.currentMediaItem
+        if (currentMediaItem != null) {
+            val song = playbackQueue.value.find { it.id == currentMediaItem.mediaId }
+            _currentPlayingSong.value = song
+            if (song != null) loadLyric(song)
+        }
+        updatePlayerState()
+        toggleProgressUpdate()
     }
 
     fun playSong(song: Song, queue: List<Song>? = null) {
+        val controller = mediaController ?: return
         scope.launch {
             val newQueue = queue ?: listOf(song)
             val index = newQueue.indexOfFirst { it.id == song.id }
             queueManager.setQueue(newQueue, index)
-            tryPlaySong(song) {
-                exoPlayer.setMediaItems(newQueue.map { it.toMediaItem() })
-                exoPlayer.seekTo(index, 0)
-            }
+
+            controller.setMediaItems(newQueue.map { it.toMediaItem() })
+            controller.seekTo(index, 0)
+            controller.prepare()
+            controller.play()
         }
     }
 
     fun playAtIndex(index: Int) {
-        scope.launch {
-            val queue = playbackQueue.value
-            if (index in queue.indices) {
-                queueManager.updateIndex(index)
-                val song = queue[index]
-                tryPlaySong(song) {
-                    exoPlayer.seekTo(index, 0)
-                }
-            }
+        val controller = mediaController ?: return
+        val queue = playbackQueue.value
+        if (index in queue.indices) {
+            queueManager.updateIndex(index)
+            controller.seekToDefaultPosition(index)
+            controller.play()
         }
     }
 
-    fun skipToNext() = playAtIndex(queueManager.getNextIndex())
-    fun skipToPrevious() = playAtIndex(queueManager.getPreviousIndex())
+    fun skipToNext() = mediaController?.seekToNextMediaItem()
+    fun skipToPrevious() = mediaController?.seekToPreviousMediaItem()
 
     fun togglePlayPause() {
-        if (exoPlayer.playbackState == Player.STATE_ENDED) exoPlayer.seekTo(0)
-        if (exoPlayer.playWhenReady) exoPlayer.pause() else exoPlayer.play()
+        val controller = mediaController ?: return
+        if (controller.playbackState == Player.STATE_ENDED) {
+            controller.seekTo(0)
+            controller.play()
+        } else {
+            if (controller.playWhenReady) controller.pause() else controller.play()
+        }
     }
 
     fun seekTo(pos: Long) {
         isSeeking = true
-        exoPlayer.seekTo(pos)
+        mediaController?.seekTo(pos)
         _playerState.update { it.copy(currentPosition = pos) }
     }
 
     fun removeSong(index: Int) {
         if (index in playbackQueue.value.indices) {
             queueManager.removeSongAt(index)
-            exoPlayer.removeMediaItem(index)
+            mediaController?.removeMediaItem(index)
         }
     }
 
     fun addSongToQueue(song: Song) {
         queueManager.addSong(song)
-        exoPlayer.addMediaItem(song.toMediaItem())
+        mediaController?.addMediaItem(song.toMediaItem())
     }
 
-    private fun setupPlayerListener() {
-        exoPlayer.addListener(object : Player.Listener {
-            override fun onEvents(player: Player, events: Player.Events) {
-                super.onEvents(player, events)
+    private val playerListener = object : Player.Listener {
+        override fun onEvents(player: Player, events: Player.Events) {
+            super.onEvents(player, events)
+            updatePlayerState()
+        }
+
+        override fun onIsLoadingChanged(isLoading: Boolean) {
+            toggleProgressUpdate()
+        }
+
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            toggleProgressUpdate()
+            if (isPlaying) startReportTimeJob() else stopReportingDuration()
+        }
+
+        override fun onPlaybackStateChanged(state: Int) {
+            if (state == Player.STATE_READY) {
+                isSeeking = false
                 updatePlayerState()
             }
+        }
 
-            // [核心修复2] 监听加载状态
-            override fun onIsLoadingChanged(isLoading: Boolean) {
-                // 当 loading 状态改变时 (开始/停止缓冲)，检查是否需要启动定时器
-                toggleProgressUpdate()
-            }
-
-            override fun onIsPlayingChanged(isPlaying: Boolean) {
-                // 播放状态改变时，检查是否需要启动定时器
-                toggleProgressUpdate()
-
-                if (isPlaying) startReportTimeJob() else stopReportingDuration()
-            }
-
-            override fun onPlaybackStateChanged(state: Int) {
-                if (state == Player.STATE_ENDED) skipToNext()
-                if (state == Player.STATE_READY) {
-                    isSeeking = false
-                    updatePlayerState()
+        override fun onMediaItemTransition(mediaItem: androidx.media3.common.MediaItem?, reason: Int) {
+            mediaItem?.mediaId?.let { songId ->
+                val song = playbackQueue.value.find { it.id == songId }
+                val index = playbackQueue.value.indexOf(song)
+                if (index != -1) {
+                    queueManager.updateIndex(index)
+                    _currentPlayingSong.value = song
+                    if (song != null) {
+                        loadLyric(song)
+                        startReportPlayJob(song)
+                    }
                 }
             }
+        }
 
-            override fun onPositionDiscontinuity(
-                oldPosition: Player.PositionInfo,
-                newPosition: Player.PositionInfo,
-                reason: Int
-            ) {
-                if (reason == Player.DISCONTINUITY_REASON_SEEK) {
-                    isSeeking = false
-                    updatePlayerState()
-                }
+        override fun onPositionDiscontinuity(oldPosition: Player.PositionInfo, newPosition: Player.PositionInfo, reason: Int) {
+            if (reason == Player.DISCONTINUITY_REASON_SEEK) {
+                isSeeking = false
+                updatePlayerState()
             }
-        })
+        }
     }
 
-    // [核心修复3] 统一管理定时器启动逻辑
     private fun toggleProgressUpdate() {
-        // 只要是在播放 OR 正在后台加载/缓冲，就保持 UI 更新
-        // 这样即使暂停了，只要还在下载缓存，进度条也会走
-        val shouldUpdate = exoPlayer.isPlaying || exoPlayer.isLoading
-        if (shouldUpdate) {
-            startProgressUpdate()
-        } else {
-            stopProgressUpdate()
-        }
+        val controller = mediaController ?: return
+        val shouldUpdate = controller.isPlaying || controller.isLoading
+        if (shouldUpdate) startProgressUpdate() else stopProgressUpdate()
     }
 
     private fun updatePlayerState() {
-        val currentPos = exoPlayer.currentPosition
-        val lines = currentPlayingSong.value?.lyricList ?: emptyList()
+        val controller = mediaController ?: return
+        val currentPos = controller.currentPosition
 
-        // 新增：VIP 试听逻辑判断
         val currentSong = _currentPlayingSong.value
-        if (currentSong != null && !checkVipPermission(currentSong)) {
-            // 如果非 VIP 且播放时间超过 10000ms (10秒)
-            if (currentPos >= 10000) {
-                if (exoPlayer.isPlaying) {
-                    exoPlayer.pause() // 暂停播放
-                    if (isSongDetailVisible) {
-                        // 如果在详情页，弹窗提示
-                        scope.launch { _uiEvent.emit("SHOW_VIP_DIALOG") }
-                    } else {
-                        // 如果在其他界面，自动下一首
-                        skipToNext()
-                    }
-                }
-                // 强制将进度限制在10秒，防止拖动进度条绕过
-                if (currentPos > 10000) {
-                    // 仅在非拖动状态下修正，或者直接修正UI显示
-                }
+        if (currentSong != null && !checkVipPermission(currentSong) && currentPos >= 10000) {
+            if (controller.isPlaying) {
+                controller.pause()
+                if (isSongDetailVisible) scope.launch { _uiEvent.emit("SHOW_VIP_DIALOG") } else skipToNext()
             }
         }
 
-        val isUiPlaying = exoPlayer.isPlaying ||
-                (exoPlayer.playbackState == Player.STATE_BUFFERING && exoPlayer.playWhenReady)
+        val isUiPlaying = controller.isPlaying ||
+                (controller.playbackState == Player.STATE_BUFFERING && controller.playWhenReady)
 
         _playerState.update {
             it.copy(
                 isPlaying = isUiPlaying,
-                duration = exoPlayer.duration.coerceAtLeast(0),
-                bufferedPosition = exoPlayer.bufferedPosition,
+                duration = controller.duration.coerceAtLeast(0),
+                bufferedPosition = controller.bufferedPosition,
                 currentPosition = if (isSeeking) it.currentPosition else currentPos,
-                currentLyricLineIndex = lines.indexOfLast { line -> line.time <= currentPos }
+                currentLyricLineIndex = currentPlayingSong.value?.lyricList?.indexOfLast { line -> line.time <= currentPos } ?: -1
             )
         }
     }
 
     private fun startProgressUpdate() {
-        // 避免重复启动 job
         if (progressJob?.isActive == true) return
-
         progressJob = scope.launch {
             while (isActive) {
-                // 只要不是正在拖拽，就更新。
-                // 这里移除了 isPlaying 的判断，改为由 toggleProgressUpdate 外部控制协程的存活
                 if (!isSeeking) {
                     updatePlayerState()
                 }
@@ -315,7 +262,6 @@ class PlayerManager @Inject constructor(
 
     private fun stopProgressUpdate() {
         progressJob?.cancel()
-        // 停止时哪怕不更新也没关系，最后一次 updatePlayerState 会保留状态
         updatePlayerState()
     }
 
@@ -325,7 +271,7 @@ class PlayerManager @Inject constructor(
             try {
                 delay(10000)
                 songRepository.playSong(song.id)
-                Log.d("PlayerManager", "Valid play recorded: ${song.title}")
+                Log.d(TAG, "Valid play recorded: ${song.title}")
             } catch (e: Exception) {
                 if (e !is CancellationException) e.printStackTrace()
             }
@@ -351,28 +297,13 @@ class PlayerManager @Inject constructor(
         reportTimeJob = null
     }
 
-    private fun restoreSession() {
-        scope.launch {
-            playerRepository.getLastPlayedSong()?.let { song ->
-                queueManager.setQueue(listOf(song), 0)
-                _currentPlayingSong.value = song
-                Log.d("PlayerManager", "Restored: ${song.title}")
-                loadLyric(song)
-                exoPlayer.setMediaItem(song.toMediaItem())
-                exoPlayer.prepare()
-            }
-        }
-    }
-
     private fun loadLyric(song: Song) {
-        if (song.lyric.isEmpty() || song.lyric == "") return
+        if (song.lyric.isEmpty()) return
         scope.launch(Dispatchers.IO) {
             try {
                 val text = java.net.URL(ResourceUtil.r2(song.lyric)).readText()
                 val list = LrcHelper.parse(text)
-                _currentPlayingSong.update {
-                    if (it?.id == song.id) it.copy(lyricList = list) else it
-                }
+                _currentPlayingSong.update { if (it?.id == song.id) it.copy(lyricList = list) else it }
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -380,7 +311,7 @@ class PlayerManager @Inject constructor(
     }
 
     fun release() {
-        exoPlayer.release()
+        mediaController?.release()
         progressJob?.cancel()
         reportPlayJob?.cancel()
         reportTimeJob?.cancel()

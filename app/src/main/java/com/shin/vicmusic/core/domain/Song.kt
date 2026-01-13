@@ -1,9 +1,12 @@
 package com.shin.vicmusic.core.domain
 
+import android.net.Uri
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 import com.shin.vicmusic.util.Constant
 import com.shin.vicmusic.util.ResourceUtil
 import kotlinx.serialization.Serializable
+import androidx.core.net.toUri
 
 /**
  * 歌曲领域模型 (Domain Model) - 用于业务逻辑层和 UI 层
@@ -36,7 +39,18 @@ data class Song (
      * 将 Song 转换为 ExoPlayer 需要的 MediaItem
      */
     fun toMediaItem(): MediaItem {
-        return MediaItem.fromUri(ResourceUtil.r2(this.uri ?: ""))
+        val metadata = MediaMetadata.Builder()
+            .setTitle(this.title)
+            .setArtist(this.artistName)
+            .setAlbumTitle(this.albumName)
+            .setArtworkUri(this.icon.toUri())
+            .build()
+
+        return MediaItem.Builder()
+            .setUri(ResourceUtil.r2(this.uri))
+            .setMediaId(this.id) // [关键] 这个 ID 是让 Service 和 Manager 同步的关键
+            .setMediaMetadata(metadata)
+            .build()
     }
 }
 @Serializable

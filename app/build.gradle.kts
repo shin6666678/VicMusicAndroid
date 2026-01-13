@@ -87,9 +87,10 @@ dependencies {
     //图片加载框架
     implementation("io.coil-kt:coil-compose:2.6.0")
 
-    // AndroidX Media3 (推荐使用，它包含ExoPlayer)
-    implementation("androidx.media3:media3-exoplayer:1.2.1") // 检查最新版本
-    implementation("androidx.media3:media3-ui:1.2.1") // 如果需要 Media3 提供的 UI 组件
+    // [已修复] 统一 AndroidX Media3 版本为 1.9.0
+    implementation("androidx.media3:media3-exoplayer:1.9.0")
+    implementation("androidx.media3:media3-ui:1.9.0")
+    implementation("androidx.media3:media3-session:1.9.0")
 
     implementation("com.google.accompanist:accompanist-flowlayout:0.28.0") // 检查最新版本
 
