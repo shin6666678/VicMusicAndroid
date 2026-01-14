@@ -1,14 +1,16 @@
 package com.shin.vicmusic.core.manager
 
 import android.app.DownloadManager
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
+import android.database.Cursor
 import android.net.Uri
 import android.os.Environment
 import androidx.core.content.FileProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,35 +19,68 @@ import javax.inject.Singleton
 class ApkInstaller @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-    // 执行下载并安装
-    fun downloadAndInstall(url: String) {
+    private val downloadManager by lazy {
+        context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+    }
+
+    /**
+     * [重构] 执行下载并返回一个进度 Flow
+     * @return Flow<Int> - 发射 0-100 的下载进度。如果下载失败，会抛出异常。
+     */
+    fun downloadAndInstall(url: String, title: String = "应用更新"): Flow<Int> = flow {
         // 1. 准备下载请求
         val fileName = "update.apk"
         val request = DownloadManager.Request(Uri.parse(url))
-            .setTitle("应用更新")
+            .setTitle(title)
             .setDescription("正在下载新版本...")
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             .setDestinationInExternalFilesDir(context, Environment.DIRECTORY_DOWNLOADS, fileName)
             .setMimeType("application/vnd.android.package-archive")
 
         // 2. 开始下载
-        val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         val downloadId = downloadManager.enqueue(request)
 
-        // 3. 监听下载完成广播
-        val receiver = object : BroadcastReceiver() {
-            override fun onReceive(ctx: Context?, intent: Intent?) {
-                val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
-                if (id == downloadId) {
-                    installApk(fileName) // 下载完成后执行安装
-                    // 注销广播防止泄漏（注意：在 ApplicationContext 中注册的广播最好要有生命周期管理，
-                    // 这里为了简化直接用一次性逻辑，实际项目可以优化解绑逻辑）
-                    try { context.unregisterReceiver(this) } catch (e: Exception) {}
+        var isDownloadFinished = false
+        var progress = 0
+
+        // 3. 循环查询下载进度
+        while (!isDownloadFinished) {
+            val cursor: Cursor = downloadManager.query(DownloadManager.Query().setFilterById(downloadId))
+            if (cursor.moveToFirst()) {
+                val statusIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
+                val status = cursor.getInt(statusIndex)
+
+                when (status) {
+                    DownloadManager.STATUS_RUNNING -> {
+                        val totalBytesIndex = cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES)
+                        val downloadedBytesIndex = cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR)
+                        val totalBytes = cursor.getLong(totalBytesIndex)
+                        val downloadedBytes = cursor.getLong(downloadedBytesIndex)
+                        if (totalBytes > 0) {
+                            progress = ((downloadedBytes * 100) / totalBytes).toInt()
+                            emit(progress) // 发射进度
+                        }
+                    }
+                    DownloadManager.STATUS_SUCCESSFUL -> {
+                        progress = 100
+                        emit(progress)
+                        isDownloadFinished = true
+                        installApk(fileName)
+                    }
+                    DownloadManager.STATUS_FAILED -> {
+                        isDownloadFinished = true
+                        throw Exception("下载失败") // 抛出异常，让调用方处理
+                    }
+                    DownloadManager.STATUS_PAUSED, DownloadManager.STATUS_PENDING -> {
+                        // 暂停或等待中，可以根据需要处理，这里暂时不发射新进度
+                    }
                 }
             }
+            cursor.close()
+            if (!isDownloadFinished) {
+                delay(500) // 每隔 0.5 秒查询一次
+            }
         }
-        // 注意：Android 13+ 需要 RECEIVER_EXPORTED 或 NOT_EXPORTED，这里根据情况适配
-        context.registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE), Context.RECEIVER_NOT_EXPORTED)
     }
 
     private fun installApk(fileName: String) {

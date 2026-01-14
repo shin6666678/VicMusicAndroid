@@ -34,9 +34,4 @@ class MainViewModel @Inject constructor(
             }
         }
     }
-
-    // 清除红点 (进入消息列表后调用)
-    fun clearUnreadCount() {
-        _unreadCount.value = 0
-    }
 }

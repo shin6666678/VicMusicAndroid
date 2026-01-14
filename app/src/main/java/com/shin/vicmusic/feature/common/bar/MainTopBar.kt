@@ -13,6 +13,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MailOutline
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +29,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.shin.vicmusic.feature.common.common.VicIconButton
+import com.shin.vicmusic.feature.common.common.VicTextButton
 
 @Preview
 @Composable
@@ -39,30 +44,33 @@ fun UniversalTopBarPreview() {
             BarTabItem("最新", false) { }
         ),
         actions = listOf(
-            BarActionItem(Icons.Default.MailOutline, "Mail") { },
-            BarActionItem(Icons.Default.Tune, "Settings") { }
+            // 示例：显示 5 条未读消息
+            BarActionItem(Icons.Default.MailOutline, "Mail", 5) { },
+            // 示例：超过 99 条显示 99+
+            BarActionItem(Icons.Default.Tune, "Settings", 100) { }
         ),
     )
 }
 
-// 左侧的 Tab 数据 (文字 + 点击逻辑 + 选中状态)
+// 左侧的 Tab 数据
 data class BarTabItem(
     val name: String,
     val isSelected: Boolean = false,
     val onClick: () -> Unit
 )
 
-// 右侧的 Action 数据 (图标 + 点击逻辑)
+// 右侧的 Action 数据 (contentNumber > 0 时显示角标)
 data class BarActionItem(
     val icon: ImageVector,
     val contentDescription: String? = null,
+    val contentNumber: Int = 0,
     val onClick: () -> Unit
 )
 
 @Composable
 fun UniversalTopBar(
-    tabs: List<BarTabItem>,       // 左侧 Tab 列表
-    actions: List<BarActionItem> = emptyList(), // 右侧图标列表
+    tabs: List<BarTabItem>,
+    actions: List<BarActionItem> = emptyList(),
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
     contentColor: Color = MaterialTheme.colorScheme.onSurface,
 ) {
@@ -74,46 +82,35 @@ fun UniversalTopBar(
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // --- 左侧区域 (LazyRow) ---
-        // 使用 weight(1f) 让它占据除右侧图标外的所有剩余空间
         LazyRow(
             modifier = Modifier.weight(1f),
-            horizontalArrangement = Arrangement.spacedBy(24.dp), // Tab 之间的间距
+            horizontalArrangement = Arrangement.spacedBy(24.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             items(tabs) { tab ->
-                Text(
+                VicTextButton(
                     text = tab.name,
-                    fontSize = if (tab.isSelected) 20.sp else 16.sp, // 选中变大
-                    fontWeight = if (tab.isSelected) FontWeight.Bold else FontWeight.Normal, // 选中加粗
-                    color = if (tab.isSelected) contentColor else contentColor.copy(alpha = 0.6f),
-                    modifier = Modifier.clickable(
-                        interactionSource = null,
-                        indication = null // 移除点击水波纹
-                    ) { tab.onClick() }
+                    isSelected = tab.isSelected,
+                    onClick = tab.onClick,
+                    selectedColor = contentColor,
+                    unselectedColor = contentColor.copy(alpha = 0.6f)
                 )
             }
         }
 
-        // --- 右侧区域 (Icons) ---
-        // 如果 actions 不为空，自然会在右侧显示
         if (actions.isNotEmpty()) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 actions.forEach { action ->
-                    IconButton(
+                    VicIconButton(
+                        icon = action.icon,
                         onClick = action.onClick,
-                        modifier = Modifier.size(40.dp) // 控制点击区域大小
-                    ) {
-                        Icon(
-                            imageVector = action.icon,
-                            contentDescription = action.contentDescription,
-                            tint = contentColor,
-                            modifier = Modifier.size(28.dp)
-                        )
-                    }
+                        contentDescription = action.contentDescription,
+                        badgeCount = action.contentNumber,
+                        tint = contentColor
+                    )
                 }
             }
         }
