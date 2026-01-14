@@ -88,6 +88,7 @@ class PlayerManager @Inject constructor(
                 playerRepository.saveLastPlayedSong(song)
             }
         }
+        restoreLastSession()
     }
 
     private fun initializeMediaController() {
@@ -111,9 +112,41 @@ class PlayerManager @Inject constructor(
             val song = playbackQueue.value.find { it.id == currentMediaItem.mediaId }
             _currentPlayingSong.value = song
             if (song != null) loadLyric(song)
+        } else {
+            // B. 【新增】如果 Service 是空的（冷啟動），檢查我們是否從本地恢復了數據
+            val restoredSong = _currentPlayingSong.value
+            if (restoredSong != null && controller.mediaItemCount == 0) {
+                // 將恢復的歌曲設置給 Player，並準備好，但不自動播放
+                val queue = playbackQueue.value
+                if (queue.isNotEmpty()) {
+                    controller.setMediaItems(queue.map { it.toMediaItem() })
+                    val index = queueManager.currentIndex.value.coerceAtLeast(0)
+                    controller.seekTo(index, 0)
+                    controller.prepare()
+                    controller.pause() // 關鍵：恢復後暫停，等待用戶點擊
+                }
+            }
         }
+
         updatePlayerState()
         toggleProgressUpdate()
+    }
+    private fun restoreLastSession() {
+        scope.launch {
+            try {
+                val lastSong = playerRepository.getLastPlayedSong()
+
+                if (lastSong != null) {
+                    _currentPlayingSong.value = lastSong
+                    if (playbackQueue.value.isEmpty()) {
+                        queueManager.setQueue(listOf(lastSong), 0)
+                    }
+                    loadLyric(lastSong)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     fun playSong(song: Song, queue: List<Song>? = null) {

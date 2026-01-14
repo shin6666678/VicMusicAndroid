@@ -15,6 +15,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -22,6 +23,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.ChatSession
 import com.shin.vicmusic.core.model.api.NotifyDto
@@ -36,10 +40,25 @@ fun MessageListRoute(
     val uiState by viewModel.uiState.collectAsState()
     val navController = LocalNavController.current
 
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.loadChatSessions()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
     MessageListScreen(
         uiState = uiState,
         onBackClick = navController::popBackStack,
-        onTabChange = viewModel::switchTab
+        onTabChange = viewModel::switchTab,
+        onSessionClick = { session ->
+            viewModel.clearUnread(session.userId)
+            navController.navigate("chat/${session.userId}/${session.username}")
+        }
     )
 }
 
@@ -47,9 +66,9 @@ fun MessageListRoute(
 fun MessageListScreen(
     uiState: MessageListUiState,
     onBackClick: () -> Unit,
-    onTabChange: (Int) -> Unit
+    onTabChange: (Int) -> Unit,
+    onSessionClick: (ChatSession) -> Unit // 添加這個回調參數
 ) {
-    val navController=LocalNavController.current
     Scaffold(
         topBar = {
             Column {
@@ -80,9 +99,7 @@ fun MessageListScreen(
             } else {
                 ChatSessionList(
                     list = uiState.chatSessions,
-                    onClick = { session ->
-                        navController.navigate("chat/${session.userId}/${session.username}")
-                    }
+                    onClick = onSessionClick
                 )
             }
 
