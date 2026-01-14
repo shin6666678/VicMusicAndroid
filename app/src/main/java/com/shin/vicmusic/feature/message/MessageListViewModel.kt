@@ -46,7 +46,18 @@ class MessageListViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
         }
     }
-
+    fun clearUnread(userId: String) {
+        _uiState.update { state ->
+            val updatedList = state.chatSessions.map { session ->
+                if (session.userId == userId) {
+                    session.copy(unreadCount = 0)
+                } else {
+                    session
+                }
+            }
+            state.copy(chatSessions = updatedList)
+        }
+    }
     fun loadChatSessions() {
         viewModelScope.launch {
             when (val result = chatRepository.getChatSessions()) {
