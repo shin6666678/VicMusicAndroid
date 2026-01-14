@@ -4,14 +4,15 @@ import android.os.CountDownTimer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.SystemRepository
-import com.shin.vicmusic.core.manager.VersionManager
 import com.shin.vicmusic.core.domain.Result
 import com.shin.vicmusic.core.manager.ApkInstaller
+import com.shin.vicmusic.core.manager.VersionManager
 import com.shin.vicmusic.core.model.api.AppUpdateDto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,24 +29,19 @@ class SplashViewModel @Inject constructor(
     private val _updateState = MutableStateFlow<AppUpdateDto?>(null)
     val updateState = _updateState.asStateFlow()
 
-    // 新增：版本更新说明弹窗状态
+    //下载进度状态，-1 表示未开始，0-100 表示进度
+    private val _downloadProgress = MutableStateFlow(-1)
+    val downloadProgress = _downloadProgress.asStateFlow()
+
     private val _releaseNoteState = MutableStateFlow<String?>(null)
     val releaseNoteState = _releaseNoteState.asStateFlow()
 
     val navigateToMain = MutableStateFlow(false)
     private var timer: CountDownTimer? = null
 
-    // 硬编码本次更新的内容，实际开发中也可以放在资源文件或服务端配置
     private val currentReleaseNotes = """
         本次更新内容：
-        1. 底部播放器可收藏音乐
-        2. 非VIP用户可收听VIP歌曲10s
-        3. 优化签到界面
-        4. 适配全面屏设计
-        5. 历史播放界面显示历史播放次数
-        6. 增加设置界面
-        7. 歌单详情界面可移除歌曲
-        8. 修复已知问题,提升用户体验
+            修复已知问题,提升用户体验
     """.trimIndent()
 
     init {
@@ -57,24 +53,18 @@ class SplashViewModel @Inject constructor(
             val currentCode = systemRepository.getCurrentVersionCode()
             val savedCode = versionManager.getSavedVersionCode()
 
-            // 如果保存的版本号小于当前版本号，说明是更新后首次运行（或者是全新安装）
             if (savedCode < currentCode) {
                 _releaseNoteState.value = currentReleaseNotes
             } else {
-                // 非首次运行，正常检查更新
                 checkUpdate()
             }
         }
     }
 
-    // 用户确认看过更新说明
     fun onReleaseNoteConfirm() {
         viewModelScope.launch {
-            // 保存当前版本号
             val currentCode = systemRepository.getCurrentVersionCode()
             versionManager.saveVersionCode(currentCode)
-
-            // 关闭弹窗并继续原有流程（检查新版本或倒计时）
             _releaseNoteState.value = null
             checkUpdate()
         }
@@ -82,13 +72,10 @@ class SplashViewModel @Inject constructor(
 
     private fun checkUpdate() {
         viewModelScope.launch {
-            // 检查更新
             val result = systemRepository.checkAppUpdate()
             if (result is Result.Success && result.data.hasUpdate) {
-                // 有更新：暂停进入主页，显示弹窗
                 _updateState.value = result.data
             } else {
-                // 无更新：正常倒计时
                 startTimer()
             }
         }
@@ -96,10 +83,7 @@ class SplashViewModel @Inject constructor(
 
     private fun startTimer(time: Long = 3000) {
         timer = object : CountDownTimer(time, 1000) {
-            override fun onFinish() {
-                toNext()
-            }
-
+            override fun onFinish() { toNext() }
             override fun onTick(millisUntilFinished: Long) {
                 _timeLeft.value = millisUntilFinished / 1000 + 1
             }
@@ -115,23 +99,29 @@ class SplashViewModel @Inject constructor(
         toNext()
     }
 
-    // 用户点击"暂不更新"
     fun onIgnoreUpdate() {
         _updateState.value = null
-        toNext() // 直接进入
+        toNext()
     }
 
     fun onConfirmUpdate() {
-        // 获取当前的更新信息
-        val updateInfo = _updateState.value
-        if (updateInfo?.downloadUrl != null) {
-            // 调用工具类下载
-            apkInstaller.downloadAndInstall(updateInfo.downloadUrl)
+        // 防止重复点击
+        if (_downloadProgress.value in 0..99) return
 
-            // 如果是强制更新，保持弹窗不关闭；如果是非强制，可以关闭弹窗或显示下载中
-            if (!updateInfo.isForce) {
-                // _updateState.value = null // 可选：关闭弹窗
-            }
+        val updateInfo = _updateState.value ?: return
+        val url = updateInfo.downloadUrl ?: return
+
+        viewModelScope.launch {
+            apkInstaller.downloadAndInstall(url, "VicMusic 新版本")
+                .catch { e ->
+                    // 下载失败，重置进度，UI可以根据-1状态显示“下载失败”
+                    _downloadProgress.value = -1
+                    e.printStackTrace()
+                }
+                .collect { progress ->
+                    // 收集并更新进度状态
+                    _downloadProgress.value = progress
+                }
         }
     }
 }

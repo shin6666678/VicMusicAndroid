@@ -46,6 +46,8 @@ import com.shin.vicmusic.feature.common.bar.BarTabItem
 import com.shin.vicmusic.feature.common.bar.UniversalTopBar
 import com.shin.vicmusic.feature.liked.navigateToLikedList
 import com.shin.vicmusic.feature.localMusic.navigateToLocalMusic
+import com.shin.vicmusic.feature.main.MainViewModel
+import com.shin.vicmusic.feature.main.TopLevelDestination
 import com.shin.vicmusic.feature.me.component.PlaylistsSection
 import com.shin.vicmusic.feature.me.component.RecentBar
 import com.shin.vicmusic.feature.me.component.UserInfoCard
@@ -61,13 +63,15 @@ import com.shin.vicmusic.feature.vip.navigateToVip
 
 @Composable
 fun MeRoute(
-    viewModel: MeViewModel = hiltViewModel()
+    viewModel: MeViewModel = hiltViewModel(),
+    mainViewModel: MainViewModel = hiltViewModel(),
 ) {
     val navController = LocalNavController.current
 
     val isLoggedIn by viewModel.isLoggedIn.collectAsState()
     val currentUser by viewModel.currentUser.collectAsState()
     val playlists by viewModel.myPlaylists.collectAsState()
+    val unreadCount by mainViewModel.unreadCount.collectAsState()
 
     // 如果已登录但无用户信息，尝试获取
     LaunchedEffect(isLoggedIn) {
@@ -90,6 +94,7 @@ fun MeRoute(
     val topBarActions = listOf(
         BarActionItem(
             icon = Icons.Default.MailOutline,
+            contentNumber = unreadCount,
             onClick = { navController.navigateToMessageList()}
         ),
         BarActionItem(
@@ -104,18 +109,10 @@ fun MeRoute(
 
         onAvatarClick = navController::navigateToMyInfo,
         onLoginClick = navController::navigateToLogin,
-        onVipClick = navController::navigateToVip,
         isLoggedIn = isLoggedIn ?: false,
         user = currentUser,
         myPlaylists = playlists,
         onMorePlaylistsClick = { navController.navigateToMyPlaylists() },
-        onLikedClick = { navController.navigateToLikedList() },
-        onLocalClick = { navController.navigateToLocalMusic() },
-
-        recentPlayList = playlists,
-        recentNum = 2,
-        recentIcon = playlists.firstOrNull()?.cover ?: "",
-        onRecentOrMoreClick = navController::navigateToRecentPlay,
 
         onFollowClick = { navController.navigateToRelationship(RelationshipTab.FOLLOWING) },
         onFansClick = { navController.navigateToRelationship(RelationshipTab.FAN)},
@@ -123,7 +120,16 @@ fun MeRoute(
         onHeardClick = { navController.navigateToRecentPlay() },
 
         onFriendClick = { navController.navigateToRelationship(RelationshipTab.FRIEND) },
+        onVipClick = navController::navigateToVip,
         onCheckInClick = { navController.navigateToCheckIn() },
+
+        onLikedClick = { navController.navigateToLikedList() },
+        onLocalClick = { navController.navigateToLocalMusic() },
+
+        recentPlayList = playlists,
+        recentNum = 2,
+        recentIcon = playlists.firstOrNull()?.cover ?: "",
+        onRecentOrMoreClick = navController::navigateToRecentPlay,
 
         onPlayListClick=  navController::navigateToPlaylistDetail,
 

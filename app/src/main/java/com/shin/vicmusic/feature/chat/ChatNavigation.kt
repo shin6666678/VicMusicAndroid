@@ -20,6 +20,6 @@ fun NavGraphBuilder.chatScreen() {
             navArgument("userName") { type = NavType.StringType }
         )
     ) {
-        ChatScreen()
+        ChatRoute()
     }
 }

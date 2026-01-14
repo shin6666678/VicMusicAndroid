@@ -4,10 +4,15 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -33,7 +38,6 @@ import com.shin.vicmusic.util.SuperDateUtil
 
 @Composable
 fun SplashRoute(
-    // 使用 hiltViewModel 以便注入 Repository
     viewModel: SplashViewModel = hiltViewModel(),
 ) {
     val navController = LocalNavController.current
@@ -41,38 +45,34 @@ fun SplashRoute(
     val navigateToMain by viewModel.navigateToMain.collectAsState()
     val updateInfo by viewModel.updateState.collectAsStateWithLifecycle()
     val releaseNotes by viewModel.releaseNoteState.collectAsStateWithLifecycle()
+    val downloadProgress by viewModel.downloadProgress.collectAsStateWithLifecycle()
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // 背景页面
         SplashScreen(
             year = SuperDateUtil.currentYear(),
             timeLeft = timeLeft,
             onSkipAdClick = viewModel::onSkipAdClick
         )
 
-        // 优先级1：本次更新内容说明（首次进入时显示）
         if (releaseNotes != null) {
             ReleaseNoteDialog(
                 content = releaseNotes!!,
                 onConfirm = viewModel::onReleaseNoteConfirm
             )
-        }
-        // 优先级2：检查是否有更新的版本（UpdateInfo）
-        else if (updateInfo != null) {
+        } else if (updateInfo != null) {
             UpdateDialog(
                 updateInfo = updateInfo!!,
-                onUpdate = { _ ->
+                downloadProgress = downloadProgress,
+                onUpdate = {
                     viewModel.onConfirmUpdate()
                 },
                 onCancel = {
-                    // 暂不更新 -> 进入主页
                     viewModel.onIgnoreUpdate()
                 }
             )
         }
     }
 
-    // 只有在没有更新弹窗且倒计时结束时才导航
     LaunchedEffect(navigateToMain) {
         if (navigateToMain) {
             navController.navigateToMain()
@@ -112,7 +112,6 @@ fun SplashScreen(
                 .padding(30.dp)
                 .align(Alignment.BottomCenter)
         )
-        // 只有倒计时大于0才显示倒计时按钮
         if (timeLeft > 0) {
             Text(
                 text = "倒计时,$timeLeft",
@@ -120,9 +119,7 @@ fun SplashScreen(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(top = 100.dp, end = 100.dp)
-                    .clickable {
-                        onSkipAdClick()
-                    }
+                    .clickable { onSkipAdClick() }
             )
         }
     }
@@ -134,11 +131,9 @@ fun ReleaseNoteDialog(
     onConfirm: () -> Unit
 ) {
     AlertDialog(
-        onDismissRequest = { /* 强制用户点击确认，不允许点击外部关闭 */ },
+        onDismissRequest = {},
         title = { Text(text = "更新说明") },
-        text = {
-            Text(text = content)
-        },
+        text = { Text(text = content) },
         confirmButton = {
             TextButton(onClick = onConfirm) {
                 Text(text = "知道了")
@@ -150,30 +145,46 @@ fun ReleaseNoteDialog(
 @Composable
 fun UpdateDialog(
     updateInfo: AppUpdateDto,
-    onUpdate: (String?) -> Unit,
+    downloadProgress: Int,
+    onUpdate: () -> Unit,
     onCancel: () -> Unit
 ) {
+    val isDownloading = downloadProgress in 0..99
+
     AlertDialog(
         onDismissRequest = {
-            // 如果不是强制更新，允许点击外部关闭
-            if (!updateInfo.isForce) {
+            if (!updateInfo.isForce && !isDownloading) {
                 onCancel()
             }
         },
         title = { Text(text = "发现新版本 ${updateInfo.version}") },
         text = {
-            Text(text = updateInfo.content ?: "为了更好的体验，请升级到最新版本")
+            Column {
+                Text(text = updateInfo.content ?: "为了更好的体验，请升级到最新版本")
+                if (downloadProgress >= 0) {
+                    Spacer(Modifier.height(16.dp))
+                    LinearProgressIndicator(
+                        progress = { downloadProgress / 100f },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = if(downloadProgress == 100) "下载完成" else "正在下载: $downloadProgress%",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.align(Alignment.End)
+                    )
+                }
+            }
         },
         confirmButton = {
-            TextButton(onClick = { onUpdate(updateInfo.downloadUrl) }) {
-                Text(text = "立即更新")
+            TextButton(onClick = onUpdate, enabled = !isDownloading) {
+                Text(text = if(isDownloading) "下载中..." else "立即更新")
             }
         },
         dismissButton = {
-            // 仅非强制更新显示取消按钮
             if (!updateInfo.isForce) {
-                TextButton(onClick = onCancel) {
-                    Text(text = "暂不更新", color = Color.Gray)
+                TextButton(onClick = onCancel, enabled = !isDownloading) {
+                    Text(text = "暂不更新", color = if(isDownloading) Color.Gray.copy(alpha=0.5f) else Color.Gray)
                 }
             }
         }

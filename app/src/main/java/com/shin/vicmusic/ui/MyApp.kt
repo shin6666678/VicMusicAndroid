@@ -1,5 +1,6 @@
 package com.shin.vicmusic.ui
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -20,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -78,7 +80,7 @@ fun MyApp(
     mainViewModel: MainViewModel = hiltViewModel()
 ) {
 
-    val navController=LocalNavController.current
+    val navController = LocalNavController.current
     val playerManager = LocalPlayerManager.current
 
     val currentSong by playerManager.currentPlayingSong.collectAsState()
@@ -88,6 +90,15 @@ fun MyApp(
     val currentRoute = navBackStackEntry?.destination?.route
     val mainTabState = rememberSaveable { mutableIntStateOf(0) }
     val unreadCount by mainViewModel.unreadCount.collectAsState()
+
+    // 监听路由变化，自动刷新未读数
+    LaunchedEffect(currentRoute) {
+        Log.d("MyApp", "currentRoute: $currentRoute")
+        val isTopLevel = currentRoute == MAIN_ROUTE
+        if (isTopLevel) {
+            mainViewModel.refreshUnreadCount()
+        }
+    }
 
     val badgeCounts = mapOf(
         TopLevelDestination.ME to unreadCount
@@ -99,7 +110,7 @@ fun MyApp(
     val isSplashScreen = currentRoute == SPLASH_ROUTE
     val isSongDetail = currentRoute?.contains("songDetail") == true
     val isChatScreen = currentRoute?.contains("chat") == true
-    val isVipScreen= currentRoute == VIP_ROUTE
+    val isVipScreen = currentRoute == VIP_ROUTE
     val isCheckInScreen = currentRoute == CHECK_IN_ROUTE
     val showBottomContainer = currentRoute != null
             && !isSplashScreen && !isSongDetail
@@ -177,7 +188,6 @@ fun MyApp(
                         .align(Alignment.BottomCenter)
                         .padding(top = songBarHalfHeight)
                         .background(MaterialTheme.colorScheme.surface)
-                        .navigationBarsPadding()
                 ) {
                     // 一个"隐形垫片"，高度等于 Padding 的高度。
                     Spacer(modifier = Modifier.height(songBarHalfHeight))
@@ -198,7 +208,7 @@ fun MyApp(
                         song = currentSong!!,
                         playerState = playerState,
                         onTogglePlayPause = playerManager::togglePlayPause,
-                        onPlaylistClick = {showPlaylistSheet=true},
+                        onPlaylistClick = { showPlaylistSheet = true },
                         onBarClick = { navController.navigateToSongDetail(currentSong!!.id) },
                         modifier = Modifier
                             .fillMaxWidth()
