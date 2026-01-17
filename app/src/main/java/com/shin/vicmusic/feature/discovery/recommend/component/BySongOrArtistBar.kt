@@ -23,7 +23,7 @@ import com.shin.vicmusic.core.design.theme.SpaceOuter
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONGS
-import com.shin.vicmusic.feature.common.ItemSongContent
+import com.shin.vicmusic.feature.common.item.ItemSongContent
 
 @Preview(showBackground = true)
 @Composable

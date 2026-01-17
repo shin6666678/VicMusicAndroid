@@ -1,4 +1,4 @@
-package com.shin.vicmusic.feature.common
+package com.shin.vicmusic.feature.common.item
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -42,6 +42,7 @@ import com.shin.vicmusic.core.domain.Album
 import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.domain.PayType
 import com.shin.vicmusic.core.domain.Song
+import com.shin.vicmusic.feature.common.MyAsyncImage
 import com.shin.vicmusic.feature.common.icon.PayTypeIcon
 import com.shin.vicmusic.feature.common.icon.PlayCountIcon
 import com.shin.vicmusic.feature.common.sheet.PlaylistSelectionSheet

@@ -1,4 +1,4 @@
-package com.shin.vicmusic.feature.common
+package com.shin.vicmusic.feature.common.item
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,6 +29,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.shin.vicmusic.core.domain.Artist
+import com.shin.vicmusic.feature.common.MyAsyncImage
 
 @Composable
 fun ItemArtist(

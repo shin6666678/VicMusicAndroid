@@ -1,9 +1,10 @@
-package com.shin.vicmusic.feature.common
+package com.shin.vicmusic.feature.common.item
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,13 +26,37 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.shin.vicmusic.core.design.composition.LocalNavController
-import com.shin.vicmusic.core.domain.Playlist
-import com.shin.vicmusic.feature.playlist.detail.navigateToPlaylistDetail
+import com.shin.vicmusic.core.domain.Album
+import com.shin.vicmusic.core.domain.Artist
+import com.shin.vicmusic.feature.common.MyAsyncImage
+
+@Preview
+@Composable
+fun ItemAlbumPreview() {
+    ItemAlbum(
+        album = Album(
+            id = "1",
+            title = " album title",
+            artist = Artist(id = "1", name = "artist name"),
+            icon = "https://picsum.photos/200/300",
+            description = "description",
+            company = "company",
+            releaseTime = "2023-05-01",
+            style = "style",
+            songCount = 10,
+            isLiked = false
+        ),
+        onClick = {}
+    )
+}
 
 @Composable
-fun ItemPlaylist(playlist: Playlist, onClick: () -> Unit) {
+fun ItemAlbum(
+    album: Album,
+    onClick: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -43,7 +68,7 @@ fun ItemPlaylist(playlist: Playlist, onClick: () -> Unit) {
             shape = RoundedCornerShape(8.dp),
             color = MaterialTheme.colorScheme.surfaceVariant
         ) {
-            if (playlist.cover.isNullOrEmpty()) {
+            if (album.icon.isEmpty()) {
                 Icon(
                     painter = rememberVectorPainter(Icons.Default.MusicNote),
                     contentDescription = null,
@@ -52,7 +77,7 @@ fun ItemPlaylist(playlist: Playlist, onClick: () -> Unit) {
                 )
             } else {
                 MyAsyncImage(
-                    model = playlist.cover,
+                    model = album.icon,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
@@ -63,14 +88,14 @@ fun ItemPlaylist(playlist: Playlist, onClick: () -> Unit) {
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = playlist.name,
+                text = album.title,
                 style = MaterialTheme.typography.titleMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "${playlist.playCount}首 来自 ${playlist.ownerName}",
+                text = "${album.songCount}首 来自 ${album.artistName}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -84,46 +109,20 @@ fun ItemPlaylist(playlist: Playlist, onClick: () -> Unit) {
         )
     }
 }
-
 @Composable
-fun ItemPlaylistSquare(
-    playlist: Playlist,
-    onClick: () -> Unit = {}
-) {
-    Column(
-        modifier = Modifier
-            .width(100.dp) // 限制宽度，适配横向列表
-            .clickable(onClick = onClick),
-        horizontalAlignment = Alignment.CenterHorizontally // 内容水平居中
+fun ItemAlbumSquare(
+    album: Album,
+    onAlbumClick: (String) -> Unit = {}
+){
+    Column(modifier = Modifier
+        .padding(8.dp)
+        .clickable { onAlbumClick(album.id) }
     ) {
-        Surface(
-            modifier = Modifier.size(100.dp), // 图片设为正方形
-            shape = RoundedCornerShape(12.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant
-        ) {
-            if (playlist.cover.isNullOrEmpty()) {
-                Icon(
-                    painter = rememberVectorPainter(Icons.Default.MusicNote),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(24.dp)
-                )
-            } else {
-                MyAsyncImage(
-                    model = playlist.cover,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(6.dp))
-
-        Text(
-            text = playlist.name,
-            style = MaterialTheme.typography.bodyMedium,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis, // 超出显示省略号
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        MyAsyncImage(
+            model = album.icon,
+            modifier = Modifier.fillMaxWidth().aspectRatio(1f), // 建议给图片指定固定高度或宽高比
         )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(text = album.title)
     }
 }

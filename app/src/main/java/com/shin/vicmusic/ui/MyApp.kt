@@ -43,6 +43,7 @@ import com.shin.vicmusic.feature.auth.registerScreen
 import com.shin.vicmusic.feature.chat.chatScreen
 import com.shin.vicmusic.feature.checkIn.CHECK_IN_ROUTE
 import com.shin.vicmusic.feature.checkIn.checkInScreen
+import com.shin.vicmusic.feature.comment.commentScreen
 import com.shin.vicmusic.feature.common.MyNavigationBar
 import com.shin.vicmusic.feature.common.bar.SongBar
 import com.shin.vicmusic.feature.liked.likedListScreen
@@ -108,10 +109,12 @@ fun MyApp(
     val isChatScreen = currentRoute?.contains("chat") == true
     val isVipScreen = currentRoute == VIP_ROUTE
     val isCheckInScreen = currentRoute == CHECK_IN_ROUTE
+    val isCommentDetail= currentRoute?.contains("commentDetail") == true
     val showBottomContainer = currentRoute != null
             && !isSplashScreen && !isSongDetail
             && !isVipScreen && !isCheckInScreen
             && !isChatScreen
+            && !isCommentDetail
 
     val playQueue by playerManager.playbackQueue.collectAsState()
     val currentQueueIndex by playerManager.currentQueueIndex.collectAsState()
@@ -160,6 +163,7 @@ fun MyApp(
             chatScreen()
             messageListScreen()
             localMusicScreen()
+            commentScreen()
         }
 
         // 底部整体容器 (SongBar + 导航栏)

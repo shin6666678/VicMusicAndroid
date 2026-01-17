@@ -1,5 +1,6 @@
 package com.shin.vicmusic.feature.common.bar
 
+import android.R.id.tabs
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,17 +22,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
 fun CommonTopBarSelect(
+    backImageVictor: ImageVector =Icons.AutoMirrored.Filled.ArrowBack,
     onBackClick: () -> Unit,
-    tabs: List<BarTabItem>,
+    tabs: List<BarTabItem> = emptyList(),
     actions: List<BarActionItem> = emptyList(),
-    backgroundColor: Color = MaterialTheme.colorScheme.surface,
-    contentColor: Color = MaterialTheme.colorScheme.onSurface,
+    backgroundColor: Color = Color.Transparent,
+    contentColor: Color = Color.White,
 ) {
     Row(
         modifier = Modifier
@@ -47,7 +50,7 @@ fun CommonTopBarSelect(
             modifier = Modifier.size(48.dp) // 标准触摸区域大小
         ) {
             Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack, // 使用镜像图标以适配RTL布局
+                imageVector = backImageVictor,
                 contentDescription = "Back",
                 tint = contentColor,
                 modifier = Modifier.size(24.dp)

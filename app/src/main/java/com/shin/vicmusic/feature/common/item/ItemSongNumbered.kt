@@ -1,4 +1,4 @@
-package com.shin.vicmusic.feature.common
+package com.shin.vicmusic.feature.common.item
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -56,9 +56,9 @@ fun ItemSongNumbered(
         ItemSong(
             song = song,
             modifier = Modifier.weight(1f),
-            showPlayCount=showPlayCount,
-            showDeleteFromPlaylist=showDeleteFromPlaylist,
-            onDeleteClick=onDeleteClick
+            showPlayCount = showPlayCount,
+            showDeleteFromPlaylist = showDeleteFromPlaylist,
+            onDeleteClick = onDeleteClick
         )
     }
 }

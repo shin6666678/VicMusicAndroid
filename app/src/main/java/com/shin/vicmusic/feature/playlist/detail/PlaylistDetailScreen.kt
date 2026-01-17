@@ -16,7 +16,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.PlaylistDetail
 import com.shin.vicmusic.feature.common.DetailControllerBar
-import com.shin.vicmusic.feature.common.ItemSongNumbered
+import com.shin.vicmusic.feature.common.item.ItemSongNumbered
 import com.shin.vicmusic.feature.common.bar.CommonTopBar
 import com.shin.vicmusic.feature.playlist.detail.component.PlaySongActionHeader
 import com.shin.vicmusic.feature.playlist.detail.component.PlaylistHeader

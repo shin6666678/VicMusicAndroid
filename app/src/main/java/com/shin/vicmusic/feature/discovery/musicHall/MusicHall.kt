@@ -57,7 +57,7 @@ import com.shin.vicmusic.core.design.theme.PremiumDarkBlue
 import com.shin.vicmusic.core.design.theme.VividIndigo
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONGS
-import com.shin.vicmusic.feature.common.ItemSong
+import com.shin.vicmusic.feature.common.item.ItemSong
 import com.shin.vicmusic.feature.discovery.DiscoveryViewModel
 
 @Preview

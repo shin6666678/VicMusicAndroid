@@ -1,6 +1,5 @@
 package com.shin.vicmusic.feature.song
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -10,12 +9,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -37,6 +43,10 @@ import com.shin.vicmusic.core.design.composition.LocalPlayerManager
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.manager.PlayerState
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONG
+import com.shin.vicmusic.feature.comment.navigateToComment
+import com.shin.vicmusic.feature.common.bar.BarActionItem
+import com.shin.vicmusic.feature.common.bar.CommonTopBar
+import com.shin.vicmusic.feature.common.bar.CommonTopBarSelect
 import com.shin.vicmusic.feature.song.component.LyricView
 import com.shin.vicmusic.feature.song.component.PlaybackControlBar
 import com.shin.vicmusic.feature.song.component.PlayerControls
@@ -63,10 +73,8 @@ fun SongDetailRoute(
     val songUiState by viewModel.songUiState.collectAsState()
     val currentPlayingSong by playerManager.currentPlayingSong.collectAsState()
 
-    // 状态：是否显示VIP弹窗
     var showVipDialog by remember { mutableStateOf(false) }
 
-    // 核心逻辑：监听进入和离开 SongDetail 界面，更新 PlayerManager 中的标志位
     DisposableEffect(Unit) {
         playerManager.isSongDetailVisible = true
         onDispose {
@@ -74,7 +82,6 @@ fun SongDetailRoute(
         }
     }
 
-    // 核心逻辑：监听 PlayerManager 发出的事件
     LaunchedEffect(playerManager.uiEvent) {
         playerManager.uiEvent.collect { event ->
             if (event == "SHOW_VIP_DIALOG") {
@@ -83,24 +90,16 @@ fun SongDetailRoute(
         }
     }
 
-    // 弹窗UI
     if (showVipDialog) {
         AlertDialog(
             onDismissRequest = { showVipDialog = false },
             title = { Text("VIP 试听结束") },
             text = { Text("本歌曲为 VIP 专享，试听已结束。请开通 VIP 继续收听。") },
             confirmButton = {
-                TextButton(onClick = {
-                    showVipDialog = false
-                    // 这里可以添加跳转到VIP购买页面的逻辑
-                }) {
-                    Text("确定")
-                }
+                TextButton(onClick = { showVipDialog = false }) { Text("确定") }
             },
             dismissButton = {
-                TextButton(onClick = { showVipDialog = false }) {
-                    Text("取消")
-                }
+                TextButton(onClick = { showVipDialog = false }) { Text("取消") }
             }
         )
     }
@@ -135,7 +134,13 @@ fun SongDetailRoute(
                 onBackClick = { navController.popBackStack() },
                 onSkipNext = playerManager::skipToNext,
                 onSkipPrevious = playerManager::skipToPrevious,
-                onToggleLike = viewModel::toggleLike
+                onToggleLike = viewModel::toggleLike,
+                onCommentClick = {
+                    navController.navigateToComment(
+                        resourceId = displaySong.id,
+                        resourceType = "song"
+                    )
+                }
             )
         }
         is SongUiState.Error -> {
@@ -156,63 +161,80 @@ fun SongDetailRoute(
 fun SongDetailScreen(
     song: Song,
     playerState: PlayerState,
-    onTogglePlayPause: () -> Unit={},
-    onSeek: (Long) -> Unit={},
-    onBackClick: () -> Unit={},
-    onSkipNext: () -> Unit={},
-    onSkipPrevious: () -> Unit={},
-    onToggleLike: () -> Unit={}
+    onTogglePlayPause: () -> Unit = {},
+    onSeek: (Long) -> Unit = {},
+    onBackClick: () -> Unit = {},
+    onSkipNext: () -> Unit = {},
+    onSkipPrevious: () -> Unit = {},
+    onToggleLike: () -> Unit = {},
+    onCommentClick: () -> Unit = {} // 新增评论点击事件
 ) {
-    // 0: 唱片机页面, 1: 歌词页面
     val pagerState = rememberPagerState(pageCount = { 2 })
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF1C1C1E))
-            .navigationBarsPadding()
-    ) {
-        SongDetailTopBar(onBackClick = onBackClick)
-
-        // 使用 Pager 实现滑动切换
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-        ) { page ->
-            if (page == 0) {
-                // 页面 0: 唱片机 + 信息
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Spacer(modifier = Modifier.weight(1f))
-                    RecordPlayerView(albumArtUrl = song.icon, isPlaying = playerState.isPlaying)
-                    Spacer(modifier = Modifier.height(32.dp))
-                    SongInfoSection(song = song)
-                    Spacer(modifier = Modifier.weight(1f))
-                    // 底部控制区域 (始终显示)
-                    Column {
-                        SongActionButtons(isLiked = song.isLiked, onLikeClick = onToggleLike)
-                        Spacer(modifier = Modifier.height(16.dp))
-                        PlaybackControlBar(playerState = playerState, onSeek = onSeek)
-                        PlayerControls(
-                            playerState = playerState,
-                            onTogglePlayPause = onTogglePlayPause,
-                            onNextClick = onSkipNext,
-                            onPreviousClick = onSkipPrevious
-                        )
-                    }
-                }
-            } else {
-                // 页面 1: 歌词
-                Log.d("1111111111111111",song.toString())
-                LyricView(
-                    lyricList = song.lyricList,
-                    currentIndex = playerState.currentLyricLineIndex,
-                    onLineClick = onSeek
+    Scaffold(
+        topBar = {
+            CommonTopBarSelect(
+                backImageVictor = Icons.Default.KeyboardArrowDown,
+                onBackClick = onBackClick,
+                actions = listOf(
+                    BarActionItem(
+                        icon = Icons.Default.Share,
+                        contentDescription = "分享",
+                        onClick = {}
+                    ),
+                    BarActionItem(
+                        icon = Icons.Default.List,
+                        contentDescription = "其他功能",
+                        onClick = {}
+                    ),
                 )
+            )
+        }
+    ) {paddingValues ->
+        Column(
+            modifier = Modifier
+                .background(Color(0xFF1C1C1E))
+                .padding(paddingValues)
+        ) {
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) { page ->
+                if (page == 0) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Spacer(modifier = Modifier.height(35.dp))
+                        RecordPlayerView(albumArtUrl = song.icon, isPlaying = playerState.isPlaying)
+                        Spacer(modifier = Modifier.height(28.dp))
+                        SongInfoSection(song = song)
+                        Spacer(modifier = Modifier.height(28.dp))
+                        Column {
+                            // 将 onCommentClick 传递给 SongActionButtons
+                            SongActionButtons(
+                                isLiked = song.isLiked,
+                                onLikeClick = onToggleLike,
+                                onCommentClick = onCommentClick // 传递事件
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            PlaybackControlBar(playerState = playerState, onSeek = onSeek)
+                            PlayerControls(
+                                playerState = playerState,
+                                onTogglePlayPause = onTogglePlayPause,
+                                onNextClick = onSkipNext,
+                                onPreviousClick = onSkipPrevious
+                            )
+                        }
+                    }
+                } else {
+                    LyricView(
+                        lyricList = song.lyricList,
+                        currentIndex = playerState.currentLyricLineIndex,
+                        onLineClick = onSeek
+                    )
+                }
             }
         }
     }

@@ -29,7 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.shin.vicmusic.core.domain.Playlist
-import com.shin.vicmusic.feature.common.ItemPlaylistSquare
+import com.shin.vicmusic.feature.common.item.ItemPlaylistSquare
 
 @Composable
 fun RecentBar(

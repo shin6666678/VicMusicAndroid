@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.feature.chat.navigateToChat
-import com.shin.vicmusic.feature.common.ItemUser
+import com.shin.vicmusic.feature.common.item.ItemUser
 
 @Composable
 fun FriendListScreen(

@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.feature.common.DetailControllerBar
-import com.shin.vicmusic.feature.common.ItemSongNumbered
+import com.shin.vicmusic.feature.common.item.ItemSongNumbered
 import com.shin.vicmusic.feature.common.MyAsyncImage
 import com.shin.vicmusic.feature.common.bar.CommonTopBar
 

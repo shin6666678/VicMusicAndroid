@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.feature.artist.artistDetail.navigateToArtistDetail
-import com.shin.vicmusic.feature.common.ItemArtist
+import com.shin.vicmusic.feature.common.item.ItemArtist
 import com.shin.vicmusic.feature.common.MyAsyncImage
 
 @Composable
