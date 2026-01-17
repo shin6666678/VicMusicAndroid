@@ -47,8 +47,8 @@ fun RankListDetailRoute(
 }
 @Composable
 fun RankListDetailScreen(
-    title: String = "排行榜(Rank List)", // [新增] 参数
-    coverUrl: String = "",            // [新增] 参数
+    title: String = "排行榜(Rank List)",
+    coverUrl: String = "",
     songs: List<Song> = emptyList(),
     popBackStack: () -> Unit = {},
 ) {

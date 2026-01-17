@@ -12,11 +12,13 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -46,87 +48,89 @@ fun RankListDetailHeader(
     popBackStack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(280.dp)
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primaryContainer,
-                        MaterialTheme.colorScheme.surface
+
+    Scaffold(
+        topBar = {
+            CommonTopBar(
+                midText = "",
+                popBackStack = popBackStack,
+            )
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = modifier
+                .padding(innerPadding)
+                .fillMaxWidth()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.primaryContainer,
+                            MaterialTheme.colorScheme.surface
+                        )
                     )
                 )
-            )
-    ) {
-        // 顶部导航栏
-        CommonTopBar(
-            midText = "排行榜详情",
-            popBackStack = popBackStack,
-            containerColor = Color.Transparent
-        )
-
-        // 主要内容 (文本和专辑封面)
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-                .align(Alignment.Center),
-            verticalAlignment = Alignment.CenterVertically,
         ) {
 
-            // 左侧：带有唱片效果的专辑封面
-            Box(
-                modifier = Modifier.size(140.dp),
-                contentAlignment = Alignment.Center
+            // 主要内容 (文本和专辑封面)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                // 唱片背景 (黑色圆盘)
-                Card(
-                    shape = CircleShape, // [修改] 直接使用 CircleShape
-                    colors = CardDefaults.cardColors(containerColor = Color.Black),
-                    modifier = Modifier
-                        .size(130.dp)
-                        .offset(x = 10.dp)
-                ) {}
-
-                // 专辑封面
-                Card(
-                    shape = RoundedCornerShape(12.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                    modifier = Modifier.size(130.dp)
+                // 左侧：带有唱片效果的专辑封面
+                Box(
+                    modifier = Modifier.size(140.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    MyAsyncImage(
-                        model = coverUrl,
-                        modifier = Modifier.fillMaxSize()
+                    // 唱片背景 (黑色圆盘)
+                    Card(
+                        shape = CircleShape,
+                        colors = CardDefaults.cardColors(containerColor = Color.Black),
+                        modifier = Modifier
+                            .size(130.dp)
+                            .offset(x = 10.dp)
+                    ) {}
+
+                    // 专辑封面
+                    Card(
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                        modifier = Modifier.size(130.dp)
+                    ) {
+                        MyAsyncImage(
+                            model = coverUrl,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(24.dp))
+
+                // 右侧：标题信息
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 2
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "VicMusic 官方出品",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "每周更新",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                     )
                 }
-            }
-
-            Spacer(modifier = Modifier.width(24.dp))
-
-            // 右侧：标题信息
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 2
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "VicMusic 官方出品",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "每周更新",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                )
             }
         }
     }

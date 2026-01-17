@@ -27,9 +27,9 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun CommonTopBarSelect(
-    onBackClick: () -> Unit,      // [新增] 返回点击回调
-    tabs: List<BarTabItem>,       // 中部 Tab 列表
-    actions: List<BarActionItem> = emptyList(), // 右侧图标列表
+    onBackClick: () -> Unit,
+    tabs: List<BarTabItem>,
+    actions: List<BarActionItem> = emptyList(),
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
     contentColor: Color = MaterialTheme.colorScheme.onSurface,
 ) {

@@ -24,11 +24,11 @@ fun CommonTopBarPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommonTopBar(
-    midText: String = "没写",
+    midText: String = "",
     showSearch: Boolean = false,
     popBackStack: () -> Unit = {},
     navigateToSearch: () -> Unit = {},
-    containerColor: Color = MaterialTheme.colorScheme.surface,
+    containerColor: Color = Color.Transparent,
     contentColor: Color = Color.Black
 ) {
     CenterAlignedTopAppBar(

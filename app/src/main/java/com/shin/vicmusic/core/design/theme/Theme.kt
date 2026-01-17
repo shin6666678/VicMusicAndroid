@@ -11,28 +11,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
-import kotlinx.serialization.descriptors.mapSerialDescriptor
 
 private val DarkColorScheme = darkColorScheme(
     primary = Red,
     secondary = PurpleGrey80,
-    tertiary = Pink80
+    tertiary = Pink80,
+    background = AppBackground,
+    surface = AppBackground,
+    onBackground = TextPrimary,
+    onSurface = TextPrimary,
+    onPrimaryContainer=TextPrimary,
+    surfaceVariant=AppBackground,
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Pink40,
     secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    tertiary = Pink40,
+    background = AppBackground,
+    surface = AppBackground,
+    onBackground = TextPrimary,
+    onSurface = TextPrimary,
+    onPrimaryContainer=TextPrimary,
+    surfaceVariant=AppBackground,
 )
 
 @Composable
