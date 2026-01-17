@@ -18,7 +18,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.feature.common.bar.CommonTopBar
-import com.shin.vicmusic.feature.common.ItemSong
+import com.shin.vicmusic.feature.common.item.ItemSong
 @Preview
 @Composable
 fun RecentPlayScreenPreview() {

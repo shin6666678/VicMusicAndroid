@@ -23,7 +23,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.ALBUMS
 import com.shin.vicmusic.feature.album.albumDetail.navigateToAlbumDetail
-import com.shin.vicmusic.feature.common.ItemAlbumSquare
+import com.shin.vicmusic.feature.common.item.ItemAlbumSquare
 import com.shin.vicmusic.feature.common.bar.CommonTopBar
 
 

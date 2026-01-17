@@ -29,8 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONGS
-import com.shin.vicmusic.feature.common.ItemSong
-import com.shin.vicmusic.feature.common.ItemSongNumbered
+import com.shin.vicmusic.feature.common.item.ItemSongNumbered
 
 @Preview
 @Composable

@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -35,14 +36,18 @@ fun SongDetailTopBar(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         IconButton(onClick = onBackClick) {
-            Icon(Icons.Default.KeyboardArrowDown, contentDescription = "返回")
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowDown,
+                contentDescription = "返回",
+                tint = Color.White
+            )
         }
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             // 两个指示器点
             Box(modifier = Modifier
                 .size(6.dp)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)))
+                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)))
             Box(modifier = Modifier
                 .size(6.dp)
                 .clip(CircleShape)
@@ -50,10 +55,18 @@ fun SongDetailTopBar(
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             IconButton(onClick = onShareClick) {
-                Icon(Icons.Default.Share, contentDescription = "分享")
+                Icon(
+                    imageVector = Icons.Default.Share,
+                    contentDescription = "分享",
+                    tint = Color.White
+                )
             }
             IconButton(onClick = onPlaylistClick) {
-                Icon(Icons.Default.List, contentDescription = "播放列表")
+                Icon(
+                    imageVector = Icons.Default.List,
+                    contentDescription = "播放列表",
+                    tint = Color.White
+                )
             }
         }
     }

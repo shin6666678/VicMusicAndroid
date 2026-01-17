@@ -13,10 +13,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.Song
-import com.shin.vicmusic.feature.common.ItemSong
+import com.shin.vicmusic.feature.common.item.ItemSong
 import com.shin.vicmusic.feature.common.bar.CommonTopBar
 
 @Composable

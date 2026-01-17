@@ -8,6 +8,7 @@ import com.shin.vicmusic.core.model.api.AppUpdateDto
 import com.shin.vicmusic.core.model.api.ArtistDetailResp
 import com.shin.vicmusic.core.model.api.ArtistDto
 import com.shin.vicmusic.core.model.api.ChatSessionDto
+import com.shin.vicmusic.core.model.api.CommentDto
 import com.shin.vicmusic.core.model.api.NotifyDto
 import com.shin.vicmusic.core.model.api.PlaylistDetailDto
 import com.shin.vicmusic.core.model.api.PlaylistDto
@@ -22,6 +23,7 @@ import com.shin.vicmusic.core.model.request.AlbumPageReq
 import com.shin.vicmusic.core.model.request.ArtistDetailReq
 import com.shin.vicmusic.core.model.request.ArtistPageReq
 import com.shin.vicmusic.core.model.request.ChangeVIPLevelReq
+import com.shin.vicmusic.core.model.request.CommentAddReq
 import com.shin.vicmusic.core.model.request.FollowReq
 import com.shin.vicmusic.core.model.request.LikeReq
 import com.shin.vicmusic.core.model.request.PageReq
@@ -315,4 +317,37 @@ class MyRetrofitDatasource @Inject constructor(
     suspend fun getChatSessions(): NetworkResponse<List<ChatSessionDto>> {
         return safeApiCall { service.getChatSessions() }
     }
+
+    /*
+Comment评论
+ */
+    suspend fun addComment(req: CommentAddReq): NetworkResponse<Unit> {
+        return safeApiCall { service.addComment(req) }
+    }
+
+    suspend fun deleteComment(id: String): NetworkResponse<Unit> {
+        return safeApiCall { service.deleteComment(id) }
+    }
+
+    suspend fun likeComment(id: String): NetworkResponse<Int> {
+        return safeApiCall { service.likeComment(id) }
+    }
+
+    suspend fun getComments(
+        resourceType: String,
+        resourceId: String,
+        queryType: String = "all",
+        page: Int,
+        size: Int
+    ): NetworkResponse<NetworkPageData<CommentDto>> {
+        return safeApiCall {
+            service.getComments(resourceType, resourceId, queryType, page, size)
+        }
+    }
+
+    suspend fun getCommentDetail(id: String): NetworkResponse<CommentDto> {
+        return safeApiCall { service.getCommentDetail(id) }
+    }
+
+
 }

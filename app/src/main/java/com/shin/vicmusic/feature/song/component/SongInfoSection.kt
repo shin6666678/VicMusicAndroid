@@ -23,7 +23,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.accompanist.flowlayout.FlowRow
 import com.shin.vicmusic.core.domain.Song
 
 @Composable
@@ -36,34 +35,17 @@ fun SongInfoSection(song: Song, modifier: Modifier = Modifier, onLikeClick: () -
             Text(
                 text = song.title, // 歌曲标题
                 style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold), // 加粗标题
-                //color = MaterialTheme.colorScheme.onSurface,
                 color = Color.White,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f)
             )
-            IconButton(onClick = onLikeClick, modifier = Modifier.size(24.dp)) { // 点赞/收藏按钮
-                Icon(Icons.Default.FavoriteBorder, contentDescription = "喜欢")
-                Text(text = "10w+", fontSize = 10.sp) // 示例数据
-            }
         }
         Spacer(modifier = Modifier.height(4.dp))
-        FlowRow(
-            modifier = Modifier.fillMaxWidth(),
-            mainAxisSpacing = 8.dp, // 横向间距
-            crossAxisSpacing = 4.dp // 纵向间距
-        ) { // 标签区域
-            TagChip(text = song.artist.name) // 艺术家作为标签
-            TagChip(text = "387人在听") // 示例数据
-            TagChip(text = "标准") // 示例数据
-            TagChip(text = "VIP") // 示例数据
-            TagChip(text = "原声") // 示例数据
-            TagChip(text = "视频") // 示例数据
-        }
         Spacer(modifier = Modifier.height(8.dp))
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = "曲: ${song.artist.name}", // 曲信息
+                text = song.artist.name, // 曲信息
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.weight(1f)

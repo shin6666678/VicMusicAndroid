@@ -20,11 +20,11 @@ import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.domain.Playlist
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.domain.UserInfo
-import com.shin.vicmusic.feature.common.ItemAlbumSquare
-import com.shin.vicmusic.feature.common.ItemArtist
-import com.shin.vicmusic.feature.common.ItemPlaylist
-import com.shin.vicmusic.feature.common.ItemSong
-import com.shin.vicmusic.feature.common.ItemUser
+import com.shin.vicmusic.feature.common.item.ItemAlbumSquare
+import com.shin.vicmusic.feature.common.item.ItemArtist
+import com.shin.vicmusic.feature.common.item.ItemPlaylist
+import com.shin.vicmusic.feature.common.item.ItemSong
+import com.shin.vicmusic.feature.common.item.ItemUser
 import com.shin.vicmusic.feature.search.SearchTab
 import com.shin.vicmusic.feature.search.SearchUiState
 
@@ -70,7 +70,10 @@ fun SearchResultContent(
                 if (result.users.isNotEmpty()) {
                     item { SectionTitle("用户") }
                     items(result.users) { user ->
-                        ItemUser(user = user)
+                        ItemUser(
+                            user = user,
+                            showFollowStatus = true
+                        )
                     }
                 }
 
@@ -92,7 +95,10 @@ fun SearchResultContent(
                             onAlbumClick = {}
                         )
                         is Artist -> ItemArtist(artist = item, onClick = {})
-                        is UserInfo -> ItemUser(user = item)
+                        is UserInfo -> ItemUser(
+                            user = item,
+                            showFollowStatus = true
+                        )
                     }
                 }
             }

@@ -1,4 +1,4 @@
-package com.shin.vicmusic.feature.common
+package com.shin.vicmusic.feature.common.item
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,6 +25,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.style.TextOverflow
@@ -33,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.domain.UserInfo
+import com.shin.vicmusic.feature.common.MyAsyncImage
 import com.shin.vicmusic.feature.relationship.RelationshipViewModel
 
 @Preview(showBackground = true)
@@ -196,7 +199,7 @@ private fun UserActionButton(
     text: String,
     onClick: () -> Unit,
     isHighlight: Boolean,
-    icon: androidx.compose.ui.graphics.vector.ImageVector? = null
+    icon: ImageVector? = null
 ) {
     val containerColor = if (isHighlight) MaterialTheme.colorScheme.primary else Color.Transparent
     val contentColor = if (isHighlight) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.outline
@@ -214,7 +217,7 @@ private fun UserActionButton(
         ),
         border = if (isHighlight) null else ButtonDefaults.outlinedButtonBorder.copy(
             width = 1.dp,
-            brush = androidx.compose.ui.graphics.SolidColor(borderColor)
+            brush = SolidColor(borderColor)
         )
     ) {
         if (icon != null) {

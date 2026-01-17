@@ -44,7 +44,7 @@ import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONGS
 import com.shin.vicmusic.feature.artist.artistDetail.component.ArtistMainCard
 import com.shin.vicmusic.feature.artist.artistDetail.component.ArtistTabRow
 import com.shin.vicmusic.feature.artist.artistDetail.component.ArtistTopBar
-import com.shin.vicmusic.feature.common.ItemSong
+import com.shin.vicmusic.feature.common.item.ItemSong
 
 @Preview
 @Composable

@@ -34,7 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONGS
-import com.shin.vicmusic.feature.common.ItemSong
+import com.shin.vicmusic.feature.common.item.ItemSong
 
 @Preview
 @Composable

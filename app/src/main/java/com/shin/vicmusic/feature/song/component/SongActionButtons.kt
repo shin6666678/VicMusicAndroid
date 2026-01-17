@@ -27,14 +27,14 @@ import androidx.compose.ui.unit.sp
 fun SongActionButtons(
     modifier: Modifier = Modifier,
     isLiked: Boolean = false,
-    onLikeClick: () -> Unit = {}
+    onLikeClick: () -> Unit = {},
+    onCommentClick: () -> Unit
 ) {
     Row(
         modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // [新增] 喜欢按钮
         IconButton(onClick = onLikeClick) {
             Icon(
                 imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
@@ -42,20 +42,27 @@ fun SongActionButtons(
                 tint = if (isLiked) Color.Red else Color.White
             )
         }
-        IconButton(onClick = { /* TODO */ }) { // 评论
-            // 使用 Icons.Default.Comment 替换 painterResource
-            Icon(Icons.Default.Comment, contentDescription = "评论")
-            Text("721", fontSize = 10.sp, modifier = Modifier.offset(x = (-8).dp, y = (-8).dp))
+        IconButton(onClick = onCommentClick) {
+            Icon(
+                imageVector = Icons.Default.Comment,
+                contentDescription = "评论",
+                tint = Color.White
+            )
+            //Text("721", fontSize = 10.sp, modifier = Modifier.offset(x = (-8).dp, y = (-8).dp))
         }
-        IconButton(onClick = { /* TODO */ }) { // 下载
-            // 使用 Icons.Default.Download 替换 painterResource
-            Icon(Icons.Default.Download, contentDescription = "下载")
+        IconButton(onClick = { /* TODO */ }) {
+            Icon(
+                imageVector = Icons.Default.Download,
+                contentDescription = "下载",
+                tint = Color.White
+            )
         }
-        IconButton(onClick = { /* TODO */ }) { // 分享
-            Icon(Icons.Default.Share, contentDescription = "分享")
-        }
-        IconButton(onClick = { /* TODO */ }) { // 更多
-            Icon(Icons.Default.MoreVert, contentDescription = "更多")
+        IconButton(onClick = { /* TODO */ }) {
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = "更多",
+                tint = Color.White
+            )
         }
     }
 }

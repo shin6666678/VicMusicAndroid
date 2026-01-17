@@ -29,8 +29,8 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.ChatSession
 import com.shin.vicmusic.core.model.api.NotifyDto
-import com.shin.vicmusic.feature.common.ItemChat
-import com.shin.vicmusic.feature.common.ItemNotify
+import com.shin.vicmusic.feature.common.item.ItemChat
+import com.shin.vicmusic.feature.common.item.ItemNotify
 import com.shin.vicmusic.feature.common.bar.CommonTopBar
 
 @Composable

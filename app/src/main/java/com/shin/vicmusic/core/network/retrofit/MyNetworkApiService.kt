@@ -8,6 +8,7 @@ import com.shin.vicmusic.core.model.api.AppUpdateDto
 import com.shin.vicmusic.core.model.api.ArtistDetailResp
 import com.shin.vicmusic.core.model.api.ArtistDto
 import com.shin.vicmusic.core.model.api.ChatSessionDto
+import com.shin.vicmusic.core.model.api.CommentDto
 import com.shin.vicmusic.core.model.api.NotifyDto
 import com.shin.vicmusic.core.model.api.PlaylistDetailDto
 import com.shin.vicmusic.core.model.api.PlaylistDto
@@ -20,6 +21,7 @@ import com.shin.vicmusic.core.model.api.SongListItemDto
 import com.shin.vicmusic.core.model.api.UserDetailDto
 import com.shin.vicmusic.core.model.api.UserDto
 import com.shin.vicmusic.core.model.request.ChangeVIPLevelReq
+import com.shin.vicmusic.core.model.request.CommentAddReq
 import com.shin.vicmusic.core.model.request.FollowReq
 import com.shin.vicmusic.core.model.request.LikeReq
 import com.shin.vicmusic.core.model.request.PageReq
@@ -31,6 +33,7 @@ import com.shin.vicmusic.core.model.response.NetworkResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
@@ -306,5 +309,28 @@ interface MyNetworkApiService {
     suspend fun getUnreadCount(): NetworkResponse<Map<String, Int>>
 
 
+    /*
+     * 评论相关
+     */
+    @POST("/api/comment/add")
+    suspend fun addComment(@Body req: CommentAddReq): NetworkResponse<Unit>
+
+    @DELETE("/api/comment/delete/{id}")
+    suspend fun deleteComment(@Path("id") id: String): NetworkResponse<Unit>
+
+    @POST("/api/comment/like/{id}")
+    suspend fun likeComment(@Path("id") id: String): NetworkResponse<Int>
+
+    @GET("/api/comment/list")
+    suspend fun getComments(
+        @Query("resourceType") resourceType: String,
+        @Query("resourceId") resourceId: String,
+        @Query("queryType") queryType: String = "all", // 默认为 "all"
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): NetworkResponse<NetworkPageData<CommentDto>>
+
+    @GET("/api/comment/detail/{id}")
+    suspend fun getCommentDetail(@Path("id") id: String): NetworkResponse<CommentDto>
 
 }

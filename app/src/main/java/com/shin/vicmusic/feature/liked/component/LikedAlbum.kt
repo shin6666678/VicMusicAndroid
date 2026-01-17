@@ -24,7 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.shin.vicmusic.core.domain.Album
-import com.shin.vicmusic.feature.common.ItemAlbum
+import com.shin.vicmusic.feature.common.item.ItemAlbum
 import com.shin.vicmusic.feature.common.bar.CommonSearchBar
 
 @Composable

@@ -17,7 +17,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.shin.vicmusic.core.domain.Playlist
-import com.shin.vicmusic.feature.common.ItemPlaylist
+import com.shin.vicmusic.feature.common.item.ItemPlaylist
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
