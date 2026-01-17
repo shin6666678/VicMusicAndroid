@@ -1,5 +1,6 @@
 package com.shin.vicmusic.feature.common.bar
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -95,12 +96,12 @@ fun SongBarScreen(
     onBarClick: () -> Unit, // 添加整个bar的点击事件
     modifier: Modifier = Modifier
 ) {
-
-    //color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f)
     // 整个播放条的背景和形状
     Card(
-        //color =MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f),
         shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        ),
         modifier = modifier
             .fillMaxWidth()
             .height(54.dp) // 根据设计图调整高度

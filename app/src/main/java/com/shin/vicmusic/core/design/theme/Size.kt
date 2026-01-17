@@ -17,8 +17,7 @@ val SpaceExtraOuter=14.dp
 val SpaceMedium=10.dp
 val SpaceExtraMedium=7.dp
 val SpaceSmall=5.dp
-val SpaceExtraSmall2=2.dp
-val SpaceExtraSmall=0.9.dp
+val SpaceExtraSmall=2.dp
 
 @Composable
 fun SpaceSmallHeight():Unit{

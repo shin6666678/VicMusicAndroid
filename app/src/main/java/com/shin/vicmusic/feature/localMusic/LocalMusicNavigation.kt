@@ -8,7 +8,7 @@ import androidx.navigation.compose.composable
 const val LOCAL_MUSIC_ROUTE = "local_music"
 fun NavGraphBuilder.localMusicScreen() {
     composable(route = LOCAL_MUSIC_ROUTE) {
-        LocalMusicScreen()
+        LocalMusicRoute()
     }
 }
 

@@ -9,11 +9,8 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,14 +27,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
-import com.shin.vicmusic.core.design.theme.SpaceExtraMedium
 import com.shin.vicmusic.feature.album.albumDetail.albumDetailScreen
 import com.shin.vicmusic.feature.album.albumList.albumListScreen
 import com.shin.vicmusic.feature.artist.artistDetail.artistDetailScreen
@@ -129,12 +125,10 @@ fun MyApp(
     // 如果是主页 -> 位移 0dp
     // 如果不是主页 -> 位移 80dp
     val navBarTranslationY by animateDpAsState(
-        targetValue = if (isMainScreen) 0.dp else 70.dp,
-        animationSpec = tween(2200),
+        targetValue = if (isMainScreen) 0.dp else 75.dp,
+        animationSpec = tween(2000),
         label = "navBarTranslation"
     )
-    val songBarHalfHeight = 27.dp // 决定背景覆盖多少，通常是 SongBar 高度的一半左右
-
     Box(modifier = Modifier.fillMaxSize()) {
         NavHost(
             navController = navController,
@@ -152,7 +146,6 @@ fun MyApp(
             vipScreen()
             artistDetailScreen()
             rankListDetailScreen()
-            // Album
             albumListScreen()
             albumDetailScreen()
             playlistDetailScreen()
@@ -172,37 +165,18 @@ fun MyApp(
         // 底部整体容器 (SongBar + 导航栏)
         AnimatedVisibility(
             visible = showBottomContainer,
-            modifier = Modifier.align(Alignment.BottomCenter),
+            modifier = Modifier
+                .align(Alignment.BottomCenter),
             enter = slideInVertically { it },
             exit = slideOutVertically { it }
         ) {
-            Box(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .offset(y = navBarTranslationY)
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.75f))
             ) {
-                // 层级 1：背景层 + 导航栏
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.BottomCenter)
-                        .padding(top = songBarHalfHeight)
-                        .background(MaterialTheme.colorScheme.surface)
-                ) {
-                    // 一个"隐形垫片"，高度等于 Padding 的高度。
-                    Spacer(modifier = Modifier.height(songBarHalfHeight))
-                    //空白部分
-                    Spacer(modifier = Modifier.height(SpaceExtraMedium))
-                    MyNavigationBar(
-                        destinations = TopLevelDestination.entries,
-                        currentDestination = TopLevelDestination.entries[mainTabState.intValue].route,
-                        onNavigateToDestination = { index -> mainTabState.intValue = index },
-                        badgeCounts = badgeCounts,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-
-                // 层级2: SongBar
+                // 如果当前有歌曲，就显示 SongBar
                 if (currentSong != null) {
                     SongBar(
                         song = currentSong!!,
@@ -212,14 +186,20 @@ fun MyApp(
                         onBarClick = { navController.navigateToSongDetail(currentSong!!.id) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .align(Alignment.TopCenter) // 对齐顶部
-                            .zIndex(1f) // 确保浮在背景层上面
                             .padding(horizontal = 16.dp)
                     )
                 }
+
+                MyNavigationBar(
+                    destinations = TopLevelDestination.entries,
+                    currentDestination = TopLevelDestination.entries[mainTabState.intValue].route,
+                    onNavigateToDestination = { index -> mainTabState.intValue = index },
+                    badgeCounts = badgeCounts,
+                    containerColor = Color.Transparent,
+                    modifier = Modifier.fillMaxWidth(),
+                )
             }
         }
-
 
         // 播放列表弹窗 (Bottom Sheet)
         if (showPlaylistSheet) {
@@ -235,7 +215,6 @@ fun MyApp(
                     onSongClick = playerManager::playAtIndex,
                     onRemoveSong = playerManager::removeSong,
                     onClose = { showPlaylistSheet = false },
-                    // 高度在 PlaybackQueueSheet 内部控制，这里不需要额外修饰
                 )
             }
         }
