@@ -1,5 +1,6 @@
 package com.shin.vicmusic.feature.song
 
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -8,12 +9,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Share
@@ -31,10 +30,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCompositionContext
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -45,15 +47,17 @@ import com.shin.vicmusic.core.manager.PlayerState
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONG
 import com.shin.vicmusic.feature.comment.navigateToComment
 import com.shin.vicmusic.feature.common.bar.BarActionItem
-import com.shin.vicmusic.feature.common.bar.CommonTopBar
 import com.shin.vicmusic.feature.common.bar.CommonTopBarSelect
 import com.shin.vicmusic.feature.song.component.LyricView
 import com.shin.vicmusic.feature.song.component.PlaybackControlBar
 import com.shin.vicmusic.feature.song.component.PlayerControls
 import com.shin.vicmusic.feature.song.component.RecordPlayerView
 import com.shin.vicmusic.feature.song.component.SongActionButtons
-import com.shin.vicmusic.feature.song.component.SongDetailTopBar
 import com.shin.vicmusic.feature.song.component.SongInfoSection
+import com.shin.vicmusic.util.ShareUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Preview
 @Composable
@@ -72,6 +76,8 @@ fun SongDetailRoute(
     val playerManager = LocalPlayerManager.current
     val songUiState by viewModel.songUiState.collectAsState()
     val currentPlayingSong by playerManager.currentPlayingSong.collectAsState()
+
+    val coroutineScope = rememberCoroutineScope()
 
     var showVipDialog by remember { mutableStateOf(false) }
 
@@ -126,6 +132,10 @@ fun SongDetailRoute(
             } else {
                 uiState.song
             }
+
+            val context = LocalContext.current
+            val parentComposition = rememberCompositionContext()
+            
             SongDetailScreen(
                 song = displaySong,
                 playerState = playerState,
@@ -140,6 +150,25 @@ fun SongDetailRoute(
                         resourceId = displaySong.id,
                         resourceType = "song"
                     )
+                },
+                onShareClick = {
+                    coroutineScope.launch { // coroutineScope 已经在顶层定义
+                        try {
+                            // --- 分享逻辑重构 ---
+
+
+                            // 2. 调用新的、更通用的分享工具
+                            // 它会构建一个包含文本、链接和图片的 Intent，并弹出系统分享菜单
+                            ShareUtils.shareSong(context, displaySong, null)
+
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            // 确保 Toast 在主线程显示
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(context, "分享失败: ${e.message}", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    }
                 }
             )
         }
@@ -167,7 +196,8 @@ fun SongDetailScreen(
     onSkipNext: () -> Unit = {},
     onSkipPrevious: () -> Unit = {},
     onToggleLike: () -> Unit = {},
-    onCommentClick: () -> Unit = {} // 新增评论点击事件
+    onCommentClick: () -> Unit = {},
+    onShareClick: () -> Unit = {}
 ) {
     val pagerState = rememberPagerState(pageCount = { 2 })
     Scaffold(
@@ -179,16 +209,19 @@ fun SongDetailScreen(
                     BarActionItem(
                         icon = Icons.Default.Share,
                         contentDescription = "分享",
-                        onClick = {}
+                        onClick = onShareClick
                     ),
                     BarActionItem(
                         icon = Icons.Default.List,
                         contentDescription = "其他功能",
-                        onClick = {}
+                        onClick = {
+                            onCommentClick()
+                        }
                     ),
                 )
             )
-        }
+        },
+        containerColor = Color.Transparent
     ) {paddingValues ->
         Column(
             modifier = Modifier
