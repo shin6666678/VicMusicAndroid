@@ -1,5 +1,9 @@
 package com.shin.vicmusic.feature.song
 
+import SongShareCard
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -10,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
@@ -40,6 +45,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.imageLoader
+import coil.request.ImageRequest
+import coil.request.SuccessResult
+import coil.util.CoilUtils.result
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
 import com.shin.vicmusic.core.domain.Song
@@ -54,7 +63,9 @@ import com.shin.vicmusic.feature.song.component.PlayerControls
 import com.shin.vicmusic.feature.song.component.RecordPlayerView
 import com.shin.vicmusic.feature.song.component.SongActionButtons
 import com.shin.vicmusic.feature.song.component.SongInfoSection
+import com.shin.vicmusic.util.ResourceUtil
 import com.shin.vicmusic.util.ShareUtils
+import com.shin.vicmusic.util.captureComposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -125,6 +136,7 @@ fun SongDetailRoute(
                 CircularProgressIndicator()
             }
         }
+
         is SongUiState.Success -> {
             val playerState by playerManager.playerState.collectAsState()
             val displaySong = if (currentPlayingSong?.id == uiState.song.id) {
@@ -135,7 +147,7 @@ fun SongDetailRoute(
 
             val context = LocalContext.current
             val parentComposition = rememberCompositionContext()
-            
+
             SongDetailScreen(
                 song = displaySong,
                 playerState = playerState,
@@ -152,30 +164,80 @@ fun SongDetailRoute(
                     )
                 },
                 onShareClick = {
-                    coroutineScope.launch { // coroutineScope 已经在顶层定义
+                    coroutineScope.launch { // 默认在主线程启动
+                        val tag = "ShareProcess"
                         try {
-                            // --- 分享逻辑重构 ---
+                            Log.d(tag, "✅ 1. 分享流程开始...")
 
+                            // 步骤 1: 切换到 IO 线程加载图片
+                            val albumArtBitmap: Bitmap? = withContext(Dispatchers.IO) {
+                                Log.d(tag, "⏳ 2. (IO线程) 正在加载图片，URL: ${displaySong.icon}")
+                                val loader = context.imageLoader
+                                val request = ImageRequest.Builder(context)
+                                    .data(ResourceUtil.r2(displaySong.icon))
+                                    .allowHardware(false)
+                                    .build()
+                                val result = loader.execute(request)
+                                if (result is SuccessResult) {
+                                    Log.d(tag, "✅ 3. (IO线程) 图片加载成功！")
+                                    (result.drawable as BitmapDrawable).bitmap
+                                } else {
+                                    Log.e(tag, "❌ 3. (IO线程) 图片加载失败！Result: $result")
+                                    null
+                                }
+                            }
 
-                            // 2. 调用新的、更通用的分享工具
-                            // 它会构建一个包含文本、链接和图片的 Intent，并弹出系统分享菜单
-                            ShareUtils.shareSong(context, displaySong, null)
+                            // 步骤 2: 切换回主线程 (Main) 来执行截图
+                            Log.d(tag, "⏳ 4. 准备切换到主线程截图...")
+                            val shareCardBitmap = withContext(Dispatchers.Main) {
+                                Log.d(tag, "✅ 4.1 (主线程) 正在截图...")
+                                captureComposable(context, parentComposition) {
+                                    // ==================== 终极修复 ====================
+                                    // 我们需要一个拥有绝对尺寸的根容器来打破测量“死结”
+                                    // SongShareCard 内部已经有了背景色和布局，我们只需要提供一个固定大小的“舞台”
+                                    Box {
+                                        SongShareCard(
+                                            song = displaySong,
+                                            albumArtBitmap = albumArtBitmap
+                                        )
+                                    }
+                                    // ===============================================
+                                }
+                            }
+
+                            Log.d(
+                                tag,
+                                "✅ 5. (主线程) 截图成功！Bitmap大小: ${shareCardBitmap.width}x${shareCardBitmap.height}"
+                            )
+
+                            // 步骤 3: 确认在主线程调用系统分享
+                            Log.d(tag, "⏳ 6. (主线程) 准备调用系统分享...")
+                            ShareUtils.shareSong(context, displaySong, shareCardBitmap)
+                            Log.d(tag, "✅ 7. (主线程) 系统分享菜单已调用！")
 
                         } catch (e: Exception) {
+                            Log.e(tag, "❌❌❌ 分享流程中断！错误信息: ", e)
                             e.printStackTrace()
-                            // 确保 Toast 在主线程显示
                             withContext(Dispatchers.Main) {
-                                Toast.makeText(context, "分享失败: ${e.message}", Toast.LENGTH_LONG).show()
+                                Toast.makeText(context, "分享失败: ${e.message}", Toast.LENGTH_LONG)
+                                    .show()
                             }
                         }
                     }
                 }
+//...
+
+
             )
         }
+
         is SongUiState.Error -> {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = "加载失败: ${uiState.message}", color = MaterialTheme.colorScheme.error)
+                    Text(
+                        text = "加载失败: ${uiState.message}",
+                        color = MaterialTheme.colorScheme.error
+                    )
                     Button(onClick = { viewModel.loadSongDetail(viewModel.songId ?: "") }) {
                         Text("重试")
                     }
@@ -222,7 +284,7 @@ fun SongDetailScreen(
             )
         },
         containerColor = Color.Transparent
-    ) {paddingValues ->
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .background(Color(0xFF1C1C1E))

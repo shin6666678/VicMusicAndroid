@@ -106,5 +106,7 @@ dependencies {
 
     implementation("com.google.accompanist:accompanist-drawablepainter:0.34.0")
 
+    implementation("androidx.appcompat:appcompat:1.7.0")
+
 
 }
