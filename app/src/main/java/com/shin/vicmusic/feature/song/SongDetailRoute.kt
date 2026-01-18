@@ -69,6 +69,8 @@ import com.shin.vicmusic.util.captureComposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import android.graphics.Color as AndroidColor
+import androidx.compose.ui.graphics.Color as ComposeColor
 
 @Preview
 @Composable
@@ -209,7 +211,17 @@ fun SongDetailRoute(
                                 tag,
                                 "✅ 5. (主线程) 截图成功！Bitmap大小: ${shareCardBitmap.width}x${shareCardBitmap.height}"
                             )
+                            // ... 在第 5 步截图成功后添加 ...
+                            Log.d(tag, "✅ 5. (主线程) 截图成功！Bitmap大小: ${shareCardBitmap.width}x${shareCardBitmap.height}")
 
+                            // ‼️ 修复引用：使用 android.graphics.Color.TRANSPARENT
+                            val pixel = shareCardBitmap.getPixel(shareCardBitmap.width / 2, shareCardBitmap.height / 2)
+                            if (pixel == 0 || pixel == android.graphics.Color.TRANSPARENT) {
+                                Log.e(tag, "❌ 警告：Bitmap 中心点是透明的，截图可能失败了！")
+                            } else {
+                                // 打印颜色值，如果是 FFFFFFFF 说明是纯白（底色），如果是其他值说明有内容
+                                Log.d(tag, "✅ 截图中心点颜色: ${Integer.toHexString(pixel)}")
+                            }
                             // 步骤 3: 确认在主线程调用系统分享
                             Log.d(tag, "⏳ 6. (主线程) 准备调用系统分享...")
                             ShareUtils.shareSong(context, displaySong, shareCardBitmap)
