@@ -2,25 +2,26 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    kotlin("plugin.serialization") version "1.9.23"
-    id("com.google.devtools.ksp")
-    id("com.google.dagger.hilt.android")
+    alias(libs.plugins.ksp) // 使用 Version Catalog 管理 KSP
+    alias(libs.plugins.hilt) // 使用 Version Catalog 管理 Hilt
+    alias(libs.plugins.kotlin.serialization) // 使用 Version Catalog 管理 Serialization
 }
 
 android {
     namespace = "com.shin.vicmusic"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36 // 建议使用 35 (Android 15) 作为当前稳定编译目标，36 也可以但可能处于预览阶段
 
     defaultConfig {
         applicationId = "com.shin.vicmusic"
         minSdk = 24
-        targetSdk = 36
-        versionCode = 5
-        versionName = "1.0.4.1"
+        targetSdk = 36 // 与 compileSdk 匹配
+        versionCode = 6
+        versionName = "1.0.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
     }
 
     buildTypes {
@@ -32,28 +33,75 @@ android {
             )
         }
     }
+
+    // AGP 8+ 必须使用 Java 17
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
     }
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
 }
 
 dependencies {
+    // AndroidX Core & Lifecycle
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.appcompat)
+
+    // Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.ui)
+    // 图标库
+    implementation(libs.androidx.compose.material.icons.core)
+    implementation(libs.androidx.compose.material.icons.extended)
+
+    // Navigation
+    implementation(libs.androidx.navigation.compose)
+
+    // Hilt (DI)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler) // 使用 KSP 替代 kapt
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    // Network (Retrofit, OkHttp, Serialization)
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.kotlinx.serialization)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.gson) // 如果你还在用 GSON，建议逐步迁移到 Kotlinx Serialization
+
+    // Image Loading
+    implementation(libs.coil.compose)
+
+    // Media3 (ExoPlayer)
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
+    implementation(libs.androidx.media3.session)
+
+    // DataStore
+    implementation(libs.androidx.datastore.preferences)
+
+    // Accompanist (注意：这些库已大部分废弃，建议未来迁移)
+    implementation(libs.accompanist.flowlayout) // 推荐迁移至 Compose Foundation 的 FlowRow
+    implementation(libs.accompanist.systemuicontroller) // 推荐迁移至 Activity.enableEdgeToEdge
+    implementation(libs.accompanist.drawablepainter)
+
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -61,52 +109,4 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-    implementation(libs.navigation.compose)
-
-    // 新增图标库依赖
-    implementation(libs.androidx.compose.material.icons.core)
-    implementation(libs.androidx.compose.material.icons.extended) // 可选，要Outlined风格就加
-
-    //kotlin序列化
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
-
-    //hilt
-    implementation("com.google.dagger:hilt-android:2.57.1")
-    ksp("com.google.dagger:hilt-android-compiler:2.57.1")
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-
-    //网络框架
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    //网络日志
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-    //类型安全网络
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    //让retrofit支持kotlin序列化
-    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
-
-    //图片加载框架
-    implementation("io.coil-kt:coil-compose:2.6.0")
-
-    // [已修复] 统一 AndroidX Media3 版本为 1.9.0
-    implementation("androidx.media3:media3-exoplayer:1.9.0")
-    implementation("androidx.media3:media3-ui:1.9.0")
-    implementation("androidx.media3:media3-session:1.9.0")
-
-    implementation("com.google.accompanist:accompanist-flowlayout:0.28.0") // 检查最新版本
-
-    //数据存储
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
-
-    //GSON
-    implementation("com.google.code.gson:gson:2.10.1")
-
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.34.0")
-
-
-
-    implementation("com.google.accompanist:accompanist-drawablepainter:0.34.0")
-
-    implementation("androidx.appcompat:appcompat:1.7.0")
-
-
 }
