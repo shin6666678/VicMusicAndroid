@@ -1,8 +1,5 @@
 package com.shin.vicmusic.feature.song
 
-import SongShareCard
-import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -63,14 +60,13 @@ import com.shin.vicmusic.feature.song.component.PlayerControls
 import com.shin.vicmusic.feature.song.component.RecordPlayerView
 import com.shin.vicmusic.feature.song.component.SongActionButtons
 import com.shin.vicmusic.feature.song.component.SongInfoSection
+import com.shin.vicmusic.util.QRCodeUtils
 import com.shin.vicmusic.util.ResourceUtil
 import com.shin.vicmusic.util.ShareUtils
 import com.shin.vicmusic.util.captureComposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import android.graphics.Color as AndroidColor
-import androidx.compose.ui.graphics.Color as ComposeColor
 
 @Preview
 @Composable
@@ -166,79 +162,47 @@ fun SongDetailRoute(
                     )
                 },
                 onShareClick = {
-                    coroutineScope.launch { // 默认在主线程启动
+                    coroutineScope.launch {
                         val tag = "ShareProcess"
                         try {
-                            Log.d(tag, "✅ 1. 分享流程开始...")
-
-                            // 步骤 1: 切换到 IO 线程加载图片
-                            val albumArtBitmap: Bitmap? = withContext(Dispatchers.IO) {
-                                Log.d(tag, "⏳ 2. (IO线程) 正在加载图片，URL: ${displaySong.icon}")
+                            // 1. 加载封面图 (IO 线程)
+                            val albumArtBitmap = withContext(Dispatchers.IO) {
                                 val loader = context.imageLoader
                                 val request = ImageRequest.Builder(context)
                                     .data(ResourceUtil.r2(displaySong.icon))
                                     .allowHardware(false)
                                     .build()
-                                val result = loader.execute(request)
-                                if (result is SuccessResult) {
-                                    Log.d(tag, "✅ 3. (IO线程) 图片加载成功！")
-                                    (result.drawable as BitmapDrawable).bitmap
-                                } else {
-                                    Log.e(tag, "❌ 3. (IO线程) 图片加载失败！Result: $result")
-                                    null
+                                (loader.execute(request) as? SuccessResult)?.let {
+                                    (it.drawable as android.graphics.drawable.BitmapDrawable).bitmap
                                 }
                             }
 
-                            // 步骤 2: 切换回主线程 (Main) 来执行截图
-                            Log.d(tag, "⏳ 4. 准备切换到主线程截图...")
+                            // 2. 生成二维码 (H5 落地页 URL)
+                            // 💡 这里应该放你的官网分享页地址，如果没有，建议先放一个下载页 URL
+                            val shareLandingUrl = "http://115.190.155.131:9001/share.html?id=${displaySong.id}"
+                            val qrBitmap = withContext(Dispatchers.Default) {
+                                QRCodeUtils.createQRCode(shareLandingUrl, 200)
+                            }
+
+                            // 3. 渲染并截图 (Main 线程)
                             val shareCardBitmap = withContext(Dispatchers.Main) {
-                                Log.d(tag, "✅ 4.1 (主线程) 正在截图...")
                                 captureComposable(context, parentComposition) {
-                                    // ==================== 终极修复 ====================
-                                    // 我们需要一个拥有绝对尺寸的根容器来打破测量“死结”
-                                    // SongShareCard 内部已经有了背景色和布局，我们只需要提供一个固定大小的“舞台”
-                                    Box {
-                                        SongShareCard(
-                                            song = displaySong,
-                                            albumArtBitmap = albumArtBitmap
-                                        )
-                                    }
-                                    // ===============================================
+                                    SongShareCard(
+                                        song = displaySong,
+                                        albumArtBitmap = albumArtBitmap,
+                                        qrCodeBitmap = qrBitmap
+                                    )
                                 }
                             }
 
-                            Log.d(
-                                tag,
-                                "✅ 5. (主线程) 截图成功！Bitmap大小: ${shareCardBitmap.width}x${shareCardBitmap.height}"
-                            )
-                            // ... 在第 5 步截图成功后添加 ...
-                            Log.d(tag, "✅ 5. (主线程) 截图成功！Bitmap大小: ${shareCardBitmap.width}x${shareCardBitmap.height}")
-
-                            // ‼️ 修复引用：使用 android.graphics.Color.TRANSPARENT
-                            val pixel = shareCardBitmap.getPixel(shareCardBitmap.width / 2, shareCardBitmap.height / 2)
-                            if (pixel == 0 || pixel == android.graphics.Color.TRANSPARENT) {
-                                Log.e(tag, "❌ 警告：Bitmap 中心点是透明的，截图可能失败了！")
-                            } else {
-                                // 打印颜色值，如果是 FFFFFFFF 说明是纯白（底色），如果是其他值说明有内容
-                                Log.d(tag, "✅ 截图中心点颜色: ${Integer.toHexString(pixel)}")
-                            }
-                            // 步骤 3: 确认在主线程调用系统分享
-                            Log.d(tag, "⏳ 6. (主线程) 准备调用系统分享...")
+                            // 4. 调用系统分享
                             ShareUtils.shareSong(context, displaySong, shareCardBitmap)
-                            Log.d(tag, "✅ 7. (主线程) 系统分享菜单已调用！")
 
                         } catch (e: Exception) {
-                            Log.e(tag, "❌❌❌ 分享流程中断！错误信息: ", e)
-                            e.printStackTrace()
-                            withContext(Dispatchers.Main) {
-                                Toast.makeText(context, "分享失败: ${e.message}", Toast.LENGTH_LONG)
-                                    .show()
-                            }
+                            Log.e(tag, "分享异常", e)
                         }
                     }
                 }
-//...
-
 
             )
         }
