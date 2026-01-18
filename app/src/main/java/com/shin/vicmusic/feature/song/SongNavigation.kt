@@ -5,13 +5,17 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 
 const val SONG_DETAIL_ROUTE="songDetail"
 
 fun NavGraphBuilder.songDetailScreen() {
     composable(
         route = "$SONG_DETAIL_ROUTE/{songId}", // Define the route with the argument
-        arguments = listOf(navArgument("songId") { type = NavType.StringType }) // Specify argument type
+        arguments = listOf(navArgument("songId") { type = NavType.StringType }) ,
+        deepLinks = listOf(
+            navDeepLink { uriPattern = "vicmusic://song/{songId}" }
+        )
     ) {
         SongDetailRoute() // 传递 navController
     }

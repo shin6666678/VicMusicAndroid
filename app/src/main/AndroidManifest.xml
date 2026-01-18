@@ -40,6 +40,15 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter android:autoVerify="true" android:label="VicMusic">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <!-- 配置协议 vicmusic://song/{id} -->
+                <data android:scheme="vicmusic" />
+                <data android:host="song" />
+            </intent-filter>
         </activity>
 
         <service

@@ -1,9 +1,10 @@
 package com.shin.vicmusic
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge // [新增导包]
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.navigation.compose.rememberNavController
 import com.shin.vicmusic.core.design.composition.LocalAuthManager
@@ -35,9 +36,10 @@ class MainActivity : ComponentActivity() {
     lateinit var tokenManager: TokenManager
     @Inject
     lateinit var songActionManager: SongActionManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge() // [全局修复] 开启边对边显示，允许Compose控制系统栏区域
+        enableEdgeToEdge()
         setContent {
             val navController = rememberNavController()
             VicMusicTheme {
@@ -53,5 +55,14 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    /**
+     * ‼️ 只需要保留这个：当 App 在后台运行，点击 DeepLink 唤起时，
+     * 必须更新 Intent，否则 NavHost 可能拿不到最新的跳转参数。
+     */
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
     }
 }
