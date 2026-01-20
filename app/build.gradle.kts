@@ -58,6 +58,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.appcompat)
+    implementation("androidx.core:core-splashscreen:1.2.0") // Splash Screen API
 
     // Compose
     implementation(platform(libs.androidx.compose.bom))
