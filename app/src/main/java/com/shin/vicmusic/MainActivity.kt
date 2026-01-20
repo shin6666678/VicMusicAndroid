@@ -5,7 +5,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import com.shin.vicmusic.core.design.composition.LocalAuthManager
 import com.shin.vicmusic.core.design.composition.LocalNavController
@@ -19,6 +21,7 @@ import com.shin.vicmusic.core.manager.PlaybackQueueManager
 import com.shin.vicmusic.core.manager.PlayerManager
 import com.shin.vicmusic.core.manager.SongActionManager
 import com.shin.vicmusic.core.manager.TokenManager
+import com.shin.vicmusic.feature.main.MainViewModel
 import com.shin.vicmusic.ui.MyApp
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -37,8 +40,16 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var songActionManager: SongActionManager
 
+    private val mainViewModel: MainViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        splashScreen.setKeepOnScreenCondition {
+            !mainViewModel.isReady.value
+        }
+
         enableEdgeToEdge()
         setContent {
             val navController = rememberNavController()
