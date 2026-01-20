@@ -1,7 +1,13 @@
 package com.shin.vicmusic.util
 
-fun formatTime(millis: Long): String {
-    val minutes = millis / 1000 / 60
-    val seconds = millis / 1000 % 60
-    return String.format("%02d:%02d", minutes, seconds)
+import android.text.format.DateUtils
+
+object TimeUtil {
+    fun getFriendlyTimeSpan(timestamp: Long): String {
+        val now = System.currentTimeMillis()
+        val aMomentAgo = DateUtils.getRelativeTimeSpanString(
+            timestamp, now, DateUtils.MINUTE_IN_MILLIS
+        )
+        return aMomentAgo.toString()
+    }
 }

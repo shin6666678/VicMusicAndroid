@@ -44,8 +44,8 @@ fun MainRoute(
             pageContent = { page ->
                 when (page) {
                     0 -> DiscoveryRoute(navController)
-                    1 -> MeRoute()
-                    2 -> FeedRoute()
+                    1 -> FeedRoute()
+                    2 -> MeRoute()
                 }
             }
         )
