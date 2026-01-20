@@ -2,7 +2,6 @@
     <string name="app_name">VicMusic</string>
     <string name="copyright" translatable="false">Copyright %1$d Shin,All Rights Reserved</string>
     <string name="tab_main">首页</string>
-    <string name="tab_video">视频</string>
     <string name="tab_me">我的</string>
-    <string name="tab_cart">动态</string>
+    <string name="tab_feed">动态</string>
 </resources>

@@ -26,18 +26,18 @@ enum class TopLevelDestination(
         titleTextId = R.string.tab_main,
         route = DISCOVERY_ROUTE
     ),
+    // 动态
+    FEED(
+        selectedIcon = Icons.Filled.People, // 对应之前的"朋友/动态"
+        unselectedIcon = Icons.Outlined.People,
+        titleTextId = R.string.tab_feed,
+        route = FEED_ROUTE
+    ),
     // 我的 -> 使用“纯人像”，去掉外圈，更加清爽
     ME(
         selectedIcon = Icons.Filled.Person,
         unselectedIcon = Icons.Outlined.Person,
         titleTextId = R.string.tab_me,
         route = ME_ROUTE
-    ),
-    // 动态
-    FEED(
-        selectedIcon = Icons.Filled.People, // 对应之前的"朋友/动态"
-        unselectedIcon = Icons.Outlined.People,
-        titleTextId = R.string.tab_cart,
-        route = FEED_ROUTE
     )
 }

@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
 import com.shin.vicmusic.core.manager.PlayerState
-import com.shin.vicmusic.util.formatTime
+import com.shin.vicmusic.util.TimeUtil
 
 @Composable
 fun PlaybackControlBar(
@@ -45,8 +45,8 @@ fun PlaybackControlBar(
         0f
     }
 
-    val currentFormattedTime = formatTime(playerState.currentPosition)
-    val totalFormattedTime = formatTime(playerState.duration)
+    val currentFormattedTime = TimeUtil.getFriendlyTimeSpan(playerState.currentPosition)
+    val totalFormattedTime = TimeUtil.getFriendlyTimeSpan(playerState.duration)
 
     Column(modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
 
