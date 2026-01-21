@@ -1,6 +1,5 @@
 package com.shin.vicmusic.feature.common.bar
 
-import android.R.id.tabs
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,7 +15,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,11 +28,12 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun CommonTopBarSelect(
     backImageVictor: ImageVector =Icons.AutoMirrored.Filled.ArrowBack,
-    onBackClick: () -> Unit,
+    showBackButton: Boolean = true,
+    onBackClick: () -> Unit={},
     tabs: List<BarTabItem> = emptyList(),
     actions: List<BarActionItem> = emptyList(),
     backgroundColor: Color = Color.Transparent,
-    contentColor: Color = Color.White,
+    contentColor: Color = Color.Black,
 ) {
     Row(
         modifier = Modifier
@@ -45,16 +44,18 @@ fun CommonTopBarSelect(
         verticalAlignment = Alignment.CenterVertically
     ) {
         // --- 左侧区域 (Fixed Back Icon) ---
-        IconButton(
-            onClick = onBackClick,
-            modifier = Modifier.size(48.dp) // 标准触摸区域大小
-        ) {
-            Icon(
-                imageVector = backImageVictor,
-                contentDescription = "Back",
-                tint = contentColor,
-                modifier = Modifier.size(24.dp)
-            )
+        if(showBackButton){
+            IconButton(
+                onClick = onBackClick,
+                modifier = Modifier.size(48.dp) // 标准触摸区域大小
+            ) {
+                Icon(
+                    imageVector = backImageVictor,
+                    contentDescription = "Back",
+                    tint = contentColor,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
 
         // --- 中间区域 (Center Tabs) ---
