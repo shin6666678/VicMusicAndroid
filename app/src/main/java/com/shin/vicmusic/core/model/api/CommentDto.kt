@@ -13,5 +13,8 @@ data class CommentDto(
     val content: String,
     val likeCount: Int,
     val liked: Boolean,
-    val createTime: Long
+    val createTime: Long,
+    val parentId: String? = null,
+    val rootId: String? = null,
+    val replyList: List<CommentDto>? = null
 )

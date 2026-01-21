@@ -3,7 +3,7 @@ package com.shin.vicmusic.feature.comment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.CommentRepository
-import com.shin.vicmusic.core.domain.Comment
+import com.shin.vicmusic.core.domain.CommentThread
 import com.shin.vicmusic.core.domain.Result
 import com.shin.vicmusic.core.model.request.CommentAddReq
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class CommentUiState(
-    val comments: List<Comment> = emptyList(),
+    val comments: List<CommentThread> = emptyList(), // Changed to CommentThread
     val isLoading: Boolean = false,
     val error: String? = null,
     val page: Int = 1,
@@ -38,13 +38,13 @@ class CommentViewModel @Inject constructor(
 
             when (val result = commentRepository.getComments(resourceType, resourceId, "all", currentPage, 20)) {
                 is Result.Success -> {
-                    val newComments = result.data.list ?: emptyList()
+                    val newThreads = result.data.list ?: emptyList()
                     val pagination = result.data.pagination
-                    val currentComments = if (isRefresh) emptyList() else _uiState.value.comments
+                    val currentThreads = if (isRefresh) emptyList() else _uiState.value.comments
 
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        comments = currentComments + newComments,
+                        comments = currentThreads + newThreads,
                         page = pagination.page + 1,
                         hasMore = pagination.page < pagination.pages
                     )
@@ -73,24 +73,39 @@ class CommentViewModel @Inject constructor(
     }
 
     // 点赞评论
-    fun toggleLike(commentId: String) {
+    fun toggleLike(commentId: String, rootCommentId: String? = null) {
         viewModelScope.launch {
             when (val result = commentRepository.likeComment(commentId)) {
                 is Result.Success -> {
-                    // 更新 UI 状态
                     val newStatus = result.data == 1 // 1 是点赞, 0 是取消
-                    _uiState.value = _uiState.value.copy(
-                        comments = _uiState.value.comments.map { comment ->
-                            if (comment.id == commentId) {
-                                comment.copy(
-                                    liked = newStatus,
-                                    likeCount = if (newStatus) comment.likeCount + 1 else comment.likeCount - 1
+                    val updatedComments = _uiState.value.comments.map { thread ->
+                        if (rootCommentId == null && thread.rootComment.id == commentId) {
+                            // It's a root comment
+                            thread.copy(
+                                rootComment = thread.rootComment.copy(
+                                    isLiked = newStatus,
+                                    likeCount = if (newStatus) thread.rootComment.likeCount + 1 else thread.rootComment.likeCount - 1
                                 )
-                            } else {
-                                comment
-                            }
+                            )
+                        } else if (rootCommentId != null && thread.rootComment.id == rootCommentId) {
+                            // It's a reply
+                            thread.copy(
+                                replies = thread.replies.map { reply ->
+                                    if (reply.id == commentId) {
+                                        reply.copy(
+                                            isLiked = newStatus,
+                                            likeCount = if (newStatus) reply.likeCount + 1 else reply.likeCount - 1
+                                        )
+                                    } else {
+                                        reply
+                                    }
+                                }
+                            )
+                        } else {
+                            thread
                         }
-                    )
+                    }
+                    _uiState.value = _uiState.value.copy(comments = updatedComments)
                 }
                 is Result.Error -> {
                     _uiState.value = _uiState.value.copy(error = "操作失败")

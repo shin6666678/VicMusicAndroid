@@ -1,7 +1,9 @@
 package com.shin.vicmusic.core.data.repository
 
-import com.shin.vicmusic.core.data.mapper.toDomain
-import com.shin.vicmusic.core.domain.Comment
+import com.shin.vicmusic.core.data.mapper.toCommentDetail
+import com.shin.vicmusic.core.data.mapper.toCommentThreads
+import com.shin.vicmusic.core.domain.CommentDetail
+import com.shin.vicmusic.core.domain.CommentThread
 import com.shin.vicmusic.core.domain.Result
 import com.shin.vicmusic.core.model.request.CommentAddReq
 import com.shin.vicmusic.core.model.response.NetworkPageData
@@ -15,7 +17,7 @@ class CommentRepository @Inject constructor(
 ) {
 
     /**
-     * 获取评论列表
+     * 获取评论列表 (已重构为评论线程)
      */
     suspend fun getComments(
         resourceType: String,
@@ -23,12 +25,12 @@ class CommentRepository @Inject constructor(
         queryType: String,
         page: Int,
         size: Int
-    ): Result<NetworkPageData<Comment>> {
+    ): Result<NetworkPageData<CommentThread>> {
         val dtoResponse = datasource.getComments(resourceType, resourceId, queryType, page, size)
 
         return if (dtoResponse.code == 0 && dtoResponse.data != null) {
             val dtoList = dtoResponse.data.list ?: emptyList()
-            val domainList = dtoList.map { it.toDomain() }
+            val domainList = dtoList.toCommentThreads()
             val domainData = NetworkPageData(
                 list = domainList,
                 pagination = dtoResponse.data.pagination
@@ -40,12 +42,13 @@ class CommentRepository @Inject constructor(
     }
 
     /**
-     * 获取评论详情
+     * 获取评论详情 (已重构)
      */
-    suspend fun getCommentDetail(id: String): Result<Comment> {
+    suspend fun getCommentDetail(id: String): Result<CommentDetail> {
         val resp = datasource.getCommentDetail(id)
         return if (resp.code == 0 && resp.data != null) {
-            Result.Success(resp.data.toDomain())
+            val commentDetail = resp.data.toCommentDetail()
+            Result.Success(commentDetail)
         } else {
             Result.Error(resp.message ?: "获取评论详情失败")
         }

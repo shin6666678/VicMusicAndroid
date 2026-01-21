@@ -34,13 +34,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
-import com.shin.vicmusic.feature.common.item.ItemComment
 import com.shin.vicmusic.core.domain.Comment
+import com.shin.vicmusic.core.domain.CommentThread
+import com.shin.vicmusic.core.domain.User
+import com.shin.vicmusic.feature.comment.detail.navigateToCommentDetail
+import com.shin.vicmusic.feature.common.item.ItemCommentThread
+
 @Composable
 fun CommentRoute(
     resourceId: String,
@@ -50,7 +53,6 @@ fun CommentRoute(
     val navController = LocalNavController.current
     val uiState by viewModel.uiState.collectAsState()
 
-    // 当页面首次加载时，根据传入的资源ID和类型加载评论
     LaunchedEffect(resourceId, resourceType) {
         viewModel.loadComments(
             resourceType = resourceType,
@@ -63,11 +65,14 @@ fun CommentRoute(
         uiState = uiState,
         onBackClick = { navController.popBackStack() },
         onLikeClick = viewModel::toggleLike,
-        onAddComment = { content ->
-            viewModel.addComment(resourceType, resourceId, content)
+        onAddComment = { content, parentId ->
+            viewModel.addComment(resourceType, resourceId, content, parentId)
         },
         onLoadMore = {
             viewModel.loadComments(resourceType, resourceId)
+        },
+        onViewMoreRepliesClick = { rootCommentId ->
+            navController.navigateToCommentDetail(rootCommentId, resourceId, resourceType)
         }
     )
 }
@@ -77,11 +82,21 @@ fun CommentRoute(
 fun CommentScreen(
     uiState: CommentUiState,
     onBackClick: () -> Unit,
-    onLikeClick: (String) -> Unit,
-    onAddComment: (String) -> Unit,
-    onLoadMore: () -> Unit
+    onLikeClick: (commentId: String, rootId: String?) -> Unit,
+    onAddComment: (content: String, parentId: String?) -> Unit,
+    onLoadMore: () -> Unit,
+    onViewMoreRepliesClick: (rootCommentId: String) -> Unit
 ) {
     var commentText by remember { mutableStateOf("") }
+    var replyInfo by remember { mutableStateOf<Pair<Comment, Comment?>?>(null) }
+
+    val placeholderText = if (replyInfo?.second != null) {
+        "回复 @${replyInfo?.second?.user?.name}:"
+    } else if (replyInfo?.first != null) {
+        "回复 @${replyInfo?.first?.user?.name}:"
+    } else {
+        "留下你的精彩评论吧"
+    }
 
     Scaffold(
         topBar = {
@@ -93,14 +108,11 @@ fun CommentScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    titleContentColor = Color.Black,
-                    navigationIconContentColor = Color.Black
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         },
         bottomBar = {
-            // 底部评论输入框
             OutlinedTextField(
                 value = commentText,
                 onValueChange = { commentText = it },
@@ -109,13 +121,15 @@ fun CommentScreen(
                     .background(MaterialTheme.colorScheme.background)
                     .padding(horizontal = 16.dp, vertical = 8.dp)
                     .navigationBarsPadding(),
-                placeholder = { Text("留下你的精彩评论吧") },
+                placeholder = { Text(placeholderText) },
                 trailingIcon = {
                     TextButton(
                         onClick = {
                             if (commentText.isNotBlank()) {
-                                onAddComment(commentText)
-                                commentText = "" // 发送后清空
+                                val parentId = replyInfo?.second?.id ?: replyInfo?.first?.id
+                                onAddComment(commentText, parentId)
+                                commentText = ""
+                                replyInfo = null // Reset reply state
                             }
                         }
                     ) {
@@ -142,19 +156,19 @@ fun CommentScreen(
                 }
             } else {
                 LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                    items(uiState.comments) { comment ->
-                        // 使用您移动后的 CommentItem
-                        ItemComment(comment = comment, onLikeClick = onLikeClick)
+                    items(uiState.comments, key = { it.rootComment.id }) { thread ->
+                        ItemCommentThread(
+                            thread = thread,
+                            onLikeClick = onLikeClick,
+                            onReplyClick = { root, reply -> replyInfo = Pair(root, reply) },
+                            onViewMoreRepliesClick = onViewMoreRepliesClick
+                        )
                         Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
                     }
 
-                    // 加载更多逻辑
                     if (uiState.hasMore) {
                         item {
-                            // 当这个item对用户可见时，触发加载更多
-                            LaunchedEffect(uiState.comments.size) {
-                                onLoadMore()
-                            }
+                            LaunchedEffect(Unit) { onLoadMore() }
                             if (uiState.isLoading) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -171,65 +185,41 @@ fun CommentScreen(
     }
 }
 
-// 预览函数
-@Preview(showBackground = true, backgroundColor = 0xFF1C1C1E)
+@Preview(showBackground = true)
 @Composable
 fun CommentScreenPreview() {
-    // 1. 创建一个用于预览的模拟 UI 状态
-    val previewUiState = CommentUiState(
-        comments = listOf(
-            Comment(
-                id = "1",
-                userId = "user1",
-                userName = "Shin",
-                userHeadImg = "",
-                resourceType = "song",
-                resourceId = "song1",
-                content = "这首歌太好听了，单曲循环一整天！",
-                likeCount = 102,
-                liked = true,
-                createTime = System.currentTimeMillis()
-            ),
-            Comment(
-                id = "2",
-                userId = "user2",
-                userName = "音乐爱好者",
-                userHeadImg = "",
-                resourceType = "song",
-                resourceId = "song1",
-                content = "前奏一响，青春就回来了。评论区的朋友们，你们好吗？",
-                likeCount = 88,
-                liked = false,
-                createTime = System.currentTimeMillis() - 1000 * 60 * 5
-            ),
-            Comment(
-                id = "3",
-                userId = "user3",
-                userName = "Vic",
-                userHeadImg = "",
-                resourceType = "song",
-                resourceId = "song1",
-                content = "有人知道这是哪部电影的插曲吗？感觉很熟悉。",
-                likeCount = 15,
-                liked = false,
-                createTime = System.currentTimeMillis() - 1000 * 60 * 30
-            )
-        ),
-        isLoading = false,
-        error = null,
-        page = 1,
-        hasMore = true
+    val mockUser1 = User(id = "user1", name = "Shin", headImg = "")
+    val mockUser2 = User(id = "user2", name = "音乐爱好者", headImg = "")
+
+    val rootComment = Comment(
+        id = "1", user = mockUser1, content = "这首歌太好听了！",
+        createTime = System.currentTimeMillis(), likeCount = 102, isLiked = true
     )
 
-    // 2. 使用模拟状态来渲染 CommentScreen
+    val replyComment = Comment(
+        id = "2", user = mockUser2, content = "确实，前奏一响就沦陷了。",
+        createTime = System.currentTimeMillis(), likeCount = 88, isLiked = false, parentId = "1", rootId = "1"
+    )
+
+    val previewUiState = CommentUiState(
+        comments = listOf(
+            CommentThread(
+                rootComment = rootComment,
+                replies = listOf(replyComment),
+                totalReplyCount = 5,
+                hasMoreReplies = true
+            )
+        )
+    )
+
     MaterialTheme {
         CommentScreen(
             uiState = previewUiState,
             onBackClick = {},
-            onLikeClick = {},
-            onAddComment = {},
-            onLoadMore = {}
+            onLikeClick = { _, _ -> },
+            onAddComment = { _, _ -> },
+            onLoadMore = {},
+            onViewMoreRepliesClick = {}
         )
     }
 }
-

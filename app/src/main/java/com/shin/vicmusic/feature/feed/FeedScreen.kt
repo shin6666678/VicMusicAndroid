@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.shin.vicmusic.core.domain.Feed
 import com.shin.vicmusic.core.domain.User
+import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.feature.common.bar.BarActionItem
 import com.shin.vicmusic.feature.common.bar.BarTabItem
 import com.shin.vicmusic.feature.common.bar.UniversalTopBar
@@ -30,7 +31,7 @@ import com.shin.vicmusic.feature.feed.component.FollowingHeader
 fun FeedScreen(
     discoveryItems: List<Feed>,
     followingItems: List<Feed>,
-    currentUser: User?,
+    currentUser: UserInfo?,
     headerBackgroundImage: String,
     pagerState: PagerState,
     followingListState: LazyListState,
