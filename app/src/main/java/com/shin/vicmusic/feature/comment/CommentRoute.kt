@@ -93,9 +93,9 @@ fun CommentScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF1C1C1E),
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = Color.Black,
+                    navigationIconContentColor = Color.Black
                 )
             )
         },
@@ -106,7 +106,7 @@ fun CommentScreen(
                 onValueChange = { commentText = it },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFF1C1C1E))
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(horizontal = 16.dp, vertical = 8.dp)
                     .navigationBarsPadding(),
                 placeholder = { Text("留下你的精彩评论吧") },
@@ -129,7 +129,7 @@ fun CommentScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(Color(0xFF1C1C1E))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(horizontal = 16.dp)
         ) {
             if (uiState.isLoading && uiState.comments.isEmpty()) {

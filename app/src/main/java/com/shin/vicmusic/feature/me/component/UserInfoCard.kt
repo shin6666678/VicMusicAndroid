@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.shin.vicmusic.R
 import com.shin.vicmusic.core.domain.UserInfo
+import com.shin.vicmusic.feature.common.MyAsyncImage
 import com.shin.vicmusic.feature.common.icon.UserLevelIcon
 import com.shin.vicmusic.feature.common.icon.VipIcon
 
@@ -118,15 +119,12 @@ private fun LoggedInHeader(
 
 
     Row(verticalAlignment = Alignment.CenterVertically) {
-        AsyncImage(
+        MyAsyncImage(
             model = user.headImg,
-            contentDescription = "Avatar",
             modifier = Modifier
                 .size(60.dp)
                 .clip(CircleShape)
                 .clickable { onAvatarClick() },
-            placeholder = painterResource(id = R.drawable.ic_launcher),
-            error = painterResource(id = R.drawable.ic_launcher),
             contentScale = ContentScale.Crop
         )
         Spacer(Modifier.width(16.dp))

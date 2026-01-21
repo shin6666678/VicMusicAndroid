@@ -16,12 +16,12 @@ import com.shin.vicmusic.core.domain.UserPost
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
 class FeedViewModel @Inject constructor() : ViewModel() {
 
+    // --- UI State ---
     private val _discoveryItems = MutableStateFlow<List<Feed>>(emptyList())
     val discoveryItems = _discoveryItems.asStateFlow()
 
@@ -30,6 +30,12 @@ class FeedViewModel @Inject constructor() : ViewModel() {
 
     private val _selectedTabIndex = MutableStateFlow(0)
     val selectedTabIndex = _selectedTabIndex.asStateFlow()
+
+    private val _currentUser = MutableStateFlow<User?>(null)
+    val currentUser = _currentUser.asStateFlow()
+
+    private val _headerBackgroundImage = MutableStateFlow("")
+    val headerBackgroundImage = _headerBackgroundImage.asStateFlow()
 
     init {
         loadMockData()
@@ -44,6 +50,10 @@ class FeedViewModel @Inject constructor() : ViewModel() {
         val mockUser1 = User(id = "user1", name = "音乐爱好者小明", headImg = "https://picsum.photos/id/237/200")
         val mockUser2 = User(id = "user2", name = "Lofi女孩", headImg = "https://picsum.photos/id/1027/200")
         val mockArtist = Artist(id = "artist2", name = "Taylor Swift", image = "https://picsum.photos/id/1067/200")
+        
+        // Set current user and header background
+        _currentUser.value = mockUser1
+        _headerBackgroundImage.value = "https://picsum.photos/id/1018/800/600"
 
         val mockSong = Song(
             id = "song1", title = "晴天", artist = Artist(id = "artist1", name = "周杰伦"),

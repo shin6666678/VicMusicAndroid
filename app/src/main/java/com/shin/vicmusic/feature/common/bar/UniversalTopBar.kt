@@ -61,7 +61,7 @@ data class BarActionItem(
 fun UniversalTopBar(
     tabs: List<BarTabItem>,
     actions: List<BarActionItem> = emptyList(),
-    backgroundColor: Color = MaterialTheme.colorScheme.surface,
+    backgroundColor: Color = Color.Transparent,
     contentColor: Color = MaterialTheme.colorScheme.onSurface,
 ) {
     Row(

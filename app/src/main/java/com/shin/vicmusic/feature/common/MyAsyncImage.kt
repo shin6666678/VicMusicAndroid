@@ -16,7 +16,7 @@ fun MyAsyncImage(model: String?,
                  contentScale: ContentScale = ContentScale.Crop): Unit {
     if(model==""||model==null)
         Image(
-            painter = painterResource(id = R.drawable.ic_launcher),
+            painter = painterResource(id = R.drawable.logo),
             contentDescription = null,
             contentScale = contentScale,
             modifier = modifier,
