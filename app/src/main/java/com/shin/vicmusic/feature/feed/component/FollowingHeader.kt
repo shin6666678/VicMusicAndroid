@@ -21,11 +21,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.shin.vicmusic.core.domain.User
+import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.feature.common.MyAsyncImage
 
 @Composable
 fun FollowingHeader(
-    user: User,
+    user: UserInfo,
     backgroundImageUrl: String,
     modifier: Modifier = Modifier
 ) {

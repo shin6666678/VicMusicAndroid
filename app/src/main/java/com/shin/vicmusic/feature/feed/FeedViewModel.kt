@@ -13,13 +13,16 @@ import com.shin.vicmusic.core.domain.SystemRecommendation
 import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.domain.UserActivity
 import com.shin.vicmusic.core.domain.UserPost
+import com.shin.vicmusic.core.manager.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class FeedViewModel @Inject constructor() : ViewModel() {
+class FeedViewModel @Inject constructor(
+    authManager: AuthManager
+) : ViewModel() {
 
     // --- UI State ---
     private val _discoveryItems = MutableStateFlow<List<Feed>>(emptyList())
@@ -31,8 +34,7 @@ class FeedViewModel @Inject constructor() : ViewModel() {
     private val _selectedTabIndex = MutableStateFlow(0)
     val selectedTabIndex = _selectedTabIndex.asStateFlow()
 
-    private val _currentUser = MutableStateFlow<User?>(null)
-    val currentUser = _currentUser.asStateFlow()
+    val currentUser = authManager.currentUser
 
     private val _headerBackgroundImage = MutableStateFlow("")
     val headerBackgroundImage = _headerBackgroundImage.asStateFlow()
@@ -52,7 +54,6 @@ class FeedViewModel @Inject constructor() : ViewModel() {
         val mockArtist = Artist(id = "artist2", name = "Taylor Swift", image = "https://picsum.photos/id/1067/200")
         
         // Set current user and header background
-        _currentUser.value = mockUser1
         _headerBackgroundImage.value = "https://picsum.photos/id/1018/800/600"
 
         val mockSong = Song(
