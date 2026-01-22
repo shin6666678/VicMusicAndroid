@@ -379,7 +379,7 @@ Comment评论
         val flagBody = flag.toRequestBody("text/plain".toMediaTypeOrNull())
         val filePart = file?.let {
             val body = it.asRequestBody("image/*".toMediaTypeOrNull())
-            MultipartBody.Part.createFormData("cover", it.name, body)
+            MultipartBody.Part.createFormData("file", it.name, body)
         }
         return safeApiCall { service.uploadImage(filePart,flagBody) }
     }
