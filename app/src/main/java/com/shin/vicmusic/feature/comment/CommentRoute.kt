@@ -193,12 +193,13 @@ fun CommentScreenPreview() {
 
     val rootComment = Comment(
         id = "1", user = mockUser1, content = "这首歌太好听了！",
-        createTime = System.currentTimeMillis(), likeCount = 102, isLiked = true
+        createTime = System.currentTimeMillis(), likeCount = 102, isLiked = true, replyCount = 0
     )
 
     val replyComment = Comment(
         id = "2", user = mockUser2, content = "确实，前奏一响就沦陷了。",
-        createTime = System.currentTimeMillis(), likeCount = 88, isLiked = false, parentId = "1", rootId = "1"
+        createTime = System.currentTimeMillis(), likeCount = 88, isLiked = false, parentId = "1", rootId = "1",
+        replyCount = 0
     )
 
     val previewUiState = CommentUiState(

@@ -335,8 +335,8 @@ interface MyNetworkApiService {
         @Query("size") size: Int
     ): NetworkResponse<NetworkPageData<CommentDto>>
 
-    @GET("/api/comment/detail/{id}")
-    suspend fun getCommentDetail(@Path("id") id: String): NetworkResponse<CommentDto>
+    @GET("/api/comment/detail")
+    suspend fun getCommentDetail(@Query("id") id: String): NetworkResponse<CommentDto>
 
     /*
     大众

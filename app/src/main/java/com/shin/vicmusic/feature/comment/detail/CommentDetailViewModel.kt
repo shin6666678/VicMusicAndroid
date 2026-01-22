@@ -65,7 +65,7 @@ class CommentDetailViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val req = CommentAddReq(resourceType, resourceId, content, parentId ?: rootCommentId)
+            val req = CommentAddReq(resourceType, resourceId, content, parentId)
             when (commentRepository.addComment(req)) {
                 is Result.Success -> {
                     // Refresh the detail list after successfully adding a comment

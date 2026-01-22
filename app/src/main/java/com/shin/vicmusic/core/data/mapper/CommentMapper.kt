@@ -11,11 +11,8 @@ import com.shin.vicmusic.core.model.api.CommentDto
  * 这个函数处理单个评论的转换。
  */
 fun CommentDto.toComment(): Comment {
-    val replyTo = if (parentId != null) {
-        // 在实际应用中，这里可能需要从一个用户缓存中查找更完整的用户信息
-        User(id = "", name = "", headImg = "") // Placeholder for replied-to user
-    } else {
-        null
+    val replyTo = this.parentComment?.let {
+        User(id = it.userId, name = it.userName, headImg = it.userHeadImg)
     }
 
     return Comment(
@@ -27,7 +24,8 @@ fun CommentDto.toComment(): Comment {
         isLiked = this.liked,
         replyToUser = replyTo,
         parentId = this.parentId,
-        rootId = this.rootId
+        rootId = this.rootId,
+        replyCount = this.replyCount ?: this.replyList?.size ?: 0
     )
 }
 
@@ -46,8 +44,8 @@ fun List<CommentDto>.toCommentThreads(): List<CommentThread> {
         CommentThread(
             rootComment = rootDto.toComment(),
             replies = replies,
-            totalReplyCount = rootDto.replyList?.size ?: 0,
-            hasMoreReplies = (rootDto.replyList?.size ?: 0) > replies.size
+            totalReplyCount = rootDto.replyCount ?: rootDto.replyList?.size ?: 0,
+            hasMoreReplies = (rootDto.replyCount ?: 0) > replies.size
         )
     }
 }
