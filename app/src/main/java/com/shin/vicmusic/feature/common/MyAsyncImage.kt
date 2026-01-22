@@ -8,27 +8,33 @@ import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImage
 import com.shin.vicmusic.R
 import com.shin.vicmusic.util.ResourceUtil
+import java.io.File
 
 
 @Composable
 fun MyAsyncImage(model: String?,
                  modifier: Modifier,
-                 contentScale: ContentScale = ContentScale.Crop): Unit {
-    if(model==""||model==null)
+                 contentScale: ContentScale = ContentScale.Crop) {
+    if (model.isNullOrEmpty()) {
         Image(
             painter = painterResource(id = R.drawable.logo),
             contentDescription = null,
             contentScale = contentScale,
             modifier = modifier,
-
         )
-    else
+    } else {
+        val imageModel: Any = if (model.startsWith("/")) {
+            File(model)
+        } else {
+            ResourceUtil.r2(model)
+        }
         AsyncImage(
-            model = ResourceUtil.r2(model),
+            model = imageModel,
             contentDescription = null,
             contentScale = contentScale,
             modifier = modifier,
             placeholder = painterResource(id = R.drawable.ic_disc), // 替换为你的默认封面
             error = painterResource(id = R.drawable.logo) // 加载失败时显示
         )
+    }
 }
