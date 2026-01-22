@@ -9,6 +9,7 @@ data class UserInfo(
     val headImg: String="",
     val slogan: String="",
     val sex: Int=2,
+    val bgImg: String="",
     val points: Int=0,
     val mail: String="",
     val followCount: Int = 0,

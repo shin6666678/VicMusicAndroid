@@ -44,7 +44,6 @@ fun FeedScreen(
     onAlbumClick: (String) -> Unit,
     onLikeClick: (String) -> Unit,
     onCommentClick: (String) -> Unit,
-    onPlayClick: (String) -> Unit,
 ) {
     // Use Box to allow content to draw behind the TopAppBar
     Box(modifier = Modifier.fillMaxSize()) {
@@ -56,7 +55,7 @@ fun FeedScreen(
             when (it) {
                 0 -> FeedList(
                     items = discoveryItems, onProfileClick, onSongClick, onPlaylistClick,
-                    onAlbumClick, onLikeClick, onCommentClick, onPlayClick
+                    onAlbumClick, onLikeClick, onCommentClick
                 )
                 1 -> {
                     LazyColumn(
@@ -81,14 +80,13 @@ fun FeedScreen(
                         ) { feed ->
                             FeedItemCard(
                                 feed = feed,
-                                modifier = Modifier.padding(horizontal = 8.dp),
+                                modifier = Modifier.padding(horizontal = 16.dp),
                                 onProfileClick = onProfileClick,
                                 onSongClick = onSongClick,
                                 onPlaylistClick = onPlaylistClick,
                                 onAlbumClick = onAlbumClick,
                                 onLikeClick = onLikeClick,
                                 onCommentClick = onCommentClick,
-                                onPlayClick = onPlayClick
                             )
                         }
                     }
@@ -114,7 +112,6 @@ private fun FeedList(
     onAlbumClick: (String) -> Unit,
     onLikeClick: (String) -> Unit,
     onCommentClick: (String) -> Unit,
-    onPlayClick: (String) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -134,7 +131,6 @@ private fun FeedList(
                 onAlbumClick = onAlbumClick,
                 onLikeClick = onLikeClick,
                 onCommentClick = onCommentClick,
-                onPlayClick = onPlayClick
             )
         }
     }

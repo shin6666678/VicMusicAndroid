@@ -35,6 +35,7 @@ fun ItemPlaylist(playlist: Playlist, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
             .clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -75,13 +76,6 @@ fun ItemPlaylist(playlist: Playlist, onClick: () -> Unit) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-        Spacer(modifier = Modifier.width(12.dp))
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-            contentDescription = null,
-            modifier = Modifier.size(16.dp),
-            tint = Color.Gray
-        )
     }
 }
 

@@ -57,6 +57,7 @@ import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.feature.common.MyAsyncImage
 import com.shin.vicmusic.feature.common.icon.VipIcon
+import com.shin.vicmusic.feature.myInfo.edit.navigateToMyInfoEdit
 
 @Preview(showBackground = true)
 @Composable
@@ -100,6 +101,7 @@ fun MyInfoRoute(
     MyInfoScreen(
         userInfo = currentUser,
         onBackClick = { navController.popBackStack() },
+        onEditClick = navController::navigateToMyInfoEdit
     )
 }
 
@@ -108,6 +110,7 @@ fun MyInfoRoute(
 fun MyInfoScreen(
     userInfo: UserInfo?,
     onBackClick: () -> Unit,
+    onEditClick: () -> Unit={}
 ) {
     Scaffold(
         topBar = {
@@ -174,7 +177,10 @@ fun MyInfoScreen(
                         verticalArrangement = Arrangement.spacedBy(16.dp) // 卡片之间的间距
                     ) {
                         // 用户信息主卡片
-                        UserInfoCard(user = userInfo)
+                        UserInfoCard(
+                            user = userInfo,
+                            onEditClick = onEditClick
+                        )
 
                         // 等级与经验卡片 (样式已统一)
                         LevelExperienceCard(user = userInfo)
@@ -192,7 +198,10 @@ fun MyInfoScreen(
 }
 
 @Composable
-private fun UserInfoCard(user: UserInfo) {
+private fun UserInfoCard(
+    user: UserInfo,
+    onEditClick: () -> Unit = {},
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
@@ -260,7 +269,7 @@ private fun UserInfoCard(user: UserInfo) {
 
                 // 右侧编辑按钮
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = onEditClick,
                     shape = CircleShape,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
