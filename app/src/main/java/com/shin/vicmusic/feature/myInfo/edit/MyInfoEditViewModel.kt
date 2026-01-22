@@ -54,10 +54,21 @@ class MyInfoEditViewModel @Inject constructor(
         }
     }
 
-    fun onNameChange(newName: String) { _uiState.update { it.copy(name = newName) } }
-    fun onSloganChange(newSlogan: String) { _uiState.update { it.copy(slogan = newSlogan) } }
-    fun onSexChange(newSex: Int) { _uiState.update { it.copy(sex = newSex) } }
-    fun onNewAvatarSelected(localPath: String) { _uiState.update { it.copy(headImg = localPath) } }
+    fun onNameChange(newName: String) {
+        _uiState.update { it.copy(name = newName) }
+    }
+
+    fun onSloganChange(newSlogan: String) {
+        _uiState.update { it.copy(slogan = newSlogan) }
+    }
+
+    fun onSexChange(newSex: Int) {
+        _uiState.update { it.copy(sex = newSex) }
+    }
+
+    fun onNewAvatarSelected(localPath: String) {
+        _uiState.update { it.copy(headImg = localPath) }
+    }
 
     fun saveChanges() {
         if (uiState.value.isLoading) return
@@ -73,40 +84,32 @@ class MyInfoEditViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
-            val original = originalUser
-
-            if (original == null) {
-                _uiState.update { it.copy(isLoading = false, error = "用户信息异常") }
-                return@launch
-            }
+            val currentState = uiState.value
+            val original = originalUser ?: return@launch
 
             try {
-                var newHeadImgUrl: String? = null
-                if (currentState.headImg != original.headImg && !currentState.headImg.startsWith("http")) {
+                var finalHeadImgUrl: String? = null
+                if (currentState.headImg != original.headImg) {
                     val file = File(currentState.headImg)
                     if (file.exists()) {
                         when (val uploadResult = commonRepository.uploadImage(file, "user")) {
                             is Result.Success -> {
-                                newHeadImgUrl = uploadResult.data
+                                finalHeadImgUrl = uploadResult.data // 拿到服务器生成的 URL
                             }
                             is Result.Error -> {
-                                _uiState.update {
-                                    it.copy(isLoading = false, error = uploadResult.message)
-                                }
-                                return@launch
+                                throw Exception("图片上传失败: ${uploadResult.message}")
                             }
                         }
-                    } else {
-                        _uiState.update { it.copy(isLoading = false, error = "找不到本地图片文件") }
-                        return@launch
+
                     }
                 }
 
-                val nameToUpdate = if (currentState.name != original.name) currentState.name else null
-                val sloganToUpdate = if (currentState.slogan != original.slogan) currentState.slogan else null
+                val nameToUpdate =
+                    if (currentState.name != original.name) currentState.name else null
+                val sloganToUpdate =
+                    if (currentState.slogan != original.slogan) currentState.slogan else null
                 val sexToUpdate = if (currentState.sex != original.sex) currentState.sex else null
-                val headImgToUpdate = newHeadImgUrl
-                if (nameToUpdate == null && sloganToUpdate == null && sexToUpdate == null && headImgToUpdate == null) {
+                if (nameToUpdate == null && sloganToUpdate == null && sexToUpdate == null && finalHeadImgUrl == null) {
                     _uiState.update { it.copy(isLoading = false, saveSuccess = true) }
                     return@launch
                 }
@@ -114,12 +117,10 @@ class MyInfoEditViewModel @Inject constructor(
                     name = nameToUpdate,
                     slogan = sloganToUpdate,
                     sex = sexToUpdate,
-                    headImg = headImgToUpdate
+                    headImg = finalHeadImgUrl
                 )
-
                 authManager.fetchUserInfo()
                 _uiState.update { it.copy(isLoading = false, saveSuccess = true) }
-
             } catch (e: Exception) {
                 e.printStackTrace()
                 _uiState.update {
