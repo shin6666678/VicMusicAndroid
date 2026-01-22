@@ -1,5 +1,7 @@
 package com.shin.vicmusic.feature.myInfo.edit
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -21,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -53,13 +56,53 @@ fun MyInfoEditPreview() {
         onBackClick = {}
     )
 }
+/**
+ * 将选择的 Uri 图片拷贝到应用缓存目录，返回 File 的绝对路径
+ */
+fun copyUriToCache(context: android.content.Context, uri: android.net.Uri): String? {
+    return try {
+        val inputStream = context.contentResolver.openInputStream(uri)
+        // 创建一个临时文件，例如：/data/user/0/com.shin.vicmusic/cache/temp_avatar_1623456.jpg
+        val file = java.io.File(context.cacheDir, "temp_avatar_${System.currentTimeMillis()}.jpg")
+        val outputStream = java.io.FileOutputStream(file)
 
+        inputStream?.use { input ->
+            outputStream.use { output ->
+                input.copyTo(output)
+            }
+        }
+        file.absolutePath // 返回路径供 ViewModel 使用
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+}
 @Composable
 fun MyInfoEditRoute(
     viewModel: MyInfoEditViewModel = hiltViewModel()
 ) {
     val navController = LocalNavController.current
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let {
+            snackbarHostState.showSnackbar(it)
+        }
+    }
+    // 图片选择启动器
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        uri?.let {
+            // 步骤 A: 将 Uri 复制到私有缓存目录，并获取 File 绝对路径
+            // 这样预览时用的是本地文件路径，点击保存时 File(path) 也能正常读取
+            val localPath = copyUriToCache(context, it)
+            if (localPath != null) {
+                viewModel.onNewAvatarSelected(localPath)
+            }
+        }
+    }
 
     LaunchedEffect(uiState.saveSuccess) {
         if (uiState.saveSuccess) {
@@ -72,7 +115,13 @@ fun MyInfoEditRoute(
         onNameChange = viewModel::onNameChange,
         onSloganChange = viewModel::onSloganChange,
         onSexChange = viewModel::onSexChange,
-        onAvatarClick = { /* TODO: Implement Image Picker */ },
+        onAvatarClick = {
+            photoPickerLauncher.launch(
+                androidx.activity.result.PickVisualMediaRequest(
+                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                )
+            )
+        },
         onSaveClick = viewModel::saveChanges,
         onBackClick = { navController.popBackStack() }
     )
