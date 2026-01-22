@@ -64,6 +64,11 @@ interface MyNetworkApiService {
     @GET("/api/user/v1/info")
     suspend fun getUserInfo(): NetworkResponse<UserDetailDto>
 
+    @POST("/api/user/v1/update")
+    suspend fun updateUserInfo(
+        @Body req: UserDetailDto
+    ): NetworkResponse<Unit>
+
     @POST("api/user/v1/check_in")
     suspend fun checkIn(): NetworkResponse<String>
 
@@ -332,5 +337,15 @@ interface MyNetworkApiService {
 
     @GET("/api/comment/detail/{id}")
     suspend fun getCommentDetail(@Path("id") id: String): NetworkResponse<CommentDto>
+
+    /*
+    大众
+     */
+    @Multipart
+    @POST("/api/common/v1/file/upload")
+    suspend fun uploadImage(
+        @Part file: MultipartBody.Part?,
+        @Part("flag") flag: RequestBody,
+    ): NetworkResponse<String>
 
 }

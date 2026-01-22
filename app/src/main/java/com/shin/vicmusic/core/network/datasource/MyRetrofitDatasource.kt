@@ -1,7 +1,10 @@
 package com.shin.vicmusic.core.network.datasource
 
+import android.R.attr.description
+import android.R.attr.name
 import android.util.Log
 import com.shin.vicmusic.core.domain.User
+import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.core.model.api.AlbumDetailResp
 import com.shin.vicmusic.core.model.api.AlbumDto
 import com.shin.vicmusic.core.model.api.AppUpdateDto
@@ -91,6 +94,23 @@ class MyRetrofitDatasource @Inject constructor(
 
     suspend fun getUserInfo(): NetworkResponse<UserDetailDto> {
         return safeApiCall { service.getUserInfo() }
+    }
+    suspend fun updateUserInfo(
+        name: String?,
+        slogan: String?,
+        sex: Int?,
+        headImg: String?
+    ): NetworkResponse<Unit> {
+        return safeApiCall {
+            service.updateUserInfo(
+                UserDetailDto(
+                    name=name,
+                    slogan=slogan,
+                    sex=sex,
+                    headImg=headImg
+                )
+            )
+        }
     }
 
     suspend fun checkIn(): NetworkResponse<String> {
@@ -349,5 +369,19 @@ Comment评论
         return safeApiCall { service.getCommentDetail(id) }
     }
 
+    /*
+    大众
+     */
+    suspend fun uploadImage(
+        file: File?,
+        flag: String
+    ): NetworkResponse<String> {
+        val flagBody = flag.toRequestBody("text/plain".toMediaTypeOrNull())
+        val filePart = file?.let {
+            val body = it.asRequestBody("image/*".toMediaTypeOrNull())
+            MultipartBody.Part.createFormData("cover", it.name, body)
+        }
+        return safeApiCall { service.uploadImage(filePart,flagBody) }
+    }
 
 }

@@ -4,15 +4,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.CommonRepository
 import com.shin.vicmusic.core.data.repository.UserRepository
+import com.shin.vicmusic.core.domain.Result // 假设Result类所在包
+import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.core.manager.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 
-// 用于表示编辑页面的UI状态
 data class MyInfoEditUiState(
     val name: String = "",
     val headImg: String = "",
@@ -35,59 +37,95 @@ class MyInfoEditViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(MyInfoEditUiState())
     val uiState = _uiState.asStateFlow()
 
+    private var originalUser: UserInfo? = null
+
     init {
-        // 使用当前登录用户的信息来预填充表单
         authManager.currentUser.value?.let { user ->
+            originalUser = user
             _uiState.update {
                 it.copy(
                     name = user.name,
                     headImg = user.headImg,
-                    mail = user.mail,
-                    slogan = user.slogan
+                    bgImg = user.bgImg,
+                    slogan = user.slogan,
+                    sex = user.sex
                 )
             }
         }
     }
 
-    // 当输入框内容变化时，更新状态
-    fun onNameChange(newName: String) {
-        _uiState.update { it.copy(name = newName) }
-    }
-
-    fun onSloganChange(newSlogan: String) {
-        _uiState.update { it.copy(slogan = newSlogan) }
-    }
-
-    fun onSexChange(newSex: Int) {
-        _uiState.update { it.copy(sex = newSex) }
-    }
-
-    // 当用户选择了新的头像或背景图时（此处仅为示例，后续需集成图片选择器）
-    fun onNewAvatarSelected(localUri: String) {
-        _uiState.update { it.copy(headImg = localUri) }
-    }
-
-    fun onNewBackgroundSelected(localUri: String) {
-        _uiState.update { it.copy(bgImg = localUri) }
-    }
+    fun onNameChange(newName: String) { _uiState.update { it.copy(name = newName) } }
+    fun onSloganChange(newSlogan: String) { _uiState.update { it.copy(slogan = newSlogan) } }
+    fun onSexChange(newSex: Int) { _uiState.update { it.copy(sex = newSex) } }
+    fun onNewAvatarSelected(localPath: String) { _uiState.update { it.copy(headImg = localPath) } }
 
     fun saveChanges() {
+        if (uiState.value.isLoading) return
+        val currentState = uiState.value
+        if (currentState.name.isBlank()) {
+            _uiState.update { it.copy(error = "昵称不能为空") }
+            return
+        }
+        if (currentState.name.length > 10) {
+            _uiState.update { it.copy(error = "昵称长度不能超过10个字符") }
+            return
+        }
+
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
+            val original = originalUser
 
-            // --- 核心业务逻辑 (将在实现Repository后完成) ---
-            // 1. 检查头像/背景图是否有变化（URI不是http链接），如果有，则调用`userRepository.uploadFile()`
-            // 2. 获取上传后的文件名
-            // 3. 构建 UserUpdateReq 对象
-            // 4. 调用 `userRepository.updateUser()`
-            // 5. 根据结果更新UI状态 (成功或失败)
+            if (original == null) {
+                _uiState.update { it.copy(isLoading = false, error = "用户信息异常") }
+                return@launch
+            }
 
-            // 模拟网络请求
-            kotlinx.coroutines.delay(1500)
+            try {
+                var newHeadImgUrl: String? = null
+                if (currentState.headImg != original.headImg && !currentState.headImg.startsWith("http")) {
+                    val file = File(currentState.headImg)
+                    if (file.exists()) {
+                        when (val uploadResult = commonRepository.uploadImage(file, "user")) {
+                            is Result.Success -> {
+                                newHeadImgUrl = uploadResult.data
+                            }
+                            is Result.Error -> {
+                                _uiState.update {
+                                    it.copy(isLoading = false, error = uploadResult.message)
+                                }
+                                return@launch
+                            }
+                        }
+                    } else {
+                        _uiState.update { it.copy(isLoading = false, error = "找不到本地图片文件") }
+                        return@launch
+                    }
+                }
 
-            // 模拟成功后，更新 AuthManager 中的用户信息，并设置成功状态以便页面可以返回
-             authManager.fetchUserInfo()
-            _uiState.update { it.copy(isLoading = false, saveSuccess = true) }
+                val nameToUpdate = if (currentState.name != original.name) currentState.name else null
+                val sloganToUpdate = if (currentState.slogan != original.slogan) currentState.slogan else null
+                val sexToUpdate = if (currentState.sex != original.sex) currentState.sex else null
+                val headImgToUpdate = newHeadImgUrl
+                if (nameToUpdate == null && sloganToUpdate == null && sexToUpdate == null && headImgToUpdate == null) {
+                    _uiState.update { it.copy(isLoading = false, saveSuccess = true) }
+                    return@launch
+                }
+                userRepository.updateUserInfo(
+                    name = nameToUpdate,
+                    slogan = sloganToUpdate,
+                    sex = sexToUpdate,
+                    headImg = headImgToUpdate
+                )
+
+                authManager.fetchUserInfo()
+                _uiState.update { it.copy(isLoading = false, saveSuccess = true) }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _uiState.update {
+                    it.copy(isLoading = false, error = e.message ?: "保存失败，请稍后重试")
+                }
+            }
         }
     }
 }

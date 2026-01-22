@@ -38,4 +38,22 @@ class UserRepository @Inject constructor(
             Result.Error(response.message?:"上报时长失败")
         }
     }
+    suspend fun updateUserInfo(
+        name: String?,
+        slogan: String?,
+        sex: Int?,
+        headImg: String?
+    ): Result<Unit>{
+        val response = datasource.updateUserInfo(
+            name=name,
+            slogan=slogan,
+            sex=sex,
+            headImg=headImg
+        )
+        return if (response.code == 0) {
+            Result.Success(Unit)
+        } else {
+            Result.Error(response.message?:"更新用户信息失败")
+        }
+    }
 }
