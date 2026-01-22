@@ -28,7 +28,6 @@ fun FeedItemCard(
     onAlbumClick: (String) -> Unit = {},
     onLikeClick: (String) -> Unit = {},
     onCommentClick: (String) -> Unit = {},
-    onPlayClick: (String) -> Unit = {},
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -36,7 +35,7 @@ fun FeedItemCard(
     ) {
         Column(modifier = Modifier.padding(vertical = 16.dp)) {
             // 1. Header Section
-            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+            Column(modifier = Modifier.padding(horizontal = 8.dp)) {
                 val author: Any
                 val actionText: String
 
@@ -92,7 +91,6 @@ fun FeedItemCard(
             // 3. Footer Section
             var likeCount = 0
             var commentCount = 0
-            var showPlayButton = false
             var contentId = ""
 
             when (feed) {
@@ -101,7 +99,6 @@ fun FeedItemCard(
                         is ShareableContent.SharedSong -> {
                             likeCount = content.song.likesCount
                             commentCount = content.song.commentsCount
-                            showPlayButton = true
                             contentId = content.song.id
                         }
                         is ShareableContent.SharedPlaylist -> {
@@ -115,7 +112,6 @@ fun FeedItemCard(
                         is ShareableContent.SharedSong -> {
                             likeCount = content.song.likesCount
                             commentCount = content.song.commentsCount
-                            showPlayButton = true
                             contentId = content.song.id
                         }
                         is ShareableContent.SharedPlaylist -> {
@@ -137,11 +133,9 @@ fun FeedItemCard(
             FeedItemFooter(
                 likeCount = likeCount,
                 commentCount = commentCount,
-                showPlayButton = showPlayButton,
                 modifier = Modifier.padding(horizontal = 8.dp),
                 onLikeClick = { onLikeClick(contentId) },
                 onCommentClick = { onCommentClick(contentId) },
-                onPlayClick = { onPlayClick(contentId) }
             )
         }
     }

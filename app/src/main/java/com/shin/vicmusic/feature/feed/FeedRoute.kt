@@ -121,6 +121,5 @@ fun FeedRoute(
         onAlbumClick = { /* TODO: Navigate to album detail */ },
         onLikeClick = { /* TODO: Handle like action */ },
         onCommentClick = { /* TODO: Navigate to comment screen */ },
-        onPlayClick = { /* TODO: Handle play action */ },
     )
 }

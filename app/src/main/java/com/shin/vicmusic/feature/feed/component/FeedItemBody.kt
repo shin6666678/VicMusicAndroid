@@ -19,6 +19,7 @@ import com.shin.vicmusic.core.domain.UserPost
 import com.shin.vicmusic.feature.common.item.ItemAlbum
 import com.shin.vicmusic.feature.common.item.ItemPlaylist
 import com.shin.vicmusic.feature.common.item.ItemSongContent
+import com.shin.vicmusic.feature.common.item.ItemText
 
 @Composable
 fun FeedItemBody(
@@ -33,10 +34,8 @@ fun FeedItemBody(
             is UserPost -> {
                 // 1. 如果有分享心得，则显示文字
                 if (!feed.comment.isNullOrBlank()) {
-                    Text(
+                    ItemText(
                         text = feed.comment,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(vertical = 8.dp)
                     )
                 }
 

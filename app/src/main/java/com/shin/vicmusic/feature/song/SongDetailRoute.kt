@@ -256,7 +256,8 @@ fun SongDetailScreen(
                             onCommentClick()
                         }
                     ),
-                )
+                ),
+                contentColor = MaterialTheme.colorScheme.surface
             )
         },
         containerColor = Color.Transparent
