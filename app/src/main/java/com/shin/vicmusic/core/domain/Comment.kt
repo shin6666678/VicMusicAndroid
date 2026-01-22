@@ -13,6 +13,7 @@ data class Comment(
     val content: String, // 评论内容
     val createTime: Long, // 创建时间
     val likeCount: Int, // 点赞数
+    val replyCount:Int,
     var isLiked: Boolean, // 当前用户是否已点赞
     val replyToUser: User? = null, // 如果是回复，回复的目标用户
     val parentId: String? = null, // 父评论ID (如果是二级评论)

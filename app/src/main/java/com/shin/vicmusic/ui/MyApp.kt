@@ -112,7 +112,7 @@ fun MyApp(
     val isChatScreen = currentRoute?.contains("chat") == true
     val isVipScreen = currentRoute == VIP_ROUTE
     val isCheckInScreen = currentRoute == CHECK_IN_ROUTE
-    val isCommentDetail= currentRoute?.contains("comment_detail") == true // Updated to new route
+    val isCommentDetail= currentRoute?.contains("comment") == true // Updated to new route
     val showBottomContainer = currentRoute != null
             && !isSplashScreen && !isSongDetail
             && !isVipScreen && !isCheckInScreen

@@ -16,5 +16,7 @@ data class CommentDto(
     val createTime: Long,
     val parentId: String? = null,
     val rootId: String? = null,
-    val replyList: List<CommentDto>? = null
+    val replyCount: Int? = null,
+    val replyList: List<CommentDto>? = null,
+    val parentComment: CommentDto? = null
 )
