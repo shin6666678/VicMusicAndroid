@@ -12,6 +12,7 @@ import com.shin.vicmusic.core.model.api.ArtistDetailResp
 import com.shin.vicmusic.core.model.api.ArtistDto
 import com.shin.vicmusic.core.model.api.ChatSessionDto
 import com.shin.vicmusic.core.model.api.CommentDto
+import com.shin.vicmusic.core.model.api.FeedItemDto
 import com.shin.vicmusic.core.model.api.NotifyDto
 import com.shin.vicmusic.core.model.api.PlaylistDetailDto
 import com.shin.vicmusic.core.model.api.PlaylistDto
@@ -31,7 +32,7 @@ import com.shin.vicmusic.core.model.request.FollowReq
 import com.shin.vicmusic.core.model.request.LikeReq
 import com.shin.vicmusic.core.model.request.PageReq
 import com.shin.vicmusic.core.model.request.PlaylistSongReq
-import com.shin.vicmusic.core.model.request.SongPageReq
+import com.shin.vicmusic.core.model.request.PublishFeedReq
 import com.shin.vicmusic.core.model.request.UserLoginReq
 import com.shin.vicmusic.core.model.request.UserRegisterReq
 import com.shin.vicmusic.core.model.response.NetworkPageData
@@ -367,6 +368,24 @@ Comment评论
 
     suspend fun getCommentDetail(id: String): NetworkResponse<CommentDto> {
         return safeApiCall { service.getCommentDetail(id) }
+    }
+
+    suspend fun getFeeds(
+        page: Int,
+        size: Int
+    ): NetworkResponse<NetworkPageData<FeedItemDto>> {
+        return safeApiCall { service.getFeeds(page, size) }
+    }
+
+    suspend fun getFollowingFeeds(
+        page: Int,
+        size: Int
+    ): NetworkResponse<NetworkPageData<FeedItemDto>> {
+        return safeApiCall { service.getFollowingFeeds(page, size) }
+    }
+
+    suspend fun publishFeed(req: PublishFeedReq): NetworkResponse<Unit> {
+        return safeApiCall { service.publishFeed(req) }
     }
 
     /*

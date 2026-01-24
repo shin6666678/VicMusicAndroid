@@ -9,8 +9,8 @@ fun PlaylistDto.toDomain(): Playlist {
     return Playlist(
         id = id,
         name = name ?: "",
-        cover = cover,
-        description = description,
+        cover = cover?:"",
+        description = description?:"",
         songCount = songCount ?: 0,
         playCount = playCount ?: 0,
         likeCount = likeCount ?: 0,

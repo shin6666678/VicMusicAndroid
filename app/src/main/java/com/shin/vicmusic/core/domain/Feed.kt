@@ -12,14 +12,14 @@ sealed class Feed {
 }
 
 /**
- * A user shares a song or a playlist with an optional comment.
+ * A user shares a song or a playlist with an optional comment, or posts a text-only update.
  */
 @Serializable
 data class UserPost(
     override val id: String,
     override val timestamp: Long,
     val user: User,
-    val content: ShareableContent,
+    val content: ShareableContent?,
     val comment: String?
 ) : Feed()
 
@@ -71,4 +71,6 @@ sealed interface ShareableContent {
     data class SharedSong(val song: Song) : ShareableContent
     @Serializable
     data class SharedPlaylist(val playlist: Playlist) : ShareableContent
+    @Serializable
+    data class SharedAlbum(val album: Album) : ShareableContent
 }
