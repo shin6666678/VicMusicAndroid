@@ -9,6 +9,7 @@ import com.shin.vicmusic.core.model.api.ArtistDetailResp
 import com.shin.vicmusic.core.model.api.ArtistDto
 import com.shin.vicmusic.core.model.api.ChatSessionDto
 import com.shin.vicmusic.core.model.api.CommentDto
+import com.shin.vicmusic.core.model.api.FeedItemDto
 import com.shin.vicmusic.core.model.api.NotifyDto
 import com.shin.vicmusic.core.model.api.PlaylistDetailDto
 import com.shin.vicmusic.core.model.api.PlaylistDto
@@ -26,6 +27,7 @@ import com.shin.vicmusic.core.model.request.FollowReq
 import com.shin.vicmusic.core.model.request.LikeReq
 import com.shin.vicmusic.core.model.request.PageReq
 import com.shin.vicmusic.core.model.request.PlaylistSongReq
+import com.shin.vicmusic.core.model.request.PublishFeedReq
 import com.shin.vicmusic.core.model.request.UserLoginReq
 import com.shin.vicmusic.core.model.request.UserRegisterReq
 import com.shin.vicmusic.core.model.response.NetworkPageData
@@ -337,6 +339,25 @@ interface MyNetworkApiService {
 
     @GET("/api/comment/detail")
     suspend fun getCommentDetail(@Query("id") id: String): NetworkResponse<CommentDto>
+
+    /*
+    Feed动态
+     */
+    @GET("/api/feed/v1/list")
+    suspend fun getFeeds(
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): NetworkResponse<NetworkPageData<FeedItemDto>>
+
+    @GET("/api/feed/v1/following")
+    suspend fun getFollowingFeeds(
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): NetworkResponse<NetworkPageData<FeedItemDto>>
+
+    @POST("/api/feed/v1/publish")
+    suspend fun publishFeed(@Body req: PublishFeedReq): NetworkResponse<Unit>
+
 
     /*
     大众

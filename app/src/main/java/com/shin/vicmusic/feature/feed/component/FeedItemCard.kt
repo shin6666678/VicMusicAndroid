@@ -44,7 +44,7 @@ fun FeedItemCard(
                 when (feed) {
                     is UserPost -> {
                         author = feed.user
-                        actionText = "分享了动态"
+                        actionText = ""
                         FeedItemHeader(
                             author = author,
                             timestamp = feed.timestamp,
@@ -52,6 +52,7 @@ fun FeedItemCard(
                             onProfileClick = { onProfileClick(feed.user.id) }
                         )
                     }
+
                     is UserActivity -> {
                         author = feed.user
                         actionText = feed.activityType.description
@@ -62,6 +63,7 @@ fun FeedItemCard(
                             onProfileClick = { onProfileClick(feed.user.id) }
                         )
                     }
+
                     is ArtistUpdate -> {
                         author = feed.artist
                         actionText = "发布了新作品"
@@ -72,8 +74,12 @@ fun FeedItemCard(
                             onProfileClick = { onProfileClick(feed.artist.id) }
                         )
                     }
+
                     is SystemRecommendation -> {
-                        Text(text = "为你推荐", style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
+                        Text(
+                            text = "为你推荐",
+                            style = androidx.compose.material3.MaterialTheme.typography.titleMedium
+                        )
                     }
                 }
             }
@@ -97,35 +103,47 @@ fun FeedItemCard(
 
             when (feed) {
                 is UserPost -> {
-                    when(val content = feed.content) {
+                    when (val content = feed.content) {
                         is ShareableContent.SharedSong -> {
                             likeCount = content.song.likesCount
                             commentCount = content.song.commentsCount
                             contentId = content.song.id
                         }
+
                         is ShareableContent.SharedPlaylist -> {
                             likeCount = content.playlist.likeCount
                             contentId = content.playlist.id
                         }
+
+                        else -> {}
                     }
                 }
+
                 is UserActivity -> {
-                     when(val content = feed.content) {
+                    when (val content = feed.content) {
                         is ShareableContent.SharedSong -> {
                             likeCount = content.song.likesCount
                             commentCount = content.song.commentsCount
                             contentId = content.song.id
                         }
+
                         is ShareableContent.SharedPlaylist -> {
                             likeCount = content.playlist.likeCount
                             contentId = content.playlist.id
                         }
+
+                        is ShareableContent.SharedAlbum -> {
+                            likeCount = 0
+                            contentId = content.album.id
+                        }
                     }
                 }
+
                 is ArtistUpdate -> {
                     // Album has no like/comment counts in the domain model
                     contentId = feed.album.id
                 }
+
                 is SystemRecommendation -> {
                     likeCount = feed.playlist.likeCount
                     contentId = feed.playlist.id

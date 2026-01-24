@@ -53,6 +53,14 @@ fun FeedItemBody(
                             onClick = { onPlaylistClick(content.playlist.id) }
                         )
                     }
+                    is ShareableContent.SharedAlbum->{
+                        ItemAlbum(
+                            album = content.album,
+                            onClick = { onAlbumClick(content.album.id) }
+                        )
+                    }
+                    null -> {
+                    }
                 }
             }
             is UserActivity -> {
@@ -68,6 +76,12 @@ fun FeedItemBody(
                         ItemPlaylist(
                             playlist = content.playlist,
                             onClick = { onPlaylistClick(content.playlist.id) }
+                        )
+                    }
+                    is ShareableContent.SharedAlbum->{
+                        ItemAlbum(
+                            album = content.album,
+                            onClick = { onAlbumClick(content.album.id) }
                         )
                     }
                 }

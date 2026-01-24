@@ -6,15 +6,15 @@ import kotlinx.serialization.Serializable
 data class Playlist(
     val id: String,
     val name: String,
-    val cover: String?,
-    val description: String?,
+    val cover: String="",
+    val description: String="",
     val songCount: Int = 0,
     val playCount: Int = 0,
     val likeCount: Int = 0,
     val isPublic: Int? = 0,
     val isLiked: Boolean = false,
 
-    val ownerName: String,
+    val ownerName: String="",
 )
 
 @Serializable
