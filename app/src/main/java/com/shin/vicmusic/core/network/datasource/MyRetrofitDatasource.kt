@@ -36,6 +36,7 @@ import com.shin.vicmusic.core.model.request.PublishFeedReq
 import com.shin.vicmusic.core.model.request.SongPageReq
 import com.shin.vicmusic.core.model.request.UserLoginReq
 import com.shin.vicmusic.core.model.request.UserRegisterReq
+import com.shin.vicmusic.core.model.request.UserUpdateRequest
 import com.shin.vicmusic.core.model.response.NetworkPageData
 import com.shin.vicmusic.core.model.response.NetworkResponse
 import com.shin.vicmusic.core.network.retrofit.MyNetworkApiService
@@ -98,18 +99,20 @@ class MyRetrofitDatasource @Inject constructor(
         return safeApiCall { service.getUserInfo() }
     }
     suspend fun updateUserInfo(
-        name: String?,
-        slogan: String?,
-        sex: Int?,
-        headImg: String?
+        name: String?=null,
+        slogan: String?=null,
+        sex: Int?=null,
+        headImg: String?=null,
+        bgImg:String?=null
     ): NetworkResponse<Unit> {
         return safeApiCall {
             service.updateUserInfo(
-                UserDetailDto(
+                UserUpdateRequest(
                     name=name,
                     slogan=slogan,
                     sex=sex,
-                    headImg=headImg
+                    headImg=headImg,
+                    bgImg = bgImg
                 )
             )
         }

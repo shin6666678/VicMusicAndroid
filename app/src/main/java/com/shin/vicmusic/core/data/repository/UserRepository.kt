@@ -42,18 +42,30 @@ class UserRepository @Inject constructor(
         name: String?,
         slogan: String?,
         sex: Int?,
-        headImg: String?
+        headImg: String?,
     ): Result<Unit>{
         val response = datasource.updateUserInfo(
             name=name,
             slogan=slogan,
             sex=sex,
-            headImg=headImg
+            headImg=headImg,
         )
         return if (response.code == 0) {
             Result.Success(Unit)
         } else {
             Result.Error(response.message?:"更新用户信息失败")
+        }
+    }
+    suspend fun updateUserBgImg(
+        bgImg: String?
+    ): Result<Unit> {
+        val response = datasource.updateUserInfo(
+            bgImg=bgImg
+        )
+        return if (response.code == 0) {
+            Result.Success(Unit)
+        } else {
+            Result.Error(response.message ?: "更新背景图片失败")
         }
     }
 }
