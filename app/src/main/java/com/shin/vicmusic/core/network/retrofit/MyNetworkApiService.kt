@@ -30,6 +30,7 @@ import com.shin.vicmusic.core.model.request.PlaylistSongReq
 import com.shin.vicmusic.core.model.request.PublishFeedReq
 import com.shin.vicmusic.core.model.request.UserLoginReq
 import com.shin.vicmusic.core.model.request.UserRegisterReq
+import com.shin.vicmusic.core.model.request.UserUpdateRequest
 import com.shin.vicmusic.core.model.response.NetworkPageData
 import com.shin.vicmusic.core.model.response.NetworkResponse
 import okhttp3.MultipartBody
@@ -68,7 +69,7 @@ interface MyNetworkApiService {
 
     @POST("/api/user/v1/update")
     suspend fun updateUserInfo(
-        @Body req: UserDetailDto
+        @Body req: UserUpdateRequest
     ): NetworkResponse<Unit>
 
     @POST("api/user/v1/check_in")
