@@ -1,6 +1,10 @@
 package com.shin.vicmusic.feature.myInfo
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,7 +27,6 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -36,11 +39,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,6 +55,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -59,6 +67,7 @@ import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.feature.common.MyAsyncImage
 import com.shin.vicmusic.feature.common.icon.VipIcon
 import com.shin.vicmusic.feature.myInfo.edit.navigateToMyInfoEdit
+import com.shin.vicmusic.util.copyUriToCache
 
 @Preview(showBackground = true)
 @Composable
@@ -67,7 +76,7 @@ fun MyInfoPreview() {
         userInfo = UserInfo(
             id = "1",
             name = "上尉诗人",
-            headImg = "https://img1.baidu.com/it/u=1302251292,3487620349&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500", // 示例头像
+            headImg = "",
             slogan = "Hello World",
             sex = 1,
             points = 1000,
@@ -82,6 +91,7 @@ fun MyInfoPreview() {
             heardCount = 100,
         ),
         onBackClick = {},
+        uiState = MyInfoUiState()
     )
 }
 
@@ -92,6 +102,34 @@ fun MyInfoRoute(
     val navController = LocalNavController.current
     val currentUser by viewModel.currentUser.collectAsStateWithLifecycle()
     val isLoggedIn by viewModel.isLoggedIn.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // 处理消息提示
+    LaunchedEffect(uiState.error, uiState.message) {
+        uiState.error?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearMessage()
+        }
+        uiState.message?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearMessage()
+        }
+    }
+
+    // 图片选择器
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        uri?.let {
+            val localPath = copyUriToCache(context, it)
+            if (localPath != null) {
+                viewModel.updateUserBg(localPath)
+            }
+        }
+    }
 
     // 如果未登录，直接退回
     if (isLoggedIn == false) {
@@ -101,8 +139,16 @@ fun MyInfoRoute(
 
     MyInfoScreen(
         userInfo = currentUser,
+        uiState = uiState,
+        snackbarHostState = snackbarHostState,
         onBackClick = { navController.popBackStack() },
-        onEditClick = navController::navigateToMyInfoEdit
+        onEditClick = navController::navigateToMyInfoEdit,
+        onBgClick = {
+            // 点击背景图触发选择
+            photoPickerLauncher.launch(
+                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+            )
+        }
     )
 }
 
@@ -110,12 +156,15 @@ fun MyInfoRoute(
 @Composable
 fun MyInfoScreen(
     userInfo: UserInfo?,
+    uiState: MyInfoUiState,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     onBackClick: () -> Unit,
-    onEditClick: () -> Unit={}
+    onEditClick: () -> Unit = {},
+    onBgClick: () -> Unit = {}
 ) {
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            // 透明的 TopAppBar，让背景图能透出来
             TopAppBar(
                 title = { },
                 navigationIcon = {
@@ -123,73 +172,84 @@ fun MyInfoScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = Color.White // 白色返回按钮
+                            tint = Color.White
                         )
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* TODO: T-shirt icon action */ }) {
+                    IconButton(onClick = { /* TODO */ }) {
                         Icon(
-                            imageVector = Icons.Default.ShoppingCart, // 示例图标
+                            imageVector = Icons.Default.ShoppingCart,
                             contentDescription = "T-shirt",
-                            tint = Color.White // 白色图标
+                            tint = Color.White
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent, // AppBar 背景透明
+                    containerColor = Color.Transparent,
                 )
             )
         },
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
             // 上半部分背景图
-            MyAsyncImage(
-                // 使用固定的 URL 或从 UserInfo 获取
-                model = "https://images.pexels.com/photos/1323550/pexels-photo-1323550.jpeg",
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(300.dp), // 固定高度
-                contentScale = ContentScale.Crop
-            )
+                    .height(300.dp)
+                    .clickable(enabled = !uiState.isLoading, onClick = onBgClick) // 添加点击事件
+            ) {
+                MyAsyncImage(
+                    model = userInfo?.bgImg,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+
+                // 加载遮罩
+                if (uiState.isLoading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.3f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = Color.White)
+                    }
+                }
+            }
 
             // 可滚动的内容区域
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues) // 应用 Scaffold 的 padding
+                    .padding(paddingValues)
                     .verticalScroll(rememberScrollState())
             ) {
                 if (userInfo == null) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(top = 100.dp), // 避免在图像顶部显示加载动画
+                            .padding(top = 100.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator()
                     }
                 } else {
-                    // 向上偏移的卡片内容
                     Column(
                         modifier = Modifier
-                            .padding(top = 150.dp) // 【修改点】增加了卡片的顶部边距，使其位置更靠下
+                            .padding(top = 150.dp)
                             .padding(horizontal = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp) // 卡片之间的间距
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        // 用户信息主卡片
                         UserInfoCard(
                             user = userInfo,
                             onEditClick = onEditClick
                         )
 
-                        // 等级与经验卡片 (样式已统一)
                         LevelExperienceCard(user = userInfo)
 
-                        // 详细信息列表
                         InfoListSection(user = userInfo)
 
-                        // 底部留白
                         Spacer(modifier = Modifier.height(32.dp))
                     }
                 }
@@ -206,9 +266,7 @@ private fun UserInfoCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        // 半透明效果
         colors = CardDefaults.cardColors(
-            // 【修改点】alpha值调高，降低透明度，使卡片更不透明
             containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f)
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -218,7 +276,6 @@ private fun UserInfoCard(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.Top
             ) {
-                // 左侧头像和等级
                 Box(modifier = Modifier.size(80.dp)) {
                     MyAsyncImage(
                         model = user.headImg,
@@ -227,7 +284,6 @@ private fun UserInfoCard(
                             .clip(CircleShape)
                             .align(Alignment.Center)
                     )
-                    // 等级徽章
                     Text(
                         text = "LV${user.level}",
                         modifier = Modifier
@@ -249,7 +305,6 @@ private fun UserInfoCard(
 
                 Spacer(modifier = Modifier.width(16.dp))
 
-                // 中间信息
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = user.name,
@@ -268,7 +323,6 @@ private fun UserInfoCard(
                     }
                 }
 
-                // 右侧编辑按钮
                 FilledTonalButton(
                     onClick = onEditClick,
                     modifier = Modifier.height(32.dp),
@@ -288,15 +342,12 @@ private fun UserInfoCard(
                 color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
             )
 
-            // 关注、粉丝等信息
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
                 FollowerInfoItem("关注", user.followCount)
                 FollowerInfoItem("粉丝", user.followerCount)
-                // 如果需要，可以从 UserInfo 中获取更多信息
-                // FollowerInfoItem("访客", user.visitorCount ?: 0)
             }
         }
     }
@@ -319,9 +370,6 @@ private fun FollowerInfoItem(label: String, count: Int) {
     }
 }
 
-/**
- * 等级和经验条卡片 (样式已与 UserInfoCard 统一)
- */
 @Composable
 private fun LevelExperienceCard(user: UserInfo) {
     Card(
@@ -391,17 +439,13 @@ private fun LevelExperienceCard(user: UserInfo) {
     }
 }
 
-/**
- * 详细信息列表区域 (样式调整)
- */
 @Composable
 private fun InfoListSection(user: UserInfo) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp), // 统一圆角
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            // 【修改点】alpha值调高，降低透明度
-            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f) // 统一颜色
+            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f)
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
@@ -410,7 +454,7 @@ private fun InfoListSection(user: UserInfo) {
             Divider(modifier = Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(0.2f))
             InfoRowItem(icon = Icons.Default.Email, label = "邮箱", value = user.mail ?: "未绑定")
             Divider(modifier = Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(0.2f))
-            InfoRowItem(icon = Icons.Default.Info, label = "注册时间", value = "2024-01-01") // 需后端返回
+            InfoRowItem(icon = Icons.Default.Info, label = "注册时间", value = "2024-01-01")
         }
     }
 }

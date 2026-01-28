@@ -1,6 +1,7 @@
 package com.shin.vicmusic.feature.myInfo.edit
 
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -35,6 +36,7 @@ import com.shin.vicmusic.feature.common.MyAsyncImage
 import com.shin.vicmusic.feature.common.bar.BarActionItem
 import com.shin.vicmusic.feature.common.bar.BarTabItem
 import com.shin.vicmusic.feature.common.bar.CommonTopBarSelect
+import com.shin.vicmusic.util.copyUriToCache
 
 @Preview
 @Composable
@@ -59,24 +61,6 @@ fun MyInfoEditPreview() {
 /**
  * 将选择的 Uri 图片拷贝到应用缓存目录，返回 File 的绝对路径
  */
-fun copyUriToCache(context: android.content.Context, uri: android.net.Uri): String? {
-    return try {
-        val inputStream = context.contentResolver.openInputStream(uri)
-        // 创建一个临时文件，例如：/data/user/0/com.shin.vicmusic/cache/temp_avatar_1623456.jpg
-        val file = java.io.File(context.cacheDir, "temp_avatar_${System.currentTimeMillis()}.jpg")
-        val outputStream = java.io.FileOutputStream(file)
-
-        inputStream?.use { input ->
-            outputStream.use { output ->
-                input.copyTo(output)
-            }
-        }
-        file.absolutePath // 返回路径供 ViewModel 使用
-    } catch (e: Exception) {
-        e.printStackTrace()
-        null
-    }
-}
 @Composable
 fun MyInfoEditRoute(
     viewModel: MyInfoEditViewModel = hiltViewModel()
@@ -117,7 +101,7 @@ fun MyInfoEditRoute(
         onSexChange = viewModel::onSexChange,
         onAvatarClick = {
             photoPickerLauncher.launch(
-                androidx.activity.result.PickVisualMediaRequest(
+                PickVisualMediaRequest(
                     ActivityResultContracts.PickVisualMedia.ImageOnly
                 )
             )

@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.CommonRepository
 import com.shin.vicmusic.core.data.repository.UserRepository
-import com.shin.vicmusic.core.domain.Result // 假设Result类所在包
+import com.shin.vicmusic.core.domain.Result
 import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.core.manager.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -70,6 +70,56 @@ class MyInfoEditViewModel @Inject constructor(
         _uiState.update { it.copy(headImg = localPath) }
     }
 
+    /**
+     * 新增：独立修改背景图的方法
+     * 设计原则：背景图修改不包含在 saveChanges 的常规用户信息保存流程中，
+     * 而是选择图片后立即上传并更新。
+     */
+    fun updateUserBg(localPath: String) {
+        if (uiState.value.isLoading) return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+
+            try {
+                val file = File(localPath)
+                if (!file.exists()) {
+                    throw Exception("图片文件不存在")
+                }
+
+                // 1. 上传图片到服务器
+                val bgImgUrl = when (val uploadResult = commonRepository.uploadImage(file, "user")) {
+                    is Result.Success -> uploadResult.data // 获取服务器返回的图片 URL
+                    is Result.Error -> throw Exception("背景图上传失败: ${uploadResult.message}")
+                }
+
+                // 2. 调用独立的更新背景接口
+                val updateResult = userRepository.updateUserBgImg(bgImg = bgImgUrl)
+                if (updateResult is Result.Error) {
+                    throw Exception(updateResult.message)
+                }
+
+                // 3. 成功后刷新全局用户信息
+                authManager.fetchUserInfo()
+
+                // 4. 更新 UI 状态
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        bgImg = bgImgUrl // 立即更新视图显示的背景图
+                    )
+                }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _uiState.update {
+                    it.copy(isLoading = false, error = e.message ?: "背景图设置失败，请重试")
+                }
+            }
+        }
+    }
+
+    // 保存常规用户信息（不包含背景图）
     fun saveChanges() {
         if (uiState.value.isLoading) return
         val currentState = uiState.value
