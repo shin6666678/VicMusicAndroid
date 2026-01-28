@@ -1,5 +1,8 @@
 package com.shin.vicmusic.feature.feed
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -15,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -22,6 +26,7 @@ import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.feature.common.bar.BarActionItem
 import com.shin.vicmusic.feature.common.bar.BarTabItem
 import com.shin.vicmusic.feature.feed.publish.navigateToPublishFeed
+import com.shin.vicmusic.util.copyUriToCache
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -30,6 +35,7 @@ fun FeedRoute(
     viewModel: FeedViewModel = hiltViewModel()
 ) {
     val navController = LocalNavController.current
+    val context = LocalContext.current
     val discoveryItems by viewModel.discoveryItems.collectAsState()
     val followingItems by viewModel.followingItems.collectAsState()
     val selectedTabIndex by viewModel.selectedTabIndex.collectAsState()
@@ -38,6 +44,19 @@ fun FeedRoute(
 
     val pagerState = rememberPagerState(initialPage = selectedTabIndex) { 2 }
     val followingListState = rememberLazyListState()
+
+    // 图片选择器
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        uri?.let {
+            // 复用工具方法
+            val localPath = copyUriToCache(context, it)
+            if (localPath != null) {
+                viewModel.updateUserBg(localPath)
+            }
+        }
+    }
 
     // 当 ViewModel 中的 Tab 变化时，滚动 Pager
     LaunchedEffect(selectedTabIndex) {
@@ -122,5 +141,11 @@ fun FeedRoute(
         onAlbumClick = { /* TODO: Navigate to album detail */ },
         onLikeClick = { /* TODO: Handle like action */ },
         onCommentClick = { /* TODO: Navigate to comment screen */ },
+        onBgClick = {
+            // 触发图片选择
+            photoPickerLauncher.launch(
+                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+            )
+        }
     )
 }
