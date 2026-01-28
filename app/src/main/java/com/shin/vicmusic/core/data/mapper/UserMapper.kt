@@ -11,6 +11,7 @@ fun UserDetailDto.toDomain(): UserInfo {
         headImg = this.headImg ?: "",
         slogan = this.slogan ?: "",
         sex = this.sex ?: 2,
+        bgImg = this.bgImg ?: "",
         points = this.points ?: 0,
         mail = this.mail ?: "",
         followCount = this.followCount ?: 0,

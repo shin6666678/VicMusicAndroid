@@ -21,6 +21,7 @@ data class UserDetailDto(
     val headImg: String?=null,
     val slogan: String?=null,
     val sex: Int?=null,
+    val bgImg: String?=null,
     val points: Int?=null,
     val mail: String?=null,
     val followCount: Int?=null,
