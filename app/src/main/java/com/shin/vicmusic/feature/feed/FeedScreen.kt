@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.shin.vicmusic.core.domain.Feed
-import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.feature.common.bar.BarActionItem
 import com.shin.vicmusic.feature.common.bar.BarTabItem
@@ -44,6 +43,7 @@ fun FeedScreen(
     onAlbumClick: (String) -> Unit,
     onLikeClick: (String) -> Unit,
     onCommentClick: (String) -> Unit,
+    onBgClick: () -> Unit,
 ) {
     // Use Box to allow content to draw behind the TopAppBar
     Box(modifier = Modifier.fillMaxSize()) {
@@ -68,7 +68,8 @@ fun FeedScreen(
                             item {
                                 FollowingHeader(
                                     user = currentUser,
-                                    backgroundImageUrl = headerBackgroundImage
+                                    backgroundImageUrl = headerBackgroundImage,
+                                    onBgClick = onBgClick
                                 )
                             }
                         }
