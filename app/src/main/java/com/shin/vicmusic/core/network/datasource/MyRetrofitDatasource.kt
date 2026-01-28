@@ -33,6 +33,7 @@ import com.shin.vicmusic.core.model.request.LikeReq
 import com.shin.vicmusic.core.model.request.PageReq
 import com.shin.vicmusic.core.model.request.PlaylistSongReq
 import com.shin.vicmusic.core.model.request.PublishFeedReq
+import com.shin.vicmusic.core.model.request.SongPageReq
 import com.shin.vicmusic.core.model.request.UserLoginReq
 import com.shin.vicmusic.core.model.request.UserRegisterReq
 import com.shin.vicmusic.core.model.response.NetworkPageData
@@ -384,7 +385,7 @@ Comment评论
         return safeApiCall { service.getFollowingFeeds(page, size) }
     }
 
-    suspend fun publishFeed(req: PublishFeedReq): NetworkResponse<Unit> {
+    suspend fun publishFeed(req: PublishFeedReq): NetworkResponse<String> {
         return safeApiCall { service.publishFeed(req) }
     }
 

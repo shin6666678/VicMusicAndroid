@@ -356,7 +356,7 @@ interface MyNetworkApiService {
     ): NetworkResponse<NetworkPageData<FeedItemDto>>
 
     @POST("/api/feed/v1/publish")
-    suspend fun publishFeed(@Body req: PublishFeedReq): NetworkResponse<Unit>
+    suspend fun publishFeed(@Body req: PublishFeedReq): NetworkResponse<String>
 
 
     /*
