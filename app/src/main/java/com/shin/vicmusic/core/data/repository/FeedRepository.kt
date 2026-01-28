@@ -46,10 +46,11 @@ class FeedRepository @Inject constructor(
         }
     }
 
-    suspend fun publishFeed(req: PublishFeedReq): Result<Unit> {
+    suspend fun publishFeed(req: PublishFeedReq): Result<String> {
         val response = datasource.publishFeed(req)
         return if (response.code == 0) {
-            Result.Success(Unit)
+            val resp = response.data ?: ""
+            Result.Success(resp)
         } else {
             Result.Error(response.message ?: "发布失败")
         }

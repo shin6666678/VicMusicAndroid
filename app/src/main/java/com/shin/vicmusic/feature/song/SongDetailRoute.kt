@@ -1,9 +1,9 @@
 package com.shin.vicmusic.feature.song
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,20 +11,25 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Feed
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -45,7 +50,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.imageLoader
 import coil.request.ImageRequest
 import coil.request.SuccessResult
-import coil.util.CoilUtils.result
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
 import com.shin.vicmusic.core.domain.Song
@@ -54,6 +58,7 @@ import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONG
 import com.shin.vicmusic.feature.comment.navigateToComment
 import com.shin.vicmusic.feature.common.bar.BarActionItem
 import com.shin.vicmusic.feature.common.bar.CommonTopBarSelect
+import com.shin.vicmusic.feature.feed.publish.navigateToPublishFeed
 import com.shin.vicmusic.feature.song.component.LyricView
 import com.shin.vicmusic.feature.song.component.PlaybackControlBar
 import com.shin.vicmusic.feature.song.component.PlayerControls
@@ -77,6 +82,7 @@ fun SongDetailPreview() {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SongDetailRoute(
     viewModel: SongDetailViewModel = hiltViewModel(),
@@ -89,6 +95,7 @@ fun SongDetailRoute(
     val coroutineScope = rememberCoroutineScope()
 
     var showVipDialog by remember { mutableStateOf(false) }
+    var showShareBottomSheet by remember { mutableStateOf(false) }
 
     DisposableEffect(Unit) {
         playerManager.isSongDetailVisible = true
@@ -119,13 +126,67 @@ fun SongDetailRoute(
         )
     }
 
-    LaunchedEffect(songUiState) {
-        if (songUiState is SongUiState.Success) {
-            val song = (songUiState as SongUiState.Success).song
-            if (currentPlayingSong?.id != song.id) {
-                playerManager.playSong(song)
+    val context = LocalContext.current
+    val parentComposition = rememberCompositionContext()
+
+    val shareToOtherApps: () -> Unit = {
+        coroutineScope.launch {
+            val displaySong = (songUiState as? SongUiState.Success)?.song ?: return@launch
+            val tag = "ShareProcess"
+            try {
+                // 1. 加载封面图 (IO 线程)
+                val albumArtBitmap = withContext(Dispatchers.IO) {
+                    val loader = context.imageLoader
+                    val request = ImageRequest.Builder(context)
+                        .data(ResourceUtil.r2(displaySong.icon))
+                        .allowHardware(false)
+                        .build()
+                    (loader.execute(request) as? SuccessResult)?.let {
+                        (it.drawable as android.graphics.drawable.BitmapDrawable).bitmap
+                    }
+                }
+
+                // 2. 生成二维码 (H5 落地页 URL)
+                val shareLandingUrl = "http://115.190.155.131:9001/share.html?id=${displaySong.id}"
+                val qrBitmap = withContext(Dispatchers.Default) {
+                    QRCodeUtils.createQRCode(shareLandingUrl, 200)
+                }
+
+                // 3. 渲染并截图 (Main 线程)
+                val shareCardBitmap = withContext(Dispatchers.Main) {
+                    captureComposable(context, parentComposition) {
+                        SongShareCard(
+                            song = displaySong,
+                            albumArtBitmap = albumArtBitmap,
+                            qrCodeBitmap = qrBitmap
+                        )
+                    }
+                }
+
+                // 4. 调用系统分享
+                ShareUtils.shareSong(context, displaySong, shareCardBitmap)
+
+            } catch (e: Exception) {
+                Log.e(tag, "分享异常", e)
             }
         }
+    }
+
+    if (showShareBottomSheet) {
+        ShareBottomSheet(
+            onDismiss = { showShareBottomSheet = false },
+            onShareToFeed = {
+                val songId = (songUiState as? SongUiState.Success)?.song?.id
+                if (songId != null) {
+                    navController.navigateToPublishFeed(songId, "song")
+                }
+                showShareBottomSheet = false
+            },
+            onShareToOtherApps = { 
+                shareToOtherApps()
+                showShareBottomSheet = false 
+            }
+        )
     }
 
     when (val uiState = songUiState) {
@@ -143,9 +204,6 @@ fun SongDetailRoute(
                 uiState.song
             }
 
-            val context = LocalContext.current
-            val parentComposition = rememberCompositionContext()
-
             SongDetailScreen(
                 song = displaySong,
                 playerState = playerState,
@@ -161,49 +219,7 @@ fun SongDetailRoute(
                         resourceType = "song"
                     )
                 },
-                onShareClick = {
-                    coroutineScope.launch {
-                        val tag = "ShareProcess"
-                        try {
-                            // 1. 加载封面图 (IO 线程)
-                            val albumArtBitmap = withContext(Dispatchers.IO) {
-                                val loader = context.imageLoader
-                                val request = ImageRequest.Builder(context)
-                                    .data(ResourceUtil.r2(displaySong.icon))
-                                    .allowHardware(false)
-                                    .build()
-                                (loader.execute(request) as? SuccessResult)?.let {
-                                    (it.drawable as android.graphics.drawable.BitmapDrawable).bitmap
-                                }
-                            }
-
-                            // 2. 生成二维码 (H5 落地页 URL)
-                            // 💡 这里应该放你的官网分享页地址，如果没有，建议先放一个下载页 URL
-                            val shareLandingUrl = "http://115.190.155.131:9001/share.html?id=${displaySong.id}"
-                            val qrBitmap = withContext(Dispatchers.Default) {
-                                QRCodeUtils.createQRCode(shareLandingUrl, 200)
-                            }
-
-                            // 3. 渲染并截图 (Main 线程)
-                            val shareCardBitmap = withContext(Dispatchers.Main) {
-                                captureComposable(context, parentComposition) {
-                                    SongShareCard(
-                                        song = displaySong,
-                                        albumArtBitmap = albumArtBitmap,
-                                        qrCodeBitmap = qrBitmap
-                                    )
-                                }
-                            }
-
-                            // 4. 调用系统分享
-                            ShareUtils.shareSong(context, displaySong, shareCardBitmap)
-
-                        } catch (e: Exception) {
-                            Log.e(tag, "分享异常", e)
-                        }
-                    }
-                }
-
+                onShareClick = { showShareBottomSheet = true }
             )
         }
 
@@ -219,6 +235,44 @@ fun SongDetailRoute(
                     }
                 }
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ShareBottomSheet(
+    onDismiss: () -> Unit,
+    onShareToFeed: () -> Unit,
+    onShareToOtherApps: () -> Unit
+) {
+    val modalBottomSheetState = rememberModalBottomSheetState()
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = modalBottomSheetState,
+    ) {
+        Column {
+            ListItem(
+                headlineContent = { Text("分享到动态") },
+                leadingContent = {
+                    Icon(
+                        imageVector = Icons.Default.Feed,
+                        contentDescription = "Share to Feed"
+                    )
+                },
+                modifier = Modifier.clickable(onClick = onShareToFeed)
+            )
+            ListItem(
+                headlineContent = { Text("分享到其他应用") },
+                leadingContent = {
+                    Icon(
+                        imageVector = Icons.Default.Share,
+                        contentDescription = "Share to Other Apps"
+                    )
+                },
+                modifier = Modifier.clickable(onClick = onShareToOtherApps)
+            )
         }
     }
 }

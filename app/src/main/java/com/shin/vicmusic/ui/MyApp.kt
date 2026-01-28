@@ -48,6 +48,7 @@ import com.shin.vicmusic.feature.comment.detail.commentDetailScreen
 import com.shin.vicmusic.feature.common.MyNavigationBar
 import com.shin.vicmusic.feature.common.bar.SongBar
 import com.shin.vicmusic.feature.feed.feedScreen
+import com.shin.vicmusic.feature.feed.publish.publishFeedScreen
 import com.shin.vicmusic.feature.liked.likedListScreen
 import com.shin.vicmusic.feature.localMusic.localMusicScreen
 import com.shin.vicmusic.feature.main.MAIN_ROUTE
@@ -170,6 +171,7 @@ fun MyApp(
             feedScreen()
             commentDetailScreen() // Register the new route
             myInfoEditScreen()
+            publishFeedScreen()
         }
 
         // 底部整体容器 (SongBar + 导航栏)

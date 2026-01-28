@@ -21,6 +21,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.feature.common.bar.BarActionItem
 import com.shin.vicmusic.feature.common.bar.BarTabItem
+import com.shin.vicmusic.feature.feed.publish.navigateToPublishFeed
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -101,7 +102,7 @@ fun FeedRoute(
         BarActionItem(
             icon = Icons.Default.Add,
             contentDescription = "Add",
-            onClick = { /* TODO: Navigate to Post creation */ },
+            onClick = { navController.navigateToPublishFeed() },
         ),
     )
 
