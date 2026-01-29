@@ -7,6 +7,8 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build // ‼️ 导入 Build
 import androidx.core.content.FileProvider
+import com.shin.vicmusic.core.domain.Album
+import com.shin.vicmusic.core.domain.Playlist
 import com.shin.vicmusic.core.domain.Song
 import java.io.File
 import java.io.FileOutputStream
@@ -56,9 +58,86 @@ object ShareUtils {
         context.startActivity(chooser)
     }
 
-    // ... (generateDeepLink 和 saveBitmapToCache 方法保持不变) ...
+    fun sharePlaylist(context: Context, playlist: Playlist, bitmap: Bitmap? = null, appUrl: String = "https://yourapp.download.link") {
+        val shareText = "我发现了一个很棒的歌单《${playlist.name}》by ${playlist.ownerName}，内含 ${playlist.songCount} 首歌曲！\n\n查看详情：${generateDeepLink(playlist)} \n或下载 VicMusic：$appUrl"
+        val intent = Intent(Intent.ACTION_SEND)
+
+        var imageUri: Uri? = null
+
+        if (bitmap != null) {
+            imageUri = saveBitmapToCache(context, bitmap)
+            if (imageUri != null) {
+                intent.type = "image/png"
+                intent.putExtra(Intent.EXTRA_STREAM, imageUri)
+                intent.clipData = ClipData.newUri(context.contentResolver, "Image", imageUri)
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            } else {
+                intent.type = "text/plain"
+            }
+        } else {
+            intent.type = "text/plain"
+        }
+
+        intent.putExtra(Intent.EXTRA_TEXT, shareText)
+        intent.putExtra(Intent.EXTRA_SUBJECT, "分享歌单：${playlist.name}")
+
+        val chooser = Intent.createChooser(intent, "分享歌单到...")
+        val resInfoList = context.packageManager.queryIntentActivities(chooser, 0)
+        for (resolveInfo in resInfoList) {
+            val packageName = resolveInfo.activityInfo.packageName
+            if (imageUri != null) {
+                context.grantUriPermission(packageName, imageUri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            }
+        }
+        chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(chooser)
+    }
+
+    fun shareAlbum(context: Context, album: Album, bitmap: Bitmap? = null, appUrl: String = "https://yourapp.download.link") {
+        val shareText = "推荐轻听 ${album.artist.name} 的专辑《${album.title}》，好歌都在这里！\n\n查看详情：${generateDeepLink(album)} \n或下载 VicMusic：$appUrl"
+        val intent = Intent(Intent.ACTION_SEND)
+
+        var imageUri: Uri? = null
+
+        if (bitmap != null) {
+            imageUri = saveBitmapToCache(context, bitmap)
+            if (imageUri != null) {
+                 intent.type = "image/png"
+                 intent.putExtra(Intent.EXTRA_STREAM, imageUri)
+                 intent.clipData = ClipData.newUri(context.contentResolver, "Image", imageUri)
+                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            } else {
+                 intent.type = "text/plain"
+            }
+        } else {
+             intent.type = "text/plain"
+        }
+
+        intent.putExtra(Intent.EXTRA_TEXT, shareText)
+        intent.putExtra(Intent.EXTRA_SUBJECT, "分享专辑：${album.title}")
+
+        val chooser = Intent.createChooser(intent, "分享专辑到...")
+        val resInfoList = context.packageManager.queryIntentActivities(chooser, 0)
+        for (resolveInfo in resInfoList) {
+            val packageName = resolveInfo.activityInfo.packageName
+            if (imageUri != null) {
+                context.grantUriPermission(packageName, imageUri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            }
+        }
+        chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(chooser)
+    }
+
     private fun generateDeepLink(song: Song): String {
         return "vicmusic://song/${song.id}"
+    }
+
+    private fun generateDeepLink(playlist: Playlist): String {
+        return "vicmusic://playlist/${playlist.id}"
+    }
+
+    private fun generateDeepLink(album: Album): String {
+        return "vicmusic://album/${album.id}"
     }
 
     private fun saveBitmapToCache(context: Context, bitmap: Bitmap): Uri? {
@@ -69,7 +148,6 @@ object ShareUtils {
             val stream = FileOutputStream(file)
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
             stream.close()
-
             FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
         } catch (e: Exception) {
             e.printStackTrace()

@@ -32,8 +32,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.Song
+import com.shin.vicmusic.core.domain.PlaylistDetail
+import com.shin.vicmusic.core.domain.AlbumDetail
 import com.shin.vicmusic.feature.common.bar.SongBar
 import com.shin.vicmusic.feature.common.item.ItemSong
+import com.shin.vicmusic.feature.common.item.ItemPlaylist
+import com.shin.vicmusic.feature.common.item.ItemAlbum
 import com.shin.vicmusic.feature.song.component.SongInfoSection
 
 @Composable
@@ -108,6 +112,8 @@ fun PublishFeedScreen(
                 Card(modifier = Modifier.fillMaxWidth()) {
                     when (content) {
                         is Song -> ItemSong(song = content)
+                        is PlaylistDetail -> ItemPlaylist(playlist = content.info, onClick = {})
+                        is AlbumDetail -> ItemAlbum(album = content.album, onClick = {})
                     }
                 }
             }

@@ -3,6 +3,7 @@ package com.shin.vicmusic.feature.common.bar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -28,6 +29,7 @@ fun CommonTopBar(
     showSearch: Boolean = false,
     popBackStack: () -> Unit = {},
     navigateToSearch: () -> Unit = {},
+    onShareClick: (() -> Unit)? = null, // 新增分享回调
     containerColor: Color = Color.Transparent,
     contentColor: Color = Color.Black
 ) {
@@ -50,10 +52,16 @@ fun CommonTopBar(
             }
         },
         actions = {
-            if (showSearch)
+            if (showSearch) {
                 IconButton(onClick = { navigateToSearch() }) {
                     Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
                 }
+            }
+            if (onShareClick != null) {
+                IconButton(onClick = onShareClick) {
+                    Icon(imageVector = Icons.Default.Share, contentDescription = "Share")
+                }
+            }
         },
     )
 }

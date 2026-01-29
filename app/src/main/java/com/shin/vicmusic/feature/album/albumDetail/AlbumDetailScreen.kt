@@ -28,6 +28,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.feature.common.DetailControllerBar
 import com.shin.vicmusic.feature.common.item.ItemSongNumbered
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.shin.vicmusic.feature.album.AlbumShareActionSheet
+import com.shin.vicmusic.util.ShareUtils
 import com.shin.vicmusic.feature.common.MyAsyncImage
 import com.shin.vicmusic.feature.common.bar.CommonTopBar
 
@@ -42,7 +48,10 @@ fun AlbumDetailRoute(
         uiState = uiState,
         popBackStack = navController::popBackStack,
         onLikeClick = viewModel::toggleLike,
-        onPlayAllClick = { /* TODO: 绑定播放列表逻辑 */ }
+        onPlayAllClick = { /* TODO: 绑定播放列表逻辑 */ },
+        onShareToFeed = { albumId ->
+             navController.navigate("publish_feed?targetId=$albumId&targetType=album")
+        }
     )
 }
 
@@ -51,8 +60,28 @@ fun AlbumDetailScreen(
     uiState: AlbumDetailUiState,
     popBackStack: () -> Unit,
     onLikeClick: () -> Unit,
-    onPlayAllClick: () -> Unit = {}
+    onPlayAllClick: () -> Unit = {},
+    onShareToFeed: (String) -> Unit = {}
 ) {
+    var showShareSheet by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    if (showShareSheet) {
+        AlbumShareActionSheet(
+            album = uiState.album!!,
+            onDismissRequest = { showShareSheet = false },
+            onShareToFeedClick = {
+                uiState.album?.let { onShareToFeed(it.id) }
+            },
+            onGenerateCardClick = {
+                // TODO: Generate Card
+            },
+            onSystemShareClick = {
+                uiState.album?.let { ShareUtils.shareAlbum(context, it) }
+            }
+        )
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -66,7 +95,8 @@ fun AlbumDetailScreen(
             CommonTopBar(
                 midText = "专辑详情",
                 popBackStack = popBackStack,
-                containerColor = Color.Transparent
+                containerColor = Color.Transparent,
+                onShareClick = { if (uiState.album != null) showShareSheet = true }
             )
 
             if (uiState.isLoading) {
