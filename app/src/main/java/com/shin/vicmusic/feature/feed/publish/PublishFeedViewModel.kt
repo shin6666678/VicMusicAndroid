@@ -5,8 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.FeedRepository
 import com.shin.vicmusic.core.data.repository.SongRepository
+import com.shin.vicmusic.core.data.repository.PlaylistRepository
+import com.shin.vicmusic.core.data.repository.AlbumRepository
 import com.shin.vicmusic.core.domain.Result
-import com.shin.vicmusic.core.domain.Song
+import com.shin.vicmusic.core.model.request.AlbumDetailReq
 import com.shin.vicmusic.core.model.request.PublishFeedReq
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +26,9 @@ data class PublishFeedUiState(
 @HiltViewModel
 class PublishFeedViewModel @Inject constructor(
     private val feedRepository: FeedRepository,
-    private val songRepository: SongRepository, // 注入 SongRepository
+    private val songRepository: SongRepository,
+    private val playlistRepository: PlaylistRepository,
+    private val albumRepository: AlbumRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -45,9 +49,10 @@ class PublishFeedViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(isLoading = true)
             val result = when (targetType) {
                 "song" -> songRepository.getSongDetail(targetId)
-                // 未来可以扩展获取歌单、专辑的逻辑
-                // "playlist" -> playlistRepository.getPlaylistDetail(targetId)
-                // "album" -> albumRepository.getAlbumDetail(targetId)
+                "playlist" -> playlistRepository.getPlaylistDetail(targetId)
+                "album" -> albumRepository.getAlbumDetail(AlbumDetailReq(
+                    id = targetId
+                ))
                 else -> Result.Error("不支持的分享类型")
             }
 
