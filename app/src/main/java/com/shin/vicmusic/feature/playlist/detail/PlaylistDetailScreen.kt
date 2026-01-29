@@ -26,6 +26,20 @@ import com.shin.vicmusic.feature.playlist.PlaylistShareActionSheet
 import com.shin.vicmusic.util.ShareUtils
 import com.shin.vicmusic.feature.playlist.detail.component.PlaySongActionHeader
 import com.shin.vicmusic.feature.playlist.detail.component.PlaylistHeader
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberCompositionContext
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+import coil.imageLoader
+import coil.request.ImageRequest
+import coil.request.SuccessResult
+import android.graphics.drawable.BitmapDrawable
+import com.shin.vicmusic.util.QRCodeUtils
+import com.shin.vicmusic.util.ResourceUtil
+import com.shin.vicmusic.util.captureComposable
+import com.shin.vicmusic.feature.playlist.PlaylistShareCard
+import android.util.Log
 
 @Composable
 fun PlaylistDetailRoute(
@@ -66,12 +80,8 @@ fun PlaylistDetailScreen(
     var showShareSheet by remember { mutableStateOf(false) }
     val context = LocalContext.current
     
-    // 截图/生成图片相关的 State
-    // 这里简化处理，实际可以使用 CaptureController 等库来生成图片
-    // 也可以将 PlaylistShareCard 绘制到 Bitmap
-    
-    // FIXME: 这是一个简化实现，实际项目可能需要 View 截图或 Canvas 绘制
-    // 这里我们暂时只做系统分享 (Text Link) 和 分享到动态 (Internal)
+    val coroutineScope = rememberCoroutineScope()
+    val compositionContext = rememberCompositionContext()
     
     if (showShareSheet) {
         PlaylistShareActionSheet(
@@ -81,8 +91,47 @@ fun PlaylistDetailScreen(
                  onShareToFeed(detail.info.id)
             },
             onGenerateCardClick = {
-                // TODO: 生成海报逻辑
-                // ShareUtils.sharePlaylist(context, detail.info, bitmap)
+                // 生成海报逻辑
+                coroutineScope.launch {
+                    val tag = "ShareProcess"
+                    try {
+                        // 1. 加载封面图 (IO 线程)
+                        val coverBitmap = withContext(Dispatchers.IO) {
+                            val loader = context.imageLoader
+                            val request = ImageRequest.Builder(context)
+                                .data(ResourceUtil.r2(detail.info.cover))
+                                .allowHardware(false)
+                                .build()
+                            (loader.execute(request) as? SuccessResult)?.let {
+                                (it.drawable as BitmapDrawable).bitmap
+                            }
+                        }
+
+                        // 2. 生成二维码 (H5 落地页 URL)
+                        // 假设落地页 URL 格式统一
+                        val shareLandingUrl = "http://115.190.155.131:9001/share_playlist.html?id=${detail.info.id}"
+                        val qrBitmap = withContext(Dispatchers.Default) {
+                            QRCodeUtils.createQRCode(shareLandingUrl, 200)
+                        }
+
+                        // 3. 渲染并截图 (Main 线程)
+                        val shareCardBitmap = withContext(Dispatchers.Main) {
+                            captureComposable(context, compositionContext) {
+                                PlaylistShareCard(
+                                    playlist = detail.info,
+                                    coverBitmap = coverBitmap,
+                                    qrCodeBitmap = qrBitmap
+                                )
+                            }
+                        }
+
+                        // 4. 调用系统分享，带上生成的图片
+                        ShareUtils.sharePlaylist(context, detail.info, shareCardBitmap)
+
+                    } catch (e: Exception) {
+                        Log.e(tag, "分享异常", e)
+                    }
+                }
             },
             onSystemShareClick = {
                 ShareUtils.sharePlaylist(context, detail.info)
