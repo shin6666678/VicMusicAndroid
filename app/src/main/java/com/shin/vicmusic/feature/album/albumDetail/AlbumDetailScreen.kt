@@ -36,6 +36,20 @@ import com.shin.vicmusic.feature.album.AlbumShareActionSheet
 import com.shin.vicmusic.util.ShareUtils
 import com.shin.vicmusic.feature.common.MyAsyncImage
 import com.shin.vicmusic.feature.common.bar.CommonTopBar
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberCompositionContext
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+import coil.imageLoader
+import coil.request.ImageRequest
+import coil.request.SuccessResult
+import android.graphics.drawable.BitmapDrawable
+import com.shin.vicmusic.util.QRCodeUtils
+import com.shin.vicmusic.util.ResourceUtil
+import com.shin.vicmusic.util.captureComposable
+import com.shin.vicmusic.feature.album.AlbumShareCard
+import android.util.Log
 
 @Composable
 fun AlbumDetailRoute(
@@ -65,6 +79,8 @@ fun AlbumDetailScreen(
 ) {
     var showShareSheet by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val compositionContext = rememberCompositionContext()
 
     if (showShareSheet) {
         AlbumShareActionSheet(
@@ -74,7 +90,47 @@ fun AlbumDetailScreen(
                 uiState.album?.let { onShareToFeed(it.id) }
             },
             onGenerateCardClick = {
-                // TODO: Generate Card
+                // 生成海报逻辑
+                coroutineScope.launch {
+                    val tag = "ShareProcess"
+                    try {
+                        val album = uiState.album!!
+                        // 1. 加载封面图 (IO 线程)
+                        val coverBitmap = withContext(Dispatchers.IO) {
+                            val loader = context.imageLoader
+                            val request = ImageRequest.Builder(context)
+                                .data(ResourceUtil.r2(album.icon))
+                                .allowHardware(false)
+                                .build()
+                            (loader.execute(request) as? SuccessResult)?.let {
+                                (it.drawable as BitmapDrawable).bitmap
+                            }
+                        }
+
+                        // 2. 生成二维码
+                        val shareLandingUrl = "http://115.190.155.131:9001/share_album.html?id=${album.id}"
+                        val qrBitmap = withContext(Dispatchers.Default) {
+                            QRCodeUtils.createQRCode(shareLandingUrl, 200)
+                        }
+
+                        // 3. 渲染并截图 (Main 线程)
+                        val shareCardBitmap = withContext(Dispatchers.Main) {
+                            captureComposable(context, compositionContext) {
+                                AlbumShareCard(
+                                    album = album,
+                                    coverBitmap = coverBitmap,
+                                    qrCodeBitmap = qrBitmap
+                                )
+                            }
+                        }
+
+                        // 4. 调用系统分享
+                        ShareUtils.shareAlbum(context, album, shareCardBitmap)
+
+                    } catch (e: Exception) {
+                        Log.e(tag, "分享异常", e)
+                    }
+                }
             },
             onSystemShareClick = {
                 uiState.album?.let { ShareUtils.shareAlbum(context, it) }
