@@ -17,7 +17,8 @@ data class CommentUiState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val page: Int = 1,
-    val hasMore: Boolean = true
+    val hasMore: Boolean = true,
+    val replyPages: Map<String, Int> = emptyMap() // rootCommentId -> nextPage
 )
 
 @HiltViewModel
@@ -72,6 +73,43 @@ class CommentViewModel @Inject constructor(
         }
     }
 
+    // 加载更多回复 (5条一页)
+    fun loadMoreReplies(rootCommentId: String) {
+        val currentPage = _uiState.value.replyPages[rootCommentId] ?: 1
+        
+        viewModelScope.launch {
+            when (val result = commentRepository.getCommentDetail(rootCommentId, currentPage, 5)) {
+                is Result.Success -> {
+                    val newReplies = result.data.allReplies
+                    val updatedComments = _uiState.value.comments.map { thread ->
+                        if (thread.rootComment.id == rootCommentId) {
+                            val existingIds = thread.replies.map { it.id }.toSet()
+                            val filteredNewReplies = newReplies.filter { it.id !in existingIds }
+                            val totalReplies = thread.replies + filteredNewReplies
+                            thread.copy(
+                                replies = totalReplies,
+                                hasMoreReplies = totalReplies.size < thread.totalReplyCount
+                            )
+                        } else {
+                            thread
+                        }
+                    }
+                    
+                    val updatedReplyPages = _uiState.value.replyPages.toMutableMap()
+                    updatedReplyPages[rootCommentId] = currentPage + 1
+                    
+                    _uiState.value = _uiState.value.copy(
+                        comments = updatedComments,
+                        replyPages = updatedReplyPages
+                    )
+                }
+                is Result.Error -> {
+                    _uiState.value = _uiState.value.copy(error = "加载回复失败: ${result.message}")
+                }
+            }
+        }
+    }
+
     // 点赞评论
     fun toggleLike(commentId: String, rootCommentId: String? = null) {
         viewModelScope.launch {
@@ -87,8 +125,8 @@ class CommentViewModel @Inject constructor(
                                     likeCount = if (newStatus) thread.rootComment.likeCount + 1 else thread.rootComment.likeCount - 1
                                 )
                             )
-                        } else if (rootCommentId != null && thread.rootComment.id == rootCommentId) {
-                            // It's a reply
+                        } else if (rootCommentId != null && (thread.rootComment.id == rootCommentId || thread.replies.any { it.id == commentId })) {
+                            // It's a reply (either linked by rootId or checked in replies list)
                             thread.copy(
                                 replies = thread.replies.map { reply ->
                                     if (reply.id == commentId) {

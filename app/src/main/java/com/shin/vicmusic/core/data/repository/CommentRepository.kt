@@ -42,15 +42,15 @@ class CommentRepository @Inject constructor(
     }
 
     /**
-     * 获取评论详情 (已重构)
+     * 获取评论详情 (带回复的分页)
      */
-    suspend fun getCommentDetail(id: String): Result<CommentDetail> {
-        val resp = datasource.getCommentDetail(id)
+    suspend fun getCommentDetail(id: String, page: Int = 1, size: Int = 5): Result<CommentDetail> {
+        val resp = datasource.getCommentDetail(id, page, size)
         return if (resp.code == 0 && resp.data != null) {
             val commentDetail = resp.data.toCommentDetail()
             Result.Success(commentDetail)
         } else {
-            Result.Error(resp.message ?: "获取评论详情失败")
+            Result.Error(resp.message ?: "获取评论回复失败")
         }
     }
 

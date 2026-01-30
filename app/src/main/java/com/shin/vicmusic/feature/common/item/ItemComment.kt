@@ -50,7 +50,7 @@ fun ItemCommentThread(
         )
 
         // 2. Render the replies, if any
-        if (thread.replies.isNotEmpty()) {
+        if (thread.replies.isNotEmpty() || thread.totalReplyCount > 0) {
             Column(modifier = Modifier.padding(start = 52.dp)) { // Indent replies
                 thread.replies.forEach { reply ->
                     CommentContent(
@@ -61,10 +61,16 @@ fun ItemCommentThread(
                     )
                 }
 
-                // 3. "View More" button
-                if (thread.hasMoreReplies) {
+                // 3. "Expand Replies" button
+                if (thread.hasMoreReplies || (thread.totalReplyCount > 0 && thread.replies.isEmpty())) {
+                    val label = if (thread.replies.isEmpty()) {
+                        "点击展开 ${thread.totalReplyCount} 条回复"
+                    } else {
+                        "点击展开剩余回复"
+                    }
+                    
                     Text(
-                        text = "查看全部 ${thread.totalReplyCount} 条回复 >",
+                        text = "$label >",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold,

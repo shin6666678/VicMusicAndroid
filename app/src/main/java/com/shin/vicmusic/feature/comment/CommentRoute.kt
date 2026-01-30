@@ -41,7 +41,6 @@ import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.Comment
 import com.shin.vicmusic.core.domain.CommentThread
 import com.shin.vicmusic.core.domain.User
-import com.shin.vicmusic.feature.comment.detail.navigateToCommentDetail
 import com.shin.vicmusic.feature.common.item.ItemCommentThread
 
 @Composable
@@ -72,7 +71,7 @@ fun CommentRoute(
             viewModel.loadComments(resourceType, resourceId)
         },
         onViewMoreRepliesClick = { rootCommentId ->
-            navController.navigateToCommentDetail(rootCommentId, resourceId, resourceType)
+            viewModel.loadMoreReplies(rootCommentId)
         }
     )
 }

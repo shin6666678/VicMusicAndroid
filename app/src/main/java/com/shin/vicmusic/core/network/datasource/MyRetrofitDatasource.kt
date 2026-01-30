@@ -370,8 +370,8 @@ Comment评论
         }
     }
 
-    suspend fun getCommentDetail(id: String): NetworkResponse<CommentDto> {
-        return safeApiCall { service.getCommentDetail(id) }
+    suspend fun getCommentDetail(id: String, page: Int, size: Int): NetworkResponse<CommentDto> {
+        return safeApiCall { service.getCommentDetail(id,page,size) }
     }
 
     suspend fun getFeeds(
