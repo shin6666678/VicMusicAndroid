@@ -30,8 +30,16 @@ fun SongListItemDto.toDomain(): Song {
         likesCount = 0,
         clicksCount = 0,
         commentsCount = 0,
-
         playCount = playCount ?: 0,
+        isCopyright = this.isCopyright != 0,
+        externalUrls = this.externalUrls?.let { 
+            try { 
+                kotlinx.serialization.json.Json.decodeFromString<List<ExternalUrl>>(it) 
+            } catch (e: Exception) { 
+                emptyList() 
+            } 
+        } ?: emptyList(),
+        disclaimer = this.disclaimer ?: ""
     )
 }
 
@@ -54,6 +62,15 @@ fun SongDetailDto.toDomain(): Song {
         likesCount = this.likesCount ?: 0,
         clicksCount = this.clicksCount ?: 0,
         commentsCount = this.commentsCount ?: 0,
+        isCopyright = this.isCopyright != 0,
+        externalUrls = this.externalUrls?.let { 
+            try { 
+                kotlinx.serialization.json.Json.decodeFromString<List<ExternalUrl>>(it) 
+            } catch (e: Exception) { 
+                emptyList() 
+            } 
+        } ?: emptyList(),
+        disclaimer = this.disclaimer ?: ""
     )
 }
 

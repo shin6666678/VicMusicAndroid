@@ -20,5 +20,8 @@ data class SongDetailDto(
     val likesCount: Int?=null,
     val clicksCount: Int?=null,
     val commentsCount: Int?=null,
-    val isLiked: Boolean?=null
+    val isLiked: Boolean?=null,
+    val isCopyright: Int?=null,
+    val externalUrls: String?=null,
+    val disclaimer: String?=null
 )

@@ -152,6 +152,11 @@ class PlayerManager @Inject constructor(
     fun playSong(song: Song, queue: List<Song>? = null) {
         val controller = mediaController ?: return
         scope.launch {
+            if (!song.isCopyright) {
+                _currentPlayingSong.value = song // Set current song so UI can access disclaimer/urls
+                _uiEvent.emit("SHOW_COPYRIGHT_DIALOG")
+                return@launch
+            }
             val newQueue = queue ?: listOf(song)
             val index = newQueue.indexOfFirst { it.id == song.id }
             queueManager.setQueue(newQueue, index)
@@ -167,6 +172,12 @@ class PlayerManager @Inject constructor(
         val controller = mediaController ?: return
         val queue = playbackQueue.value
         if (index in queue.indices) {
+            val song = queue[index]
+            if (!song.isCopyright) {
+                _currentPlayingSong.value = song
+                scope.launch { _uiEvent.emit("SHOW_COPYRIGHT_DIALOG") }
+                return
+            }
             queueManager.updateIndex(index)
             controller.seekToDefaultPosition(index)
             controller.play()
@@ -182,6 +193,11 @@ class PlayerManager @Inject constructor(
             controller.seekTo(0)
             controller.play()
         } else {
+            val currentSong = _currentPlayingSong.value
+            if (currentSong != null && !currentSong.isCopyright && !controller.playWhenReady) {
+                 scope.launch { _uiEvent.emit("SHOW_COPYRIGHT_DIALOG") }
+                 return
+            }
             if (controller.playWhenReady) controller.pause() else controller.play()
         }
     }
@@ -229,6 +245,12 @@ class PlayerManager @Inject constructor(
         override fun onMediaItemTransition(mediaItem: androidx.media3.common.MediaItem?, reason: Int) {
             mediaItem?.mediaId?.let { songId ->
                 val song = playbackQueue.value.find { it.id == songId }
+                if (song != null && !song.isCopyright) {
+                    _currentPlayingSong.value = song
+                    mediaController?.pause()
+                    scope.launch { _uiEvent.emit("SHOW_COPYRIGHT_DIALOG") }
+                    return
+                }
                 val index = playbackQueue.value.indexOf(song)
                 if (index != -1) {
                     queueManager.updateIndex(index)
@@ -260,10 +282,17 @@ class PlayerManager @Inject constructor(
         val currentPos = controller.currentPosition
 
         val currentSong = _currentPlayingSong.value
-        if (currentSong != null && !checkVipPermission(currentSong) && currentPos >= 10000) {
-            if (controller.isPlaying) {
-                controller.pause()
-                if (isSongDetailVisible) scope.launch { _uiEvent.emit("SHOW_VIP_DIALOG") } else skipToNext()
+        if (currentSong != null) {
+            if (!currentSong.isCopyright) {
+                if (controller.isPlaying) {
+                    controller.pause()
+                    scope.launch { _uiEvent.emit("SHOW_COPYRIGHT_DIALOG") }
+                }
+            } else if (!checkVipPermission(currentSong) && currentPos >= 10000) {
+                if (controller.isPlaying) {
+                    controller.pause()
+                    if (isSongDetailVisible) scope.launch { _uiEvent.emit("SHOW_VIP_DIALOG") } else skipToNext()
+                }
             }
         }
 
