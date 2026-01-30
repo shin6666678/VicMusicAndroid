@@ -46,6 +46,22 @@ class FeedRepository @Inject constructor(
         }
     }
 
+    suspend fun getUserFeeds(userId: String, page: Int, size: Int): Result<NetworkPageData<Feed>> {
+        val dtoResponse = datasource.getUserFeeds(userId, page, size)
+
+        return if (dtoResponse.code == 0 && dtoResponse.data != null) {
+            val dtoList = dtoResponse.data.list ?: emptyList()
+            val domainList = dtoList.map { it.toFeed() }
+            val domainData = NetworkPageData(
+                list = domainList,
+                pagination = dtoResponse.data.pagination
+            )
+            Result.Success(domainData)
+        } else {
+            Result.Error(dtoResponse.message ?: "获取用户动态失败")
+        }
+    }
+
     suspend fun publishFeed(req: PublishFeedReq): Result<String> {
         val response = datasource.publishFeed(req)
         return if (response.code == 0) {

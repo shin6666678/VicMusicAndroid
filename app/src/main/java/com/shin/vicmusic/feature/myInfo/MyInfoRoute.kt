@@ -17,10 +17,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Email
@@ -63,9 +63,11 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.shin.vicmusic.core.design.composition.LocalNavController
+import com.shin.vicmusic.core.domain.Feed
 import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.feature.common.MyAsyncImage
 import com.shin.vicmusic.feature.common.icon.VipIcon
+import com.shin.vicmusic.feature.feed.component.FeedItemCard
 import com.shin.vicmusic.feature.myInfo.edit.navigateToMyInfoEdit
 import com.shin.vicmusic.util.copyUriToCache
 
@@ -91,7 +93,14 @@ fun MyInfoPreview() {
             heardCount = 100,
         ),
         onBackClick = {},
-        uiState = MyInfoUiState()
+        uiState = MyInfoUiState(),
+        userFeeds = emptyList(),
+        isFeedLoading = false,
+        isMe = true,
+        snackbarHostState = remember { SnackbarHostState() },
+        onEditClick = {},
+        onFollowClick = {},
+        onBgClick = {}
     )
 }
 
@@ -137,17 +146,26 @@ fun MyInfoRoute(
         return
     }
 
+    val isMe = isLoggedIn == true && (currentUser?.id == uiState.userInfo?.id || uiState.userInfo == null)
+    val displayUserInfo = if (isMe) currentUser else uiState.userInfo
+
     MyInfoScreen(
-        userInfo = currentUser,
+        userInfo = displayUserInfo,
+        userFeeds = uiState.userFeeds,
+        isFeedLoading = uiState.isFeedLoading,
+        isMe = isMe,
         uiState = uiState,
         snackbarHostState = snackbarHostState,
         onBackClick = { navController.popBackStack() },
         onEditClick = navController::navigateToMyInfoEdit,
+        onFollowClick = { displayUserInfo?.id?.let { viewModel.toggleFollow(it) } },
         onBgClick = {
             // 点击背景图触发选择
-            photoPickerLauncher.launch(
-                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-            )
+            if (isMe) {
+                photoPickerLauncher.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                )
+            }
         }
     )
 }
@@ -156,10 +174,14 @@ fun MyInfoRoute(
 @Composable
 fun MyInfoScreen(
     userInfo: UserInfo?,
+    userFeeds: List<Feed>,
+    isFeedLoading: Boolean,
+    isMe: Boolean,
     uiState: MyInfoUiState,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     onBackClick: () -> Unit,
     onEditClick: () -> Unit = {},
+    onFollowClick: () -> Unit = {},
     onBgClick: () -> Unit = {}
 ) {
     Scaffold(
@@ -219,38 +241,69 @@ fun MyInfoScreen(
             }
 
             // 可滚动的内容区域
-            Column(
+            LazyColumn(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .verticalScroll(rememberScrollState())
+                    .fillMaxSize(),
+                contentPadding = PaddingValues(bottom = paddingValues.calculateBottomPadding() + 32.dp)
             ) {
                 if (userInfo == null) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(top = 100.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 300.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
                     }
                 } else {
-                    Column(
-                        modifier = Modifier
-                            .padding(top = 150.dp)
-                            .padding(horizontal = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        UserInfoCard(
-                            user = userInfo,
-                            onEditClick = onEditClick
-                        )
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .padding(top = 200.dp)
+                                .padding(horizontal = 16.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            UserInfoCard(
+                                user = userInfo,
+                                isMe = isMe,
+                                onEditClick = onEditClick,
+                                onFollowClick = onFollowClick
+                            )
 
-                        LevelExperienceCard(user = userInfo)
+                            LevelExperienceCard(user = userInfo)
 
-                        InfoListSection(user = userInfo)
-
-                        Spacer(modifier = Modifier.height(32.dp))
+                            InfoListSection(user = userInfo)
+                            
+                            Text(
+                                text = "动态列表",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(top = 8.dp)
+                            )
+                        }
+                    }
+                    
+                    if (isFeedLoading && userFeeds.isEmpty()) {
+                        item {
+                            Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                            }
+                        }
+                    } else if (userFeeds.isEmpty()) {
+                        item {
+                            Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
+                                Text(text = "暂无动态", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                        }
+                    } else {
+                        items(userFeeds, key = { it.id }) { feed ->
+                            FeedItemCard(
+                                feed = feed,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                            )
+                        }
                     }
                 }
             }
@@ -261,7 +314,9 @@ fun MyInfoScreen(
 @Composable
 private fun UserInfoCard(
     user: UserInfo,
+    isMe: Boolean,
     onEditClick: () -> Unit = {},
+    onFollowClick: () -> Unit = {},
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -324,16 +379,26 @@ private fun UserInfoCard(
                 }
 
                 FilledTonalButton(
-                    onClick = onEditClick,
+                    onClick = if (isMe) onEditClick else onFollowClick,
                     modifier = Modifier.height(32.dp),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
                     shape = CircleShape,
                     colors = ButtonDefaults.filledTonalButtonColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        containerColor = if (isMe || !(user.isFollowing ?: false))
+                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f)
+                        else
+                            MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.7f),
+                        contentColor = if (isMe || !(user.isFollowing ?: false))
+                            MaterialTheme.colorScheme.onPrimaryContainer
+                        else
+                            MaterialTheme.colorScheme.onSecondaryContainer
                     )
                 ) {
-                    Text("编辑资料", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = if (isMe) "编辑资料" else if (user.isFollowing == true) "已关注" else "关注",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
 

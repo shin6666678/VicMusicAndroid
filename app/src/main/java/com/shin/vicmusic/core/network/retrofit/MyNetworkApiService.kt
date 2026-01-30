@@ -64,6 +64,10 @@ interface MyNetworkApiService {
     @POST("/api/user/v1/login")
     suspend fun login(@Body req: UserLoginReq): NetworkResponse<String>
 
+
+    @GET("/api/user/v1/info/{userId}")
+    suspend fun getUserInfoById(@Path("userId") userId: String): NetworkResponse<UserDetailDto>
+
     @GET("/api/user/v1/info")
     suspend fun getUserInfo(): NetworkResponse<UserDetailDto>
 
@@ -356,6 +360,13 @@ interface MyNetworkApiService {
 
     @GET("/api/feed/v1/following")
     suspend fun getFollowingFeeds(
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): NetworkResponse<NetworkPageData<FeedItemDto>>
+
+    @GET("/api/feed/v1/user/{userId}")
+    suspend fun getUserFeeds(
+        @Path("userId") userId: String,
         @Query("page") page: Int,
         @Query("size") size: Int
     ): NetworkResponse<NetworkPageData<FeedItemDto>>

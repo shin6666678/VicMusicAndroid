@@ -26,6 +26,7 @@ import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.feature.common.bar.BarActionItem
 import com.shin.vicmusic.feature.common.bar.BarTabItem
 import com.shin.vicmusic.feature.feed.publish.navigateToPublishFeed
+import com.shin.vicmusic.feature.myInfo.navigateToMyInfo
 import com.shin.vicmusic.util.copyUriToCache
 import kotlinx.coroutines.flow.collectLatest
 
@@ -133,7 +134,7 @@ fun FeedRoute(
         topBarContainerColor = topBarContainerColor,
         topBarSelectTabs = commonTopBarSelectTabs,
         topBarSelectActions = commonTopBarSelectActions,
-        onProfileClick = { /* TODO: Navigate to profile screen */ },
+        onProfileClick = { userId -> navController.navigateToMyInfo(userId) },
         onSongClick = { /* TODO: Navigate to song detail */ },
         onPlaylistClick = { /* TODO: Navigate to playlist detail */ },
         onAlbumClick = { /* TODO: Navigate to album detail */ },
