@@ -98,6 +98,10 @@ class MyRetrofitDatasource @Inject constructor(
     suspend fun getUserInfo(): NetworkResponse<UserDetailDto> {
         return safeApiCall { service.getUserInfo() }
     }
+
+    suspend fun getUserInfoById(userId: String): NetworkResponse<UserDetailDto> {
+        return safeApiCall { service.getUserInfoById(userId) }
+    }
     suspend fun updateUserInfo(
         name: String?=null,
         slogan: String?=null,
@@ -390,6 +394,14 @@ Comment评论
 
     suspend fun publishFeed(req: PublishFeedReq): NetworkResponse<String> {
         return safeApiCall { service.publishFeed(req) }
+    }
+
+    suspend fun getUserFeeds(
+        userId: String,
+        page: Int,
+        size: Int
+    ): NetworkResponse<NetworkPageData<FeedItemDto>> {
+        return safeApiCall { service.getUserFeeds(userId, page, size) }
     }
 
     /*

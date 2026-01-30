@@ -68,4 +68,13 @@ class UserRepository @Inject constructor(
             Result.Error(response.message ?: "更新背景图片失败")
         }
     }
+
+    suspend fun getUserInfo(userId: String): Result<UserInfo> {
+        val response = datasource.getUserInfoById(userId)
+        return if (response.code == 0 && response.data != null) {
+            Result.Success(response.data.toDomain())
+        } else {
+            Result.Error(response.message ?: "获取用户信息失败")
+        }
+    }
 }

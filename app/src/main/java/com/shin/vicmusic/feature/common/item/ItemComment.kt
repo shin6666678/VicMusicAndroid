@@ -39,6 +39,7 @@ fun ItemCommentThread(
     onLikeClick: (commentId: String, rootId: String?) -> Unit,
     onReplyClick: (rootComment: Comment, replyTo: Comment?) -> Unit,
     onViewMoreRepliesClick: (rootCommentId: String) -> Unit,
+    onProfileClick: (userId: String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.padding(vertical = 12.dp)) {
@@ -46,7 +47,8 @@ fun ItemCommentThread(
         CommentContent(
             comment = thread.rootComment,
             onLikeClick = { onLikeClick(thread.rootComment.id, null) },
-            onReplyClick = { onReplyClick(thread.rootComment, null) }
+            onReplyClick = { onReplyClick(thread.rootComment, null) },
+            onProfileClick = onProfileClick
         )
 
         // 2. Render the replies, if any
@@ -57,6 +59,7 @@ fun ItemCommentThread(
                         comment = reply,
                         onLikeClick = { onLikeClick(reply.id, thread.rootComment.id) },
                         onReplyClick = { onReplyClick(thread.rootComment, reply) },
+                        onProfileClick = onProfileClick,
                         isReply = true
                     )
                 }
@@ -92,6 +95,7 @@ private fun CommentContent(
     comment: Comment,
     onLikeClick: () -> Unit,
     onReplyClick: () -> Unit,
+    onProfileClick: (userId: String) -> Unit = {},
     isReply: Boolean = false
 ) {
     Row(
@@ -105,7 +109,8 @@ private fun CommentContent(
             contentDescription = "${comment.user.name}'s avatar",
             modifier = Modifier
                 .size(if (isReply) 28.dp else 40.dp)
-                .clip(CircleShape),
+                .clip(CircleShape)
+                .clickable { onProfileClick(comment.user.id) },
             contentScale = ContentScale.Crop
         )
 

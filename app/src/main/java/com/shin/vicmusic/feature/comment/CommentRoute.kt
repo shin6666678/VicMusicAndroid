@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import com.shin.vicmusic.feature.myInfo.navigateToMyInfo
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
@@ -72,7 +73,8 @@ fun CommentRoute(
         },
         onViewMoreRepliesClick = { rootCommentId ->
             viewModel.loadMoreReplies(rootCommentId)
-        }
+        },
+        onProfileClick = { userId -> navController.navigateToMyInfo(userId) }
     )
 }
 
@@ -84,7 +86,8 @@ fun CommentScreen(
     onLikeClick: (commentId: String, rootId: String?) -> Unit,
     onAddComment: (content: String, parentId: String?) -> Unit,
     onLoadMore: () -> Unit,
-    onViewMoreRepliesClick: (rootCommentId: String) -> Unit
+    onViewMoreRepliesClick: (rootCommentId: String) -> Unit,
+    onProfileClick: (userId: String) -> Unit = {}
 ) {
     var commentText by remember { mutableStateOf("") }
     var replyInfo by remember { mutableStateOf<Pair<Comment, Comment?>?>(null) }
@@ -160,7 +163,8 @@ fun CommentScreen(
                             thread = thread,
                             onLikeClick = onLikeClick,
                             onReplyClick = { root, reply -> replyInfo = Pair(root, reply) },
-                            onViewMoreRepliesClick = onViewMoreRepliesClick
+                            onViewMoreRepliesClick = onViewMoreRepliesClick,
+                            onProfileClick = onProfileClick
                         )
                         Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
                     }
