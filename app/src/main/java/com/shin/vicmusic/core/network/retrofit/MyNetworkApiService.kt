@@ -339,7 +339,11 @@ interface MyNetworkApiService {
     ): NetworkResponse<NetworkPageData<CommentDto>>
 
     @GET("/api/comment/detail")
-    suspend fun getCommentDetail(@Query("id") id: String): NetworkResponse<CommentDto>
+    suspend fun getCommentDetail(
+        @Query("id") id: String,
+        @Query("page") page: Int,
+        @Query("size") size: Int
+    ): NetworkResponse<CommentDto>
 
     /*
     Feed动态
