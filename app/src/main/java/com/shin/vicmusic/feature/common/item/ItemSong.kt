@@ -1,5 +1,6 @@
 package com.shin.vicmusic.feature.common.item
 
+import androidx.annotation.OptIn
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,6 +36,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.media3.common.util.UnstableApi
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
 import com.shin.vicmusic.core.design.composition.LocalSongActionManager
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
@@ -50,6 +52,7 @@ import com.shin.vicmusic.feature.common.sheet.SongActionSheet
 import com.shin.vicmusic.feature.playlist.meList.PlaylistViewModel
 
 // 1. 对外使用的有状态组件 (Stateful)
+@OptIn(UnstableApi::class)
 @Composable
 fun ItemSong(
     song: Song,
@@ -166,14 +169,14 @@ fun ItemSongContent(
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = if (song.isCopyright) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
             )
             Spacer(modifier = Modifier.height(2.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = "${song.artist.name} - ${song.album.title}",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = if (song.isCopyright) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )

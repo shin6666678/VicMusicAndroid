@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.shin.vicmusic.core.design.composition.LocalNavController
@@ -60,6 +61,7 @@ import com.shin.vicmusic.feature.message.messageListScreen
 import com.shin.vicmusic.feature.myInfo.edit.myInfoEditScreen
 import com.shin.vicmusic.feature.myInfo.myInfoScreen
 import com.shin.vicmusic.feature.playBackQueue.PlaybackQueueSheet
+import com.shin.vicmusic.feature.common.dialog.CopyrightDialog
 import com.shin.vicmusic.feature.playlist.detail.playlistDetailScreen
 import com.shin.vicmusic.feature.playlist.meList.myPlaylistScreen
 import com.shin.vicmusic.feature.playlist.publicList.publicPlaylistScreen
@@ -74,6 +76,7 @@ import com.shin.vicmusic.feature.splash.splashScreen
 import com.shin.vicmusic.feature.vip.VIP_ROUTE
 import com.shin.vicmusic.feature.vip.vipScreen
 
+@androidx.annotation.OptIn(UnstableApi::class)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyApp(
@@ -91,12 +94,23 @@ fun MyApp(
     val mainTabState = rememberSaveable { mutableIntStateOf(0) }
     val unreadCount by mainViewModel.unreadCount.collectAsState()
 
+    var showCopyrightDialog by rememberSaveable { mutableStateOf(false) }
+
     // 监听路由变化，自动刷新未读数
     LaunchedEffect(currentRoute) {
         Log.d("MyApp", "currentRoute: $currentRoute")
         val isTopLevel = currentRoute == MAIN_ROUTE
         if (isTopLevel) {
             mainViewModel.refreshUnreadCount()
+        }
+    }
+
+    // 监听全局 UI 事件 (如版权弹窗)
+    LaunchedEffect(playerManager.uiEvent) {
+        playerManager.uiEvent.collect { event ->
+            when (event) {
+                "SHOW_COPYRIGHT_DIALOG" -> showCopyrightDialog = true
+            }
         }
     }
 
@@ -227,6 +241,14 @@ fun MyApp(
                     onClose = { showPlaylistSheet = false },
                 )
             }
+        }
+
+        // 全局版权弹窗
+        if (showCopyrightDialog) {
+            CopyrightDialog(
+                song = currentSong,
+                onDismissRequest = { showCopyrightDialog = false }
+            )
         }
     }
 }
