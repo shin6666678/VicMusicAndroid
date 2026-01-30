@@ -33,7 +33,10 @@ data class Song (
     val duration: Long = 0,
 
     val isLiked: Boolean = false,
-    val playCount:Int=0
+    val playCount:Int=0,
+    val isCopyright: Boolean = true,
+    val externalUrls: List<ExternalUrl> = emptyList(),
+    val disclaimer: String = ""
 ){
     /**
      * 将 Song 转换为 ExoPlayer 需要的 MediaItem
@@ -55,3 +58,6 @@ data class Song (
 }
 @Serializable
 data class LyricLine(val time: Long, val content: String)
+
+@Serializable
+data class ExternalUrl(val name: String, val url: String)

@@ -50,7 +50,15 @@ fun SongInfoSection(song: Song, modifier: Modifier = Modifier, onLikeClick: () -
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.weight(1f)
             )
-            // 假设这里可以有其他信息
+        }
+        if (song.disclaimer.isNotBlank()) {
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = song.disclaimer,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }

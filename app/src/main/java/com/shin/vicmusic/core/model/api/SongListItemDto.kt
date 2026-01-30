@@ -13,5 +13,8 @@ data class SongListItemDto(
     val uri:String?=null,
     val lyric:String?=null,
     val isLiked: Boolean?=null, // 列表接口返回的字段
-    val playCount:Int?=null
+    val playCount:Int?=null,
+    val isCopyright: Int?=null,
+    val externalUrls: String?=null,
+    val disclaimer: String?=null
 )
