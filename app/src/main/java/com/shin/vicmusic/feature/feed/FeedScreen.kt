@@ -40,7 +40,7 @@ fun FeedScreen(
     onSongClick: (String) -> Unit,
     onPlaylistClick: (String) -> Unit,
     onAlbumClick: (String) -> Unit,
-    onLikeClick: (String) -> Unit,
+    onLikeClick: (Feed) -> Unit,
     onCommentClick: (String) -> Unit,
     onBgClick: () -> Unit,
 ) {
@@ -109,7 +109,7 @@ private fun FeedList(
     onSongClick: (String) -> Unit,
     onPlaylistClick: (String) -> Unit,
     onAlbumClick: (String) -> Unit,
-    onLikeClick: (String) -> Unit,
+    onLikeClick: (Feed) -> Unit,
     onCommentClick: (String) -> Unit,
 ) {
     LazyColumn(

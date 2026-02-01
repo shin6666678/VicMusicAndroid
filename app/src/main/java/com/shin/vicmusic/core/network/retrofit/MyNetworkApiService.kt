@@ -320,6 +320,9 @@ interface MyNetworkApiService {
     @GET("api/notify/v1/unread_count")
     suspend fun getUnreadCount(): NetworkResponse<Map<String, Int>>
 
+    @POST("api/notify/v1/page/feed")
+    suspend fun getFeedNotifyPage(@Body req: PageReq): NetworkResponse<NetworkPageData<NotifyDto>>
+
 
     /*
      * 评论相关
@@ -373,6 +376,9 @@ interface MyNetworkApiService {
 
     @POST("/api/feed/v1/publish")
     suspend fun publishFeed(@Body req: PublishFeedReq): NetworkResponse<String>
+
+    @POST("/api/feed/v1/like/{id}")
+    suspend fun likeFeed(@Path("id") id: String): NetworkResponse<Unit>
 
 
     /*

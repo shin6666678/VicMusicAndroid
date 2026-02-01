@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material.ripple.rememberRipple
@@ -27,6 +28,7 @@ import androidx.compose.ui.unit.dp
 fun FeedItemFooter(
     likeCount: Int,
     commentCount: Int,
+    isLiked: Boolean,
     modifier: Modifier = Modifier,
     onLikeClick: () -> Unit = {},
     onCommentClick: () -> Unit = {},
@@ -36,11 +38,12 @@ fun FeedItemFooter(
         horizontalArrangement = Arrangement.SpaceAround, // 保持均勻分佈
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Like Button (自定義組件，不再使用 IconButton)
+        // Like Button
         FeedActionButton(
-            icon = Icons.Default.FavoriteBorder,
+            icon = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
             text = likeCount.toString(),
-            onClick = onLikeClick
+            onClick = onLikeClick,
+            iconTint = if (isLiked) androidx.compose.ui.graphics.Color.Red else MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         // Comment Button
@@ -56,6 +59,7 @@ fun FeedItemFooter(
 private fun FeedActionButton(
     icon: ImageVector,
     text: String,
+    iconTint: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurfaceVariant,
     onClick: () -> Unit
 ) {
     Row(
@@ -72,7 +76,7 @@ private fun FeedActionButton(
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(20.dp),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
+            tint = iconTint
         )
         Spacer(modifier = Modifier.width(4.dp))
         Text(

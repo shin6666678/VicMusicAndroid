@@ -54,6 +54,11 @@ class MessageListViewModel @Inject constructor(
     fun loadNotifications() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
+            val result = notifyRepository.getNotifyPage(1, 20)
+            if (result is MyNetWorkResult.Success) {
+                _uiState.update { it.copy(notifications = result.data.list ?: emptyList()) }
+            }
+            _uiState.update { it.copy(isLoading = false) }
         }
     }
     fun clearUnread(userId: String) {

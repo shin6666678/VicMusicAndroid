@@ -26,12 +26,17 @@ import com.shin.vicmusic.core.model.api.NotifyDto
 import com.shin.vicmusic.feature.common.MyAsyncImage
 
 @Composable
-fun ItemNotify(notify: NotifyDto) {
+fun ItemNotify(
+    notify: NotifyDto,
+    onClick: () -> Unit = {}
+) {
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         ),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(notify.title, fontWeight = FontWeight.Bold)

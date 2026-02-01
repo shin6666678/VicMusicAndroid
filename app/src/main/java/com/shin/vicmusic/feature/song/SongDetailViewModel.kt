@@ -37,7 +37,8 @@ class SongDetailViewModel @Inject constructor(
 
 
     // 从导航参数中获取 songId
-    val songId: String? = savedStateHandle["songId"]
+    var songId: String? = savedStateHandle["songId"]
+        private set
 
     // UI 状态，用于驱动界面显示加载中、成功或失败
     private val _songUiState = MutableStateFlow<SongUiState>(SongUiState.Loading)
@@ -45,12 +46,19 @@ class SongDetailViewModel @Inject constructor(
 
     init {
         // ViewModel 初始化时，检查 songId 是否存在
-        if (songId.isNullOrBlank()) {
-            // 如果 songId 不存在，更新UI状态为错误
-            _songUiState.value = SongUiState.Error("歌曲ID不存在")
-        } else {
+        if (!songId.isNullOrBlank()) {
             // 如果 songId 存在，开始加载歌曲数据
-            loadSongDetail(songId)
+            loadSongDetail(songId!!)
+        }
+    }
+
+    /**
+     * 设置歌曲ID并加载详情 (用于非导航场景，如弹窗)
+     */
+    fun setSongId(id: String) {
+        if (songId != id) {
+            songId = id
+            loadSongDetail(id)
         }
     }
 

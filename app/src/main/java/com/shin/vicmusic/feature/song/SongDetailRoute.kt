@@ -87,6 +87,8 @@ fun SongDetailPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SongDetailRoute(
+    songId: String? = null,
+    onDismiss: () -> Unit,
     viewModel: SongDetailViewModel = hiltViewModel(),
 ) {
     val navController = LocalNavController.current
@@ -99,6 +101,13 @@ fun SongDetailRoute(
     var showVipDialog by remember { mutableStateOf(false) }
     var showShareBottomSheet by remember { mutableStateOf(false) }
     val context = LocalContext.current
+
+    // 如果是通过参数传入的 songId，通知 ViewModel 加载
+    LaunchedEffect(songId) {
+        if (songId != null) {
+            viewModel.setSongId(songId)
+        }
+    }
 
     DisposableEffect(Unit) {
         playerManager.isSongDetailVisible = true
@@ -178,9 +187,9 @@ fun SongDetailRoute(
         ShareBottomSheet(
             onDismiss = { showShareBottomSheet = false },
             onShareToFeed = {
-                val songId = (songUiState as? SongUiState.Success)?.song?.id
-                if (songId != null) {
-                    navController.navigateToPublishFeed(songId, "song")
+                val songIdToShare = (songUiState as? SongUiState.Success)?.song?.id
+                if (songIdToShare != null) {
+                    navController.navigateToPublishFeed(songIdToShare, "song")
                 }
                 showShareBottomSheet = false
             },
@@ -211,7 +220,7 @@ fun SongDetailRoute(
                 playerState = playerState,
                 onTogglePlayPause = playerManager::togglePlayPause,
                 onSeek = playerManager::seekTo,
-                onBackClick = { navController.popBackStack() },
+                onBackClick = onDismiss,
                 onSkipNext = playerManager::skipToNext,
                 onSkipPrevious = playerManager::skipToPrevious,
                 onToggleLike = viewModel::toggleLike,

@@ -1,6 +1,5 @@
 package com.shin.vicmusic.core.data.mapper
 
-import com.shin.vicmusic.core.domain.ActivityType
 import com.shin.vicmusic.core.domain.Feed
 import com.shin.vicmusic.core.domain.ShareableContent
 import com.shin.vicmusic.core.domain.UserActivity
@@ -19,6 +18,8 @@ fun FeedItemDto.toFeed(): Feed {
         UserActivity(
             id = id,
             timestamp = timestamp,
+            likesCount = likeCount ?: 0,
+            isLiked = isLiked ?: false,
             user = user,
             activityType = activityType,
             content = shareableContent
@@ -27,6 +28,8 @@ fun FeedItemDto.toFeed(): Feed {
         UserPost(
             id = id,
             timestamp = timestamp,
+            likesCount = likeCount ?: 0,
+            isLiked = isLiked ?: false,
             user = user,
             content = shareableContent,
             comment = comment

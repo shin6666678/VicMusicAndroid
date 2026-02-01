@@ -75,8 +75,7 @@ import com.shin.vicmusic.feature.rankList.rankList.rankListScreen
 import com.shin.vicmusic.feature.rankList.rankListDetail.rankListDetailScreen
 import com.shin.vicmusic.feature.relationship.relationshipScreen
 import com.shin.vicmusic.feature.search.searchScreen
-import com.shin.vicmusic.feature.song.navigateToSongDetail
-import com.shin.vicmusic.feature.song.songDetailScreen
+import com.shin.vicmusic.feature.song.SongDetailRoute
 import com.shin.vicmusic.feature.splash.SPLASH_ROUTE
 import com.shin.vicmusic.feature.splash.splashScreen
 import com.shin.vicmusic.feature.vip.VIP_ROUTE
@@ -158,8 +157,12 @@ fun MyApp(
 
     // 播放列表弹窗显示状态
     var showPlaylistSheet by rememberSaveable { mutableStateOf(false) }
+    // 歌曲详情弹窗显示状态
+    var showSongDetailSheet by rememberSaveable { mutableStateOf(false) }
+
     // BottomSheet 状态
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val songDetailSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     // 2. 定义位移量
     // 如果是主页 -> 位移 0dp
@@ -178,7 +181,6 @@ fun MyApp(
             splashScreen()
             mainScreen(mainTabState = mainTabState)
             loginScreen()
-            songDetailScreen()
             registerScreen()
             searchScreen()
             artistListScreen()
@@ -227,7 +229,7 @@ fun MyApp(
                         playerState = playerState,
                         onTogglePlayPause = playerManager::togglePlayPause,
                         onPlaylistClick = { showPlaylistSheet = true },
-                        onBarClick = { navController.navigateToSongDetail(currentSong!!.id) },
+                        onBarClick = { showSongDetailSheet = true },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp)
@@ -259,6 +261,22 @@ fun MyApp(
                     onSongClick = playerManager::playAtIndex,
                     onRemoveSong = playerManager::removeSong,
                     onClose = { showPlaylistSheet = false },
+                )
+            }
+        }
+
+        // 歌曲详情弹窗 (Bottom Sheet)
+        if (showSongDetailSheet) {
+            ModalBottomSheet(
+                onDismissRequest = { showSongDetailSheet = false },
+                sheetState = songDetailSheetState,
+                containerColor = MaterialTheme.colorScheme.surface,
+                dragHandle = null,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                SongDetailRoute(
+                    songId = currentSong?.id,
+                    onDismiss = { showSongDetailSheet = false }
                 )
             }
         }

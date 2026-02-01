@@ -5,8 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.CommonRepository // 新增
 import com.shin.vicmusic.core.data.repository.FeedRepository
 import com.shin.vicmusic.core.data.repository.UserRepository // 新增
+import com.shin.vicmusic.core.domain.ArtistUpdate
 import com.shin.vicmusic.core.domain.Feed
 import com.shin.vicmusic.core.domain.MyNetWorkResult
+import com.shin.vicmusic.core.domain.SystemRecommendation
+import com.shin.vicmusic.core.domain.UserActivity
+import com.shin.vicmusic.core.domain.UserPost
 import com.shin.vicmusic.core.manager.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -89,6 +93,37 @@ class FeedViewModel @Inject constructor(
     fun clearMessage() {
         _message.value = null
         _error.value = null
+    }
+
+    fun toggleLike(feed: Feed) {
+        viewModelScope.launch {
+            // Optimistic update
+            updateFeedInState(feed.copy(
+                isLiked = !feed.isLiked,
+                likesCount = if (feed.isLiked) feed.likesCount - 1 else feed.likesCount + 1
+            ))
+
+            val result = feedRepository.toggleLikeFeed(feed.id)
+            if (result is MyNetWorkResult.Error) {
+                updateFeedInState(feed)
+                _error.value = result.message
+            }
+        }
+    }
+
+    private fun updateFeedInState(updatedFeed: Feed) {
+        _discoveryItems.value = _discoveryItems.value.map { if (it.id == updatedFeed.id) updatedFeed else it }
+        _followingItems.value = _followingItems.value.map { if (it.id == updatedFeed.id) updatedFeed else it }
+    }
+
+    // Helper extension for copying Feed (since it's a sealed class)
+    private fun Feed.copy(isLiked: Boolean, likesCount: Int): Feed {
+        return when (this) {
+            is UserPost -> this.copy(isLiked = isLiked, likesCount = likesCount)
+            is UserActivity -> this.copy(isLiked = isLiked, likesCount = likesCount)
+            is ArtistUpdate -> this.copy(isLiked = isLiked, likesCount = likesCount)
+            is SystemRecommendation -> this.copy(isLiked = isLiked, likesCount = likesCount)
+        }
     }
 
     // 复用逻辑：更新背景图

@@ -16,7 +16,9 @@ data class FeedItemDto(
     val comment: String? = null,
     val targetType: String? = null,
     val activityType: ActivityType? = null,
-    val content: FeedContentDto? = null
+    val content: FeedContentDto? = null,
+    val likeCount: Int? = 0,
+    val isLiked: Boolean? = false
 )
 
 @Serializable

@@ -9,6 +9,8 @@ import kotlinx.serialization.Serializable
 sealed class Feed {
     abstract val id: String
     abstract val timestamp: Long
+    abstract val likesCount: Int
+    abstract val isLiked: Boolean
 }
 
 /**
@@ -18,6 +20,8 @@ sealed class Feed {
 data class UserPost(
     override val id: String,
     override val timestamp: Long,
+    override val likesCount: Int = 0,
+    override val isLiked: Boolean = false,
     val user: User,
     val content: ShareableContent?,
     val comment: String?
@@ -30,6 +34,8 @@ data class UserPost(
 data class UserActivity(
     override val id: String,
     override val timestamp: Long,
+    override val likesCount: Int = 0,
+    override val isLiked: Boolean = false,
     val user: User,
     val activityType: ActivityType,
     val content: ShareableContent
@@ -48,6 +54,8 @@ enum class ActivityType(val description: String) {
 data class ArtistUpdate(
     override val id: String,
     override val timestamp: Long,
+    override val likesCount: Int = 0,
+    override val isLiked: Boolean = false,
     val artist: Artist,
     val album: Album
 ) : Feed()
@@ -59,6 +67,8 @@ data class ArtistUpdate(
 data class SystemRecommendation(
     override val id: String,
     override val timestamp: Long,
+    override val likesCount: Int = 0,
+    override val isLiked: Boolean = false,
     val playlist: Playlist
 ) : Feed()
 
