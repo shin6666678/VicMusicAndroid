@@ -1,7 +1,7 @@
 package com.shin.vicmusic.core.data.repository
 
 import android.content.Context
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.model.api.AppUpdateDto
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -27,14 +27,14 @@ class SystemRepository @Inject constructor(
         }
     }
 
-    suspend fun checkAppUpdate(): Result<AppUpdateDto> {
+    suspend fun checkAppUpdate(): MyNetWorkResult<AppUpdateDto> {
         val currentCode = getCurrentVersionCode()
         // 调用 Datasource
         val resp = datasource.checkUpdate(currentCode)
         return if (resp.code == 0 && resp.data != null) {
-            Result.Success(resp.data)
+            MyNetWorkResult.Success(resp.data)
         } else {
-            Result.Error(resp.message ?: "Check update failed")
+            MyNetWorkResult.Error(resp.message ?: "Check update failed")
         }
     }
 

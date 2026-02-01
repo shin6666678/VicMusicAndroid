@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.CommonRepository
 import com.shin.vicmusic.core.data.repository.UserRepository
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.core.manager.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -89,13 +89,13 @@ class MyInfoEditViewModel @Inject constructor(
 
                 // 1. 上传图片到服务器
                 val bgImgUrl = when (val uploadResult = commonRepository.uploadImage(file, "user")) {
-                    is Result.Success -> uploadResult.data // 获取服务器返回的图片 URL
-                    is Result.Error -> throw Exception("背景图上传失败: ${uploadResult.message}")
+                    is MyNetWorkResult.Success -> uploadResult.data // 获取服务器返回的图片 URL
+                    is MyNetWorkResult.Error -> throw Exception("背景图上传失败: ${uploadResult.message}")
                 }
 
                 // 2. 调用独立的更新背景接口
                 val updateResult = userRepository.updateUserBgImg(bgImg = bgImgUrl)
-                if (updateResult is Result.Error) {
+                if (updateResult is MyNetWorkResult.Error) {
                     throw Exception(updateResult.message)
                 }
 
@@ -143,10 +143,10 @@ class MyInfoEditViewModel @Inject constructor(
                     val file = File(currentState.headImg)
                     if (file.exists()) {
                         when (val uploadResult = commonRepository.uploadImage(file, "user")) {
-                            is Result.Success -> {
+                            is MyNetWorkResult.Success -> {
                                 finalHeadImgUrl = uploadResult.data // 拿到服务器生成的 URL
                             }
-                            is Result.Error -> {
+                            is MyNetWorkResult.Error -> {
                                 throw Exception("图片上传失败: ${uploadResult.message}")
                             }
                         }

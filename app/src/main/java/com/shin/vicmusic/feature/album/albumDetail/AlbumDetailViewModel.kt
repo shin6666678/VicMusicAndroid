@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.AlbumRepository
 import com.shin.vicmusic.core.data.repository.LikeRepository
 import com.shin.vicmusic.core.domain.Album
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.model.request.AlbumDetailReq
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,7 +36,7 @@ class AlbumDetailViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             when (val result = albumRepository.getAlbumDetail(AlbumDetailReq(id = albumId))) {
-                is Result.Success -> {
+                is MyNetWorkResult.Success -> {
                     _uiState.update { state ->
                         state.copy(
                             isLoading = false,
@@ -46,7 +46,7 @@ class AlbumDetailViewModel @Inject constructor(
                         )
                     }
                 }
-                is Result.Error -> {
+                is MyNetWorkResult.Error -> {
                     _uiState.update { state ->
                         state.copy(
                             isLoading = false,
@@ -63,7 +63,7 @@ class AlbumDetailViewModel @Inject constructor(
 
         viewModelScope.launch {
             when (val response = likeRepository.toggleLike(currentAlbum.id, 2)) {
-                is Result.Success -> {
+                is MyNetWorkResult.Success -> {
                     val newStatus = response.data
                     _uiState.update { state ->
                         state.copy(
@@ -71,7 +71,7 @@ class AlbumDetailViewModel @Inject constructor(
                         )
                     }
                 }
-                is Result.Error -> {
+                is MyNetWorkResult.Error -> {
                     _uiState.update { it.copy(error = response.message) }
                 }
             }

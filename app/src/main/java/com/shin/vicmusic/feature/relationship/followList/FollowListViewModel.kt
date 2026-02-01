@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.RelationshipRepository
 import com.shin.vicmusic.core.domain.Artist
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.domain.UserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -29,10 +29,10 @@ class FollowListViewModel @Inject constructor(
             isLoading = true
             if (tabIndex == 0) {
                 val res = relationshipRepository.getFollowedUser(0,99)
-                if (res is Result.Success) userList = res.data.items
+                if (res is MyNetWorkResult.Success) userList = res.data.items
             } else {
                 val res = relationshipRepository.getFollowedArtists(0,99)
-                if (res is Result.Success) artistList = res.data.items
+                if (res is MyNetWorkResult.Success) artistList = res.data.items
             }
             isLoading = false
         }

@@ -4,7 +4,7 @@ import com.shin.vicmusic.core.data.mapper.toDomain
 import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.domain.ArtistDetail
 import com.shin.vicmusic.core.domain.PageResult
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.model.request.ArtistDetailReq
 import com.shin.vicmusic.core.model.request.ArtistPageReq
 import com.shin.vicmusic.core.model.response.NetworkPageData
@@ -18,7 +18,7 @@ class ArtistRepository@Inject constructor(
     private val datasource: MyRetrofitDatasource
 ){
     // 透传筛选参数到数据源
-    suspend fun getArtists(artistPageReq: ArtistPageReq): Result<NetworkPageData<Artist>> {
+    suspend fun getArtists(artistPageReq: ArtistPageReq): MyNetWorkResult<NetworkPageData<Artist>> {
         val dtoResponse = datasource.getArtists(artistPageReq)
 
         if (dtoResponse.code == 0 && dtoResponse.data != null) {
@@ -28,12 +28,12 @@ class ArtistRepository@Inject constructor(
                 list = domainList,
                 pagination = dtoResponse.data.pagination
             )
-            return Result.Success(domainData)
+            return MyNetWorkResult.Success(domainData)
         }
-        return Result.Error(dtoResponse.message ?: "未知错误")
+        return MyNetWorkResult.Error(dtoResponse.message ?: "未知错误")
     }
 
-    suspend fun getArtistDetail(artistDetailReq: ArtistDetailReq): Result<ArtistDetail>{
+    suspend fun getArtistDetail(artistDetailReq: ArtistDetailReq): MyNetWorkResult<ArtistDetail>{
         val resp= datasource.getArtistById(artistDetailReq)
         if (resp.code == 0 && resp.data != null) {
             val dto = resp.data
@@ -50,9 +50,9 @@ class ArtistRepository@Inject constructor(
             } else {
                 PageResult(emptyList(), 0, 1, false)
             }
-            return Result.Success(ArtistDetail(artistDomain, songPageResult))
+            return MyNetWorkResult.Success(ArtistDetail(artistDomain, songPageResult))
         }
-        return Result.Error(resp.message ?: "未知错误")
+        return MyNetWorkResult.Error(resp.message ?: "未知错误")
     }
 
 }

@@ -77,6 +77,9 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler) // 使用 KSP 替代 kapt
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.work)
+    ksp(libs.androidx.hilt.compiler)
+    implementation(libs.androidx.work.runtime.ktx)
 
     // Network (Retrofit, OkHttp, Serialization)
     implementation(libs.okhttp)

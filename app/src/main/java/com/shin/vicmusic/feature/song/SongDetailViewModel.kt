@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.LikeRepository
 import com.shin.vicmusic.core.data.repository.SongRepository
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.domain.Song
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -66,13 +66,13 @@ class SongDetailViewModel @Inject constructor(
                 // 2. 发起网络请求获取歌曲详情
                 val result = songRepository.getSongDetail(id)
                 when(result){
-                    is Result.Success->{
+                    is MyNetWorkResult.Success->{
                         result.data.let {
                             // 3. 网络请求成功且数据不为空
                             _songUiState.value = SongUiState.Success(it) // 更新UI状态为成功 // 命令全局 PlayerViewModel 播放这首歌
                         }
                     }
-                    is Result.Error->{
+                    is MyNetWorkResult.Error->{
 
                     }
                 }
@@ -96,7 +96,7 @@ class SongDetailViewModel @Inject constructor(
                 // 发送网络请求
                 val result = likeRepository.toggleLike(currentSong.id,1)
                 when (result) {
-                    is Result.Success -> {
+                    is MyNetWorkResult.Success -> {
                         _songUiState.update {
                             if (it is SongUiState.Success) {
                                 it.copy(song = it.song.copy(isLiked = !it.song.isLiked))
@@ -105,7 +105,7 @@ class SongDetailViewModel @Inject constructor(
                             }
                         }
                     }
-                    is Result.Error -> {
+                    is MyNetWorkResult.Error -> {
 
                     }
                 }

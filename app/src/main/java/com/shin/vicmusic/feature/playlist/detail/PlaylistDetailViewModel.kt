@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.LikeRepository
 import com.shin.vicmusic.core.data.repository.PlaylistRepository
 import com.shin.vicmusic.core.domain.PlaylistDetail
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -32,10 +32,10 @@ class PlaylistDetailViewModel @Inject constructor(
     private fun fetchDetail() {
         viewModelScope.launch {
             when (val res = repository.getPlaylistDetail(playlistId)) {
-                is Result.Success -> {
+                is MyNetWorkResult.Success -> {
                     _detail.value = res.data
                 }
-                is Result.Error -> {
+                is MyNetWorkResult.Error -> {
                 }
             }
         }
@@ -43,7 +43,7 @@ class PlaylistDetailViewModel @Inject constructor(
 
     fun changePublicStatus(id: String) {
         viewModelScope.launch {
-            if (repository.changePublicStatus(id) is Result.Success) {
+            if (repository.changePublicStatus(id) is MyNetWorkResult.Success) {
                 fetchDetail()
             }
         }
@@ -63,7 +63,7 @@ class PlaylistDetailViewModel @Inject constructor(
         viewModelScope.launch {
             // Type 3: Playlist
             when (val result = likeRepository.toggleLike(currentInfo.id, 3)) {
-                is Result.Success -> {
+                is MyNetWorkResult.Success -> {
                     val newStatus = result.data
                     // ⚠️ 修正嵌套 Copy 逻辑错误：
                     // 我们必须更新 _detail (PlaylistDetail)，更新其内部的 info (PlayList)
@@ -73,7 +73,7 @@ class PlaylistDetailViewModel @Inject constructor(
                         )
                     }
                 }
-                is Result.Error -> {
+                is MyNetWorkResult.Error -> {
                     println("Collect failed: ${result.message}")
                 }
             }

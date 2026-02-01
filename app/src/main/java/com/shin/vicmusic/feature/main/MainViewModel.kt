@@ -26,6 +26,13 @@ class MainViewModel @Inject constructor(
 
     init {
         refreshUnreadCount()
+        // 启动轮询，每5秒自动刷新未读数（用于更新角标）
+        viewModelScope.launch {
+            while (true) {
+                kotlinx.coroutines.delay(5000)
+                refreshUnreadCount()
+            }
+        }
     }
 
     fun refreshUnreadCount() {

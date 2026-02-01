@@ -3,7 +3,7 @@ package com.shin.vicmusic.core.data.repository
 import com.shin.vicmusic.core.data.mapper.toDomain
 import com.shin.vicmusic.core.domain.ChatMessage
 import com.shin.vicmusic.core.domain.ChatSession
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.manager.AuthManager
 import com.shin.vicmusic.core.manager.WebSocketManager
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
@@ -45,14 +45,14 @@ class ChatRepository @Inject constructor(
         }
     }
 
-    suspend fun getChatSessions(): Result<List<ChatSession>> {
+    suspend fun getChatSessions(): MyNetWorkResult<List<ChatSession>> {
         val dtoResponse = datasource.getChatSessions()
         if (dtoResponse.code == 0 && dtoResponse.data != null) {
             val dtoList = dtoResponse.data
             val domainList = dtoList.map { it.toDomain()}
-            return Result.Success(domainList)
+            return MyNetWorkResult.Success(domainList)
         }
-        return Result.Error(dtoResponse.message ?: "未知错误")
+        return MyNetWorkResult.Error(dtoResponse.message ?: "未知错误")
 
     }
 }

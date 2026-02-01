@@ -3,7 +3,7 @@ package com.shin.vicmusic.core.data.repository
 import com.shin.vicmusic.core.data.mapper.toDomain
 import com.shin.vicmusic.core.domain.Album
 import com.shin.vicmusic.core.domain.Playlist
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.model.request.LikeReq
 import com.shin.vicmusic.core.model.response.NetworkPageData
@@ -13,7 +13,7 @@ import javax.inject.Inject
 class LikeRepository @Inject constructor(
     private val datasource: MyRetrofitDatasource
 )  {
-    suspend fun likedSongs(): Result<NetworkPageData<Song>> {
+    suspend fun likedSongs(): MyNetWorkResult<NetworkPageData<Song>> {
         val dtoResponse =datasource.likedSongs()
 
         if (dtoResponse.code == 0 && dtoResponse.data != null) {
@@ -23,12 +23,12 @@ class LikeRepository @Inject constructor(
                 list = domainList,
                 pagination = dtoResponse.data.pagination
             )
-            return Result.Success(domainData)
+            return MyNetWorkResult.Success(domainData)
         }
-        return Result.Error(dtoResponse.message ?: "未知错误")
+        return MyNetWorkResult.Error(dtoResponse.message ?: "未知错误")
     }
 
-    suspend fun likedAlbums(): Result<NetworkPageData<Album>> {
+    suspend fun likedAlbums(): MyNetWorkResult<NetworkPageData<Album>> {
         val dtoResponse = datasource.likedAlbums()
         if (dtoResponse.code == 0 && dtoResponse.data != null) {
             val dtoList = dtoResponse.data.list ?: emptyList()
@@ -38,12 +38,12 @@ class LikeRepository @Inject constructor(
                 list = domainList,
                 pagination = dtoResponse.data.pagination
             )
-            return Result.Success(domainData)
+            return MyNetWorkResult.Success(domainData)
         }
-        return Result.Error(dtoResponse.message ?: "获取专辑失败")
+        return MyNetWorkResult.Error(dtoResponse.message ?: "获取专辑失败")
     }
 
-    suspend fun likedPlaylists(): Result<NetworkPageData<Playlist>> {
+    suspend fun likedPlaylists(): MyNetWorkResult<NetworkPageData<Playlist>> {
         val dtoResponse = datasource.likedPlaylists()
         if (dtoResponse.code == 0 && dtoResponse.data != null) {
             val dtoList = dtoResponse.data.list ?: emptyList()
@@ -53,17 +53,17 @@ class LikeRepository @Inject constructor(
                 list = domainList,
                 pagination = dtoResponse.data.pagination
             )
-            return Result.Success(domainData)
+            return MyNetWorkResult.Success(domainData)
         }
-        return Result.Error(dtoResponse.message ?: "获取歌单失败")
+        return MyNetWorkResult.Error(dtoResponse.message ?: "获取歌单失败")
     }
 
-    suspend fun toggleLike(id: String,type:Int): Result<Boolean> {
+    suspend fun toggleLike(id: String,type:Int): MyNetWorkResult<Boolean> {
         val dtoResponse = datasource.toggleLike(LikeReq(id,type))
         if (dtoResponse.code == 0) {
-            return Result.Success(true)
+            return MyNetWorkResult.Success(true)
         }
-        return Result.Error(dtoResponse.message ?: "操作失败")
+        return MyNetWorkResult.Error(dtoResponse.message ?: "操作失败")
     }
 
 }

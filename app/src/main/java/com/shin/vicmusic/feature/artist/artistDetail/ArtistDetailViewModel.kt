@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.ArtistRepository
 import com.shin.vicmusic.core.domain.Artist
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.model.request.ArtistDetailReq
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,7 +36,7 @@ class ArtistDetailViewModel @Inject constructor(
             val result=artistRepository.getArtistDetail(ArtistDetailReq(id = artistId))
             _uiState.update { state ->
                 when (result) {
-                    is Result.Success -> {
+                    is MyNetWorkResult.Success -> {
                         val detail = result.data
                         state.copy(
                             isLoading = false,
@@ -45,7 +45,7 @@ class ArtistDetailViewModel @Inject constructor(
                             error = null
                         )
                     }
-                    is Result.Error -> state.copy(
+                    is MyNetWorkResult.Error -> state.copy(
                         isLoading = false,
                         error = result.message
                     )

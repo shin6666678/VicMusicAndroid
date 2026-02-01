@@ -23,13 +23,15 @@ fun SettingRoute(
     val navController= LocalNavController.current
     SettingScreen(
         onBackClick = navController::popBackStack,
-        onLogoutClick = viewModel::logout
+        onLogoutClick = viewModel::logout,
+        onDebugCheckMessage = viewModel::triggerMessageCheck
     )
 }
 @Composable
 fun SettingScreen(
     onBackClick: () -> Unit={},
-    onLogoutClick: ()->Unit={}
+    onLogoutClick: ()->Unit={},
+    onDebugCheckMessage: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -46,6 +48,7 @@ fun SettingScreen(
             SettingItem(title = "消息通知")
             SettingItem(title = "隐私设置")
             SettingItem(title = "通用")
+            SettingItem(title = "【Debug】立即检查消息", onClick = onDebugCheckMessage)
             HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp), thickness = 8.dp, color = Color.LightGray.copy(0.2f))
             SettingItem(title = "切换账号")
             SettingItem(title = "退出登录", textColor = Color.Red, onClick = onLogoutClick)

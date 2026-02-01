@@ -7,7 +7,7 @@ import com.shin.vicmusic.core.data.repository.FeedRepository
 import com.shin.vicmusic.core.data.repository.SongRepository
 import com.shin.vicmusic.core.data.repository.PlaylistRepository
 import com.shin.vicmusic.core.data.repository.AlbumRepository
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.model.request.AlbumDetailReq
 import com.shin.vicmusic.core.model.request.PublishFeedReq
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -47,21 +47,21 @@ class PublishFeedViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
-            val result = when (targetType) {
+            val myNetWorkResult = when (targetType) {
                 "song" -> songRepository.getSongDetail(targetId)
                 "playlist" -> playlistRepository.getPlaylistDetail(targetId)
                 "album" -> albumRepository.getAlbumDetail(AlbumDetailReq(
                     id = targetId
                 ))
-                else -> Result.Error("不支持的分享类型")
+                else -> MyNetWorkResult.Error("不支持的分享类型")
             }
 
-            when (result) {
-                is Result.Success -> {
-                    _uiState.value = _uiState.value.copy(isLoading = false, sharedContent = result.data)
+            when (myNetWorkResult) {
+                is MyNetWorkResult.Success -> {
+                    _uiState.value = _uiState.value.copy(isLoading = false, sharedContent = myNetWorkResult.data)
                 }
-                is Result.Error -> {
-                    _uiState.value = _uiState.value.copy(isLoading = false, error = result.message)
+                is MyNetWorkResult.Error -> {
+                    _uiState.value = _uiState.value.copy(isLoading = false, error = myNetWorkResult.message)
                 }
             }
         }
@@ -79,10 +79,10 @@ class PublishFeedViewModel @Inject constructor(
                 comment = comment
             )
             when (val result = feedRepository.publishFeed(req)) {
-                is Result.Success -> {
+                is MyNetWorkResult.Success -> {
                     _uiState.value = _uiState.value.copy(isLoading = false, isPublished = true)
                 }
-                is Result.Error -> {
+                is MyNetWorkResult.Error -> {
                     _uiState.value = _uiState.value.copy(isLoading = false, error = result.message)
                 }
             }

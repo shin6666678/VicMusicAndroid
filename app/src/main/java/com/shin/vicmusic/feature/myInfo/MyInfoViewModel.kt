@@ -8,7 +8,7 @@ import com.shin.vicmusic.core.data.repository.FeedRepository
 import com.shin.vicmusic.core.data.repository.RelationshipRepository
 import com.shin.vicmusic.core.data.repository.UserRepository
 import com.shin.vicmusic.core.domain.Feed
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.core.manager.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -69,8 +69,8 @@ class MyInfoViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
             val result = userRepository.getUserInfo(userId)
             when (result) {
-                is Result.Success -> _uiState.update { it.copy(isLoading = false, userInfo = result.data) }
-                is Result.Error -> _uiState.update { it.copy(isLoading = false, error = result.message) }
+                is MyNetWorkResult.Success -> _uiState.update { it.copy(isLoading = false, userInfo = result.data) }
+                is MyNetWorkResult.Error -> _uiState.update { it.copy(isLoading = false, error = result.message) }
             }
         }
     }
@@ -80,8 +80,8 @@ class MyInfoViewModel @Inject constructor(
             _uiState.update { it.copy(isFeedLoading = true) }
             val result = feedRepository.getUserFeeds(userId, 1, 20)
             when (result) {
-                is Result.Success -> _uiState.update { it.copy(isFeedLoading = false, userFeeds = result.data.list ?: emptyList()) }
-                is Result.Error -> _uiState.update { it.copy(isFeedLoading = false, error = result.message) }
+                is MyNetWorkResult.Success -> _uiState.update { it.copy(isFeedLoading = false, userFeeds = result.data.list ?: emptyList()) }
+                is MyNetWorkResult.Error -> _uiState.update { it.copy(isFeedLoading = false, error = result.message) }
             }
         }
     }
@@ -89,14 +89,14 @@ class MyInfoViewModel @Inject constructor(
     fun toggleFollow(userId: String) {
         viewModelScope.launch {
             val result = relationshipRepository.follow(userId, 0) // type 0 = User
-            if (result is Result.Success) {
+            if (result is MyNetWorkResult.Success) {
                 // 刷新用户信息以更新关注状态
                 if (targetUserId != null) {
                     loadTargetUserInfo(targetUserId)
                 } else {
                     authManager.fetchUserInfo()
                 }
-            } else if (result is Result.Error) {
+            } else if (result is MyNetWorkResult.Error) {
                 _uiState.update { it.copy(error = result.message) }
             }
         }
@@ -127,13 +127,13 @@ class MyInfoViewModel @Inject constructor(
                 // 1. 上传图片
                 val uploadResult = commonRepository.uploadImage(file, "user")
                 val finalBgImgUrl = when (uploadResult) {
-                    is Result.Success -> uploadResult.data
-                    is Result.Error -> throw Exception(uploadResult.message ?: "图片上传失败")
+                    is MyNetWorkResult.Success -> uploadResult.data
+                    is MyNetWorkResult.Error -> throw Exception(uploadResult.message ?: "图片上传失败")
                 }
 
                 // 2. 更新用户背景图 (单独接口)
                 val updateResult = userRepository.updateUserBgImg(finalBgImgUrl)
-                if (updateResult is Result.Error) {
+                if (updateResult is MyNetWorkResult.Error) {
                     throw Exception(updateResult.message ?: "更新背景失败")
                 }
 

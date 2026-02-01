@@ -1,17 +1,14 @@
 package com.shin.vicmusic.feature.me
 
-import android.R.id.message
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.PlaylistRepository
 import com.shin.vicmusic.core.data.repository.UserRepository
 import com.shin.vicmusic.core.domain.Playlist
-import com.shin.vicmusic.core.domain.Result
-import com.shin.vicmusic.core.domain.UserInfo
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.manager.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -42,10 +39,10 @@ class MeViewModel @Inject constructor(
         viewModelScope.launch {
             // 这里假设 Repository 会处理 token 等逻辑，或者 API 不需要特殊处理
             when (val result = playlistRepository.getMyPlaylists()) {
-                is Result.Success -> {
+                is MyNetWorkResult.Success -> {
                     _myPlaylists.value = result.data
                 }
-                is Result.Error -> {
+                is MyNetWorkResult.Error -> {
                     // 可以处理错误，比如提示用户
                 }
             }
@@ -56,14 +53,14 @@ class MeViewModel @Inject constructor(
         viewModelScope.launch {
             // 1. 调用 Repository 执行签到请求
             when (val result = userRepository.checkIn()) {
-                is Result.Success -> {
+                is MyNetWorkResult.Success -> {
                     _toastMessage.value = result.data // "签到成功..."
 
                     // 2. 关键步骤：签到成功后，通知 AuthManager 刷新用户信息
                     // 这样 UI 上的积分、经验条、等级才会立即更新
                     authManager.fetchUserInfo()
                 }
-                is Result.Error -> {
+                is MyNetWorkResult.Error -> {
                     _toastMessage.value = result.message
                 }
                 else -> {}

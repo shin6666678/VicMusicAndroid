@@ -7,7 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.RelationshipRepository
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.domain.UserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -25,7 +25,7 @@ class FriendListViewModel @Inject constructor(
         viewModelScope.launch {
             isLoading = true
             val res = relationshipRepository.getFriends(1, 10)
-            if (res is Result.Success) userList = res.data.items
+            if (res is MyNetWorkResult.Success) userList = res.data.items
             Log.d("FriendListViewModel", "loadData: $res")
             isLoading = false
         }

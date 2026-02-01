@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.HistoryRepository
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.domain.Song
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -24,7 +24,7 @@ class RecentPlayViewModel @Inject constructor(
         viewModelScope.launch {
             isLoading = true
             val res = historyRepository.getHistory()
-            if (res is Result.Success) {
+            if (res is MyNetWorkResult.Success) {
                 songList = res.data
             }
             isLoading = false

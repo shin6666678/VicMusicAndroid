@@ -3,7 +3,7 @@ package com.shin.vicmusic.core.data.repository
 import com.shin.vicmusic.core.data.mapper.toDomain
 import com.shin.vicmusic.core.domain.Artist
 import com.shin.vicmusic.core.domain.PageResult
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.core.model.request.FollowReq
 import com.shin.vicmusic.core.network.datasource.MyMockDatasource
@@ -14,7 +14,7 @@ class RelationshipRepository @Inject constructor(
     private val datasource: MyRetrofitDatasource,
     private val mockDatasource: MyMockDatasource
 ) {
-    suspend fun getFollowedUser(page: Int, size: Int): Result<PageResult<UserInfo>> {
+    suspend fun getFollowedUser(page: Int, size: Int): MyNetWorkResult<PageResult<UserInfo>> {
         return try {
             val response = datasource.getFollowedUsers()
             if (response.code == 0 && response.data != null) {
@@ -23,7 +23,7 @@ class RelationshipRepository @Inject constructor(
                 // [Fix] 计算 hasMore
                 val hasMore = (page * size) < total
 
-                Result.Success(
+                MyNetWorkResult.Success(
                     PageResult(
                         items = pageData.list?.map { it.toDomain() } ?: emptyList(),
                         total = total,
@@ -32,13 +32,13 @@ class RelationshipRepository @Inject constructor(
                     )
                 )
             } else {
-                Result.Error(response.message ?: "Unknown error")
+                MyNetWorkResult.Error(response.message ?: "Unknown error")
             }
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Network error")
+            MyNetWorkResult.Error(e.message ?: "Network error")
         }
     }
-    suspend fun getFollowedArtists(page: Int, size: Int): Result<PageResult<Artist>> {
+    suspend fun getFollowedArtists(page: Int, size: Int): MyNetWorkResult<PageResult<Artist>> {
         return try {
             val response = datasource.getFollowedArtists()
             if (response.code == 0 && response.data != null) {
@@ -46,7 +46,7 @@ class RelationshipRepository @Inject constructor(
                 val total = pageData.pagination.total
                 val hasMore = (page * size) < total
 
-                Result.Success(
+                MyNetWorkResult.Success(
                     PageResult(
                         items = pageData.list?.map { it.toDomain() } ?: emptyList(),
                         total = total,
@@ -55,14 +55,14 @@ class RelationshipRepository @Inject constructor(
                     )
                 )
             } else {
-                Result.Error(response.message ?: "Unknown error")
+                MyNetWorkResult.Error(response.message ?: "Unknown error")
             }
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Network error")
+            MyNetWorkResult.Error(e.message ?: "Network error")
         }
     }
 
-    suspend fun getFans(page: Int, size: Int): Result<PageResult<UserInfo>> {
+    suspend fun getFans(page: Int, size: Int): MyNetWorkResult<PageResult<UserInfo>> {
         return try {
             val response = datasource.getFans()
             if (response.code == 0 && response.data != null) {
@@ -71,7 +71,7 @@ class RelationshipRepository @Inject constructor(
                 // [Fix] 计算 hasMore
                 val hasMore = (page * size) < total
 
-                Result.Success(
+                MyNetWorkResult.Success(
                     PageResult(
                         items = pageData.list?.map { it.toDomain() } ?: emptyList(),
                         total = total,
@@ -80,13 +80,13 @@ class RelationshipRepository @Inject constructor(
                     )
                 )
             } else {
-                Result.Error(response.message ?: "Unknown error")
+                MyNetWorkResult.Error(response.message ?: "Unknown error")
             }
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Network error")
+            MyNetWorkResult.Error(e.message ?: "Network error")
         }
     }
-    suspend fun getFriends(page: Int, size: Int): Result<PageResult<UserInfo>> {
+    suspend fun getFriends(page: Int, size: Int): MyNetWorkResult<PageResult<UserInfo>> {
         return try {
             val response = datasource.getFriends()
             if (response.code == 0 && response.data != null) {
@@ -95,7 +95,7 @@ class RelationshipRepository @Inject constructor(
                 // [Fix] 计算 hasMore
                 val hasMore = (page * size) < total
 
-                Result.Success(
+                MyNetWorkResult.Success(
                     PageResult(
                         items = pageData.list?.map { it.toDomain() } ?: emptyList(),
                         total = total,
@@ -104,18 +104,18 @@ class RelationshipRepository @Inject constructor(
                     )
                 )
             } else {
-                Result.Error(response.message ?: "Unknown error")
+                MyNetWorkResult.Error(response.message ?: "Unknown error")
             }
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Network error")
+            MyNetWorkResult.Error(e.message ?: "Network error")
         }
     }
 
-    suspend fun follow(targetId:String,targetType:Int):Result<Unit> {
+    suspend fun follow(targetId:String,targetType:Int):MyNetWorkResult<Unit> {
         val dtoResponse = datasource.follow(FollowReq(targetId,targetType))
         if (dtoResponse.code == 0) {
-            return Result.Success(Unit)
+            return MyNetWorkResult.Success(Unit)
         }
-        return Result.Error(dtoResponse.message ?: "操作失败")
+        return MyNetWorkResult.Error(dtoResponse.message ?: "操作失败")
     }
 }

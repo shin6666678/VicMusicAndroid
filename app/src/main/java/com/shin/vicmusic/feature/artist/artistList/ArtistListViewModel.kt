@@ -7,7 +7,7 @@ import com.shin.vicmusic.core.data.repository.ArtistRepository
 import com.shin.vicmusic.core.data.repository.RelationshipRepository
 import com.shin.vicmusic.core.data.repository.UserRepository
 import com.shin.vicmusic.core.domain.Artist
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.model.request.ArtistPageReq
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,10 +52,10 @@ class ArtistListViewModel @Inject constructor(
                 )
             )
             when(artistsResult){
-                is Result.Success->{
+                is MyNetWorkResult.Success->{
                     _artists.value = artistsResult.data.list?: emptyList()
                 }
-                is Result.Error->{}
+                is MyNetWorkResult.Error->{}
             }
         }
     }
@@ -80,7 +80,7 @@ class ArtistListViewModel @Inject constructor(
         viewModelScope.launch {
             val result=relationshipRepository.follow(artistId, 1)
             when(result){
-                is Result.Success->{
+                is MyNetWorkResult.Success->{
                     // 更新 artist
                     val artist=_artists.value.find { it.id==artistId }
                     if (artist!=null){
@@ -89,7 +89,7 @@ class ArtistListViewModel @Inject constructor(
                         }
                     }
                 }
-                is Result.Error->{
+                is MyNetWorkResult.Error->{
                     Log.d("follow","error")
                 }
             }

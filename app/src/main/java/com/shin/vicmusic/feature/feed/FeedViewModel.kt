@@ -6,14 +6,11 @@ import com.shin.vicmusic.core.data.repository.CommonRepository // 新增
 import com.shin.vicmusic.core.data.repository.FeedRepository
 import com.shin.vicmusic.core.data.repository.UserRepository // 新增
 import com.shin.vicmusic.core.domain.Feed
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.manager.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
@@ -73,7 +70,7 @@ class FeedViewModel @Inject constructor(
             }
 
             when (result) {
-                is Result.Success -> {
+                is MyNetWorkResult.Success -> {
                     if (_selectedTabIndex.value == 0) {
                         _discoveryItems.value = result.data.list ?: emptyList()
                     } else {
@@ -81,7 +78,7 @@ class FeedViewModel @Inject constructor(
                     }
                     _isLoading.value = false
                 }
-                is Result.Error -> {
+                is MyNetWorkResult.Error -> {
                     _error.value = result.message
                     _isLoading.value = false
                 }
@@ -109,13 +106,13 @@ class FeedViewModel @Inject constructor(
                 // 1. 上传图片
                 val uploadResult = commonRepository.uploadImage(file, "user")
                 val finalBgUrl = when(uploadResult) {
-                    is Result.Success -> uploadResult.data
-                    is Result.Error -> throw Exception(uploadResult.message)
+                    is MyNetWorkResult.Success -> uploadResult.data
+                    is MyNetWorkResult.Error -> throw Exception(uploadResult.message)
                 }
 
                 // 2. 更新用户信息
                 val updateResult = userRepository.updateUserBgImg(finalBgUrl)
-                if (updateResult is Result.Error) {
+                if (updateResult is MyNetWorkResult.Error) {
                     throw Exception(updateResult.message)
                 }
 

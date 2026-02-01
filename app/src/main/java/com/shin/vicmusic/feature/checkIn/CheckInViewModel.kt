@@ -3,7 +3,7 @@ package com.shin.vicmusic.feature.checkIn
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.UserRepository
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.manager.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,11 +31,11 @@ class CheckInViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = CheckInUiState.Loading
             when (val result = userRepository.checkIn()) {
-                is Result.Success -> {
+                is MyNetWorkResult.Success -> {
                     _uiState.value = CheckInUiState.Success(result.data)
                     authManager.fetchUserInfo() // 签到成功刷新全局用户状态
                 }
-                is Result.Error -> {
+                is MyNetWorkResult.Error -> {
                     _uiState.value = CheckInUiState.Error(result.message)
                 }
                 else -> {}

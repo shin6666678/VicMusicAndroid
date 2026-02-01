@@ -1,5 +1,11 @@
 package com.shin.vicmusic.ui
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
@@ -111,6 +117,20 @@ fun MyApp(
             when (event) {
                 "SHOW_COPYRIGHT_DIALOG" -> showCopyrightDialog = true
             }
+        }
+    }
+
+    // Android 13+ 请求通知权限
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val permissionLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+            onResult = { isGranted ->
+                Log.d("MyApp", "Notification permission granted: $isGranted")
+            }
+        )
+        // 应用启动时检查并请求权限
+        LaunchedEffect(Unit) {
+            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
 

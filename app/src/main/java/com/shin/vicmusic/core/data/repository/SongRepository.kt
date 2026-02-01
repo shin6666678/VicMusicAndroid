@@ -2,7 +2,7 @@ package com.shin.vicmusic.core.data.repository
 
 import com.shin.vicmusic.core.data.mapper.toDomain
 import com.shin.vicmusic.core.domain.RecommendCard
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.model.api.SongListItemDto
 import com.shin.vicmusic.core.model.request.SongPageReq
@@ -17,7 +17,7 @@ class SongRepository @Inject constructor(
     private val datasource: MyRetrofitDatasource,
     private val mockDatasource: MyMockDatasource
 ) {
-    suspend fun getSongs(pageReq: SongPageReq): Result<NetworkPageData<Song>> {
+    suspend fun getSongs(pageReq: SongPageReq): MyNetWorkResult<NetworkPageData<Song>> {
         val dtoResponse = datasource.songs(pageReq)
 
         // 如果成功，进行数据转换
@@ -30,20 +30,20 @@ class SongRepository @Inject constructor(
                 list = domainList,
                 pagination = dtoResponse.data.pagination
             )
-            return Result.Success(domainData)
+            return MyNetWorkResult.Success(domainData)
         }
         // 失败则原样返回错误信息
-        return Result.Error(dtoResponse.message ?: "未知错误")
+        return MyNetWorkResult.Error(dtoResponse.message ?: "未知错误")
     }
 
     // 歌曲详情
-    suspend fun getSongDetail(id: String): Result<Song> {
+    suspend fun getSongDetail(id: String): MyNetWorkResult<Song> {
         val dtoResponse = datasource.songDetail(id)
 
         if (dtoResponse.code == 0 && dtoResponse.data != null) {
-            return Result.Success(dtoResponse.data.toDomain())
+            return MyNetWorkResult.Success(dtoResponse.data.toDomain())
         }
-        return Result.Error(dtoResponse.message ?: "未知错误")
+        return MyNetWorkResult.Error(dtoResponse.message ?: "未知错误")
     }
 
     suspend fun playSong(id: String) {
@@ -53,23 +53,23 @@ class SongRepository @Inject constructor(
     /**
      * 获取每日推荐
      */
-    suspend fun getDailyRecommendSongs(): Result<List<SongListItemDto>> {
+    suspend fun getDailyRecommendSongs(): MyNetWorkResult<List<SongListItemDto>> {
         val response = datasource.getDailyRecommendSongs()
         return if (response.code == 0 && response.data != null) {
-            Result.Success(response.data)
+            MyNetWorkResult.Success(response.data)
         } else {
-            Result.Error(response.message ?: "未知错误")
+            MyNetWorkResult.Error(response.message ?: "未知错误")
         }
     }
 
-    suspend fun getAlsoListening(): Result<RecommendCard> {
+    suspend fun getAlsoListening(): MyNetWorkResult<RecommendCard> {
         val response = datasource.getAlsoListening()
         // 2. 判断并转换
         return if (response.code == 0 && response.data != null) {
             val domainData = response.data.toDomain()
-            Result.Success(domainData)
+            MyNetWorkResult.Success(domainData)
         } else {
-            Result.Error(response.message ?: "未知错误")
+            MyNetWorkResult.Error(response.message ?: "未知错误")
         }
     }
 

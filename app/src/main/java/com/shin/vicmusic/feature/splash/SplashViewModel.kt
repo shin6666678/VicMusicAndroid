@@ -4,7 +4,7 @@ import android.os.CountDownTimer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.SystemRepository
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.manager.ApkInstaller
 import com.shin.vicmusic.core.manager.VersionManager
 import com.shin.vicmusic.core.model.api.AppUpdateDto
@@ -73,7 +73,7 @@ class SplashViewModel @Inject constructor(
     private fun checkUpdate() {
         viewModelScope.launch {
             val result = systemRepository.checkAppUpdate()
-            if (result is Result.Success && result.data.hasUpdate) {
+            if (result is MyNetWorkResult.Success && result.data.hasUpdate) {
                 _updateState.value = result.data
             } else {
                 startTimer()

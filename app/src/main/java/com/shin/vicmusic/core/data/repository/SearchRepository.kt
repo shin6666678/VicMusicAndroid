@@ -10,23 +10,23 @@ class SearchRepository @Inject constructor(
     private val api: MyNetworkApiService
 ) {
     // 综合搜索
-    suspend fun searchComprehensive(keyword: String): Result<SearchComprehensiveResult> {
+    suspend fun searchComprehensive(keyword: String): MyNetWorkResult<SearchComprehensiveResult> {
         return try {
             val response = api.searchComprehensive(keyword)
             if (response.code == 0 && response.data != null) {
-                Result.Success(response.data!!.toDomain())
+                MyNetWorkResult.Success(response.data!!.toDomain())
             } else {
                 // [Fix] 传入 String
-                Result.Error(response.message ?: "Unknown error")
+                MyNetWorkResult.Error(response.message ?: "Unknown error")
             }
         } catch (e: Exception) {
             // [Fix] 传入 String
-            Result.Error(e.message ?: "Network error")
+            MyNetWorkResult.Error(e.message ?: "Network error")
         }
     }
 
     // 歌曲搜索
-    suspend fun searchSongs(keyword: String, page: Int, size: Int = 20): Result<PageResult<Song>> {
+    suspend fun searchSongs(keyword: String, page: Int, size: Int = 20): MyNetWorkResult<PageResult<Song>> {
         return try {
             val response = api.searchSongs(keyword = keyword, page = page, size = size)
             if (response.code == 0 && response.data != null) {
@@ -35,7 +35,7 @@ class SearchRepository @Inject constructor(
                 // [Fix] 计算 hasMore
                 val hasMore = (page * size) < total
 
-                Result.Success(
+                MyNetWorkResult.Success(
                     PageResult(
                         items = pageData.list?.map { it.toDomain() } ?: emptyList(),
                         total = total,
@@ -44,15 +44,15 @@ class SearchRepository @Inject constructor(
                     )
                 )
             } else {
-                Result.Error(response.message ?: "Unknown error")
+                MyNetWorkResult.Error(response.message ?: "Unknown error")
             }
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Network error")
+            MyNetWorkResult.Error(e.message ?: "Network error")
         }
     }
 
     // 歌单搜索
-    suspend fun searchPlaylists(keyword: String, page: Int, size: Int = 20): Result<PageResult<Playlist>> {
+    suspend fun searchPlaylists(keyword: String, page: Int, size: Int = 20): MyNetWorkResult<PageResult<Playlist>> {
         return try {
             val response = api.searchPlaylists(keyword = keyword, page = page, size = size)
             if (response.code == 0 && response.data != null) {
@@ -60,7 +60,7 @@ class SearchRepository @Inject constructor(
                 val total = pageData.pagination.total
                 val hasMore = (page * size) < total
 
-                Result.Success(
+                MyNetWorkResult.Success(
                     PageResult(
                         items = pageData.list?.map { it.toDomain() } ?: emptyList(),
                         total = total,
@@ -69,15 +69,15 @@ class SearchRepository @Inject constructor(
                     )
                 )
             } else {
-                Result.Error(response.message ?: "Unknown error")
+                MyNetWorkResult.Error(response.message ?: "Unknown error")
             }
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Network error")
+            MyNetWorkResult.Error(e.message ?: "Network error")
         }
     }
 
     // 专辑搜索
-    suspend fun searchAlbums(keyword: String, page: Int, size: Int = 20): Result<PageResult<Album>> {
+    suspend fun searchAlbums(keyword: String, page: Int, size: Int = 20): MyNetWorkResult<PageResult<Album>> {
         return try {
             val response = api.searchAlbums(keyword = keyword, page = page, size = size)
             if (response.code == 0 && response.data != null) {
@@ -85,7 +85,7 @@ class SearchRepository @Inject constructor(
                 val total = pageData.pagination.total
                 val hasMore = (page * size) < total
 
-                Result.Success(
+                MyNetWorkResult.Success(
                     PageResult(
                         items = pageData.list?.map { it.toDomain() } ?: emptyList(),
                         total = total,
@@ -94,15 +94,15 @@ class SearchRepository @Inject constructor(
                     )
                 )
             } else {
-                Result.Error(response.message ?: "Unknown error")
+                MyNetWorkResult.Error(response.message ?: "Unknown error")
             }
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Network error")
+            MyNetWorkResult.Error(e.message ?: "Network error")
         }
     }
 
     // 歌手搜索
-    suspend fun searchArtists(keyword: String, page: Int, size: Int = 20): Result<PageResult<Artist>> {
+    suspend fun searchArtists(keyword: String, page: Int, size: Int = 20): MyNetWorkResult<PageResult<Artist>> {
         return try {
             val response = api.searchArtists(keyword = keyword, page = page, size = size)
             if (response.code == 0 && response.data != null) {
@@ -110,7 +110,7 @@ class SearchRepository @Inject constructor(
                 val total = pageData.pagination.total
                 val hasMore = (page * size) < total
 
-                Result.Success(
+                MyNetWorkResult.Success(
                     PageResult(
                         items = pageData.list?.map { it.toDomain() } ?: emptyList(),
                         total = total,
@@ -119,15 +119,15 @@ class SearchRepository @Inject constructor(
                     )
                 )
             } else {
-                Result.Error(response.message ?: "Unknown error")
+                MyNetWorkResult.Error(response.message ?: "Unknown error")
             }
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Network error")
+            MyNetWorkResult.Error(e.message ?: "Network error")
         }
     }
 
     // 用户搜索
-    suspend fun searchUsers(keyword: String, page: Int, size: Int = 20): Result<PageResult<UserInfo>> {
+    suspend fun searchUsers(keyword: String, page: Int, size: Int = 20): MyNetWorkResult<PageResult<UserInfo>> {
         return try {
             val response = api.searchUsers(keyword = keyword, page = page, size = size)
             if (response.code == 0 && response.data != null) {
@@ -135,7 +135,7 @@ class SearchRepository @Inject constructor(
                 val total = pageData.pagination.total
                 val hasMore = (page * size) < total
 
-                Result.Success(
+                MyNetWorkResult.Success(
                     PageResult(
                         items = pageData.list?.map { it.toDomain() } ?: emptyList(),
                         total = total,
@@ -144,10 +144,10 @@ class SearchRepository @Inject constructor(
                     )
                 )
             } else {
-                Result.Error(response.message ?: "Unknown error")
+                MyNetWorkResult.Error(response.message ?: "Unknown error")
             }
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Network error")
+            MyNetWorkResult.Error(e.message ?: "Network error")
         }
     }
 

@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.ChatRepository
 import com.shin.vicmusic.core.data.repository.NotifyRepository
 import com.shin.vicmusic.core.domain.ChatSession
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.model.api.NotifyDto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,6 +35,16 @@ class MessageListViewModel @Inject constructor(
     init {
         loadNotifications()
         loadChatSessions()
+        startPolling()
+    }
+
+    private fun startPolling() {
+        viewModelScope.launch {
+            while (true) {
+                kotlinx.coroutines.delay(5000) // 每 5 秒轮询一次
+                loadChatSessions()
+            }
+        }
     }
 
     fun switchTab(index: Int) {
@@ -61,10 +71,10 @@ class MessageListViewModel @Inject constructor(
     fun loadChatSessions() {
         viewModelScope.launch {
             when (val result = chatRepository.getChatSessions()) {
-                is Result.Success -> {
+                is MyNetWorkResult.Success -> {
                     _uiState.update { it.copy(chatSessions = result.data) }
                 }
-                is Result.Error -> {
+                is MyNetWorkResult.Error -> {
                 }
             }
             _uiState.update { it.copy(isLoading = false) }
