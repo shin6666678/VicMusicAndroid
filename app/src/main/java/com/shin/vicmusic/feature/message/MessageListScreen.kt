@@ -29,9 +29,9 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.ChatSession
 import com.shin.vicmusic.core.model.api.NotifyDto
+import com.shin.vicmusic.feature.common.bar.CommonTopBar
 import com.shin.vicmusic.feature.common.item.ItemChat
 import com.shin.vicmusic.feature.common.item.ItemNotify
-import com.shin.vicmusic.feature.common.bar.CommonTopBar
 
 @Composable
 fun MessageListRoute(
@@ -112,10 +112,28 @@ fun MessageListScreen(
 
 @Composable
 fun NotificationList(list: List<NotifyDto>) {
+    val navController = LocalNavController.current
     LazyColumn(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        // First item: Dynamic News Entry
+        item {
+            ItemNotify(
+                NotifyDto(
+                    id = 0,
+                    title = "动态消息",
+                    content = "查看动态点赞和评论",
+                    type = 101, // Custom type for Feed Entry
+                    isRead = true,
+                    userId = 0,
+                    createTime = "0"
+                ),
+                onClick = {
+                    navController.navigate("feed_notifications")
+                }
+            )
+        }
         items(list) { msg ->
             ItemNotify(
                 msg

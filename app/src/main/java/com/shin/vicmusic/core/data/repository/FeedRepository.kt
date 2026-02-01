@@ -71,4 +71,13 @@ class FeedRepository @Inject constructor(
             MyNetWorkResult.Error(response.message ?: "发布失败")
         }
     }
+
+    suspend fun toggleLikeFeed(feedId: String): MyNetWorkResult<Unit> {
+        val response = datasource.likeFeed(feedId)
+        return if (response.code == 0) {
+            MyNetWorkResult.Success(Unit)
+        } else {
+            MyNetWorkResult.Error(response.message ?: "操作失败")
+        }
+    }
 }

@@ -334,9 +334,14 @@ class MyRetrofitDatasource @Inject constructor(
     suspend fun checkUpdate(currentCode: Int): NetworkResponse<AppUpdateDto> {
         return safeApiCall { service.checkUpdate(currentCode) }
     }
-
+    /*
+Notify通知
+ */
     suspend fun getNotifyPage(req: PageReq): NetworkResponse<NetworkPageData<NotifyDto>> {
         return safeApiCall { service.getNotifyPage(req) }
+    }
+    suspend fun getFeedNotifyPage(pageReq: PageReq) : NetworkResponse<NetworkPageData<NotifyDto>>{
+        return safeApiCall { service.getFeedNotifyPage(pageReq) }
     }
 
     suspend fun getUnreadCount(): NetworkResponse<Map<String, Int>> {
@@ -378,6 +383,9 @@ Comment评论
         return safeApiCall { service.getCommentDetail(id,page,size) }
     }
 
+    /*
+Feed动态
+ */
     suspend fun getFeeds(
         page: Int,
         size: Int
@@ -394,6 +402,9 @@ Comment评论
 
     suspend fun publishFeed(req: PublishFeedReq): NetworkResponse<String> {
         return safeApiCall { service.publishFeed(req) }
+    }
+    suspend fun likeFeed(feedId: String) : NetworkResponse<Unit>{
+        return safeApiCall { service.likeFeed(feedId) }
     }
 
     suspend fun getUserFeeds(
@@ -418,5 +429,4 @@ Comment评论
         }
         return safeApiCall { service.uploadImage(filePart,flagBody) }
     }
-
 }

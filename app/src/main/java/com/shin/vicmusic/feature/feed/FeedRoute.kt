@@ -138,7 +138,7 @@ fun FeedRoute(
         onSongClick = { /* TODO: Navigate to song detail */ },
         onPlaylistClick = { /* TODO: Navigate to playlist detail */ },
         onAlbumClick = { /* TODO: Navigate to album detail */ },
-        onLikeClick = { /* TODO: Handle like action */ },
+        onLikeClick = viewModel::toggleLike,
         onCommentClick = { /* TODO: Navigate to comment screen */ },
         onBgClick = {
             // 触发图片选择

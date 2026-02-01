@@ -27,7 +27,7 @@ fun FeedItemCard(
     onSongClick: (String) -> Unit = {},
     onPlaylistClick: (String) -> Unit = {},
     onAlbumClick: (String) -> Unit = {},
-    onLikeClick: (String) -> Unit = {},
+    onLikeClick: (Feed) -> Unit = {},
     onCommentClick: (String) -> Unit = {},
 ) {
     Card(
@@ -151,10 +151,11 @@ fun FeedItemCard(
             }
 
             FeedItemFooter(
-                likeCount = likeCount,
-                commentCount = commentCount,
+                likeCount = feed.likesCount,
+                commentCount = commentCount, // Assuming commentCount remains as is or comes from feed
+                isLiked = feed.isLiked,
                 modifier = Modifier.padding(horizontal = 8.dp),
-                onLikeClick = { onLikeClick(contentId) },
+                onLikeClick = { onLikeClick(feed) },
                 onCommentClick = { onCommentClick(contentId) },
             )
         }

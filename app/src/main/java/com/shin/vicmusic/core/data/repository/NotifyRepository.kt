@@ -33,4 +33,16 @@ class NotifyRepository @Inject constructor(
             MyNetWorkResult.Error(result.message?:"")
         }
     }
+
+    /**
+     * 获取动态通知列表（分页）
+     */
+    suspend fun getFeedNotifyPage(page: Int, size: Int): MyNetWorkResult<NetworkPageData<NotifyDto>> {
+        val result = network.getFeedNotifyPage(PageReq(page = page, size = size))
+        return if (result.code == 0 && result.data != null) {
+            MyNetWorkResult.Success(result.data)
+        } else {
+            MyNetWorkResult.Error(result.message?:"")
+        }
+    }
 }
