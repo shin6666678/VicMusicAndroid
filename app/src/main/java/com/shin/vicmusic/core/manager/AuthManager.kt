@@ -2,10 +2,8 @@ package com.shin.vicmusic.core.manager
 
 import com.shin.vicmusic.core.config.AppGlobalData
 import com.shin.vicmusic.core.data.repository.AuthRepository
-import com.shin.vicmusic.core.domain.Result
-import com.shin.vicmusic.core.domain.User
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.domain.UserInfo
-import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -60,12 +58,12 @@ class AuthManager @Inject constructor(
         scope.launch {
             val result =  authRepository.getUserInfo()
             when(result){
-                is Result.Success->{
+                is MyNetWorkResult.Success->{
                     _currentUser.value = result.data
                     // 确保登录状态为 true
                     if (_isLoggedIn.value != true) _isLoggedIn.value = true
                 }
-                is Result.Error->{}
+                is MyNetWorkResult.Error->{}
             }
 
         }

@@ -8,7 +8,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.compose.rememberNavController
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.shin.vicmusic.core.design.composition.LocalAuthManager
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.composition.LocalPlaybackQueueManager
@@ -26,6 +29,7 @@ import com.shin.vicmusic.ui.MyApp
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@UnstableApi
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
@@ -45,6 +49,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        // 初始化后台消息检查任务（WorkManager）
+        scheduleMessageCheckWorker()
 
         splashScreen.setKeepOnScreenCondition {
             !mainViewModel.isReady.value
@@ -66,6 +73,31 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    /**
+     * 设置 WorkManager 定期任务，用于后台私信检查。
+     */
+    private fun scheduleMessageCheckWorker() {
+        // 设置限制条件：必须有网络连接
+        val constraints = androidx.work.Constraints.Builder()
+            .setRequiredNetworkType(androidx.work.NetworkType.CONNECTED)
+            .build()
+
+        // 创建周期性任务请求：每隔 15 分钟运行一次 (WorkManager 最小间隔)
+        val workRequest = PeriodicWorkRequestBuilder<com.shin.vicmusic.core.worker.MessageCheckWorker>(
+            15, java.util.concurrent.TimeUnit.MINUTES
+        )
+            .setConstraints(constraints)
+            .build()
+
+        // 提交任务到 WorkManager
+        // 使用 KEEP 策略，确保任务不会被重复提交
+        WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
+            "MessageCheckWork",
+            androidx.work.ExistingPeriodicWorkPolicy.KEEP,
+            workRequest
+        )
     }
 
     /**

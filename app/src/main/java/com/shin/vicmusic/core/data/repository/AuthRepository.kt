@@ -1,7 +1,7 @@
 package com.shin.vicmusic.core.data.repository
 
 import com.shin.vicmusic.core.data.mapper.toDomain
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.core.model.request.ChangeVIPLevelReq
 import com.shin.vicmusic.core.model.request.UserLoginReq
@@ -22,21 +22,21 @@ class AuthRepository @Inject constructor(
     suspend fun register(req: UserRegisterReq) = datasource.register(req)
 
     // 获取用户信息(Get User Info)
-    suspend fun getUserInfo(): Result<UserInfo> {
+    suspend fun getUserInfo(): MyNetWorkResult<UserInfo> {
         val dtoResponse = datasource.getUserInfo()
         if(dtoResponse.code == 0 && dtoResponse.data != null){
             val domainUser = dtoResponse.data.toDomain()
-            return Result.Success(domainUser)
+            return MyNetWorkResult.Success(domainUser)
         }
-        return Result.Error(dtoResponse.message ?: "未知错误")
+        return MyNetWorkResult.Error(dtoResponse.message ?: "未知错误")
     }
 
     // 修改VIP等级
-    suspend fun changeVipLevel(level: Int): Result<Unit> {
+    suspend fun changeVipLevel(level: Int): MyNetWorkResult<Unit> {
         val dtoResponse = datasource.changeVIPLevel(ChangeVIPLevelReq(level))
         if(dtoResponse.code == 0){
-            return Result.Success(Unit)
+            return MyNetWorkResult.Success(Unit)
         }
-        return Result.Error(dtoResponse.message ?: "修改VIP失败")
+        return MyNetWorkResult.Error(dtoResponse.message ?: "修改VIP失败")
     }
 }

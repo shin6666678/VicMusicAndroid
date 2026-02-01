@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.RankListRepository
 import com.shin.vicmusic.core.domain.RankListDetail
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,10 +29,10 @@ class RankListDetailViewModel @Inject constructor(
         viewModelScope.launch {
             // [修改] 处理 Result<RankListDetail>
             when (val result = rankListRepository.getRankListById(rankListId)) {
-                is Result.Success -> {
+                is MyNetWorkResult.Success -> {
                     _rankListDetail.value = result.data
                 }
-                is Result.Error -> {
+                is MyNetWorkResult.Error -> {
                     // 这里可以处理错误，比如设置一个 error 状态 string
                     // _error.value = result.message
                 }

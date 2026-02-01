@@ -4,7 +4,7 @@ import com.shin.vicmusic.core.data.mapper.toDomain
 import com.shin.vicmusic.core.domain.Album
 import com.shin.vicmusic.core.domain.AlbumDetail
 import com.shin.vicmusic.core.domain.PageResult
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.model.request.AlbumDetailReq
 import com.shin.vicmusic.core.model.request.AlbumPageReq
 import com.shin.vicmusic.core.model.response.NetworkPageData
@@ -14,7 +14,7 @@ import javax.inject.Inject
 class AlbumRepository @Inject constructor(
     private val datasource: MyRetrofitDatasource
 ) {
-    suspend fun getAlbums(pageReq: AlbumPageReq): Result<NetworkPageData<Album>> {
+    suspend fun getAlbums(pageReq: AlbumPageReq): MyNetWorkResult<NetworkPageData<Album>> {
         val dtoResponse=datasource.getAlbums(pageReq)
         if (dtoResponse.code == 0 && dtoResponse.data != null) {
             val dtoList = dtoResponse.data.list ?: emptyList()
@@ -23,13 +23,13 @@ class AlbumRepository @Inject constructor(
                 list = domainList,
                 pagination = dtoResponse.data.pagination
             )
-            return Result.Success(domainData)
+            return MyNetWorkResult.Success(domainData)
         }
-        return Result.Error(dtoResponse.message ?: "未知错误")
+        return MyNetWorkResult.Error(dtoResponse.message ?: "未知错误")
     }
 
 
-    suspend fun getAlbumDetail(albumDetailReq: AlbumDetailReq): Result<AlbumDetail> {
+    suspend fun getAlbumDetail(albumDetailReq: AlbumDetailReq): MyNetWorkResult<AlbumDetail> {
         val resp= datasource.getAlbumById(albumDetailReq)
         if (resp.code == 0 && resp.data != null) {
             val dto = resp.data
@@ -47,9 +47,9 @@ class AlbumRepository @Inject constructor(
                 // 如果后端没返回 songs，给个空页
                 PageResult(emptyList(), 0, 1, false)
             }
-            return Result.Success(AlbumDetail(albumDomain, songPageResult))
+            return MyNetWorkResult.Success(AlbumDetail(albumDomain, songPageResult))
         }
-        return Result.Error(resp.message ?: "未知错误")
+        return MyNetWorkResult.Error(resp.message ?: "未知错误")
     }
 
 }

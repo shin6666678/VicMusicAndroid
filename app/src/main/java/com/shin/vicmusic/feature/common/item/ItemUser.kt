@@ -36,6 +36,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.feature.common.MyAsyncImage
+import com.shin.vicmusic.feature.myInfo.navigateToMyInfo
+import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.feature.relationship.RelationshipViewModel
 
 @Preview(showBackground = true)
@@ -90,13 +92,22 @@ fun ItemUser(
     }
 
     val actualViewModel = viewModel ?: hiltViewModel()
+    val navController = LocalNavController.current
+    
     ItemUserContent(
         user = user,
         modifier = modifier,
         showSlogan = showSlogan,
         showPMButton = showPMButton,
         showFollowStatus = showFollowStatus,
-        onClick = { onItemClick?.invoke(user.id) },
+        onClick = { 
+            // 如果外部传入了点击事件，则执行外部事件；否则默认跳转到用户主页
+            if (onItemClick != null) {
+                onItemClick(user.id)
+            } else {
+                navController.navigateToMyInfo(user.id)
+            }
+        },
         onFollowClick = {
             actualViewModel.toggleFollow(user.id, 0)
         },

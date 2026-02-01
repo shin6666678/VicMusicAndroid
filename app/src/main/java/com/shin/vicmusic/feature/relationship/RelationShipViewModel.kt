@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.RelationshipRepository
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,10 +20,10 @@ class RelationshipViewModel @Inject constructor(
         viewModelScope.launch {
             val result = relationshipRepository.follow(targetId, targetType)
             when (result) {
-                is Result.Success -> {
+                is MyNetWorkResult.Success -> {
                     // 成功逻辑
                 }
-                is Result.Error -> {
+                is MyNetWorkResult.Error -> {
                     Log.d("follow", "error")
                 }
             }

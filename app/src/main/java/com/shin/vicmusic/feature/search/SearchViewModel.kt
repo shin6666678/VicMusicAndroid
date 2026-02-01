@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.SearchRepository
 import com.shin.vicmusic.core.domain.*
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.manager.SearchHistoryManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -92,10 +92,10 @@ class SearchViewModel @Inject constructor(
 
             if (tab == SearchTab.COMPREHENSIVE) {
                 when (val result = searchRepository.searchComprehensive(query)) {
-                    is Result.Success -> {
+                    is MyNetWorkResult.Success -> {
                         _uiState.update { it.copy(isLoading = false, comprehensiveResult = result.data) }
                     }
-                    is Result.Error -> {
+                    is MyNetWorkResult.Error -> {
                         _uiState.update { it.copy(isLoading = false, error = result.message) }
                     }
                 }
@@ -121,13 +121,13 @@ class SearchViewModel @Inject constructor(
     }
 
     // [Fix] 添加 <T : Any> 约束，确保 List<T> 可以赋值给 List<Any>
-    private fun <T : Any> handleResult(result: Result<PageResult<T>>) {
-        when (result) {
-            is Result.Success -> {
-                _uiState.update { it.copy(isLoading = false, listResult = result.data.items) }
+    private fun <T : Any> handleResult(myNetWorkResult: MyNetWorkResult<PageResult<T>>) {
+        when (myNetWorkResult) {
+            is MyNetWorkResult.Success -> {
+                _uiState.update { it.copy(isLoading = false, listResult = myNetWorkResult.data.items) }
             }
-            is Result.Error -> {
-                _uiState.update { it.copy(isLoading = false, error = result.message) }
+            is MyNetWorkResult.Error -> {
+                _uiState.update { it.copy(isLoading = false, error = myNetWorkResult.message) }
             }
         }
     }

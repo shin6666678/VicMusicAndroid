@@ -1,9 +1,8 @@
 package com.shin.vicmusic.core.data.repository
 
 import com.shin.vicmusic.core.data.mapper.toDomain
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.domain.UserInfo
-import com.shin.vicmusic.core.model.request.FollowReq
 import com.shin.vicmusic.core.network.datasource.MyRetrofitDatasource
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -15,27 +14,27 @@ class UserRepository @Inject constructor(
 
 
     // 签到 (Check-in)
-    suspend fun checkIn(): Result<String> {
+    suspend fun checkIn(): MyNetWorkResult<String> {
         val response = datasource.checkIn()
         return if (response.code == 0) {
             // 成功时返回消息 (Return message on success)
-            Result.Success(response.data.toString()) // 实际上 data 可能是 null，这里取 msg 更好，但在 Result 封装里通常 Success 携带数据
+            MyNetWorkResult.Success(response.data.toString()) // 实际上 data 可能是 null，这里取 msg 更好，但在 Result 封装里通常 Success 携带数据
             // 这里为了简单，我们假设 ViewModel 会重新拉取用户信息
             // 或者我们可以修改 NetworkResponse 解析逻辑
             // 简单处理：
-            Result.Success("签到成功")
+            MyNetWorkResult.Success("签到成功")
         } else {
-            Result.Error(response.message?:"签到失败")
+            MyNetWorkResult.Error(response.message?:"签到失败")
         }
     }
 
     // 上报时长 (Report duration)
-    suspend fun reportDuration(seconds: Int): Result<Unit> {
+    suspend fun reportDuration(seconds: Int): MyNetWorkResult<Unit> {
         val response = datasource.reportDuration(seconds)
         return if (response.code == 0) {
-            Result.Success(Unit)
+            MyNetWorkResult.Success(Unit)
         } else {
-            Result.Error(response.message?:"上报时长失败")
+            MyNetWorkResult.Error(response.message?:"上报时长失败")
         }
     }
     suspend fun updateUserInfo(
@@ -43,7 +42,7 @@ class UserRepository @Inject constructor(
         slogan: String?,
         sex: Int?,
         headImg: String?,
-    ): Result<Unit>{
+    ): MyNetWorkResult<Unit>{
         val response = datasource.updateUserInfo(
             name=name,
             slogan=slogan,
@@ -51,30 +50,30 @@ class UserRepository @Inject constructor(
             headImg=headImg,
         )
         return if (response.code == 0) {
-            Result.Success(Unit)
+            MyNetWorkResult.Success(Unit)
         } else {
-            Result.Error(response.message?:"更新用户信息失败")
+            MyNetWorkResult.Error(response.message?:"更新用户信息失败")
         }
     }
     suspend fun updateUserBgImg(
         bgImg: String?
-    ): Result<Unit> {
+    ): MyNetWorkResult<Unit> {
         val response = datasource.updateUserInfo(
             bgImg=bgImg
         )
         return if (response.code == 0) {
-            Result.Success(Unit)
+            MyNetWorkResult.Success(Unit)
         } else {
-            Result.Error(response.message ?: "更新背景图片失败")
+            MyNetWorkResult.Error(response.message ?: "更新背景图片失败")
         }
     }
 
-    suspend fun getUserInfo(userId: String): Result<UserInfo> {
+    suspend fun getUserInfo(userId: String): MyNetWorkResult<UserInfo> {
         val response = datasource.getUserInfoById(userId)
         return if (response.code == 0 && response.data != null) {
-            Result.Success(response.data.toDomain())
+            MyNetWorkResult.Success(response.data.toDomain())
         } else {
-            Result.Error(response.message ?: "获取用户信息失败")
+            MyNetWorkResult.Error(response.message ?: "获取用户信息失败")
         }
     }
 }

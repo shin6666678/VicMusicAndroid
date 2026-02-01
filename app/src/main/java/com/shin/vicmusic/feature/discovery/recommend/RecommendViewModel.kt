@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.SongRepository
 import com.shin.vicmusic.core.domain.RecommendCard
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.core.manager.AuthManager
 import com.shin.vicmusic.core.model.api.SongListItemDto
@@ -44,17 +44,17 @@ class RecommendViewModel @Inject constructor(
     private fun fetchDailyRecommendSongs() {
         viewModelScope.launch {
             when(val result=songRepository.getDailyRecommendSongs()){
-                is Result.Success->{
+                is MyNetWorkResult.Success->{
                     _dailyRecommendSongs.value = result.data
                 }
-                is Result.Error->{}
+                is MyNetWorkResult.Error->{}
             }
         }
     }
     private fun fetchAlsoListening() {
         viewModelScope.launch {
             val result = songRepository.getAlsoListening()
-            if (result is Result.Success) {
+            if (result is MyNetWorkResult.Success) {
                 _recommendCard.value = result.data
             }
         }

@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.LikeRepository
 import com.shin.vicmusic.core.data.repository.SongRepository
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.manager.AuthManager
 import com.shin.vicmusic.core.model.request.SongPageReq
@@ -44,7 +44,7 @@ class DiscoveryViewModel @Inject constructor(
             try {
                 val result = songRepository.getSongs(SongPageReq(page = currentPage, size = pageSize))
                 when(result){
-                    is Result.Success->{
+                    is MyNetWorkResult.Success->{
                         val newSongs = result.data.list ?: emptyList()
                         if (newSongs.size < pageSize) {
                             isLastPage = true
@@ -59,7 +59,7 @@ class DiscoveryViewModel @Inject constructor(
                             currentPage++
                         }
                     }
-                     is Result.Error->{}
+                     is MyNetWorkResult.Error->{}
                 }
 
             } catch (e: Exception) {
@@ -82,14 +82,14 @@ class DiscoveryViewModel @Inject constructor(
         viewModelScope.launch {
             val result = likeRepository.toggleLike(song.id,1)
             when(result){
-                is Result.Success->{
+                is MyNetWorkResult.Success->{
                     _datum.update { list ->
                         list.map { item ->
                             if (item.id == song.id) item.copy(isLiked = !item.isLiked) else item
                         }
                     }
                 }
-                is Result.Error->{}
+                is MyNetWorkResult.Error->{}
             }
         }
     }

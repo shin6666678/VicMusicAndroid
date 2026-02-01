@@ -1,7 +1,7 @@
 package com.shin.vicmusic.core.manager
 
 import com.shin.vicmusic.core.data.repository.LikeRepository
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.domain.Song
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +33,7 @@ class SongActionManager @Inject constructor(
             val result = likeRepository.toggleLike(song.id,1)
 
             // 3. 如果失败，回滚状态
-            if (result is Result.Error) {
+            if (result is MyNetWorkResult.Error) {
                 _songUpdateEvent.emit(song) // 发回原始状态
             }
         }

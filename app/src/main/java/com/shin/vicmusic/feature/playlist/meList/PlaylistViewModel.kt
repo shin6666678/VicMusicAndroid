@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.PlaylistRepository
 import com.shin.vicmusic.core.domain.Playlist
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,7 +23,7 @@ class PlaylistViewModel @Inject constructor(
     fun fetchMyPlaylists() {
         viewModelScope.launch {
             val resp=repository.getMyPlaylists()
-            if (resp is Result.Success) {
+            if (resp is MyNetWorkResult.Success) {
                 _playlists.value = resp.data
             }
         }
@@ -38,7 +38,7 @@ class PlaylistViewModel @Inject constructor(
     fun createPlaylist(name: String, description: String? = null, cover: File? = null) {
         viewModelScope.launch {
             val result = repository.addPlaylist(name, description, cover)
-            if (result is Result.Success) {
+            if (result is MyNetWorkResult.Success) {
                 fetchMyPlaylists() // Refresh list
             }
         }
@@ -47,7 +47,7 @@ class PlaylistViewModel @Inject constructor(
     fun updatePlaylist(id: String, name: String, description: String? = null, cover: File? = null) {
         viewModelScope.launch {
             val result = repository.updatePlaylist(id, name, description, cover)
-            if (result is Result.Success) {
+            if (result is MyNetWorkResult.Success) {
                 fetchMyPlaylists() // Refresh list
             }
         }

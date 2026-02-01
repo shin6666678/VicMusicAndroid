@@ -2,9 +2,10 @@ package com.shin.vicmusic.feature.comment
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.shin.vicmusic.core.common.AppConstants
 import com.shin.vicmusic.core.data.repository.CommentRepository
 import com.shin.vicmusic.core.domain.CommentThread
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.model.request.CommentAddReq
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,7 +39,7 @@ class CommentViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
 
             when (val result = commentRepository.getComments(resourceType, resourceId, "all", currentPage, 20)) {
-                is Result.Success -> {
+                is MyNetWorkResult.Success -> {
                     val newThreads = result.data.list ?: emptyList()
                     val pagination = result.data.pagination
                     val currentThreads = if (isRefresh) emptyList() else _uiState.value.comments
@@ -50,7 +51,7 @@ class CommentViewModel @Inject constructor(
                         hasMore = pagination.page < pagination.pages
                     )
                 }
-                is Result.Error -> {
+                is MyNetWorkResult.Error -> {
                     _uiState.value = _uiState.value.copy(isLoading = false, error = result.message)
                 }
             }
@@ -62,11 +63,11 @@ class CommentViewModel @Inject constructor(
         viewModelScope.launch {
             val req = CommentAddReq(resourceType, resourceId, content, parentId)
             when (commentRepository.addComment(req)) {
-                is Result.Success -> {
+                is MyNetWorkResult.Success -> {
                     // 成功后刷新列表
                     loadComments(resourceType, resourceId, isRefresh = true)
                 }
-                is Result.Error -> {
+                is MyNetWorkResult.Error -> {
                     _uiState.value = _uiState.value.copy(error = "评论失败，请重试")
                 }
             }
@@ -79,7 +80,7 @@ class CommentViewModel @Inject constructor(
         
         viewModelScope.launch {
             when (val result = commentRepository.getCommentDetail(rootCommentId, currentPage, 5)) {
-                is Result.Success -> {
+                is MyNetWorkResult.Success -> {
                     val newReplies = result.data.allReplies
                     val updatedComments = _uiState.value.comments.map { thread ->
                         if (thread.rootComment.id == rootCommentId) {
@@ -103,7 +104,7 @@ class CommentViewModel @Inject constructor(
                         replyPages = updatedReplyPages
                     )
                 }
-                is Result.Error -> {
+                is MyNetWorkResult.Error -> {
                     _uiState.value = _uiState.value.copy(error = "加载回复失败: ${result.message}")
                 }
             }
@@ -114,8 +115,8 @@ class CommentViewModel @Inject constructor(
     fun toggleLike(commentId: String, rootCommentId: String? = null) {
         viewModelScope.launch {
             when (val result = commentRepository.likeComment(commentId)) {
-                is Result.Success -> {
-                    val newStatus = result.data == 1 // 1 是点赞, 0 是取消
+                is MyNetWorkResult.Success -> {
+                    val newStatus = result.data == AppConstants.LIKE_STATUS_LIKED // 1 是点赞, 0 是取消
                     val updatedComments = _uiState.value.comments.map { thread ->
                         if (rootCommentId == null && thread.rootComment.id == commentId) {
                             // It's a root comment
@@ -145,7 +146,7 @@ class CommentViewModel @Inject constructor(
                     }
                     _uiState.value = _uiState.value.copy(comments = updatedComments)
                 }
-                is Result.Error -> {
+                is MyNetWorkResult.Error -> {
                     _uiState.value = _uiState.value.copy(error = "操作失败")
                 }
             }

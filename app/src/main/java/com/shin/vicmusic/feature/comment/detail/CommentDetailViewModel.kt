@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.CommentRepository
 import com.shin.vicmusic.core.domain.CommentDetail
-import com.shin.vicmusic.core.domain.Result
+import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.model.request.CommentAddReq
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,10 +44,10 @@ class CommentDetailViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             when (val result = commentRepository.getCommentDetail(commentId)) {
-                is Result.Success -> {
+                is MyNetWorkResult.Success -> {
                     _uiState.value = CommentDetailUiState(commentDetail = result.data, isLoading = false)
                 }
-                is Result.Error -> {
+                is MyNetWorkResult.Error -> {
                     _uiState.value = CommentDetailUiState(error = result.message, isLoading = false)
                 }
             }
@@ -67,11 +67,11 @@ class CommentDetailViewModel @Inject constructor(
         viewModelScope.launch {
             val req = CommentAddReq(resourceType, resourceId, content, parentId)
             when (commentRepository.addComment(req)) {
-                is Result.Success -> {
+                is MyNetWorkResult.Success -> {
                     // Refresh the detail list after successfully adding a comment
                     loadCommentDetail(isRefresh = true)
                 }
-                is Result.Error -> {
+                is MyNetWorkResult.Error -> {
                     _uiState.value = _uiState.value.copy(error = "评论失败，请重试")
                 }
             }
