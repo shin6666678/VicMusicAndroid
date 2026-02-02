@@ -18,6 +18,7 @@ import com.shin.vicmusic.core.domain.UserActivity
 import com.shin.vicmusic.core.domain.UserPost
 import com.shin.vicmusic.feature.common.item.ItemAlbum
 import com.shin.vicmusic.feature.common.item.ItemPlaylist
+import com.shin.vicmusic.feature.common.item.ItemSong
 import com.shin.vicmusic.feature.common.item.ItemSongContent
 import com.shin.vicmusic.feature.common.item.ItemText
 
@@ -42,9 +43,8 @@ fun FeedItemBody(
                 // 2. 显示分享的具体内容 (歌曲或歌单)
                 when (val content = feed.content) {
                     is ShareableContent.SharedSong -> {
-                        ItemSongContent(
+                        ItemSong(
                             song = content.song,
-                            onPlayClick = { onSongClick(content.song.id) }
                         )
                     }
                     is ShareableContent.SharedPlaylist -> {
