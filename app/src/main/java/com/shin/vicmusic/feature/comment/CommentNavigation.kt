@@ -22,8 +22,6 @@ fun NavGraphBuilder.commentScreen() {
         val resourceId = backStackEntry.arguments?.getString("resourceId") ?: ""
         val resourceType = backStackEntry.arguments?.getString("resourceType") ?: ""
 
-        // 调用该路由对应的 Composable
-        CommentRoute(resourceId = resourceId, resourceType = resourceType)
     }
 }
 
