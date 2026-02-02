@@ -161,8 +161,6 @@ fun MyApp(
     var showPlaylistSheet by rememberSaveable { mutableStateOf(false) }
     // 歌曲详情弹窗显示状态
     var showSongDetailSheet by rememberSaveable { mutableStateOf(false) }
-    // 评论弹窗（覆盖层）参数
-    var commentOverlayArgs by rememberSaveable { mutableStateOf<Pair<String, String>?>(null) }
 
     // BottomSheet 状态
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -279,11 +277,7 @@ fun MyApp(
             ) {
                 SongDetailRoute(
                     songId = currentSong?.id,
-                    onDismiss = { showSongDetailSheet = false },
-                    onNavigateToComment = { resourceId, resourceType ->
-                        // showSongDetailSheet = false // Do NOT close the sheet
-                        commentOverlayArgs = resourceId to resourceType
-                    }
+                    onDismiss = { showSongDetailSheet = false }
                 )
             }
         }
@@ -294,23 +288,6 @@ fun MyApp(
                 song = currentSong,
                 onDismissRequest = { showCopyrightDialog = false }
             )
-        }
-
-        // Comment Overlay (Stacked Bottom Sheet)
-        if (commentOverlayArgs != null) {
-             ModalBottomSheet(
-                onDismissRequest = { commentOverlayArgs = null },
-                sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-                containerColor = MaterialTheme.colorScheme.background,
-                dragHandle = null,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                 com.shin.vicmusic.feature.comment.CommentRoute(
-                    resourceId = commentOverlayArgs!!.first,
-                    resourceType = commentOverlayArgs!!.second,
-                    onBackClick = { commentOverlayArgs = null }
-                )
-            }
         }
     }
 }
