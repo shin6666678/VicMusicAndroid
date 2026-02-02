@@ -1,6 +1,13 @@
 package com.shin.vicmusic.feature.song
 
 import android.util.Log
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -39,6 +46,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,7 +64,7 @@ import com.shin.vicmusic.core.design.composition.LocalPlayerManager
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.manager.PlayerState
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONG
-import com.shin.vicmusic.feature.comment.navigateToComment
+import com.shin.vicmusic.feature.comment.CommentRoute
 import com.shin.vicmusic.feature.common.bar.BarActionItem
 import com.shin.vicmusic.feature.common.bar.CommonTopBarSelect
 import com.shin.vicmusic.feature.feed.publish.navigateToPublishFeed
@@ -89,7 +97,6 @@ fun SongDetailPreview() {
 fun SongDetailRoute(
     songId: String? = null,
     onDismiss: () -> Unit,
-    onNavigateToComment: (String, String) -> Unit,
     viewModel: SongDetailViewModel = hiltViewModel(),
 ) {
     val navController = LocalNavController.current
@@ -101,6 +108,12 @@ fun SongDetailRoute(
 
     var showVipDialog by remember { mutableStateOf(false) }
     var showShareBottomSheet by remember { mutableStateOf(false) }
+
+    var showComments by rememberSaveable { mutableStateOf(false) }
+    BackHandler(enabled = showComments) {
+        showComments = false
+    }
+
     val context = LocalContext.current
 
     // 如果是通过参数传入的 songId，通知 ViewModel 加载
@@ -216,20 +229,44 @@ fun SongDetailRoute(
                 uiState.song
             }
 
-            SongDetailScreen(
-                song = displaySong,
-                playerState = playerState,
-                onTogglePlayPause = playerManager::togglePlayPause,
-                onSeek = playerManager::seekTo,
-                onBackClick = onDismiss,
-                onSkipNext = playerManager::skipToNext,
-                onSkipPrevious = playerManager::skipToPrevious,
-                onToggleLike = viewModel::toggleLike,
-                onCommentClick = {
-                    onNavigateToComment(displaySong.id, "song")
+            AnimatedContent(
+                targetState = showComments,
+                transitionSpec = {
+                    if (targetState) {
+                        (slideInHorizontally { width -> width } + fadeIn()) togetherWith
+                                (slideOutHorizontally { width -> -width } + fadeOut())
+                    } else {
+                        (slideInHorizontally { width -> -width } + fadeIn()) togetherWith
+                                (slideOutHorizontally { width -> width } + fadeOut())
+                    }
                 },
-                onShareClick = { showShareBottomSheet = true }
-            )
+                label = "SongDetailContent"
+            ) { isCommentVisible ->
+                if (isCommentVisible) {
+                    Box(modifier = Modifier.fillMaxSize().background(Color(0xFF1C1C1E))) {
+                         CommentRoute(
+                             resourceId = displaySong.id,
+                             resourceType = "song",
+                             onBackClick = { showComments = false }
+                         )
+                    }
+                } else {
+                    SongDetailScreen(
+                        song = displaySong,
+                        playerState = playerState,
+                        onTogglePlayPause = playerManager::togglePlayPause,
+                        onSeek = playerManager::seekTo,
+                        onBackClick = onDismiss,
+                        onSkipNext = playerManager::skipToNext,
+                        onSkipPrevious = playerManager::skipToPrevious,
+                        onToggleLike = viewModel::toggleLike,
+                        onCommentClick = {
+                             showComments = true
+                        },
+                        onShareClick = { showShareBottomSheet = true }
+                    )
+                }
+            }
         }
 
         is SongUiState.Error -> {
