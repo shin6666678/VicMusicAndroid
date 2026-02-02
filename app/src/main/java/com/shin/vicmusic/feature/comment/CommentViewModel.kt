@@ -111,43 +111,59 @@ class CommentViewModel @Inject constructor(
         }
     }
 
-    // 点赞评论
+    // 点赞评论 (乐观更新)
     fun toggleLike(commentId: String, rootCommentId: String? = null) {
+        val oldComments = _uiState.value.comments
+        
+        // 1. 立即在本地执行乐观更新
+        val optimisticComments = oldComments.map { thread ->
+            if (rootCommentId == null && thread.rootComment.id == commentId) {
+                // Root comment
+                val oldStatus = thread.rootComment.isLiked
+                val newStatus = !oldStatus
+                thread.copy(
+                    rootComment = thread.rootComment.copy(
+                        isLiked = newStatus,
+                        likeCount = (if (newStatus) thread.rootComment.likeCount + 1 else thread.rootComment.likeCount - 1).coerceAtLeast(0)
+                    )
+                )
+            } else if (rootCommentId != null && (thread.rootComment.id == rootCommentId || thread.replies.any { it.id == commentId })) {
+                // Reply
+                thread.copy(
+                    replies = thread.replies.map { reply ->
+                        if (reply.id == commentId) {
+                            val oldStatus = reply.isLiked
+                            val newStatus = !oldStatus
+                            reply.copy(
+                                isLiked = newStatus,
+                                likeCount = (if (newStatus) reply.likeCount + 1 else reply.likeCount - 1).coerceAtLeast(0)
+                            )
+                        } else {
+                            reply
+                        }
+                    }
+                )
+            } else {
+                thread
+            }
+        }
+        
+        _uiState.value = _uiState.value.copy(comments = optimisticComments)
+
+        // 2. 发送网络请求
         viewModelScope.launch {
             when (val result = commentRepository.likeComment(commentId)) {
                 is MyNetWorkResult.Success -> {
-                    val newStatus = result.data == AppConstants.LIKE_STATUS_LIKED // 1 是点赞, 0 是取消
-                    val updatedComments = _uiState.value.comments.map { thread ->
-                        if (rootCommentId == null && thread.rootComment.id == commentId) {
-                            // It's a root comment
-                            thread.copy(
-                                rootComment = thread.rootComment.copy(
-                                    isLiked = newStatus,
-                                    likeCount = if (newStatus) thread.rootComment.likeCount + 1 else thread.rootComment.likeCount - 1
-                                )
-                            )
-                        } else if (rootCommentId != null && (thread.rootComment.id == rootCommentId || thread.replies.any { it.id == commentId })) {
-                            // It's a reply (either linked by rootId or checked in replies list)
-                            thread.copy(
-                                replies = thread.replies.map { reply ->
-                                    if (reply.id == commentId) {
-                                        reply.copy(
-                                            isLiked = newStatus,
-                                            likeCount = if (newStatus) reply.likeCount + 1 else reply.likeCount - 1
-                                        )
-                                    } else {
-                                        reply
-                                    }
-                                }
-                            )
-                        } else {
-                            thread
-                        }
-                    }
-                    _uiState.value = _uiState.value.copy(comments = updatedComments)
+                    // 请求成功，保持当前状态即可
+                    // 如果服务器返回了最新的准确状态，也可以在这里做二次校验，
+                    // 但为了体验丝滑，通常信任乐观更新，除非数据明显不一致。
                 }
                 is MyNetWorkResult.Error -> {
-                    _uiState.value = _uiState.value.copy(error = "操作失败")
+                    // 请求失败，回滚状态
+                    _uiState.value = _uiState.value.copy(
+                        comments = oldComments, 
+                        error = "操作失败"
+                    )
                 }
             }
         }
