@@ -13,6 +13,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,6 +30,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -50,7 +52,7 @@ import com.shin.vicmusic.feature.auth.registerScreen
 import com.shin.vicmusic.feature.chat.chatScreen
 import com.shin.vicmusic.feature.checkIn.CHECK_IN_ROUTE
 import com.shin.vicmusic.feature.checkIn.checkInScreen
-import com.shin.vicmusic.feature.comment.commentScreen
+import com.shin.vicmusic.feature.comment.CommentRoute
 import com.shin.vicmusic.feature.common.MyNavigationBar
 import com.shin.vicmusic.feature.common.bar.SongBar
 import com.shin.vicmusic.feature.feed.feedScreen
@@ -159,6 +161,8 @@ fun MyApp(
     var showPlaylistSheet by rememberSaveable { mutableStateOf(false) }
     // 歌曲详情弹窗显示状态
     var showSongDetailSheet by rememberSaveable { mutableStateOf(false) }
+    // 评论弹窗（覆盖层）参数
+    var commentOverlayArgs by rememberSaveable { mutableStateOf<Pair<String, String>?>(null) }
 
     // BottomSheet 状态
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -202,7 +206,6 @@ fun MyApp(
             chatScreen()
             messageListScreen()
             localMusicScreen()
-            commentScreen()
             feedScreen()
             myInfoEditScreen()
             publishFeedScreen()
@@ -270,23 +273,44 @@ fun MyApp(
             ModalBottomSheet(
                 onDismissRequest = { showSongDetailSheet = false },
                 sheetState = songDetailSheetState,
-                containerColor = MaterialTheme.colorScheme.surface,
+                containerColor = Color(0xFF1C1C1E),
                 dragHandle = null,
                 modifier = Modifier.fillMaxSize()
             ) {
                 SongDetailRoute(
                     songId = currentSong?.id,
-                    onDismiss = { showSongDetailSheet = false }
+                    onDismiss = { showSongDetailSheet = false },
+                    onNavigateToComment = { resourceId, resourceType ->
+                        // showSongDetailSheet = false // Do NOT close the sheet
+                        commentOverlayArgs = resourceId to resourceType
+                    }
                 )
             }
         }
 
-        // 全局版权弹窗
+        // Global Copyright Dialog
         if (showCopyrightDialog) {
             CopyrightDialog(
                 song = currentSong,
                 onDismissRequest = { showCopyrightDialog = false }
             )
+        }
+
+        // Comment Overlay (Stacked Bottom Sheet)
+        if (commentOverlayArgs != null) {
+             ModalBottomSheet(
+                onDismissRequest = { commentOverlayArgs = null },
+                sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+                containerColor = MaterialTheme.colorScheme.background,
+                dragHandle = null,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                 com.shin.vicmusic.feature.comment.CommentRoute(
+                    resourceId = commentOverlayArgs!!.first,
+                    resourceType = commentOverlayArgs!!.second,
+                    onBackClick = { commentOverlayArgs = null }
+                )
+            }
         }
     }
 }

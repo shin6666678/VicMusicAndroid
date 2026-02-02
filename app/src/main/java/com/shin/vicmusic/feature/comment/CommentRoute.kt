@@ -48,6 +48,7 @@ import com.shin.vicmusic.feature.common.item.ItemCommentThread
 fun CommentRoute(
     resourceId: String,
     resourceType: String,
+    onBackClick: () -> Unit,
     viewModel: CommentViewModel = hiltViewModel(),
 ) {
     val navController = LocalNavController.current
@@ -63,7 +64,7 @@ fun CommentRoute(
 
     CommentScreen(
         uiState = uiState,
-        onBackClick = { navController.popBackStack() },
+        onBackClick = onBackClick,
         onLikeClick = viewModel::toggleLike,
         onAddComment = { content, parentId ->
             viewModel.addComment(resourceType, resourceId, content, parentId)

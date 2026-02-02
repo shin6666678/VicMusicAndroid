@@ -89,6 +89,7 @@ fun SongDetailPreview() {
 fun SongDetailRoute(
     songId: String? = null,
     onDismiss: () -> Unit,
+    onNavigateToComment: (String, String) -> Unit,
     viewModel: SongDetailViewModel = hiltViewModel(),
 ) {
     val navController = LocalNavController.current
@@ -225,10 +226,7 @@ fun SongDetailRoute(
                 onSkipPrevious = playerManager::skipToPrevious,
                 onToggleLike = viewModel::toggleLike,
                 onCommentClick = {
-                    navController.navigateToComment(
-                        resourceId = displaySong.id,
-                        resourceType = "song"
-                    )
+                    onNavigateToComment(displaySong.id, "song")
                 },
                 onShareClick = { showShareBottomSheet = true }
             )
