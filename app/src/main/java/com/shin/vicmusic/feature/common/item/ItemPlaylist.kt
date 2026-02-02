@@ -44,7 +44,7 @@ fun ItemPlaylist(playlist: Playlist, onClick: () -> Unit) {
             shape = RoundedCornerShape(8.dp),
             color = MaterialTheme.colorScheme.surfaceVariant
         ) {
-            if (playlist.cover.isNullOrEmpty()) {
+            if (playlist.cover.isEmpty()) {
                 Icon(
                     painter = rememberVectorPainter(Icons.Default.MusicNote),
                     contentDescription = null,

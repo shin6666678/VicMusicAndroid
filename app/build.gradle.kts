@@ -15,8 +15,8 @@ android {
         applicationId = "com.shin.vicmusic"
         minSdk = 24
         targetSdk = 36 // 与 compileSdk 匹配
-        versionCode = 6
-        versionName = "1.0.5"
+        versionCode = 7
+        versionName = "1.0.5.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -47,6 +48,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,7 +57,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -160,7 +164,6 @@ fun MyInfoRoute(
         onEditClick = navController::navigateToMyInfoEdit,
         onFollowClick = { displayUserInfo?.id?.let { viewModel.toggleFollow(it) } },
         onBgClick = {
-            // 点击背景图触发选择
             if (isMe) {
                 photoPickerLauncher.launch(
                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
@@ -184,6 +187,8 @@ fun MyInfoScreen(
     onFollowClick: () -> Unit = {},
     onBgClick: () -> Unit = {}
 ) {
+    val cardHeightDp = remember { mutableStateOf(0.dp) }
+    val density = LocalDensity.current
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
@@ -214,32 +219,6 @@ fun MyInfoScreen(
         },
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
-            // 上半部分背景图
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(300.dp)
-                    .clickable(enabled = !uiState.isLoading, onClick = onBgClick) // 添加点击事件
-            ) {
-                MyAsyncImage(
-                    model = userInfo?.bgImg,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-
-                // 加载遮罩
-                if (uiState.isLoading) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.Black.copy(alpha = 0.3f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(color = Color.White)
-                    }
-                }
-            }
-
             // 可滚动的内容区域
             LazyColumn(
                 modifier = Modifier
@@ -258,19 +237,63 @@ fun MyInfoScreen(
                         }
                     }
                 } else {
+                    //上部分
+                    item{
+                        // 在 item 内部
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(300.dp)
+                                .clickable(enabled = !uiState.isLoading, onClick = onBgClick)
+                        ) {
+                            // 背景图片
+                            MyAsyncImage(
+                                model = userInfo.bgImg,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+
+                            // 底部居中的用户信息卡片，中心线与底部对齐
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .onGloballyPositioned { coords ->
+                                        val heightPx = coords.size.height
+                                        val density = density
+                                        with(density) {
+                                            cardHeightDp.value = heightPx.toDp()
+                                        }
+                                    }
+                                    .offset(y = cardHeightDp.value / 2)
+                            ) {
+                                UserInfoCard(
+                                    user = userInfo,
+                                    isMe = isMe,
+                                    onEditClick = onEditClick,
+                                    onFollowClick = onFollowClick
+                                )
+                            }
+
+                            // 加载遮罩
+                            if (uiState.isLoading) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(Color.Black.copy(alpha = 0.3f)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(color = Color.White)
+                                }
+                            }
+                        }
+                    }
                     item {
                         Column(
                             modifier = Modifier
-                                .padding(top = 200.dp)
-                                .padding(horizontal = 16.dp),
+                                .padding(horizontal = 16.dp)
+                                .padding(top = cardHeightDp.value / 2 + 16.dp),
                             verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            UserInfoCard(
-                                user = userInfo,
-                                isMe = isMe,
-                                onEditClick = onEditClick,
-                                onFollowClick = onFollowClick
-                            )
 
                             LevelExperienceCard(user = userInfo)
 
