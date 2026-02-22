@@ -4,10 +4,13 @@ import com.shin.vicmusic.core.config.AppGlobalData
 import com.shin.vicmusic.core.data.repository.AuthRepository
 import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.domain.UserInfo
+import com.shin.vicmusic.core.datastore.UserPrefsProto
+import androidx.datastore.core.DataStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -15,7 +18,8 @@ import javax.inject.Singleton
 @Singleton// 更改为 @Singleton
 class AuthManager @Inject constructor(
     private val authRepository: AuthRepository,
-    private val tokenManager: TokenManager // 必须注入
+    private val tokenManager: TokenManager, // 必须注入
+    private val userPrefsDataStore: DataStore<UserPrefsProto>
 ) {
     private val scope = CoroutineScope(SupervisorJob())
 
@@ -30,6 +34,14 @@ class AuthManager @Inject constructor(
     init {
         // [修改2] 初始化时监听 Token，如果有则自动恢复登录
         scope.launch {
+            // 从 Proto DataStore 快速读取用户信息缓存
+            launch {
+                val proto = userPrefsDataStore.data.first()
+                if (proto.id.isNotEmpty()) {
+                    _currentUser.value = proto.toUserInfo()
+                }
+            }
+
             tokenManager.tokenFlow.collect { savedToken ->
                 if (!savedToken.isNullOrBlank()) {
                     AppGlobalData.token = savedToken
@@ -49,7 +61,10 @@ class AuthManager @Inject constructor(
             fetchUserInfo() // [新增] 登录成功自动获取用户信息
         } else {
             _currentUser.value = null // 登出清空信息
-            scope.launch { tokenManager.clearToken() }
+            scope.launch { 
+                tokenManager.clearToken() 
+                userPrefsDataStore.updateData { it.toBuilder().clear().build() }
+            }
         }
     }
 
@@ -62,10 +77,59 @@ class AuthManager @Inject constructor(
                     _currentUser.value = result.data
                     // 确保登录状态为 true
                     if (_isLoggedIn.value != true) _isLoggedIn.value = true
+                    // 异步保存到 Proto DataStore
+                    userPrefsDataStore.updateData { result.data.toProto() }
                 }
                 is MyNetWorkResult.Error->{}
             }
 
         }
+    }
+
+    // Mapper Helpers to protect domain layer from Protobuf details
+    private fun UserInfo.toProto(): UserPrefsProto {
+        return UserPrefsProto.newBuilder()
+            .setId(this.id)
+            .setName(this.name)
+            .setHeadImg(this.headImg)
+            .setSlogan(this.slogan)
+            .setSex(this.sex)
+            .setBgImg(this.bgImg)
+            .setPoints(this.points)
+            .setMail(this.mail)
+            .setFollowCount(this.followCount)
+            .setFollowerCount(this.followerCount)
+            .setLevel(this.level)
+            .setVipLevel(this.vipLevel)
+            .setHeardCount(this.heardCount)
+            .setIsFollowing(this.isFollowing)
+            .setIsFollowingMe(this.isFollowingMe)
+            .setExperience(this.experience)
+            .setNextLevelExp(this.nextLevelExp)
+            .setTotalListenTime(this.totalListenTime)
+            .build()
+    }
+
+    private fun UserPrefsProto.toUserInfo(): UserInfo {
+        return UserInfo(
+            id = this.id,
+            name = this.name,
+            headImg = this.headImg,
+            slogan = this.slogan,
+            sex = this.sex,
+            bgImg = this.bgImg,
+            points = this.points,
+            mail = this.mail,
+            followCount = this.followCount,
+            followerCount = this.followerCount,
+            level = this.level,
+            vipLevel = this.vipLevel,
+            heardCount = this.heardCount,
+            isFollowing = this.isFollowing,
+            isFollowingMe = this.isFollowingMe,
+            experience = this.experience,
+            nextLevelExp = this.nextLevelExp,
+            totalListenTime = this.totalListenTime
+        )
     }
 }
