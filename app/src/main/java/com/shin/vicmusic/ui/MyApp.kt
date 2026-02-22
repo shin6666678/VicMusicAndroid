@@ -269,15 +269,19 @@ fun MyApp(
         // 歌曲详情弹窗 (Bottom Sheet)
         if (showSongDetailSheet) {
             ModalBottomSheet(
-                onDismissRequest = { showSongDetailSheet = false },
+                onDismissRequest = { 
+                    showSongDetailSheet = false 
+                },
                 sheetState = songDetailSheetState,
-                containerColor = Color(0xFF1C1C1E),
+                containerColor = Color.Transparent,
                 dragHandle = null,
                 modifier = Modifier.fillMaxSize()
             ) {
                 SongDetailRoute(
                     songId = currentSong?.id,
-                    onDismiss = { showSongDetailSheet = false }
+                    onDismiss = { 
+                        showSongDetailSheet = false
+                    }
                 )
             }
         }

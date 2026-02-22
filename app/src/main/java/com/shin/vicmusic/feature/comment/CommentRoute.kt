@@ -35,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -102,16 +103,17 @@ fun CommentScreen(
     }
 
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
-                title = { Text("评论区 (${uiState.comments.size})") },
+                title = { Text("评论区 (${uiState.comments.size})", color = Color.White) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回", tint = Color.White)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
+                    containerColor = Color.Transparent
                 )
             )
         },
@@ -121,10 +123,11 @@ fun CommentScreen(
                 onValueChange = { commentText = it },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background)
+                    .background(Color.Transparent)
                     .padding(horizontal = 16.dp, vertical = 8.dp)
                     .navigationBarsPadding(),
-                placeholder = { Text(placeholderText) },
+                placeholder = { Text(placeholderText, color = Color.White.copy(alpha = 0.6f)) },
+                textStyle = androidx.compose.ui.text.TextStyle(color = Color.White),
                 trailingIcon = {
                     TextButton(
                         onClick = {
@@ -136,9 +139,14 @@ fun CommentScreen(
                             }
                         }
                     ) {
-                        Text("发送")
+                        Text("发送", color = MaterialTheme.colorScheme.primary)
                     }
-                }
+                },
+                colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                     focusedBorderColor = Color.White.copy(alpha = 0.5f),
+                     unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
+                     cursorColor = MaterialTheme.colorScheme.primary
+                )
             )
         }
     ) { paddingValues ->
@@ -146,7 +154,7 @@ fun CommentScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(MaterialTheme.colorScheme.background)
+                .background(Color.Transparent)
                 .padding(horizontal = 16.dp)
         ) {
             if (uiState.isLoading && uiState.comments.isEmpty()) {
