@@ -21,6 +21,7 @@ class SettingViewModel @Inject constructor(
     fun triggerMessageCheck() {
         // 创建一次性任务请求
         val workRequest = OneTimeWorkRequestBuilder<com.shin.vicmusic.core.worker.MessageCheckWorker>()
+            .setExpedited(androidx.work.OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             .build()
         // 立即加入队列
         WorkManager.getInstance(context).enqueue(workRequest)

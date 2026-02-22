@@ -20,6 +20,7 @@ class WebSocketManager @Inject constructor(
     private val tokenManager: TokenManager
 ) {
     private var webSocket: WebSocket? = null
+    val isConnected: Boolean get() = webSocket != null
     private val client = OkHttpClient()
     private val gson = Gson()
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())

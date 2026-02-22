@@ -24,6 +24,7 @@ import com.shin.vicmusic.core.manager.PlaybackQueueManager
 import com.shin.vicmusic.core.manager.PlayerManager
 import com.shin.vicmusic.core.manager.SongActionManager
 import com.shin.vicmusic.core.manager.TokenManager
+import com.shin.vicmusic.core.worker.MessageCheckWorker
 import com.shin.vicmusic.feature.main.MainViewModel
 import com.shin.vicmusic.ui.MyApp
 import dagger.hilt.android.AndroidEntryPoint
@@ -85,7 +86,7 @@ class MainActivity : ComponentActivity() {
             .build()
 
         // 创建周期性任务请求：每隔 15 分钟运行一次 (WorkManager 最小间隔)
-        val workRequest = PeriodicWorkRequestBuilder<com.shin.vicmusic.core.worker.MessageCheckWorker>(
+        val workRequest = PeriodicWorkRequestBuilder<MessageCheckWorker>(
             15, java.util.concurrent.TimeUnit.MINUTES
         )
             .setConstraints(constraints)
