@@ -24,6 +24,7 @@ import com.shin.vicmusic.MainActivity
 import com.shin.vicmusic.R
 import com.shin.vicmusic.core.data.repository.NotifyRepository
 import com.shin.vicmusic.core.domain.MyNetWorkResult
+import com.shin.vicmusic.core.manager.WebSocketManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
@@ -40,7 +41,8 @@ private val Context.dataStore by preferencesDataStore(name = "notification_prefs
 class MessageCheckWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted workerParams: WorkerParameters,
-    private val notifyRepository: NotifyRepository
+    private val notifyRepository: NotifyRepository,
+    private val webSocketManager: WebSocketManager
 ) : CoroutineWorker(appContext, workerParams) {
 
     companion object {
@@ -54,6 +56,10 @@ class MessageCheckWorker @AssistedInject constructor(
      */
     override suspend fun doWork(): Result {
         return try {
+//            if (webSocketManager.isConnected) {
+//                Log.d("MessageCheckWorker", "WebSocket已连接，跳过轮询检查")
+//                return Result.success()
+//            }
             Log.d("MessageCheckWorker", "正在检查新私信...")
             // 调用仓库获取最新的未读统计
             val result = notifyRepository.getUnreadCount()
