@@ -50,6 +50,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -110,6 +111,7 @@ fun SongDetailRoute(
     var showShareBottomSheet by remember { mutableStateOf(false) }
 
     var showComments by rememberSaveable { mutableStateOf(false) }
+
     BackHandler(enabled = showComments) {
         showComments = false
     }
@@ -229,42 +231,71 @@ fun SongDetailRoute(
                 uiState.song
             }
 
-            AnimatedContent(
-                targetState = showComments,
-                transitionSpec = {
-                    if (targetState) {
-                        (slideInHorizontally { width -> width } + fadeIn()) togetherWith
-                                (slideOutHorizontally { width -> -width } + fadeOut())
+            Box(modifier = Modifier.fillMaxSize().background(Color(0xFF1C1C1E))) {
+                // 1. 背景层：高斯模糊封面
+                val context = LocalContext.current
+                var isLoading by remember { mutableStateOf(true) }
+
+                androidx.compose.foundation.Image(
+                    painter = coil.compose.rememberAsyncImagePainter(
+                        model = ImageRequest.Builder(context)
+                            .data(ResourceUtil.r2(displaySong.icon))
+                            .crossfade(true)
+                            .build(),
+                        onLoading = { isLoading = true },
+                        onSuccess = { isLoading = false }
+                    ),
+                    contentDescription = null,
+                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .blur(radius = 50.dp) // Android 12+ 生效
+                )
+                
+                // 2. 遮罩层：半透明黑色，提升文字可读性
+                Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f)))
+
+                // 3. 内容层：平移切换
+                AnimatedContent(
+                    targetState = showComments,
+                    transitionSpec = {
+                        if (targetState) {
+                            (slideInHorizontally { width -> width } + fadeIn()) togetherWith
+                                    (slideOutHorizontally { width -> -width } + fadeOut())
+                        } else {
+                            (slideInHorizontally { width -> -width } + fadeIn()) togetherWith
+                                    (slideOutHorizontally { width -> width } + fadeOut())
+                        }
+                    },
+                    label = "SongDetailContent",
+                    modifier = Modifier.fillMaxSize()
+                ) { isCommentVisible ->
+                    if (isCommentVisible) {
+                        // 评论页容器：必须透明
+                        Box(modifier = Modifier.fillMaxSize()) {
+                             CommentRoute(
+                                 resourceId = displaySong.id,
+                                 resourceType = "song",
+                                 onBackClick = { showComments = false }
+                             )
+                        }
                     } else {
-                        (slideInHorizontally { width -> -width } + fadeIn()) togetherWith
-                                (slideOutHorizontally { width -> width } + fadeOut())
+                        // 播放页容器：传入透明背景
+                        SongDetailScreen(
+                            song = displaySong,
+                            playerState = playerState,
+                            onTogglePlayPause = playerManager::togglePlayPause,
+                            onSeek = playerManager::seekTo,
+                            onBackClick = onDismiss,
+                            onSkipNext = playerManager::skipToNext,
+                            onSkipPrevious = playerManager::skipToPrevious,
+                            onToggleLike = viewModel::toggleLike,
+                            onCommentClick = {
+                                 showComments = true
+                            },
+                            onShareClick = { showShareBottomSheet = true }
+                        )
                     }
-                },
-                label = "SongDetailContent"
-            ) { isCommentVisible ->
-                if (isCommentVisible) {
-                    Box(modifier = Modifier.fillMaxSize().background(Color(0xFF1C1C1E))) {
-                         CommentRoute(
-                             resourceId = displaySong.id,
-                             resourceType = "song",
-                             onBackClick = { showComments = false }
-                         )
-                    }
-                } else {
-                    SongDetailScreen(
-                        song = displaySong,
-                        playerState = playerState,
-                        onTogglePlayPause = playerManager::togglePlayPause,
-                        onSeek = playerManager::seekTo,
-                        onBackClick = onDismiss,
-                        onSkipNext = playerManager::skipToNext,
-                        onSkipPrevious = playerManager::skipToPrevious,
-                        onToggleLike = viewModel::toggleLike,
-                        onCommentClick = {
-                             showComments = true
-                        },
-                        onShareClick = { showShareBottomSheet = true }
-                    )
                 }
             }
         }
@@ -364,7 +395,7 @@ fun SongDetailScreen(
     ) { paddingValues ->
         Column(
             modifier = Modifier
-                .background(Color(0xFF1C1C1E))
+                .background(Color.Transparent)
                 .padding(paddingValues)
         ) {
             HorizontalPager(
