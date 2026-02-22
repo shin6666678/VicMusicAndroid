@@ -6,4 +6,5 @@ plugins {
     alias(libs.plugins.ksp) apply false // 关键：这里必须用 alias，不能写死版本号
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.protobuf) apply false
 }

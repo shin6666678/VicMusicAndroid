@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.ksp) // 使用 Version Catalog 管理 KSP
     alias(libs.plugins.hilt) // 使用 Version Catalog 管理 Hilt
     alias(libs.plugins.kotlin.serialization) // 使用 Version Catalog 管理 Serialization
+    alias(libs.plugins.protobuf)
 }
 
 android {
@@ -48,6 +49,24 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:${libs.versions.protobuf.get()}"
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                create("java") {
+                    option("lite")
+                }
+                create("kotlin") {
+                    option("lite")
+                }
+            }
         }
     }
 }
@@ -99,6 +118,9 @@ dependencies {
 
     // DataStore
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.datastore)
+    implementation(libs.protobuf.javalite)
+    implementation(libs.protobuf.kotlin.lite)
 
     // Accompanist (注意：这些库已大部分废弃，建议未来迁移)
     implementation(libs.accompanist.flowlayout) // 推荐迁移至 Compose Foundation 的 FlowRow

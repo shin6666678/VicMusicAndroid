@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option java_package = "com.shin.vicmusic.core.datastore";
+option java_multiple_files = true;
+
+message UserPrefsProto {
+  string id = 1;
+  string name = 2;
+  string headImg = 3;
+  string slogan = 4;
+  int32 sex = 5;
+  string bgImg = 6;
+  int32 points = 7;
+  string mail = 8;
+  int32 followCount = 9;
+  int32 followerCount = 10;
+  int32 level = 11;
+  int32 vipLevel = 12;
+  int32 heardCount = 13;
+  bool isFollowing = 14;
+  bool isFollowingMe = 15;
+  int32 experience = 16;
+  int32 nextLevelExp = 17;
+  int64 totalListenTime = 18;
+}
