@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import com.shin.vicmusic.core.design.theme.isAppInDarkTheme
 import com.shin.vicmusic.core.design.theme.LocalAppColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -189,7 +188,6 @@ fun MyApp(
     val isMeTabSelected = mainTabState.intValue == TopLevelDestination.entries.indexOf(TopLevelDestination.ME)
     
     val appColors = LocalAppColors.current
-    val isDark = isAppInDarkTheme()
 
     val bottomContainerColor by animateColorAsState(
         targetValue = if (isMeTabSelected) {

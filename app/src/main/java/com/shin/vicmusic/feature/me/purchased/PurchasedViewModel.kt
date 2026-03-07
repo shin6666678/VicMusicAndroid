@@ -31,9 +31,7 @@ class PurchasedViewModel @Inject constructor() : ViewModel() {
     private fun loadData() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            // 模拟加载数据
-            val mockData = listOf("已购专辑 1", "已购单曲 1")
-            _state.update { it.copy(isLoading = false, items = mockData) }
+            _state.update { it.copy(isLoading = false) }
         }
     }
 }

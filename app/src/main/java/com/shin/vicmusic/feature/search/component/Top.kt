@@ -73,7 +73,7 @@ fun SearchTopBar(
                     value = searchText,
                     onValueChange = onSearchTextChange,
                     modifier = Modifier
-                        .weight(1f),
+                        .weight(0.6f),
                     placeholder = {
                         Text(
                             "搜索歌曲、歌单、歌手...",

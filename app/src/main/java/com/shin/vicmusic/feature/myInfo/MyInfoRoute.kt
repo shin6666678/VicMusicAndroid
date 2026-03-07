@@ -81,7 +81,6 @@ import androidx.compose.animation.core.*
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import com.shin.vicmusic.core.design.theme.LocalAppColors
-import com.shin.vicmusic.core.design.theme.isAppInDarkTheme
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 

@@ -3,7 +3,6 @@ package com.shin.vicmusic.feature.auth
 import android.widget.Toast
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
-import com.shin.vicmusic.core.design.theme.isAppInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions

@@ -31,9 +31,7 @@ class AudioViewModel @Inject constructor() : ViewModel() {
     private fun loadData() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            // 模拟加载数据
-            val mockData = listOf("有声书 1", "有声书 2", "播客 1")
-            _state.update { it.copy(isLoading = false, items = mockData) }
+            _state.update { it.copy(isLoading = false) }
         }
     }
 }

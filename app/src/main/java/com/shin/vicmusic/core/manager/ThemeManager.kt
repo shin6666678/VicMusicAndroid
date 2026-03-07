@@ -12,18 +12,19 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
-enum class DressUpStyle(val isDarkTheme: Boolean?) {
-    SYSTEM_DEFAULT(null),
-    LIGHT_GLOW(false),
-    DARK_GLOW(true),
-    LIGHT_SOLID(false),
-    DARK_SOLID(true),
-    LIGHT_NONE(false),
-    DARK_NONE(true);
+enum class DressUpStyle {
+    SYSTEM_DEFAULT,
+    LIGHT_GLOW,
+    DARK_GLOW,
+    LIGHT_SOLID,
+    DARK_SOLID,
+    LIGHT_NONE,
+    DARK_NONE,
+    RED;
 
     companion object {
         fun fromOrdinal(ordinal: Int): DressUpStyle {
-            return values().getOrNull(ordinal) ?: SYSTEM_DEFAULT
+            return entries.getOrNull(ordinal) ?: SYSTEM_DEFAULT
         }
     }
 }

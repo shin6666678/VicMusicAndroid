@@ -1,14 +1,7 @@
 ﻿package com.shin.vicmusic.core.design.theme
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
-
-val LocalThemeIsDark = compositionLocalOf { false }
-
-@Composable
-fun isAppInDarkTheme(): Boolean = LocalThemeIsDark.current
 
 data class AppColors(
     val gradientStart: Color,
@@ -23,7 +16,8 @@ data class AppColors(
     val iconColor: Color,
     val bottomBarBackground: Color,
     val bottomBarContent: Color,
-    val isDark: Boolean
+    val songDetailBackground: Color,
+    val dividerColor: Color
 )
 
 val lightAppColors = AppColors(
@@ -39,7 +33,8 @@ val lightAppColors = AppColors(
     iconColor = Color(0xFF1E293B),
     bottomBarBackground = Color(0xCCFFFFFF),
     bottomBarContent = Color(0xFF1E293B),
-    isDark = false
+    songDetailBackground = Color(0xFFF8FAFC),
+    dividerColor = Color(0xFFF5F5F5)
 )
 
 val darkAppColors = AppColors(
@@ -55,7 +50,25 @@ val darkAppColors = AppColors(
     iconColor = Color.White,
     bottomBarBackground = Color(0xCC111827),
     bottomBarContent = Color.White,
-    isDark = true
+    songDetailBackground = Color(0xFF1C1C1E),
+    dividerColor = Color(0xFF000000)
+)
+
+val redAppColors = AppColors(
+    gradientStart = Color.White,
+    gradientMid = Color.White,
+    gradientEnd = Color.White,
+    accentPrimary = Color.Red,
+    accentSecondary = Color(0xFFFF6B6B), // A lighter red for secondary
+    glassWhite = Color(0x1AFFFFFF),
+    glassBorder = Color(0x33FF0000), // Reddish border for glass
+    inputBackground = Color(0x0DFF0000),
+    textColor = Color.Red,
+    iconColor = Color.Red,
+    bottomBarBackground = Color(0xCCFFFFFF),
+    bottomBarContent = Color.Red,
+    songDetailBackground = Color.White,
+    dividerColor = Color(0xFFF5F5F5)
 )
 
 val LocalAppColors = staticCompositionLocalOf<AppColors> {

@@ -22,11 +22,12 @@ import com.shin.vicmusic.core.design.composition.LocalPlayerManager
 import com.shin.vicmusic.core.design.composition.LocalSongActionManager
 import com.shin.vicmusic.core.design.composition.LocalTokenManager
 import com.shin.vicmusic.core.design.theme.LocalAppColors
-import com.shin.vicmusic.core.design.theme.LocalThemeIsDark
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
 import com.shin.vicmusic.core.design.theme.darkAppColors
 import com.shin.vicmusic.core.design.theme.lightAppColors
+import com.shin.vicmusic.core.design.theme.redAppColors
 import com.shin.vicmusic.core.manager.AuthManager
+import com.shin.vicmusic.core.manager.DressUpStyle
 import com.shin.vicmusic.core.manager.PlaybackQueueManager
 import com.shin.vicmusic.core.manager.PlayerManager
 import com.shin.vicmusic.core.manager.SongActionManager
@@ -71,11 +72,19 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val navController = rememberNavController()
-            val dressUpStyle by themeManager.dressUpStyle.collectAsState(initial = com.shin.vicmusic.core.manager.DressUpStyle.SYSTEM_DEFAULT)
+            val dressUpStyle by themeManager.dressUpStyle.collectAsState(initial = DressUpStyle.SYSTEM_DEFAULT)
             val isSystemDark = isSystemInDarkTheme()
-            val isDarkTheme = dressUpStyle.isDarkTheme ?: isSystemDark
-            
-            val currentAppColors = if (isDarkTheme) darkAppColors else lightAppColors
+
+            val currentAppColors = when (dressUpStyle) {
+                DressUpStyle.SYSTEM_DEFAULT -> if (isSystemDark) darkAppColors else lightAppColors
+                DressUpStyle.LIGHT_GLOW -> lightAppColors
+                DressUpStyle.DARK_GLOW -> darkAppColors
+                DressUpStyle.LIGHT_SOLID -> lightAppColors
+                DressUpStyle.DARK_SOLID -> darkAppColors
+                DressUpStyle.LIGHT_NONE -> lightAppColors
+                DressUpStyle.DARK_NONE -> darkAppColors
+                DressUpStyle.RED -> redAppColors
+            }
             
             CompositionLocalProvider(
                 LocalPlayerManager provides playerManager,
@@ -84,10 +93,9 @@ class MainActivity : ComponentActivity() {
                 LocalAuthManager provides authManager,
                 LocalTokenManager provides tokenManager,
                 LocalSongActionManager provides songActionManager,
-                LocalThemeIsDark provides isDarkTheme,
                 LocalAppColors provides currentAppColors
             ) {
-                VicMusicTheme(darkTheme = isDarkTheme, appColors = currentAppColors) {
+                VicMusicTheme(appColors = currentAppColors) {
                     MyApp()
                 }
             }

@@ -14,7 +14,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.background
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -48,17 +50,22 @@ fun FeedScreen(
     onBgClick: () -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        // Use AppBackground to allow content to draw behind the TopAppBar
-        // The Pager is now the bottom layer
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.fillMaxSize()
         ) {
             when (it) {
-                0 -> FeedList(
-                    items = discoveryItems, onProfileClick, onSongClick, onPlaylistClick,
-                    onAlbumClick, onLikeClick, onCommentClick
-                )
+                0 -> {
+                    if (discoveryItems.isEmpty()) {
+                        Text(
+                            text = "还没有人公布自己的动态,要不要发一个呢?",
+                        )
+                    } else
+                        FeedList(
+                            items = discoveryItems, onProfileClick, onSongClick, onPlaylistClick,
+                            onAlbumClick, onLikeClick, onCommentClick
+                        )
+                }
 
                 1 -> {
                     LazyColumn(
