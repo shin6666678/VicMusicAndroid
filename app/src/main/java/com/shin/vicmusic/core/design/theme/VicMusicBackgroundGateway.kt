@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.theme.dressUp.dynamicGlow.DynamicGlowAppBackGround
 import com.shin.vicmusic.core.manager.DressUpStyle
@@ -44,6 +45,11 @@ fun VicMusicBackgroundGateway(
             }
             DressUpStyle.LIGHT_NONE, DressUpStyle.DARK_NONE -> {
                 Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+                    content()
+                }
+            }
+            DressUpStyle.RED -> {
+                Box(Modifier.fillMaxSize().background(Color.White)) {
                     content()
                 }
             }

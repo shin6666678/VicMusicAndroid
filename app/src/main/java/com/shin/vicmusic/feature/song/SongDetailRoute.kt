@@ -233,7 +233,7 @@ fun SongDetailRoute(
             }
 
             val appColors = LocalAppColors.current
-            Box(modifier = Modifier.fillMaxSize().background(if (appColors.isDark) Color(0xFF1C1C1E) else Color(0xFFF8FAFC))) {
+            Box(modifier = Modifier.fillMaxSize().background(appColors.songDetailBackground)) {
                 // 1. 背景层：高斯模糊封面
                 val context = LocalContext.current
                 var isLoading by remember { mutableStateOf(true) }

@@ -23,14 +23,6 @@ class SsoAuthActivity : ComponentActivity() {
         } else {
             // 未登录，展示纯 Compose 编写的登录 UI，引导用户登录
             setContent {
-                VicMusicTheme {
-                    // 复用您项目中现有的 LoginScreen(登录屏幕) Composable
-                    LoginScreen(
-                        uiState = TODO(),
-                        onIntent = TODO(),
-                        onRegisterClick = TODO()
-                    )
-                }
             }
         }
     }

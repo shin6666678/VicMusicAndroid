@@ -27,7 +27,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.shin.vicmusic.core.design.theme.isAppInDarkTheme
 import com.shin.vicmusic.core.domain.Playlist
 import com.shin.vicmusic.feature.common.MyAsyncImage
 import com.shin.vicmusic.core.design.theme.LocalAppColors

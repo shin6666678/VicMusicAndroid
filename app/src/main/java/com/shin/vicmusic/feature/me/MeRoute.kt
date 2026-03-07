@@ -68,7 +68,6 @@ import com.shin.vicmusic.feature.me.purchased.navigateToPurchased
 import androidx.compose.animation.core.*
 import androidx.compose.ui.draw.blur
 import androidx.compose.foundation.background
-import com.shin.vicmusic.core.design.theme.isAppInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -247,13 +246,13 @@ fun MeScreen(
                 QuickAccessItem(
                     icon = Icons.Filled.Headphones,
                     text = "有声",
-                    count = "6",
+                    count = "0",
                     onClick = onAudioClick
                 )
                 QuickAccessItem(
                     icon = Icons.Filled.ReceiptLong,
                     text = "已购",
-                    count = "1",
+                    count = "0",
                     onClick = onPurchasedClick
                 )
             }

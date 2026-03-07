@@ -153,6 +153,35 @@ fun DressUpScreen(
                     }
                 }
             }
+
+            // SPECIAL Themes
+            SectionTitle("特别主题")
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Box(modifier = Modifier.weight(1f)) {
+                    StylePreviewCard(
+                        title = "RED",
+                        description = "纯白背景与鲜艳红色文字",
+                        isSelected = currentStyle == DressUpStyle.RED,
+                        onClick = { onStyleSelected(DressUpStyle.RED) },
+                        height = 100.dp
+                    ) {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .background(Color.White)
+                        ) {
+                            Text(
+                                "Aa",
+                                color = Color.Red,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 32.sp,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.weight(1f))
+            }
         }
     }
 }

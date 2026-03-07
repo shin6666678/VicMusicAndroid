@@ -27,7 +27,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.shin.vicmusic.core.design.theme.isAppInDarkTheme
 import coil.compose.AsyncImage
 import com.shin.vicmusic.core.domain.Playlist
 import com.shin.vicmusic.feature.common.item.ItemPlaylistSquare
