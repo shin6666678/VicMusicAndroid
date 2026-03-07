@@ -3,6 +3,7 @@ package com.shin.vicmusic.feature.auth
 import android.widget.Toast
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -37,15 +38,15 @@ import com.shin.vicmusic.R
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import kotlinx.coroutines.flow.collectLatest
 
-// ---- 主题色常量 ----
-private val GradientStart = Color(0xFF020617)
-private val GradientMid = Color(0xFF0F172A)
-private val GradientEnd = Color(0xFF1E293B)
-private val AccentPrimary = Color(0xFF3B82F6)
-private val AccentSecondary = Color(0xFF2DD4BF)
-private val GlassWhite = Color(0x1AFFFFFF)
-private val GlassBorder = Color(0x33FFFFFF)
-private val InputBackground = Color(0x0DFFFFFF)
+import com.shin.vicmusic.core.design.theme.getDynamicAccentPrimary
+import com.shin.vicmusic.core.design.theme.getDynamicAccentSecondary
+import com.shin.vicmusic.core.design.theme.getDynamicGlassBorder
+import com.shin.vicmusic.core.design.theme.getDynamicGlassWhite
+import com.shin.vicmusic.core.design.theme.getDynamicGradientEnd
+import com.shin.vicmusic.core.design.theme.getDynamicGradientMid
+import com.shin.vicmusic.core.design.theme.getDynamicGradientStart
+import com.shin.vicmusic.core.design.theme.getDynamicInputBackground
+import com.shin.vicmusic.core.design.theme.getDynamicTextColor
 
 @Composable
 fun LoginRoute(
@@ -97,6 +98,11 @@ fun LoginScreen(
         contentSlide.animateTo(0f, animationSpec = tween(600, easing = FastOutSlowInEasing))
     }
 
+    val isDark = isSystemInDarkTheme()
+    val textColor = getDynamicTextColor(isDark)
+    val accentPrimary = getDynamicAccentPrimary(isDark)
+    val accentSecondary = getDynamicAccentSecondary(isDark)
+
     // ---- 浮动光晕动画 ----
     val infiniteTransition = rememberInfiniteTransition(label = "glow")
     val glow1X by infiniteTransition.animateFloat(
@@ -119,7 +125,13 @@ fun LoginScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(
-                Brush.verticalGradient(listOf(GradientStart, GradientMid, GradientEnd))
+                Brush.verticalGradient(
+                    listOf(
+                        getDynamicGradientStart(isDark),
+                        getDynamicGradientMid(isDark),
+                        getDynamicGradientEnd(isDark)
+                    )
+                )
             )
     ) {
         // ---- 背景光晕球 ----
@@ -130,7 +142,7 @@ fun LoginScreen(
                 .blur(80.dp)
                 .background(
                     Brush.radialGradient(
-                        listOf(AccentPrimary.copy(alpha = 0.35f), Color.Transparent),
+                        listOf(accentPrimary.copy(alpha = 0.35f), Color.Transparent),
                         center = Offset.Zero, radius = 600f
                     ),
                     shape = RoundedCornerShape(50)
@@ -144,7 +156,7 @@ fun LoginScreen(
                 .blur(70.dp)
                 .background(
                     Brush.radialGradient(
-                        listOf(AccentSecondary.copy(alpha = 0.3f), Color.Transparent),
+                        listOf(accentSecondary.copy(alpha = 0.3f), Color.Transparent),
                         center = Offset.Zero, radius = 500f
                     ),
                     shape = RoundedCornerShape(50)
@@ -167,7 +179,7 @@ fun LoginScreen(
                     .clip(RoundedCornerShape(24.dp))
                     .background(
                         Brush.linearGradient(
-                            listOf(AccentPrimary, AccentSecondary),
+                            listOf(accentPrimary, accentSecondary),
                             start = Offset(0f, 0f), end = Offset(300f, 300f)
                         )
                     ),
@@ -185,10 +197,10 @@ fun LoginScreen(
 
             // 标题
             Text(
-                text = "VicMusic",
+                text = "欢迎回来",
                 fontSize = 32.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color = Color.White,
+                color = textColor,
                 modifier = Modifier.alpha(contentAlpha.value)
             )
             Text(
@@ -209,7 +221,7 @@ fun LoginScreen(
                     .offset(y = contentSlide.value.dp)
                     .alpha(contentAlpha.value)
                     .clip(RoundedCornerShape(24.dp))
-                    .background(GlassWhite)
+                    .background(getDynamicGlassWhite(isDark))
                     .padding(1.dp)
             ) {
                 Column(
@@ -218,17 +230,17 @@ fun LoginScreen(
                         .clip(RoundedCornerShape(24.dp))
                         .background(
                             Brush.verticalGradient(
-                                listOf(Color(0x26FFFFFF), Color(0x0DFFFFFF))
+                                listOf(getDynamicGlassBorder(isDark).copy(alpha = 0.15f), getDynamicInputBackground(isDark).copy(alpha = 0.05f))
                             )
                         )
                         .padding(horizontal = 24.dp, vertical = 32.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "欢迎登录",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
+                        text = "Vic Music. 让音乐随心而动",
+                        color = textColor.copy(alpha = 0.8f),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium,
                         modifier = Modifier.fillMaxWidth()
                     )
 
@@ -238,9 +250,9 @@ fun LoginScreen(
                     AuthTextField(
                         value = uiState.mail,
                         onValueChange = { onIntent(LoginIntent.UpdateMail(it)) },
-                        label = "邮箱账号",
+                        label = "邮箱地址",
                         leadingIcon = {
-                            Icon(Icons.Default.Email, null, tint = AccentPrimary.copy(alpha = 0.8f))
+                            Icon(Icons.Default.Email, null, tint = accentPrimary.copy(alpha = 0.8f))
                         },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Email,
@@ -254,16 +266,16 @@ fun LoginScreen(
                     AuthTextField(
                         value = uiState.password,
                         onValueChange = { onIntent(LoginIntent.UpdatePassword(it)) },
-                        label = "登录密码",
+                        label = "输入密码",
                         leadingIcon = {
-                            Icon(Icons.Default.Lock, null, tint = AccentPrimary.copy(alpha = 0.8f))
+                            Icon(Icons.Default.Lock, null, tint = accentPrimary.copy(alpha = 0.8f))
                         },
                         trailingIcon = {
                             IconButton(onClick = { passwordVisible = !passwordVisible }) {
                                 Icon(
                                     imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
                                     contentDescription = null,
-                                    tint = Color.White.copy(alpha = 0.5f)
+                                    tint = textColor.copy(alpha = 0.5f)
                                 )
                             }
                         },
@@ -296,7 +308,7 @@ fun LoginScreen(
                                 .background(
                                     if (!uiState.isLoading)
                                         Brush.linearGradient(
-                                            listOf(AccentPrimary, AccentSecondary),
+                                            listOf(accentPrimary, accentSecondary),
                                             start = Offset(0f, 0f),
                                             end = Offset(800f, 0f)
                                         )
@@ -315,10 +327,10 @@ fun LoginScreen(
                                 )
                             } else {
                                 Text(
-                                    text = "立即登录",
-                                    fontSize = 17.sp,
+                                    text = "账号登录",
+                                    fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.White
+                                    color = textColor.copy(alpha = 0.9f)
                                 )
                             }
                         }
@@ -333,13 +345,13 @@ fun LoginScreen(
                 modifier = Modifier.alpha(contentAlpha.value),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("还没有账号？", color = Color.White.copy(alpha = 0.6f), fontSize = 14.sp)
+                Text("还没有账号？", color = textColor.copy(alpha = 0.6f), fontSize = 14.sp)
                 TextButton(onClick = onRegisterClick, contentPadding = PaddingValues(horizontal = 6.dp)) {
                     Text(
                         "立即注册",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = AccentPrimary
+                        color = accentPrimary
                     )
                 }
             }
@@ -359,10 +371,16 @@ private fun AuthTextField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
+    val isDark = isSystemInDarkTheme()
+    val textColor = getDynamicTextColor(isDark)
+    val accentPrimary = getDynamicAccentPrimary(isDark)
+    val glassBorder = getDynamicGlassBorder(isDark)
+    val inputBg = getDynamicInputBackground(isDark)
+
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label, color = Color.White.copy(alpha = 0.5f), fontSize = 13.sp) },
+        label = { Text(label, color = textColor.copy(alpha = 0.5f), fontSize = 13.sp) },
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
         visualTransformation = visualTransformation,
@@ -371,14 +389,14 @@ private fun AuthTextField(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = Color.White,
-            unfocusedTextColor = Color.White,
-            focusedBorderColor = AccentPrimary,
-            unfocusedBorderColor = GlassBorder,
-            focusedContainerColor = InputBackground,
-            unfocusedContainerColor = InputBackground,
-            cursorColor = AccentPrimary,
-            focusedLabelColor = AccentPrimary,
+            focusedTextColor = textColor,
+            unfocusedTextColor = textColor,
+            focusedBorderColor = accentPrimary,
+            unfocusedBorderColor = glassBorder,
+            focusedContainerColor = inputBg,
+            unfocusedContainerColor = inputBg,
+            cursorColor = accentPrimary,
+            focusedLabelColor = accentPrimary,
         )
     )
 }

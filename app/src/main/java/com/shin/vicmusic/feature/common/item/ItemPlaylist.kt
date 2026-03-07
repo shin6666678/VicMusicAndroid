@@ -19,19 +19,24 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.isSystemInDarkTheme
+import com.shin.vicmusic.core.design.theme.getDynamicTextColor
 import com.shin.vicmusic.core.domain.Playlist
 import com.shin.vicmusic.feature.common.MyAsyncImage
 
 @Composable
 fun ItemPlaylist(playlist: Playlist, onClick: () -> Unit) {
+    val isDark = isSystemInDarkTheme()
+    val textColor = getDynamicTextColor(isDark)
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -68,13 +73,13 @@ fun ItemPlaylist(playlist: Playlist, onClick: () -> Unit) {
                 style = MaterialTheme.typography.titleMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                color = Color.White
+                color = textColor
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = "${playlist.playCount}首 来自 ${playlist.ownerName}",
                 style = MaterialTheme.typography.bodySmall,
-                color = Color.White.copy(alpha = 0.6f)
+                color = textColor.copy(alpha = 0.6f)
             )
         }
     }
@@ -85,6 +90,9 @@ fun ItemPlaylistSquare(
     playlist: Playlist,
     onClick: () -> Unit = {}
 ) {
+    val isDark = isSystemInDarkTheme()
+    val textColor = getDynamicTextColor(isDark)
+
     Column(
         modifier = Modifier
             .width(100.dp) // 限制宽度，适配横向列表
@@ -119,7 +127,7 @@ fun ItemPlaylistSquare(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis, // 超出显示省略号
             textAlign = TextAlign.Center,
-            color = Color.White
+            color = textColor
         )
     }
 }

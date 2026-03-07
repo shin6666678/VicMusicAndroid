@@ -27,6 +27,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.isSystemInDarkTheme
+import com.shin.vicmusic.core.design.theme.getDynamicTextColor
 import coil.compose.AsyncImage
 import com.shin.vicmusic.core.domain.Playlist
 import com.shin.vicmusic.feature.common.item.ItemPlaylistSquare
@@ -38,6 +40,9 @@ fun RecentBar(
     recentIcon: String = "",                 // 最近播放歌曲封面
     onRecentOrMoreClick: () -> Unit = {},    // 点击"全部已播"或"更多"
 ) {
+    val isDark = isSystemInDarkTheme()
+    val textColor = getDynamicTextColor(isDark)
+
     Column(modifier = Modifier.fillMaxWidth()) {
         Spacer(Modifier.height(12.dp)) // 稍微调整顶部间距
 
@@ -53,7 +58,7 @@ fun RecentBar(
                 text = "最近播放",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = textColor
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -62,12 +67,12 @@ fun RecentBar(
                 Text(
                     text = "更多",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color.White.copy(alpha = 0.6f)
+                    color = textColor.copy(alpha = 0.6f)
                 )
                 Icon(
                     imageVector = Icons.Filled.KeyboardArrowRight,
                     contentDescription = "More",
-                    tint = Color.White.copy(alpha = 0.6f)
+                    tint = textColor.copy(alpha = 0.6f)
                 )
             }
         }
@@ -100,7 +105,7 @@ fun RecentBar(
                         text = "已播歌曲${recentNum}首",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium,
-                        color = Color.White
+                        color = textColor
                     )
                 }
             }

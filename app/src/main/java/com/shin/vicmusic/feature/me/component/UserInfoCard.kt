@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -46,6 +47,10 @@ import com.shin.vicmusic.feature.common.MyAsyncImage
 import com.shin.vicmusic.feature.common.icon.UserLevelIcon
 import com.shin.vicmusic.feature.common.icon.VipIcon
 
+import com.shin.vicmusic.core.design.theme.getDynamicGlassBorder
+import com.shin.vicmusic.core.design.theme.getDynamicGlassWhite
+import com.shin.vicmusic.core.design.theme.getDynamicTextColor
+
 @Preview
 @Composable
 fun UserInfoCardPreview() {
@@ -75,12 +80,16 @@ fun UserInfoCard(
     onFriendClick: () -> Unit = {},
     onCheckInClick: () -> Unit = {}
 ) {
+    val isDark = isSystemInDarkTheme()
+    val glassWhite = getDynamicGlassWhite(isDark)
+    val glassBorder = getDynamicGlassBorder(isDark)
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
         elevation = CardDefaults.cardElevation(0.dp),
-        border = BorderStroke(1.dp, Color(0x33FFFFFF)),
-        colors = CardDefaults.cardColors(containerColor = Color(0x1AFFFFFF)) // 玻璃拟态背景
+        border = BorderStroke(1.dp, glassBorder),
+        colors = CardDefaults.cardColors(containerColor = glassWhite) // 玻璃拟态背景
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             // 1. 头部区域：根据登录状态切换
@@ -118,6 +127,9 @@ private fun LoggedInHeader(
 ) {
     // 1. 解析 VIP 等级 (默认为 0)
     val vipLevelInt = user.vipLevel
+    
+    val isDark = isSystemInDarkTheme()
+    val textColor = getDynamicTextColor(isDark)
 
 
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -135,7 +147,7 @@ private fun LoggedInHeader(
                 text = user.name,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = textColor
             )
             Spacer(modifier = Modifier.height(6.dp))
             Row {
@@ -153,6 +165,10 @@ private fun LoggedInHeader(
 
 @Composable
 private fun LoggedOutHeader(onLoginClick: () -> Unit) {
+    val isDark = isSystemInDarkTheme()
+    val textColor = getDynamicTextColor(isDark)
+    val glassWhite = getDynamicGlassWhite(isDark)
+    
     val VdGreen = Color(0xFF1AAD19)
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -164,8 +180,8 @@ private fun LoggedOutHeader(onLoginClick: () -> Unit) {
             modifier = Modifier
                 .height(40.dp), // 保持高度，移除 weight(0.5f)
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0x33FFFFFF),
-                contentColor = Color.White
+                containerColor = glassWhite,
+                contentColor = textColor
             ),
             shape = RoundedCornerShape(50),
             // 2. 显式设置内边距，防止默认边距过大挤压文字
@@ -192,7 +208,7 @@ private fun LoggedOutHeader(onLoginClick: () -> Unit) {
         Text(
             text = "登录体验更多精彩内容",
             style = MaterialTheme.typography.bodySmall,
-            color = Color.White.copy(alpha = 0.6f),
+            color = textColor.copy(alpha = 0.6f),
             modifier = Modifier.weight(1f) // 占据剩下的所有宽度
         )
     }
@@ -252,6 +268,9 @@ private fun UserStatsRow(
 
 @Composable
 fun StatItem(count: Int?, label: String, onClick: () -> Unit = {}) { // 添加 onClick 参数
+    val isDark = isSystemInDarkTheme()
+    val textColor = getDynamicTextColor(isDark)
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.clickable { onClick() } // 绑定点击
@@ -260,12 +279,12 @@ fun StatItem(count: Int?, label: String, onClick: () -> Unit = {}) { // 添加 o
             text = (count ?: 0).toString(),
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Bold,
-            color = Color.White
+            color = textColor
         )
         Text(
             text = label,
             style = MaterialTheme.typography.labelSmall,
-            color = Color.White.copy(alpha=0.6f)
+            color = textColor.copy(alpha=0.6f)
         )
     }
 }
@@ -276,6 +295,9 @@ fun ActionItem(
     iconTint: Color,
     onClick: () -> Unit = {}
 ) {
+    val isDark = isSystemInDarkTheme()
+    val textColor = getDynamicTextColor(isDark)
+
     Column(horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.clickable { onClick() }
     ) {
@@ -286,6 +308,6 @@ fun ActionItem(
             tint = iconTint
         )
         Spacer(Modifier.height(4.dp))
-        Text(text = text, style = MaterialTheme.typography.bodySmall, color = Color.White)
+        Text(text = text, style = MaterialTheme.typography.bodySmall, color = textColor)
     }
 }

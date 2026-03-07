@@ -25,6 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.isSystemInDarkTheme
+import com.shin.vicmusic.core.design.theme.getDynamicTextColor
 import com.shin.vicmusic.core.domain.Playlist
 import com.shin.vicmusic.feature.common.CreatePlaylistDialog
 import com.shin.vicmusic.feature.common.item.ItemPlaylist
@@ -42,6 +44,9 @@ fun PlaylistsSection(
         )
     }
 
+    val isDark = isSystemInDarkTheme()
+    val textColor = getDynamicTextColor(isDark)
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Bottom
@@ -54,7 +59,7 @@ fun PlaylistsSection(
                 text = "自建歌单",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = textColor
             )
             Spacer(Modifier.height(4.dp))
             Divider(
@@ -72,7 +77,7 @@ fun PlaylistsSection(
             Text(
                 text = "收藏歌单",
                 style = MaterialTheme.typography.titleMedium,
-                color = Color.White.copy(alpha = 0.6f)
+                color = textColor.copy(alpha = 0.6f)
             )
             Spacer(Modifier.height(4.dp))
             Divider(
@@ -86,7 +91,7 @@ fun PlaylistsSection(
         Icon(
             imageVector = Icons.Filled.Add,
             contentDescription = "Add Playlist",
-            tint = Color.White,
+            tint = textColor,
             modifier = Modifier.clickable {
                 showCreateDialog = true
             }
@@ -95,7 +100,7 @@ fun PlaylistsSection(
         Icon(
             imageVector = Icons.Filled.KeyboardArrowRight,
             contentDescription = "More Playlists",
-            tint = Color.White,
+            tint = textColor,
             modifier = Modifier.clickable { onMorePlaylistsClick() }
         )
     }

@@ -65,6 +65,7 @@ import com.shin.vicmusic.feature.vip.navigateToVip
 import androidx.compose.animation.core.*
 import androidx.compose.ui.draw.blur
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -72,15 +73,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 
-// ---- 主题色常量 ----
-private val GradientStart = Color(0xFF020617)
-private val GradientMid = Color(0xFF0F172A)
-private val GradientEnd = Color(0xFF1E293B)
-private val AccentPrimary = Color(0xFF3B82F6)
-private val AccentSecondary = Color(0xFF2DD4BF)
-private val GlassWhite = Color(0x1AFFFFFF)
-private val GlassBorder = Color(0x33FFFFFF)
-private val InputBackground = Color(0x0DFFFFFF)
+import com.shin.vicmusic.core.design.theme.getDynamicAccentPrimary
+import com.shin.vicmusic.core.design.theme.getDynamicAccentSecondary
+import com.shin.vicmusic.core.design.theme.getDynamicGlassBorder
+import com.shin.vicmusic.core.design.theme.getDynamicGlassWhite
+import com.shin.vicmusic.core.design.theme.getDynamicGradientEnd
+import com.shin.vicmusic.core.design.theme.getDynamicGradientMid
+import com.shin.vicmusic.core.design.theme.getDynamicGradientStart
+import com.shin.vicmusic.core.design.theme.getDynamicInputBackground
+import com.shin.vicmusic.core.design.theme.getDynamicTextColor
 
 @Composable
 fun MeRoute(
@@ -201,11 +202,22 @@ fun MeScreen(
         label = "glow2x"
     )
 
+    val isDark = isSystemInDarkTheme()
+    val textColor = getDynamicTextColor(isDark)
+    val accentPrimary = getDynamicAccentPrimary(isDark)
+    val accentSecondary = getDynamicAccentSecondary(isDark)
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(
-                Brush.verticalGradient(listOf(GradientStart, GradientMid, GradientEnd))
+                Brush.verticalGradient(
+                    listOf(
+                        getDynamicGradientStart(isDark),
+                        getDynamicGradientMid(isDark),
+                        getDynamicGradientEnd(isDark)
+                    )
+                )
             )
     ) {
         // ---- 背景光晕球 ----
@@ -216,7 +228,7 @@ fun MeScreen(
                 .blur(80.dp)
                 .background(
                     Brush.radialGradient(
-                        listOf(AccentPrimary.copy(alpha = 0.35f), Color.Transparent),
+                        listOf(accentPrimary.copy(alpha = 0.35f), Color.Transparent),
                         center = Offset.Zero, radius = 600f
                     ),
                     shape = RoundedCornerShape(50)
@@ -230,7 +242,7 @@ fun MeScreen(
                 .blur(70.dp)
                 .background(
                     Brush.radialGradient(
-                        listOf(AccentSecondary.copy(alpha = 0.3f), Color.Transparent),
+                        listOf(accentSecondary.copy(alpha = 0.3f), Color.Transparent),
                         center = Offset.Zero, radius = 500f
                     ),
                     shape = RoundedCornerShape(50)
@@ -244,7 +256,7 @@ fun MeScreen(
                     tabs = topBarTabs,
                     actions = topBarActions,
                     backgroundColor = Color.Transparent,
-                    contentColor = Color.White
+                    contentColor = textColor
                 )
             },
         ) { paddingValues ->
@@ -321,14 +333,17 @@ fun QuickAccessItem(
     count: String,
     onClick: () -> Unit = {}
 ) {
+    val isDark = isSystemInDarkTheme()
+    val textColor = getDynamicTextColor(isDark)
+    
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.clickable { onClick() }
     ) {
-        Icon(imageVector = icon, contentDescription = text, modifier = Modifier.size(28.dp), tint = Color.White)
+        Icon(imageVector = icon, contentDescription = text, modifier = Modifier.size(28.dp), tint = textColor)
         Spacer(Modifier.height(4.dp))
-        Text(text = text, style = MaterialTheme.typography.bodySmall, color = Color.White)
-        Text(text = count, style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.6f))
+        Text(text = text, style = MaterialTheme.typography.bodySmall, color = textColor)
+        Text(text = count, style = MaterialTheme.typography.labelSmall, color = textColor.copy(alpha = 0.6f))
     }
 }
 

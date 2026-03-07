@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,7 +30,8 @@ fun MyNavigationBar(
     onNavigateToDestination: (Int) -> Unit,
     badgeCounts: Map<TopLevelDestination, Int> = emptyMap(),
     modifier: Modifier = Modifier,
-    containerColor: Color = MaterialTheme.colorScheme.surface
+    containerColor: Color = MaterialTheme.colorScheme.surface,
+    contentColor: Color = MaterialTheme.colorScheme.onSurface
 ) {
     NavigationBar(
         modifier = modifier,
@@ -53,7 +55,14 @@ fun MyNavigationBar(
                 label = {
                     Text(text = stringResource(id = destination.titleTextId))
                 },
-                alwaysShowLabel = true
+                alwaysShowLabel = true,
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = contentColor,
+                    unselectedIconColor = contentColor.copy(alpha = 0.5f),
+                    selectedTextColor = contentColor,
+                    unselectedTextColor = contentColor.copy(alpha = 0.5f),
+                    indicatorColor = contentColor.copy(alpha = 0.1f)
+                )
             )
         }
     }
