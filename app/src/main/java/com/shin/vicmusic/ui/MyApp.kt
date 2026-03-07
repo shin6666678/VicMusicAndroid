@@ -10,6 +10,7 @@ import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -174,6 +176,32 @@ fun MyApp(
         animationSpec = tween(2000),
         label = "navBarTranslation"
     )
+
+    // 动态底部栏颜色状态
+    val isMeTabSelected = mainTabState.intValue == TopLevelDestination.entries.indexOf(TopLevelDestination.ME)
+    
+    val isDark = isSystemInDarkTheme()
+    val meTabContainerColor = if (isDark) Color(0x33000000) else Color(0x33FFFFFF)
+    val meTabContentColor = if (isDark) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+
+    val bottomContainerColor by animateColorAsState(
+        targetValue = if (isMeTabSelected) {
+            meTabContainerColor
+        } else {
+            MaterialTheme.colorScheme.surface.copy(alpha = 0.75f) // 原默认亮色系透明
+        },
+        label = "bottomContainerColor"
+    )
+
+    val bottomContentColor by animateColorAsState(
+        targetValue = if (isMeTabSelected) {
+            meTabContentColor
+        } else {
+            MaterialTheme.colorScheme.onSurface // 其他页面文字/图标颜色
+        },
+        label = "bottomContentColor"
+    )
+
     Box(modifier = Modifier.fillMaxSize()) {
         NavHost(
             navController = navController,
@@ -221,7 +249,7 @@ fun MyApp(
                 modifier = Modifier
                     .fillMaxWidth()
                     .offset(y = navBarTranslationY)
-                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.75f))
+                    .background(bottomContainerColor)
             ) {
                 // 如果当前有歌曲，就显示 SongBar
                 if (currentSong != null) {
@@ -243,6 +271,7 @@ fun MyApp(
                     onNavigateToDestination = { index -> mainTabState.intValue = index },
                     badgeCounts = badgeCounts,
                     containerColor = Color.Transparent,
+                    contentColor = bottomContentColor,
                     modifier = Modifier.fillMaxWidth(),
                 )
             }

@@ -80,17 +80,17 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 
-// ---- 视觉风格常量 (与登录页对齐) ----
-private val ProfileGradientStart = Color(0xFF020617)
-private val ProfileGradientMid = Color(0xFF0F172A)
-private val ProfileGradientEnd = Color(0xFF1E293B)
-private val ProfileAccentPrimary = Color(0xFF3B82F6)
-private val ProfileAccentSecondary = Color(0xFF2DD4BF)
-private val ProfileGlassWhite = Color(0x1AFFFFFF)
-private val ProfileGlassBorder = Color(0x33FFFFFF)
+import com.shin.vicmusic.core.design.theme.getDynamicAccentPrimary
+import com.shin.vicmusic.core.design.theme.getDynamicAccentSecondary
+import com.shin.vicmusic.core.design.theme.getDynamicGlassWhite
+import com.shin.vicmusic.core.design.theme.getDynamicGradientEnd
+import com.shin.vicmusic.core.design.theme.getDynamicGradientMid
+import com.shin.vicmusic.core.design.theme.getDynamicGradientStart
+import com.shin.vicmusic.core.design.theme.getDynamicTextColor
 
 @Preview(showBackground = true)
 @Composable
@@ -237,9 +237,14 @@ fun MyInfoScreen(
         label = "glow2x"
     )
 
+    val isDark = isSystemInDarkTheme()
+    val textColor = getDynamicTextColor(isDark)
+    val accentPrimary = getDynamicAccentPrimary(isDark)
+    val accentSecondary = getDynamicAccentSecondary(isDark)
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = ProfileGradientMid, // 设置基础背景色
+        containerColor = getDynamicGradientMid(isDark), // 设置基础背景色
         topBar = {
             TopAppBar(
                 title = { },
@@ -248,7 +253,7 @@ fun MyInfoScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = Color.White
+                            tint = textColor
                         )
                     }
                 },
@@ -257,7 +262,7 @@ fun MyInfoScreen(
                         Icon(
                             imageVector = Icons.Default.ShoppingCart,
                             contentDescription = "T-shirt",
-                            tint = Color.White
+                            tint = textColor
                         )
                     }
                 },
@@ -270,7 +275,13 @@ fun MyInfoScreen(
         Box(modifier = Modifier
             .fillMaxSize()
             .background(
-                Brush.verticalGradient(listOf(ProfileGradientStart, ProfileGradientMid, ProfileGradientEnd))
+                Brush.verticalGradient(
+                    listOf(
+                        getDynamicGradientStart(isDark), 
+                        getDynamicGradientMid(isDark), 
+                        getDynamicGradientEnd(isDark)
+                    )
+                )
             )
         ) {
             // ---- 背景光晕球 (与登录页一致) ----
@@ -281,7 +292,7 @@ fun MyInfoScreen(
                     .blur(100.dp)
                     .background(
                         Brush.radialGradient(
-                            listOf(ProfileAccentPrimary.copy(alpha = 0.2f), Color.Transparent),
+                            listOf(accentPrimary.copy(alpha = 0.2f), Color.Transparent),
                             center = Offset.Zero, radius = 800f
                         ),
                         shape = RoundedCornerShape(50)
@@ -295,7 +306,7 @@ fun MyInfoScreen(
                     .blur(90.dp)
                     .background(
                         Brush.radialGradient(
-                            listOf(ProfileAccentSecondary.copy(alpha = 0.15f), Color.Transparent),
+                            listOf(accentSecondary.copy(alpha = 0.15f), Color.Transparent),
                             center = Offset.Zero, radius = 700f
                         ),
                         shape = RoundedCornerShape(50)
@@ -400,7 +411,7 @@ fun MyInfoScreen(
                                 text = "动态列表",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.White,
+                                color = textColor,
                                 modifier = Modifier.padding(top = 8.dp)
                             )
                         }
@@ -439,11 +450,17 @@ private fun UserInfoCard(
     onEditClick: () -> Unit = {},
     onFollowClick: () -> Unit = {},
 ) {
+    val isDark = isSystemInDarkTheme()
+    val textColor = getDynamicTextColor(isDark)
+    val accentPrimary = getDynamicAccentPrimary(isDark)
+    val accentSecondary = getDynamicAccentSecondary(isDark)
+    val glassWhite = getDynamicGlassWhite(isDark)
+
     Card(
         modifier = Modifier.fillMaxWidth().padding(1.dp),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = ProfileGlassWhite
+            containerColor = glassWhite
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
@@ -481,7 +498,7 @@ private fun UserInfoCard(
                                     )
                                 )
                                 .padding(horizontal = 8.dp, vertical = 2.dp),
-                            color = Color.White,
+                            color = Color.White, // 等级标签始终为白字
                             fontWeight = FontWeight.Bold,
                             fontSize = 12.sp
                         )
@@ -494,13 +511,13 @@ private fun UserInfoCard(
                             text = user.name,
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = textColor
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = if (user.sex == 1) "男" else "女",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = Color.White.copy(alpha = 0.7f)
+                            color = textColor.copy(alpha = 0.7f)
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Row {
@@ -515,9 +532,9 @@ private fun UserInfoCard(
                         shape = CircleShape,
                         colors = ButtonDefaults.filledTonalButtonColors(
                             containerColor = if (isMe || !(user.isFollowing ?: false))
-                                ProfileAccentPrimary.copy(alpha = 0.9f)
+                                accentPrimary.copy(alpha = 0.9f)
                             else
-                                ProfileAccentSecondary.copy(alpha = 0.7f),
+                                accentSecondary.copy(alpha = 0.7f),
                             contentColor = Color.White
                         )
                     ) {
@@ -531,7 +548,7 @@ private fun UserInfoCard(
 
                 Divider(
                     modifier = Modifier.padding(vertical = 12.dp),
-                    color = Color.White.copy(alpha = 0.1f)
+                    color = textColor.copy(alpha = 0.1f)
                 )
 
                 Row(
@@ -566,11 +583,16 @@ private fun FollowerInfoItem(label: String, count: Int) {
 
 @Composable
 private fun LevelExperienceCard(user: UserInfo) {
+    val isDark = isSystemInDarkTheme()
+    val textColor = getDynamicTextColor(isDark)
+    val accentPrimary = getDynamicAccentPrimary(isDark)
+    val glassWhite = getDynamicGlassWhite(isDark)
+
     Card(
         modifier = Modifier.fillMaxWidth().padding(1.dp),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = ProfileGlassWhite
+            containerColor = glassWhite
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
@@ -591,13 +613,13 @@ private fun LevelExperienceCard(user: UserInfo) {
                     Text(
                         text = "当前等级",
                         style = MaterialTheme.typography.titleMedium,
-                        color = Color.White
+                        color = textColor
                     )
                     Text(
                         text = "Lv.${user.level}",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = ProfileAccentPrimary
+                        color = accentPrimary
                     )
                 }
 
@@ -614,8 +636,8 @@ private fun LevelExperienceCard(user: UserInfo) {
                         .fillMaxWidth()
                         .height(8.dp)
                         .clip(RoundedCornerShape(4.dp)),
-                    color = ProfileAccentPrimary,
-                    trackColor = Color.White.copy(alpha = 0.1f)
+                    color = accentPrimary,
+                    trackColor = textColor.copy(alpha = 0.1f)
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -627,7 +649,7 @@ private fun LevelExperienceCard(user: UserInfo) {
                     Text(
                         text = "${user.experience} / ${user.nextLevelExp} EXP",
                         style = MaterialTheme.typography.labelMedium,
-                        color = Color.White.copy(alpha = 0.5f)
+                        color = textColor.copy(alpha = 0.5f)
                     )
 
                     val hours = user.totalListenTime / 3600
@@ -635,7 +657,7 @@ private fun LevelExperienceCard(user: UserInfo) {
                     Text(
                         text = "总听歌: ${hours}小时${minutes}分",
                         style = MaterialTheme.typography.labelMedium,
-                        color = Color.White.copy(alpha = 0.5f)
+                        color = textColor.copy(alpha = 0.5f)
                     )
                 }
             }
@@ -646,11 +668,14 @@ private fun LevelExperienceCard(user: UserInfo) {
 
 @Composable
 private fun InfoListSection(user: UserInfo) {
+    val isDark = isSystemInDarkTheme()
+    val glassWhite = getDynamicGlassWhite(isDark)
+
     Card(
         modifier = Modifier.fillMaxWidth().padding(1.dp),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = ProfileGlassWhite
+            containerColor = glassWhite
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
@@ -675,6 +700,10 @@ private fun InfoListSection(user: UserInfo) {
 
 @Composable
 private fun InfoRowItem(icon: ImageVector, label: String, value: String) {
+    val isDark = isSystemInDarkTheme()
+    val textColor = getDynamicTextColor(isDark)
+    val accentPrimary = getDynamicAccentPrimary(isDark)
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -684,20 +713,20 @@ private fun InfoRowItem(icon: ImageVector, label: String, value: String) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = ProfileAccentPrimary,
+            tint = accentPrimary,
             modifier = Modifier.size(20.dp)
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
-            color = Color.White.copy(alpha = 0.8f),
+            color = textColor.copy(alpha = 0.8f),
             modifier = Modifier.width(80.dp)
         )
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
-            color = Color.White.copy(alpha = 0.6f),
+            color = textColor.copy(alpha = 0.6f),
             maxLines = 1
         )
     }

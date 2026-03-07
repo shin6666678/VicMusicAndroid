@@ -3,6 +3,7 @@ package com.shin.vicmusic.feature.auth
 import android.widget.Toast
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,15 +39,15 @@ import com.shin.vicmusic.R
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import kotlinx.coroutines.flow.collectLatest
 
-// ---- 主题色常量 ----
-private val GradientStart = Color(0xFF020617)
-private val GradientMid = Color(0xFF0F172A)
-private val GradientEnd = Color(0xFF1E293B)
-private val AccentPrimary = Color(0xFF3B82F6)
-private val AccentSecondary = Color(0xFF2DD4BF)
-private val GlassWhite = Color(0x1AFFFFFF)
-private val GlassBorder = Color(0x33FFFFFF)
-private val InputBackground = Color(0x0DFFFFFF)
+import com.shin.vicmusic.core.design.theme.getDynamicAccentPrimary
+import com.shin.vicmusic.core.design.theme.getDynamicAccentSecondary
+import com.shin.vicmusic.core.design.theme.getDynamicGlassBorder
+import com.shin.vicmusic.core.design.theme.getDynamicGlassWhite
+import com.shin.vicmusic.core.design.theme.getDynamicGradientEnd
+import com.shin.vicmusic.core.design.theme.getDynamicGradientMid
+import com.shin.vicmusic.core.design.theme.getDynamicGradientStart
+import com.shin.vicmusic.core.design.theme.getDynamicInputBackground
+import com.shin.vicmusic.core.design.theme.getDynamicTextColor
 
 @Composable
 fun RegisterRoute(
@@ -110,6 +111,11 @@ fun RegisterScreen(
         contentSlide.animateTo(0f, animationSpec = tween(600, easing = FastOutSlowInEasing))
     }
 
+    val isDark = isSystemInDarkTheme()
+    val textColor = getDynamicTextColor(isDark)
+    val accentPrimary = getDynamicAccentPrimary(isDark)
+    val accentSecondary = getDynamicAccentSecondary(isDark)
+
     // ---- 浮动光晕动画 ----
     val infiniteTransition = rememberInfiniteTransition(label = "glow")
     val glow1X by infiniteTransition.animateFloat(
@@ -132,7 +138,13 @@ fun RegisterScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(
-                Brush.verticalGradient(listOf(GradientStart, GradientMid, GradientEnd))
+                Brush.verticalGradient(
+                    listOf(
+                        getDynamicGradientStart(isDark),
+                        getDynamicGradientMid(isDark),
+                        getDynamicGradientEnd(isDark)
+                    )
+                )
             )
     ) {
         // ---- 背景光晕球 ----
@@ -143,7 +155,7 @@ fun RegisterScreen(
                 .blur(80.dp)
                 .background(
                     Brush.radialGradient(
-                        listOf(AccentPrimary.copy(alpha = 0.35f), Color.Transparent),
+                        listOf(accentPrimary.copy(alpha = 0.35f), Color.Transparent),
                         center = Offset.Zero, radius = 600f
                     ),
                     shape = RoundedCornerShape(50)
@@ -157,7 +169,7 @@ fun RegisterScreen(
                 .blur(70.dp)
                 .background(
                     Brush.radialGradient(
-                        listOf(AccentSecondary.copy(alpha = 0.3f), Color.Transparent),
+                        listOf(accentSecondary.copy(alpha = 0.3f), Color.Transparent),
                         center = Offset.Zero, radius = 500f
                     ),
                     shape = RoundedCornerShape(50)
@@ -172,7 +184,7 @@ fun RegisterScreen(
                 .padding(16.dp)
                 .alpha(contentAlpha.value)
         ) {
-            Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+            Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = textColor)
         }
 
         // ---- 主内容 ----
@@ -191,7 +203,7 @@ fun RegisterScreen(
                     .clip(RoundedCornerShape(20.dp))
                     .background(
                         Brush.linearGradient(
-                            listOf(AccentPrimary, AccentSecondary),
+                            listOf(accentPrimary, accentSecondary),
                             start = Offset(0f, 0f), end = Offset(300f, 300f)
                         )
                     ),
@@ -212,7 +224,7 @@ fun RegisterScreen(
                 text = "创建账号",
                 fontSize = 32.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color = Color.White,
+                color = textColor,
                 modifier = Modifier.alpha(contentAlpha.value)
             )
 
@@ -226,7 +238,7 @@ fun RegisterScreen(
                     .offset(y = contentSlide.value.dp)
                     .alpha(contentAlpha.value)
                     .clip(RoundedCornerShape(24.dp))
-                    .background(GlassWhite)
+                    .background(getDynamicGlassWhite(isDark))
                     .padding(1.dp)
             ) {
                 Column(
@@ -235,7 +247,7 @@ fun RegisterScreen(
                         .clip(RoundedCornerShape(24.dp))
                         .background(
                             Brush.verticalGradient(
-                                listOf(Color(0x26FFFFFF), Color(0x0DFFFFFF))
+                                listOf(getDynamicGlassBorder(isDark).copy(alpha = 0.15f), getDynamicInputBackground(isDark).copy(alpha = 0.05f))
                             )
                         )
                         .padding(horizontal = 24.dp, vertical = 24.dp),
@@ -248,7 +260,7 @@ fun RegisterScreen(
                             text = "第一步：验证邮箱",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White.copy(alpha = 0.9f),
+                            color = textColor.copy(alpha = 0.9f),
                             modifier = Modifier.fillMaxWidth()
                         )
                         Spacer(modifier = Modifier.height(20.dp))
@@ -259,7 +271,7 @@ fun RegisterScreen(
                             onValueChange = { onIntent(RegisterIntent.UpdateEmail(it)) },
                             label = "邮箱地址",
                             leadingIcon = {
-                                Icon(Icons.Default.Email, null, tint = AccentPrimary.copy(alpha = 0.8f))
+                                Icon(Icons.Default.Email, null, tint = accentPrimary.copy(alpha = 0.8f))
                             },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Email,
@@ -280,7 +292,7 @@ fun RegisterScreen(
                                     onValueChange = { onIntent(RegisterIntent.UpdateCaptcha(it)) },
                                     label = "图形验证码",
                                     leadingIcon = {
-                                        Icon(Icons.Default.Image, null, tint = AccentPrimary.copy(alpha = 0.8f))
+                                        Icon(Icons.Default.Image, null, tint = accentPrimary.copy(alpha = 0.8f))
                                     },
                                     keyboardOptions = KeyboardOptions(
                                         keyboardType = KeyboardType.Text,
@@ -310,7 +322,7 @@ fun RegisterScreen(
                                 } else {
                                     CircularProgressIndicator(
                                         modifier = Modifier.size(24.dp),
-                                        color = AccentPrimary,
+                                        color = accentPrimary,
                                         strokeWidth = 2.dp
                                     )
                                 }
@@ -339,7 +351,7 @@ fun RegisterScreen(
                                     .background(
                                         if (!uiState.emailCodeSending)
                                             Brush.linearGradient(
-                                                listOf(AccentPrimary, AccentSecondary),
+                                                listOf(accentPrimary, accentSecondary),
                                                 start = Offset(0f, 0f), end = Offset(800f, 0f)
                                             )
                                         else
@@ -365,13 +377,13 @@ fun RegisterScreen(
                             text = "第二步：设置密码",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White.copy(alpha = 0.9f),
+                            color = textColor.copy(alpha = 0.9f),
                             modifier = Modifier.fillMaxWidth()
                         )
                         Text(
                             text = "验证码已发送至 ${uiState.email}",
                             fontSize = 12.sp,
-                            color = AccentSecondary.copy(alpha = 0.9f),
+                            color = accentSecondary.copy(alpha = 0.9f),
                             modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
@@ -382,7 +394,7 @@ fun RegisterScreen(
                             onValueChange = { onIntent(RegisterIntent.UpdateMailCode(it)) },
                             label = "邮箱收到的验证码",
                             leadingIcon = {
-                                Icon(Icons.Default.Pin, null, tint = AccentPrimary.copy(alpha = 0.8f))
+                                Icon(Icons.Default.Pin, null, tint = accentPrimary.copy(alpha = 0.8f))
                             },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number,
@@ -398,14 +410,14 @@ fun RegisterScreen(
                             onValueChange = { onIntent(RegisterIntent.UpdatePassword(it)) },
                             label = "设置密码",
                             leadingIcon = {
-                                Icon(Icons.Default.Lock, null, tint = AccentPrimary.copy(alpha = 0.8f))
+                                Icon(Icons.Default.Lock, null, tint = accentPrimary.copy(alpha = 0.8f))
                             },
                             trailingIcon = {
                                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                                     Icon(
                                         imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
                                         contentDescription = null,
-                                        tint = Color.White.copy(alpha = 0.5f)
+                                        tint = textColor.copy(alpha = 0.5f)
                                     )
                                 }
                             },
@@ -438,7 +450,7 @@ fun RegisterScreen(
                                     .background(
                                         if (!uiState.isLoading)
                                             Brush.linearGradient(
-                                                listOf(AccentPrimary, AccentSecondary),
+                                                listOf(accentPrimary, accentSecondary),
                                                 start = Offset(0f, 0f), end = Offset(800f, 0f)
                                             )
                                         else
@@ -466,7 +478,7 @@ fun RegisterScreen(
             // 底部提示信息
             Text(
                 text = "注册即代表您同意 VicMusic 的服务条款和隐私权政策",
-                color = Color.White.copy(alpha = 0.4f),
+                color = textColor.copy(alpha = 0.4f),
                 fontSize = 12.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
@@ -489,10 +501,16 @@ private fun AuthTextField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
+    val isDark = isSystemInDarkTheme()
+    val textColor = getDynamicTextColor(isDark)
+    val accentPrimary = getDynamicAccentPrimary(isDark)
+    val glassBorder = getDynamicGlassBorder(isDark)
+    val inputBg = getDynamicInputBackground(isDark)
+
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label, color = Color.White.copy(alpha = 0.5f), fontSize = 13.sp) },
+        label = { Text(label, color = textColor.copy(alpha = 0.5f), fontSize = 13.sp) },
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
         visualTransformation = visualTransformation,
@@ -501,14 +519,14 @@ private fun AuthTextField(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = Color.White,
-            unfocusedTextColor = Color.White,
-            focusedBorderColor = AccentPrimary,
-            unfocusedBorderColor = GlassBorder,
-            focusedContainerColor = InputBackground,
-            unfocusedContainerColor = InputBackground,
-            cursorColor = AccentPrimary,
-            focusedLabelColor = AccentPrimary,
+            focusedTextColor = textColor,
+            unfocusedTextColor = textColor,
+            focusedBorderColor = accentPrimary,
+            unfocusedBorderColor = glassBorder,
+            focusedContainerColor = inputBg,
+            unfocusedContainerColor = inputBg,
+            cursorColor = accentPrimary,
+            focusedLabelColor = accentPrimary,
         )
     )
 }
