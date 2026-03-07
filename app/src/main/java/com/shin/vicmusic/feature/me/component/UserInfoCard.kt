@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.isSystemInDarkTheme
+import com.shin.vicmusic.core.design.theme.isAppInDarkTheme
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -46,10 +46,8 @@ import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.feature.common.MyAsyncImage
 import com.shin.vicmusic.feature.common.icon.UserLevelIcon
 import com.shin.vicmusic.feature.common.icon.VipIcon
+import com.shin.vicmusic.core.design.theme.LocalAppColors
 
-import com.shin.vicmusic.core.design.theme.getDynamicGlassBorder
-import com.shin.vicmusic.core.design.theme.getDynamicGlassWhite
-import com.shin.vicmusic.core.design.theme.getDynamicTextColor
 
 @Preview
 @Composable
@@ -80,9 +78,9 @@ fun UserInfoCard(
     onFriendClick: () -> Unit = {},
     onCheckInClick: () -> Unit = {}
 ) {
-    val isDark = isSystemInDarkTheme()
-    val glassWhite = getDynamicGlassWhite(isDark)
-    val glassBorder = getDynamicGlassBorder(isDark)
+    val isDark = isAppInDarkTheme()
+    val glassWhite = LocalAppColors.current.glassWhite
+    val glassBorder = LocalAppColors.current.glassBorder
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -128,8 +126,8 @@ private fun LoggedInHeader(
     // 1. 解析 VIP 等级 (默认为 0)
     val vipLevelInt = user.vipLevel
     
-    val isDark = isSystemInDarkTheme()
-    val textColor = getDynamicTextColor(isDark)
+    val isDark = isAppInDarkTheme()
+    val textColor = LocalAppColors.current.textColor
 
 
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -165,9 +163,9 @@ private fun LoggedInHeader(
 
 @Composable
 private fun LoggedOutHeader(onLoginClick: () -> Unit) {
-    val isDark = isSystemInDarkTheme()
-    val textColor = getDynamicTextColor(isDark)
-    val glassWhite = getDynamicGlassWhite(isDark)
+    val isDark = isAppInDarkTheme()
+    val textColor = LocalAppColors.current.textColor
+    val glassWhite = LocalAppColors.current.glassWhite
     
     val VdGreen = Color(0xFF1AAD19)
     Row(
@@ -268,8 +266,8 @@ private fun UserStatsRow(
 
 @Composable
 fun StatItem(count: Int?, label: String, onClick: () -> Unit = {}) { // 添加 onClick 参数
-    val isDark = isSystemInDarkTheme()
-    val textColor = getDynamicTextColor(isDark)
+    val isDark = isAppInDarkTheme()
+    val textColor = LocalAppColors.current.textColor
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -295,8 +293,8 @@ fun ActionItem(
     iconTint: Color,
     onClick: () -> Unit = {}
 ) {
-    val isDark = isSystemInDarkTheme()
-    val textColor = getDynamicTextColor(isDark)
+    val isDark = isAppInDarkTheme()
+    val textColor = LocalAppColors.current.textColor
 
     Column(horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.clickable { onClick() }

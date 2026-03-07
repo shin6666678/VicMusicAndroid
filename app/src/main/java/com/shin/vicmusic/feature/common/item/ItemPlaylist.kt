@@ -27,15 +27,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.isSystemInDarkTheme
-import com.shin.vicmusic.core.design.theme.getDynamicTextColor
+import com.shin.vicmusic.core.design.theme.isAppInDarkTheme
 import com.shin.vicmusic.core.domain.Playlist
 import com.shin.vicmusic.feature.common.MyAsyncImage
+import com.shin.vicmusic.core.design.theme.LocalAppColors
 
 @Composable
 fun ItemPlaylist(playlist: Playlist, onClick: () -> Unit) {
-    val isDark = isSystemInDarkTheme()
-    val textColor = getDynamicTextColor(isDark)
+    val textColor = LocalAppColors.current.textColor
 
     Row(
         modifier = Modifier
@@ -90,8 +89,7 @@ fun ItemPlaylistSquare(
     playlist: Playlist,
     onClick: () -> Unit = {}
 ) {
-    val isDark = isSystemInDarkTheme()
-    val textColor = getDynamicTextColor(isDark)
+    val textColor = LocalAppColors.current.textColor
 
     Column(
         modifier = Modifier

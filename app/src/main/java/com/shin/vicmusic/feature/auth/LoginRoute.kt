@@ -3,7 +3,7 @@ package com.shin.vicmusic.feature.auth
 import android.widget.Toast
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
+import com.shin.vicmusic.core.design.theme.isAppInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -37,16 +37,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.R
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import kotlinx.coroutines.flow.collectLatest
+import com.shin.vicmusic.core.design.theme.LocalAppColors
 
-import com.shin.vicmusic.core.design.theme.getDynamicAccentPrimary
-import com.shin.vicmusic.core.design.theme.getDynamicAccentSecondary
-import com.shin.vicmusic.core.design.theme.getDynamicGlassBorder
-import com.shin.vicmusic.core.design.theme.getDynamicGlassWhite
-import com.shin.vicmusic.core.design.theme.getDynamicGradientEnd
-import com.shin.vicmusic.core.design.theme.getDynamicGradientMid
-import com.shin.vicmusic.core.design.theme.getDynamicGradientStart
-import com.shin.vicmusic.core.design.theme.getDynamicInputBackground
-import com.shin.vicmusic.core.design.theme.getDynamicTextColor
 
 @Composable
 fun LoginRoute(
@@ -98,10 +90,9 @@ fun LoginScreen(
         contentSlide.animateTo(0f, animationSpec = tween(600, easing = FastOutSlowInEasing))
     }
 
-    val isDark = isSystemInDarkTheme()
-    val textColor = getDynamicTextColor(isDark)
-    val accentPrimary = getDynamicAccentPrimary(isDark)
-    val accentSecondary = getDynamicAccentSecondary(isDark)
+    val textColor = LocalAppColors.current.textColor
+    val accentPrimary = LocalAppColors.current.accentPrimary
+    val accentSecondary = LocalAppColors.current.accentSecondary
 
     // ---- 浮动光晕动画 ----
     val infiniteTransition = rememberInfiniteTransition(label = "glow")
@@ -127,9 +118,9 @@ fun LoginScreen(
             .background(
                 Brush.verticalGradient(
                     listOf(
-                        getDynamicGradientStart(isDark),
-                        getDynamicGradientMid(isDark),
-                        getDynamicGradientEnd(isDark)
+                        LocalAppColors.current.gradientStart,
+                        LocalAppColors.current.gradientMid,
+                        LocalAppColors.current.gradientEnd
                     )
                 )
             )
@@ -221,7 +212,7 @@ fun LoginScreen(
                     .offset(y = contentSlide.value.dp)
                     .alpha(contentAlpha.value)
                     .clip(RoundedCornerShape(24.dp))
-                    .background(getDynamicGlassWhite(isDark))
+                    .background(LocalAppColors.current.glassWhite)
                     .padding(1.dp)
             ) {
                 Column(
@@ -230,7 +221,7 @@ fun LoginScreen(
                         .clip(RoundedCornerShape(24.dp))
                         .background(
                             Brush.verticalGradient(
-                                listOf(getDynamicGlassBorder(isDark).copy(alpha = 0.15f), getDynamicInputBackground(isDark).copy(alpha = 0.05f))
+                                listOf(LocalAppColors.current.glassBorder.copy(alpha = 0.15f), LocalAppColors.current.inputBackground.copy(alpha = 0.05f))
                             )
                         )
                         .padding(horizontal = 24.dp, vertical = 32.dp),
@@ -371,11 +362,11 @@ private fun AuthTextField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
-    val isDark = isSystemInDarkTheme()
-    val textColor = getDynamicTextColor(isDark)
-    val accentPrimary = getDynamicAccentPrimary(isDark)
-    val glassBorder = getDynamicGlassBorder(isDark)
-    val inputBg = getDynamicInputBackground(isDark)
+    val isDark = isAppInDarkTheme()
+    val textColor = LocalAppColors.current.textColor
+    val accentPrimary = LocalAppColors.current.accentPrimary
+    val glassBorder = LocalAppColors.current.glassBorder
+    val inputBg = LocalAppColors.current.inputBackground
 
     OutlinedTextField(
         value = value,

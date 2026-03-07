@@ -1,0 +1,57 @@
+﻿package com.shin.vicmusic.core.design.theme
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
+
+val LocalThemeIsDark = compositionLocalOf { false }
+
+@Composable
+fun isAppInDarkTheme(): Boolean = LocalThemeIsDark.current
+
+data class AppColors(
+    val gradientStart: Color,
+    val gradientMid: Color,
+    val gradientEnd: Color,
+    val accentPrimary: Color,
+    val accentSecondary: Color,
+    val glassWhite: Color,
+    val glassBorder: Color,
+    val inputBackground: Color,
+    val textColor: Color,
+    val iconColor: Color,
+    val isDark: Boolean
+)
+
+val lightAppColors = AppColors(
+    gradientStart = Color(0xFFF1F5F9),
+    gradientMid = Color(0xFFE2E8F0),
+    gradientEnd = Color(0xFFCBD5E1),
+    accentPrimary = Color(0xFF60A5FA),
+    accentSecondary = Color(0xFF34D399),
+    glassWhite = Color(0x66FFFFFF),
+    glassBorder = Color(0x26000000),
+    inputBackground = Color(0x0D000000),
+    textColor = Color(0xFF1E293B),
+    iconColor = Color(0xFF1E293B),
+    isDark = false
+)
+
+val darkAppColors = AppColors(
+    gradientStart = Color(0xFF020617),
+    gradientMid = Color(0xFF0F172A),
+    gradientEnd = Color(0xFF1E293B),
+    accentPrimary = Color(0xFF3B82F6),
+    accentSecondary = Color(0xFF2DD4BF),
+    glassWhite = Color(0x1AFFFFFF),
+    glassBorder = Color(0x33FFFFFF),
+    inputBackground = Color(0x0DFFFFFF),
+    textColor = Color.White,
+    iconColor = Color.White,
+    isDark = true
+)
+
+val LocalAppColors = staticCompositionLocalOf<AppColors> {
+    error("No AppColors provided!")
+}

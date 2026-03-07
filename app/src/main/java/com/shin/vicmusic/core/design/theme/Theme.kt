@@ -1,7 +1,7 @@
 package com.shin.vicmusic.core.design.theme
 
 import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
+import com.shin.vicmusic.core.design.theme.isAppInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -38,7 +38,7 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun VicMusicTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = isAppInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit

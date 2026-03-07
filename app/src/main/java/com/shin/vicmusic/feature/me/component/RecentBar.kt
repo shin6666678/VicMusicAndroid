@@ -27,11 +27,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.isSystemInDarkTheme
-import com.shin.vicmusic.core.design.theme.getDynamicTextColor
+import com.shin.vicmusic.core.design.theme.isAppInDarkTheme
 import coil.compose.AsyncImage
 import com.shin.vicmusic.core.domain.Playlist
 import com.shin.vicmusic.feature.common.item.ItemPlaylistSquare
+import com.shin.vicmusic.core.design.theme.LocalAppColors
 
 @Composable
 fun RecentBar(
@@ -40,8 +40,8 @@ fun RecentBar(
     recentIcon: String = "",                 // 最近播放歌曲封面
     onRecentOrMoreClick: () -> Unit = {},    // 点击"全部已播"或"更多"
 ) {
-    val isDark = isSystemInDarkTheme()
-    val textColor = getDynamicTextColor(isDark)
+    val isDark = isAppInDarkTheme()
+    val textColor = LocalAppColors.current.textColor
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Spacer(Modifier.height(12.dp)) // 稍微调整顶部间距

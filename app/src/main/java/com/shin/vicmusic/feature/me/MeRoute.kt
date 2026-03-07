@@ -65,23 +65,15 @@ import com.shin.vicmusic.feature.vip.navigateToVip
 import androidx.compose.animation.core.*
 import androidx.compose.ui.draw.blur
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
+import com.shin.vicmusic.core.design.theme.isAppInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
+import com.shin.vicmusic.core.design.theme.LocalAppColors
 
-import com.shin.vicmusic.core.design.theme.getDynamicAccentPrimary
-import com.shin.vicmusic.core.design.theme.getDynamicAccentSecondary
-import com.shin.vicmusic.core.design.theme.getDynamicGlassBorder
-import com.shin.vicmusic.core.design.theme.getDynamicGlassWhite
-import com.shin.vicmusic.core.design.theme.getDynamicGradientEnd
-import com.shin.vicmusic.core.design.theme.getDynamicGradientMid
-import com.shin.vicmusic.core.design.theme.getDynamicGradientStart
-import com.shin.vicmusic.core.design.theme.getDynamicInputBackground
-import com.shin.vicmusic.core.design.theme.getDynamicTextColor
 
 @Composable
 fun MeRoute(
@@ -202,10 +194,10 @@ fun MeScreen(
         label = "glow2x"
     )
 
-    val isDark = isSystemInDarkTheme()
-    val textColor = getDynamicTextColor(isDark)
-    val accentPrimary = getDynamicAccentPrimary(isDark)
-    val accentSecondary = getDynamicAccentSecondary(isDark)
+    val isDark = isAppInDarkTheme()
+    val textColor = LocalAppColors.current.textColor
+    val accentPrimary = LocalAppColors.current.accentPrimary
+    val accentSecondary = LocalAppColors.current.accentSecondary
 
     Box(
         modifier = Modifier
@@ -213,9 +205,9 @@ fun MeScreen(
             .background(
                 Brush.verticalGradient(
                     listOf(
-                        getDynamicGradientStart(isDark),
-                        getDynamicGradientMid(isDark),
-                        getDynamicGradientEnd(isDark)
+                        LocalAppColors.current.gradientStart,
+                        LocalAppColors.current.gradientMid,
+                        LocalAppColors.current.gradientEnd
                     )
                 )
             )
@@ -333,8 +325,8 @@ fun QuickAccessItem(
     count: String,
     onClick: () -> Unit = {}
 ) {
-    val isDark = isSystemInDarkTheme()
-    val textColor = getDynamicTextColor(isDark)
+    val isDark = isAppInDarkTheme()
+    val textColor = LocalAppColors.current.textColor
     
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

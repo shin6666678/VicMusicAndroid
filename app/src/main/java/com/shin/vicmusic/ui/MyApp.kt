@@ -17,11 +17,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.isSystemInDarkTheme
+import com.shin.vicmusic.core.design.theme.isAppInDarkTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -180,7 +181,7 @@ fun MyApp(
     // 动态底部栏颜色状态
     val isMeTabSelected = mainTabState.intValue == TopLevelDestination.entries.indexOf(TopLevelDestination.ME)
     
-    val isDark = isSystemInDarkTheme()
+    val isDark = isAppInDarkTheme()
     val meTabContainerColor = if (isDark) Color(0x33000000) else Color(0x33FFFFFF)
     val meTabContentColor = if (isDark) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
 
@@ -295,24 +296,22 @@ fun MyApp(
             }
         }
 
-        // 歌曲详情弹窗 (Bottom Sheet)
-        if (showSongDetailSheet) {
-            ModalBottomSheet(
-                onDismissRequest = { 
-                    showSongDetailSheet = false 
-                },
-                sheetState = songDetailSheetState,
-                containerColor = Color.Transparent,
-                dragHandle = null,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                SongDetailRoute(
-                    songId = currentSong?.id,
-                    onDismiss = { 
-                        showSongDetailSheet = false
-                    }
-                )
+        // 歌曲详情页 Edge-to-Edge 覆盖层
+        androidx.compose.animation.AnimatedVisibility(
+            visible = showSongDetailSheet,
+            enter = androidx.compose.animation.slideInVertically(initialOffsetY = { it }),
+            exit = androidx.compose.animation.slideOutVertically(targetOffsetY = { it }),
+            modifier = Modifier.fillMaxSize()
+        ) {
+            androidx.activity.compose.BackHandler {
+                showSongDetailSheet = false
             }
+            SongDetailRoute(
+                songId = currentSong?.id,
+                onDismiss = { 
+                    showSongDetailSheet = false
+                }
+            )
         }
 
         // Global Copyright Dialog
