@@ -3,6 +3,12 @@
 
     <style name="Theme.VicMusic" parent="android:Theme.Material.Light.NoActionBar" />
 
+    <style name="Theme.VicMusic.Transparent" parent="Theme.VicMusic">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@android:color/white</item>
         <item name="windowSplashScreenAnimatedIcon">@android:color/transparent</item>

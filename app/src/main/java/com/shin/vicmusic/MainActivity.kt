@@ -12,17 +12,25 @@ import androidx.media3.common.util.UnstableApi
 import androidx.navigation.compose.rememberNavController
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.foundation.isSystemInDarkTheme
 import com.shin.vicmusic.core.design.composition.LocalAuthManager
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.composition.LocalPlaybackQueueManager
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
 import com.shin.vicmusic.core.design.composition.LocalSongActionManager
 import com.shin.vicmusic.core.design.composition.LocalTokenManager
+import com.shin.vicmusic.core.design.theme.LocalAppColors
+import com.shin.vicmusic.core.design.theme.LocalThemeIsDark
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
+import com.shin.vicmusic.core.design.theme.darkAppColors
+import com.shin.vicmusic.core.design.theme.lightAppColors
 import com.shin.vicmusic.core.manager.AuthManager
 import com.shin.vicmusic.core.manager.PlaybackQueueManager
 import com.shin.vicmusic.core.manager.PlayerManager
 import com.shin.vicmusic.core.manager.SongActionManager
+import com.shin.vicmusic.core.manager.ThemeManager
 import com.shin.vicmusic.core.manager.TokenManager
 import com.shin.vicmusic.core.worker.MessageCheckWorker
 import com.shin.vicmusic.feature.main.MainViewModel
@@ -44,6 +52,8 @@ class MainActivity : ComponentActivity() {
     lateinit var tokenManager: TokenManager
     @Inject
     lateinit var songActionManager: SongActionManager
+    @Inject
+    lateinit var themeManager: ThemeManager
 
     private val mainViewModel: MainViewModel by viewModels()
 
@@ -61,6 +71,14 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val navController = rememberNavController()
+            val themeMode by themeManager.themeMode.collectAsState(initial = com.shin.vicmusic.core.manager.AppThemeMode.SYSTEM)
+            val isSystemDark = isSystemInDarkTheme()
+            val isDarkTheme = when (themeMode) {
+                com.shin.vicmusic.core.manager.AppThemeMode.LIGHT -> false
+                com.shin.vicmusic.core.manager.AppThemeMode.DARK -> true
+                com.shin.vicmusic.core.manager.AppThemeMode.SYSTEM -> isSystemDark
+                else -> isSystemDark
+            }
             VicMusicTheme {
                 CompositionLocalProvider(
                     LocalPlayerManager provides playerManager,
@@ -68,7 +86,9 @@ class MainActivity : ComponentActivity() {
                     LocalPlaybackQueueManager provides playbackQueueManager,
                     LocalAuthManager provides authManager,
                     LocalTokenManager provides tokenManager,
-                    LocalSongActionManager provides songActionManager
+                    LocalSongActionManager provides songActionManager,
+                    LocalThemeIsDark provides isDarkTheme,
+                    LocalAppColors provides if (isDarkTheme) darkAppColors else lightAppColors
                 ) {
                     MyApp()
                 }

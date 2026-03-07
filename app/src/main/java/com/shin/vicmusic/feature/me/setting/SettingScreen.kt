@@ -3,38 +3,45 @@ package com.shin.vicmusic.feature.me.setting
 import android.content.Intent
 import android.provider.Settings
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.Alignment
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
+import com.shin.vicmusic.core.manager.AppThemeMode
 import com.shin.vicmusic.feature.common.bar.CommonTopBar
 
 @Composable
 fun SettingRoute(
-    viewModel: SettingViewModel= hiltViewModel(),
+    viewModel: SettingViewModel = hiltViewModel(),
 ) {
-    val navController= LocalNavController.current
+    val navController = LocalNavController.current
+    val currentThemeMode by viewModel.currentThemeMode.collectAsState(initial = AppThemeMode.SYSTEM)
     SettingScreen(
+        currentThemeMode = currentThemeMode,
+        onThemeChanged = viewModel::updateTheme,
         onBackClick = navController::popBackStack,
         onLogoutClick = viewModel::logout,
         onDebugCheckMessage = viewModel::triggerMessageCheck
     )
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingScreen(
-    onBackClick: () -> Unit={},
-    onLogoutClick: ()->Unit={},
+    currentThemeMode: AppThemeMode,
+    onThemeChanged: (AppThemeMode) -> Unit,
+    onBackClick: () -> Unit = {},
+    onLogoutClick: () -> Unit = {},
     onDebugCheckMessage: () -> Unit = {}
 ) {
+    var showThemeDialog by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             CommonTopBar(midText = "设置", popBackStack = onBackClick)
@@ -45,11 +52,18 @@ fun SettingScreen(
                 .padding(paddingValues)
                 .fillMaxWidth()
         ) {
-            // 简单示例条目
             SettingItem(title = "账号安全")
             SettingItem(title = "消息通知")
             SettingItem(title = "隐私设置")
             SettingItem(title = "通用")
+
+            val themeText = when (currentThemeMode) {
+                AppThemeMode.SYSTEM -> "跟随系统"
+                AppThemeMode.LIGHT -> "浅色模式"
+                AppThemeMode.DARK -> "深色模式"
+            }
+            SettingItem(title = "外观设置", subtitle = themeText, onClick = { showThemeDialog = true })
+
             val context = androidx.compose.ui.platform.LocalContext.current
             SettingItem(title = "【Debug】立即检查消息", onClick = onDebugCheckMessage)
             SettingItem(
@@ -63,18 +77,65 @@ fun SettingScreen(
             SettingItem(title = "切换账号")
             SettingItem(title = "退出登录", textColor = Color.Red, onClick = onLogoutClick)
         }
+
+        if (showThemeDialog) {
+            AlertDialog(
+                onDismissRequest = { showThemeDialog = false },
+                title = { Text("选择外观主题") },
+                text = {
+                    Column {
+                        ThemeOptionItem(text = "跟随系统", selected = currentThemeMode == AppThemeMode.SYSTEM) {
+                            onThemeChanged(AppThemeMode.SYSTEM)
+                            showThemeDialog = false
+                        }
+                        ThemeOptionItem(text = "浅色模式", selected = currentThemeMode == AppThemeMode.LIGHT) {
+                            onThemeChanged(AppThemeMode.LIGHT)
+                            showThemeDialog = false
+                        }
+                        ThemeOptionItem(text = "深色模式", selected = currentThemeMode == AppThemeMode.DARK) {
+                            onThemeChanged(AppThemeMode.DARK)
+                            showThemeDialog = false
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { showThemeDialog = false }) {
+                        Text("关闭")
+                    }
+                }
+            )
+        }
     }
 }
 
 @Composable
-fun SettingItem(title: String, textColor: Color = Color.Unspecified, onClick: () -> Unit = {}) {
-    Text(
-        text = title,
+fun ThemeOptionItem(text: String, selected: Boolean, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RadioButton(selected = selected, onClick = onClick)
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(text)
+    }
+}
+
+@Composable
+fun SettingItem(title: String, subtitle: String? = null, textColor: Color = Color.Unspecified, onClick: () -> Unit = {}) {
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 16.dp),
-        fontSize = 16.sp,
-        color = textColor
-    )
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = title, fontSize = 16.sp, color = textColor)
+        if (subtitle != null) {
+            Text(text = subtitle, fontSize = 14.sp, color = Color.Gray)
+        }
+    }
 }

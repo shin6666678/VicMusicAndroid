@@ -1,4 +1,4 @@
-package com.shin.vicmusic.feature.myInfo
+﻿package com.shin.vicmusic.feature.myInfo
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -81,16 +81,18 @@ import androidx.compose.animation.core.*
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.foundation.isSystemInDarkTheme
+import com.shin.vicmusic.core.design.theme.LocalAppColors
+import com.shin.vicmusic.core.design.theme.isAppInDarkTheme
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 
-import com.shin.vicmusic.core.design.theme.getDynamicAccentPrimary
-import com.shin.vicmusic.core.design.theme.getDynamicAccentSecondary
-import com.shin.vicmusic.core.design.theme.getDynamicGlassWhite
-import com.shin.vicmusic.core.design.theme.getDynamicGradientEnd
-import com.shin.vicmusic.core.design.theme.getDynamicGradientMid
-import com.shin.vicmusic.core.design.theme.getDynamicGradientStart
-import com.shin.vicmusic.core.design.theme.getDynamicTextColor
+
+
+
+
+
+
+
 
 @Preview(showBackground = true)
 @Composable
@@ -238,13 +240,13 @@ fun MyInfoScreen(
     )
 
     val isDark = isSystemInDarkTheme()
-    val textColor = getDynamicTextColor(isDark)
-    val accentPrimary = getDynamicAccentPrimary(isDark)
-    val accentSecondary = getDynamicAccentSecondary(isDark)
+    val textColor = LocalAppColors.current.textColor
+    val accentPrimary = LocalAppColors.current.accentPrimary
+    val accentSecondary = LocalAppColors.current.accentSecondary
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = getDynamicGradientMid(isDark), // 设置基础背景色
+        containerColor = LocalAppColors.current.gradientMid, // 设置基础背景色
         topBar = {
             TopAppBar(
                 title = { },
@@ -277,9 +279,9 @@ fun MyInfoScreen(
             .background(
                 Brush.verticalGradient(
                     listOf(
-                        getDynamicGradientStart(isDark), 
-                        getDynamicGradientMid(isDark), 
-                        getDynamicGradientEnd(isDark)
+                        LocalAppColors.current.gradientStart, 
+                        LocalAppColors.current.gradientMid, 
+                        LocalAppColors.current.gradientEnd
                     )
                 )
             )
@@ -451,10 +453,10 @@ private fun UserInfoCard(
     onFollowClick: () -> Unit = {},
 ) {
     val isDark = isSystemInDarkTheme()
-    val textColor = getDynamicTextColor(isDark)
-    val accentPrimary = getDynamicAccentPrimary(isDark)
-    val accentSecondary = getDynamicAccentSecondary(isDark)
-    val glassWhite = getDynamicGlassWhite(isDark)
+    val textColor = LocalAppColors.current.textColor
+    val accentPrimary = LocalAppColors.current.accentPrimary
+    val accentSecondary = LocalAppColors.current.accentSecondary
+    val glassWhite = LocalAppColors.current.glassWhite
 
     Card(
         modifier = Modifier.fillMaxWidth().padding(1.dp),
@@ -584,9 +586,9 @@ private fun FollowerInfoItem(label: String, count: Int) {
 @Composable
 private fun LevelExperienceCard(user: UserInfo) {
     val isDark = isSystemInDarkTheme()
-    val textColor = getDynamicTextColor(isDark)
-    val accentPrimary = getDynamicAccentPrimary(isDark)
-    val glassWhite = getDynamicGlassWhite(isDark)
+    val textColor = LocalAppColors.current.textColor
+    val accentPrimary = LocalAppColors.current.accentPrimary
+    val glassWhite = LocalAppColors.current.glassWhite
 
     Card(
         modifier = Modifier.fillMaxWidth().padding(1.dp),
@@ -669,7 +671,7 @@ private fun LevelExperienceCard(user: UserInfo) {
 @Composable
 private fun InfoListSection(user: UserInfo) {
     val isDark = isSystemInDarkTheme()
-    val glassWhite = getDynamicGlassWhite(isDark)
+    val glassWhite = com.shin.vicmusic.core.design.theme.LocalAppColors.current.glassWhite
 
     Card(
         modifier = Modifier.fillMaxWidth().padding(1.dp),
@@ -701,8 +703,8 @@ private fun InfoListSection(user: UserInfo) {
 @Composable
 private fun InfoRowItem(icon: ImageVector, label: String, value: String) {
     val isDark = isSystemInDarkTheme()
-    val textColor = getDynamicTextColor(isDark)
-    val accentPrimary = getDynamicAccentPrimary(isDark)
+    val textColor = com.shin.vicmusic.core.design.theme.LocalAppColors.current.textColor
+    val accentPrimary = com.shin.vicmusic.core.design.theme.LocalAppColors.current.accentPrimary
 
     Row(
         modifier = Modifier
