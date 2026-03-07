@@ -48,6 +48,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
+import com.shin.vicmusic.core.design.theme.AppBackground
+import com.shin.vicmusic.core.design.theme.VicMusicBackgroundGateway
 import com.shin.vicmusic.feature.album.albumDetail.albumDetailScreen
 import com.shin.vicmusic.feature.album.albumList.albumListScreen
 import com.shin.vicmusic.feature.artist.artistDetail.artistDetailScreen
@@ -200,130 +202,135 @@ fun MyApp(
         label = "bottomContentColor"
     )
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        NavHost(
-            navController = navController,
-            startDestination = SPLASH_ROUTE,
+    VicMusicBackgroundGateway {
+        Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            splashScreen()
-            mainScreen(mainTabState = mainTabState)
-            loginScreen()
-            registerScreen()
-            searchScreen()
-            artistListScreen()
-            rankListScreen()
-            vipScreen()
-            artistDetailScreen()
-            rankListDetailScreen()
-            albumListScreen()
-            albumDetailScreen()
-            playlistDetailScreen()
-            myPlaylistScreen()
-            likedListScreen()
-            recentPlayScreen()
-            myInfoScreen()
-            publicPlaylistScreen()
-            checkInScreen()
-            settingScreen()
-            relationshipScreen()
-            chatScreen()
-            messageListScreen()
-            localMusicScreen()
-            feedScreen()
-            myInfoEditScreen()
-            publishFeedScreen()
-        }
+            NavHost(
+                navController = navController,
+                startDestination = SPLASH_ROUTE,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                splashScreen()
+                mainScreen(mainTabState = mainTabState)
+                loginScreen()
+                registerScreen()
+                searchScreen()
+                artistListScreen()
+                rankListScreen()
+                vipScreen()
+                artistDetailScreen()
+                rankListDetailScreen()
+                albumListScreen()
+                albumDetailScreen()
+                playlistDetailScreen()
+                myPlaylistScreen()
+                likedListScreen()
+                recentPlayScreen()
+                myInfoScreen()
+                publicPlaylistScreen()
+                checkInScreen()
+                settingScreen()
+                relationshipScreen()
+                chatScreen()
+                messageListScreen()
+                localMusicScreen()
+                feedScreen()
+                myInfoEditScreen()
+                publishFeedScreen()
+            }
 
-        // 底部整体容器 (SongBar + 导航栏)
-        AnimatedVisibility(
-            visible = showBottomContainer,
-            modifier = Modifier
-                .align(Alignment.BottomCenter),
-            enter = slideInVertically { it },
-            exit = slideOutVertically { it }
-        ) {
-            Column(
+            // 底部整体容器 (SongBar + 导航栏)
+            AnimatedVisibility(
+                visible = showBottomContainer,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .offset(y = navBarTranslationY)
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(
-                                bottomContainerColor.copy(alpha = 0f),
-                                bottomContainerColor.copy(alpha = 0.9f)
+                    .align(Alignment.BottomCenter),
+                enter = slideInVertically { it },
+                exit = slideOutVertically { it }
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .offset(y = navBarTranslationY)
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    bottomContainerColor.copy(alpha = 0.2f),
+                                    bottomContainerColor.copy(alpha = 1f)
+                                )
                             )
                         )
-                    )
-            ) {
-                // 如果当前有歌曲，就显示 SongBar
-                if (currentSong != null) {
-                    SongBar(
-                        song = currentSong!!,
-                        playerState = playerState,
-                        onTogglePlayPause = playerManager::togglePlayPause,
-                        onPlaylistClick = { showPlaylistSheet = true },
-                        onBarClick = { showSongDetailSheet = true },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
+                ) {
+                    // 如果当前有歌曲，就显示 SongBar
+                    if (currentSong != null) {
+                        SongBar(
+                            song = currentSong!!,
+                            playerState = playerState,
+                            onTogglePlayPause = playerManager::togglePlayPause,
+                            onPlaylistClick = { showPlaylistSheet = true },
+                            onBarClick = { showSongDetailSheet = true },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                        )
+                    }
+
+                    MyNavigationBar(
+                        destinations = TopLevelDestination.entries,
+                        currentDestination = TopLevelDestination.entries[mainTabState.intValue].route,
+                        onNavigateToDestination = { index -> mainTabState.intValue = index },
+                        badgeCounts = badgeCounts,
+                        containerColor = Color.Transparent,
+                        contentColor = bottomContentColor,
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
-
-                MyNavigationBar(
-                    destinations = TopLevelDestination.entries,
-                    currentDestination = TopLevelDestination.entries[mainTabState.intValue].route,
-                    onNavigateToDestination = { index -> mainTabState.intValue = index },
-                    badgeCounts = badgeCounts,
-                    containerColor = Color.Transparent,
-                    contentColor = bottomContentColor,
-                    modifier = Modifier.fillMaxWidth(),
-                )
             }
-        }
 
-        // 播放列表弹窗 (Bottom Sheet)
-        if (showPlaylistSheet) {
-            ModalBottomSheet(
-                onDismissRequest = { showPlaylistSheet = false },
-                sheetState = sheetState,
-                containerColor = MaterialTheme.colorScheme.surface,
-                dragHandle = null // 隐藏默认的拖拽手柄，使顶部更紧凑
+            // 播放列表弹窗 (Bottom Sheet)
+            if (showPlaylistSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = { showPlaylistSheet = false },
+                    sheetState = sheetState,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    dragHandle = null // 隐藏默认的拖拽手柄，使顶部更紧凑
+                ) {
+                    PlaybackQueueSheet(
+                        isPlayingQueue = playQueue,
+                        currentIndex = currentQueueIndex,
+                        onSongClick = playerManager::playAtIndex,
+                        onRemoveSong = playerManager::removeSong,
+                        onClose = { showPlaylistSheet = false },
+                    )
+                }
+            }
+
+            // 歌曲详情页 Edge-to-Edge 覆盖层
+            androidx.compose.animation.AnimatedVisibility(
+                visible = showSongDetailSheet,
+                enter = androidx.compose.animation.slideInVertically(initialOffsetY = { it }),
+                exit = androidx.compose.animation.slideOutVertically(targetOffsetY = { it }),
+                modifier = Modifier.fillMaxSize()
             ) {
-                PlaybackQueueSheet(
-                    isPlayingQueue = playQueue,
-                    currentIndex = currentQueueIndex,
-                    onSongClick = playerManager::playAtIndex,
-                    onRemoveSong = playerManager::removeSong,
-                    onClose = { showPlaylistSheet = false },
-                )
-            }
-        }
-
-        // 歌曲详情页 Edge-to-Edge 覆盖层
-        androidx.compose.animation.AnimatedVisibility(
-            visible = showSongDetailSheet,
-            enter = androidx.compose.animation.slideInVertically(initialOffsetY = { it }),
-            exit = androidx.compose.animation.slideOutVertically(targetOffsetY = { it }),
-            modifier = Modifier.fillMaxSize()
-        ) {
-            androidx.activity.compose.BackHandler {
-                showSongDetailSheet = false
-            }
-            SongDetailRoute(
-                songId = currentSong?.id,
-                onDismiss = { 
+                androidx.activity.compose.BackHandler {
                     showSongDetailSheet = false
                 }
-            )
-        }
+                SongDetailRoute(
+                    songId = currentSong?.id,
+                    onDismiss = {
+                        showSongDetailSheet = false
+                    }
+                )
+            }
 
-        // Global Copyright Dialog
-        if (showCopyrightDialog) {
-            CopyrightDialog(
-                song = currentSong,
-                onDismissRequest = { showCopyrightDialog = false }
-            )
+            // Global Copyright Dialog
+            if (showCopyrightDialog) {
+                CopyrightDialog(
+                    song = currentSong,
+                    onDismissRequest = { showCopyrightDialog = false }
+                )
+            }
         }
     }
+
 }

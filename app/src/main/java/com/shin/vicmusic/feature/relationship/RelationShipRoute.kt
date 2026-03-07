@@ -61,28 +61,26 @@ fun RelationshipScreen(
         )
     }
 
-    AppBackground {
-        Scaffold(
-            containerColor = Color.Transparent,
-            topBar = {
-                CommonTopBarSelect(
-                    tabs = topBarTabs,
-                    backgroundColor = Color.Transparent,
-                    onBackClick = onBackClick
-                )
-            }
-        ) { paddingValues ->
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-            ) { page ->
-                when (page) {
-                    0 -> FollowListScreen()
-                    1 -> FanListScreen()
-                    2 -> FriendListScreen()
-                }
+    Scaffold(
+        containerColor = Color.Transparent,
+        topBar = {
+            CommonTopBarSelect(
+                tabs = topBarTabs,
+                backgroundColor = Color.Transparent,
+                onBackClick = onBackClick
+            )
+        }
+    ) { paddingValues ->
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) { page ->
+            when (page) {
+                0 -> FollowListScreen()
+                1 -> FanListScreen()
+                2 -> FriendListScreen()
             }
         }
     }

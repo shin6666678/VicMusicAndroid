@@ -8,10 +8,12 @@ import androidx.work.WorkManager
 import com.shin.vicmusic.core.manager.AppThemeMode
 import com.shin.vicmusic.core.manager.AuthManager
 import com.shin.vicmusic.core.manager.ThemeManager
+import com.shin.vicmusic.core.manager.BackgroundStyle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 
 @HiltViewModel
 class SettingViewModel @Inject constructor(
@@ -21,10 +23,17 @@ class SettingViewModel @Inject constructor(
 ) : ViewModel() {
 
     val currentThemeMode = themeManager.themeMode
+    val currentBackgroundStyle = themeManager.backgroundStyle
 
     fun updateTheme(mode: AppThemeMode) {
         viewModelScope.launch {
             themeManager.setThemeMode(mode)
+        }
+    }
+
+    fun updateBackgroundStyle(style: BackgroundStyle) {
+        viewModelScope.launch {
+            themeManager.updateBackgroundStyle(style)
         }
     }
 

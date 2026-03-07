@@ -96,17 +96,18 @@ fun SongBarScreen(
     onBarClick: () -> Unit, // 添加整个bar的点击事件
     modifier: Modifier = Modifier
 ) {
+    val appColors = com.shin.vicmusic.core.design.theme.LocalAppColors.current
     // 整个播放条的背景和形状
     Card(
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            containerColor = appColors.glassWhite, // Use glass background instead of surfaceVariant
         ),
         modifier = modifier
             .fillMaxWidth()
             .height(54.dp) // 根据设计图调整高度
             .clickable { onBarClick() }, // 整个bar可点击
-        elevation = CardDefaults.cardElevation(2.dp)
+        elevation = CardDefaults.cardElevation(0.dp) // Remove elevation to fix transparency shadow artifact
     ) {
 
         Row(

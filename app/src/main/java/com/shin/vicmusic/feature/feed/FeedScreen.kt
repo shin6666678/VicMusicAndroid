@@ -47,8 +47,8 @@ fun FeedScreen(
     onCommentClick: (String) -> Unit,
     onBgClick: () -> Unit,
 ) {
-    // Use AppBackground to allow content to draw behind the TopAppBar
-    AppBackground {
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Use AppBackground to allow content to draw behind the TopAppBar
         // The Pager is now the bottom layer
         HorizontalPager(
             state = pagerState,
@@ -59,6 +59,7 @@ fun FeedScreen(
                     items = discoveryItems, onProfileClick, onSongClick, onPlaylistClick,
                     onAlbumClick, onLikeClick, onCommentClick
                 )
+
                 1 -> {
                     LazyColumn(
                         state = followingListState, // Apply the state here
@@ -103,6 +104,7 @@ fun FeedScreen(
             backgroundColor = topBarContainerColor
         )
     }
+
 }
 
 @Composable
@@ -117,7 +119,10 @@ private fun FeedList(
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(top = 80.dp, bottom = 8.dp), // Add top padding to not be obscured by TopAppBar
+        contentPadding = PaddingValues(
+            top = 80.dp,
+            bottom = 8.dp
+        ), // Add top padding to not be obscured by TopAppBar
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(

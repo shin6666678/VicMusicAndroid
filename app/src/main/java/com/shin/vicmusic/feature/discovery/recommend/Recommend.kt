@@ -72,24 +72,11 @@ fun RecommendScreen(
     onMediaCardClick: (String) -> Unit = {},
     onMessageClick: () -> Unit = {}
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        LocalAppColors.current.gradientStart,
-                        LocalAppColors.current.gradientMid,
-                        LocalAppColors.current.gradientEnd
-                    )
-                )
-            )
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(bottom = SpaceOuter),
+        verticalArrangement = Arrangement.spacedBy(SpaceExtraMedium)
     ) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = SpaceOuter),
-            verticalArrangement = Arrangement.spacedBy(SpaceExtraMedium)
-        ) {
             // 1. 用户问候区 (包含红点逻辑)
             item {
                 UserGreeting(
@@ -119,5 +106,4 @@ fun RecommendScreen(
                 )
             }
         }
-    }
 }

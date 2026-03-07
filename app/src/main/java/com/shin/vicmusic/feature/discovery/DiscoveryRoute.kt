@@ -17,6 +17,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.shin.vicmusic.core.design.theme.LocalAppColors
@@ -45,7 +47,7 @@ fun DiscoveryRoute(
         songs = datum,
         toSearch = { navController.navigateToSearch() },
         onQuickAccessClick = { label ->
-            when(label) {
+            when (label) {
                 "歌手" -> navController.navigate("artist_list")
                 "排行" -> navController.navigate(RANK_LIST_ROUTE)
                 "专辑" -> navController.navigate(ALBUM_LIST_ROUTE)
@@ -80,24 +82,24 @@ fun DiscoveryScreen(
             Column {
                 UniversalTopBar(
                     tabs = topBarTabs,
-                    backgroundColor = LocalAppColors.current.gradientStart
                 )
                 SearchBar(toSearch = toSearch)
             }
         },
+        containerColor = Color.Transparent,
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(WindowInsets.navigationBars)
     ) { paddingValues ->
         HorizontalPager(
             state = pagerState,
             modifier = Modifier
                 .fillMaxSize()
-                .background(LocalAppColors.current.gradientMid)
                 .padding(paddingValues)
         ) { page ->
             when (page) {
                 0 -> {
                     RecommendRoute()
                 }
+
                 1 -> {
                     MusicHall(
                         songs = songs,
@@ -105,6 +107,7 @@ fun DiscoveryScreen(
                     )
                 }
             }
+
         }
     }
 }
