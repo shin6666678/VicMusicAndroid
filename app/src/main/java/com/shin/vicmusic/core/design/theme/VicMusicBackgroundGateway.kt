@@ -11,7 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.theme.dressUp.dynamicGlow.DynamicGlowAppBackGround
-import com.shin.vicmusic.core.manager.BackgroundStyle
+import com.shin.vicmusic.core.manager.DressUpStyle
 import com.shin.vicmusic.feature.main.MainViewModel
 
 /**
@@ -24,24 +24,25 @@ fun VicMusicBackgroundGateway(
     mainViewModel: MainViewModel = hiltViewModel(),
     content: @Composable BoxScope.() -> Unit
 ) {
-    // Collect the current background style as state, defaulting to DYNAMIC_GLOW
-    val userStyle by mainViewModel.backgroundStyle.collectAsState()
-    val isDark = LocalAppColors.current.isDark
-    
-    // Force DYNAMIC_GLOW if in Dark Mode, ignoring user style
-    val currentStyle = if (isDark) BackgroundStyle.DYNAMIC_GLOW else userStyle
+    // Collect the current dress up style as state
+    val currentStyle by mainViewModel.dressUpStyle.collectAsState()
 
     Box(modifier = modifier.fillMaxSize()) {
         when (currentStyle) {
-            BackgroundStyle.DYNAMIC_GLOW -> {
+            DressUpStyle.SYSTEM_DEFAULT -> {
+                Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+                    content()
+                }
+            }
+            DressUpStyle.LIGHT_GLOW, DressUpStyle.DARK_GLOW -> {
                 DynamicGlowAppBackGround(content = content)
             }
-            BackgroundStyle.SOLID_COLOR -> {
+            DressUpStyle.LIGHT_SOLID, DressUpStyle.DARK_SOLID -> {
                 Box(Modifier.fillMaxSize().background(LocalAppColors.current.gradientMid)) {
                     content()
                 }
             }
-            BackgroundStyle.NONE -> {
+            DressUpStyle.LIGHT_NONE, DressUpStyle.DARK_NONE -> {
                 Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
                     content()
                 }

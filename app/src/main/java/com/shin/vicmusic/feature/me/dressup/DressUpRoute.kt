@@ -5,6 +5,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -22,7 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.theme.LocalAppColors
 import com.shin.vicmusic.core.design.theme.AppBackground
 import com.shin.vicmusic.core.design.theme.dressUp.dynamicGlow.DynamicGlowAppBackGround
-import com.shin.vicmusic.core.manager.BackgroundStyle
+import com.shin.vicmusic.core.manager.DressUpStyle
 import com.shin.vicmusic.feature.common.bar.CommonTopBar
 
 @Composable
@@ -30,88 +32,147 @@ fun DressUpRoute(
     popBackStack: () -> Unit,
     viewModel: DressUpViewModel = hiltViewModel()
 ) {
-    val currentStyle by viewModel.currentBackgroundStyle.collectAsState(initial = BackgroundStyle.DYNAMIC_GLOW)
+    val currentStyle by viewModel.currentDressUpStyle.collectAsState(initial = DressUpStyle.SYSTEM_DEFAULT)
 
     DressUpScreen(
         popBackStack = popBackStack,
         currentStyle = currentStyle,
-        onStyleSelected = viewModel::updateBackgroundStyle
+        onStyleSelected = viewModel::updateDressUpStyle
     )
 }
 
 @Composable
 fun DressUpScreen(
     popBackStack: () -> Unit,
-    currentStyle: BackgroundStyle,
-    onStyleSelected: (BackgroundStyle) -> Unit
+    currentStyle: DressUpStyle,
+    onStyleSelected: (DressUpStyle) -> Unit
 ) {
     val appColors = LocalAppColors.current
 
     Scaffold(
         containerColor = Color.Transparent,
         topBar = {
-            CommonTopBar(midText = "装扮", popBackStack = popBackStack)
+            CommonTopBar(midText = "装扮中心", popBackStack = popBackStack)
         }
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             Text(
-                text = "选择你的专属背景效果",
+                text = "选择你的专属主题与背景",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 color = appColors.textColor
             )
 
-            // DYNAMIC_GLOW Preview
+            // SYSTEM_DEFAULT
             StylePreviewCard(
-                title = "动态光晕",
-                description = "跟随页面呼吸的灵动色彩，沉浸感十足",
-                isSelected = currentStyle == BackgroundStyle.DYNAMIC_GLOW,
-                onClick = { onStyleSelected(BackgroundStyle.DYNAMIC_GLOW) }
+                title = "系统默认",
+                description = "跟随系统亮暗设置，保持原生体验",
+                isSelected = currentStyle == DressUpStyle.SYSTEM_DEFAULT,
+                onClick = { onStyleSelected(DressUpStyle.SYSTEM_DEFAULT) }
             ) {
-                DynamicGlowAppBackGround(modifier = Modifier.fillMaxSize()) {}
+                Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background))
             }
 
-            // SOLID_COLOR Preview
-            StylePreviewCard(
-                title = "纯色渐变",
-                description = "极简主义，安静柔和的视觉体验",
-                isSelected = currentStyle == BackgroundStyle.SOLID_COLOR,
-                onClick = { onStyleSelected(BackgroundStyle.SOLID_COLOR) }
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(appColors.gradientMid)
-                )
+            // GLOW Styles
+            SectionTitle("动态光晕")
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Box(modifier = Modifier.weight(1f)) {
+                    StylePreviewCard(
+                        title = "浅色光晕",
+                        isSelected = currentStyle == DressUpStyle.LIGHT_GLOW,
+                        onClick = { onStyleSelected(DressUpStyle.LIGHT_GLOW) },
+                        height = 100.dp
+                    ) {
+                        DynamicGlowAppBackGround(modifier = Modifier.fillMaxSize()) {}
+                    }
+                }
+                Box(modifier = Modifier.weight(1f)) {
+                    StylePreviewCard(
+                        title = "深色光晕",
+                        isSelected = currentStyle == DressUpStyle.DARK_GLOW,
+                        onClick = { onStyleSelected(DressUpStyle.DARK_GLOW) },
+                        height = 100.dp
+                    ) {
+                        DynamicGlowAppBackGround(modifier = Modifier.fillMaxSize()) {}
+                    }
+                }
             }
 
-            // NONE Preview
-            StylePreviewCard(
-                title = "无背景",
-                description = "极爽快的性能表现与系统默认配色",
-                isSelected = currentStyle == BackgroundStyle.NONE,
-                onClick = { onStyleSelected(BackgroundStyle.NONE) }
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.background)
-                )
+            // SOLID Styles
+            SectionTitle("极简纯色")
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Box(modifier = Modifier.weight(1f)) {
+                    StylePreviewCard(
+                        title = "清爽白",
+                        isSelected = currentStyle == DressUpStyle.LIGHT_SOLID,
+                        onClick = { onStyleSelected(DressUpStyle.LIGHT_SOLID) },
+                        height = 100.dp
+                    ) {
+                        Box(Modifier.fillMaxSize().background(Color(0xFFF1F5F9)))
+                    }
+                }
+                Box(modifier = Modifier.weight(1f)) {
+                    StylePreviewCard(
+                        title = "深邃蓝",
+                        isSelected = currentStyle == DressUpStyle.DARK_SOLID,
+                        onClick = { onStyleSelected(DressUpStyle.DARK_SOLID) },
+                        height = 100.dp
+                    ) {
+                        Box(Modifier.fillMaxSize().background(Color(0xFF0F172A)))
+                    }
+                }
+            }
+
+            // NONE Styles
+            SectionTitle("无背景")
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Box(modifier = Modifier.weight(1f)) {
+                    StylePreviewCard(
+                        title = "纯净浅色",
+                        isSelected = currentStyle == DressUpStyle.LIGHT_NONE,
+                        onClick = { onStyleSelected(DressUpStyle.LIGHT_NONE) },
+                        height = 100.dp
+                    ) {
+                        Box(Modifier.fillMaxSize().background(Color.White))
+                    }
+                }
+                Box(modifier = Modifier.weight(1f)) {
+                    StylePreviewCard(
+                        title = "纯净深色",
+                        isSelected = currentStyle == DressUpStyle.DARK_NONE,
+                        onClick = { onStyleSelected(DressUpStyle.DARK_NONE) },
+                        height = 100.dp
+                    ) {
+                        Box(Modifier.fillMaxSize().background(Color(0xFF020617)))
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
+fun SectionTitle(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelMedium,
+        color = LocalAppColors.current.textColor.copy(alpha = 0.6f),
+        modifier = Modifier.padding(top = 8.dp)
+    )
+}
+
+@Composable
 fun StylePreviewCard(
     title: String,
-    description: String,
+    description: String? = null,
     isSelected: Boolean,
+    height: androidx.compose.ui.unit.Dp = 120.dp,
     onClick: () -> Unit,
     previewContent: @Composable () -> Unit
 ) {
@@ -135,7 +196,7 @@ fun StylePreviewCard(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(120.dp)
+                .height(height)
                 .clip(RoundedCornerShape(8.dp))
                 .border(1.dp, appColors.glassBorder, RoundedCornerShape(8.dp))
         ) {
@@ -149,7 +210,7 @@ fun StylePreviewCard(
                         .padding(horizontal = 6.dp, vertical = 2.dp)
                 ) {
                     Text(
-                        text = "使用中",
+                        text = "已应用",
                         color = Color.White,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold
@@ -167,11 +228,13 @@ fun StylePreviewCard(
             fontWeight = FontWeight.Bold,
             color = appColors.textColor
         )
-        Text(
-            text = description,
-            style = MaterialTheme.typography.bodySmall,
-            color = appColors.textColor.copy(alpha = 0.7f),
-            modifier = Modifier.padding(top = 4.dp)
-        )
+        if (description != null) {
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodySmall,
+                color = appColors.textColor.copy(alpha = 0.7f),
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
     }
 }

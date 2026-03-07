@@ -16,7 +16,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.theme.LocalAppColors
 import com.shin.vicmusic.core.design.theme.AppBackground
-import com.shin.vicmusic.core.manager.AppThemeMode
 import com.shin.vicmusic.feature.common.bar.CommonTopBar
 
 @Composable
@@ -24,10 +23,7 @@ fun SettingRoute(
     viewModel: SettingViewModel = hiltViewModel(),
 ) {
     val navController = LocalNavController.current
-    val currentThemeMode by viewModel.currentThemeMode.collectAsState(initial = AppThemeMode.SYSTEM)
     SettingScreen(
-        currentThemeMode = currentThemeMode,
-        onThemeChanged = viewModel::updateTheme,
         onBackClick = navController::popBackStack,
         onLogoutClick = viewModel::logout,
         onDebugCheckMessage = viewModel::triggerMessageCheck
@@ -37,8 +33,6 @@ fun SettingRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingScreen(
-    currentThemeMode: AppThemeMode,
-    onThemeChanged: (AppThemeMode) -> Unit,
     onBackClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {},
     onDebugCheckMessage: () -> Unit = {}
@@ -63,13 +57,6 @@ fun SettingScreen(
             SettingItem(title = "隐私设置")
             SettingItem(title = "通用")
 
-            val themeText = when (currentThemeMode) {
-                AppThemeMode.SYSTEM -> "跟随系统"
-                AppThemeMode.LIGHT -> "浅色模式"
-                AppThemeMode.DARK -> "深色模式"
-            }
-            SettingItem(title = "外观设置", subtitle = themeText, onClick = { showThemeDialog = true })
-
             val context = androidx.compose.ui.platform.LocalContext.current
             SettingItem(title = "【Debug】立即检查消息", onClick = onDebugCheckMessage)
             SettingItem(
@@ -82,61 +69,6 @@ fun SettingScreen(
             HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp), thickness = 8.dp, color = appColors.textColor.copy(0.05f))
             SettingItem(title = "切换账号")
             SettingItem(title = "退出登录", textColor = Color.Red, onClick = onLogoutClick)
-        }
-
-        var showDarkThemeWarningDialog by remember { mutableStateOf(false) }
-
-        if (showThemeDialog) {
-            AlertDialog(
-                onDismissRequest = { showThemeDialog = false },
-                title = { Text("选择外观主题") },
-                text = {
-                    Column {
-                        ThemeOptionItem(text = "跟随系统", selected = currentThemeMode == AppThemeMode.SYSTEM) {
-                            onThemeChanged(AppThemeMode.SYSTEM)
-                            showThemeDialog = false
-                        }
-                        ThemeOptionItem(text = "浅色模式", selected = currentThemeMode == AppThemeMode.LIGHT) {
-                            onThemeChanged(AppThemeMode.LIGHT)
-                            showThemeDialog = false
-                        }
-                        ThemeOptionItem(text = "深色模式", selected = currentThemeMode == AppThemeMode.DARK) {
-                            if (currentThemeMode != AppThemeMode.DARK) {
-                                showDarkThemeWarningDialog = true
-                            }
-                            showThemeDialog = false
-                        }
-                    }
-                },
-                confirmButton = {
-                    TextButton(onClick = { showThemeDialog = false }) {
-                        Text("关闭")
-                    }
-                }
-            )
-        }
-
-        if (showDarkThemeWarningDialog) {
-            AlertDialog(
-                onDismissRequest = { showDarkThemeWarningDialog = false },
-                title = { Text("提示") },
-                text = { Text("切换到深色模式会取消当前应用的主题装扮，是否继续？") },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            onThemeChanged(AppThemeMode.DARK)
-                            showDarkThemeWarningDialog = false
-                        }
-                    ) {
-                        Text("确定")
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showDarkThemeWarningDialog = false }) {
-                        Text("取消")
-                    }
-                }
-            )
         }
     }
 }

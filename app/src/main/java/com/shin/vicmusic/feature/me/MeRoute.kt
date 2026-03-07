@@ -63,6 +63,8 @@ import com.shin.vicmusic.feature.relationship.RelationshipTab
 import com.shin.vicmusic.feature.relationship.navigateToRelationship
 import com.shin.vicmusic.feature.vip.navigateToVip
 import com.shin.vicmusic.feature.me.dressup.navigateToDressUp
+import com.shin.vicmusic.feature.me.audio.navigateToAudio
+import com.shin.vicmusic.feature.me.purchased.navigateToPurchased
 import androidx.compose.animation.core.*
 import androidx.compose.ui.draw.blur
 import androidx.compose.foundation.background
@@ -143,6 +145,9 @@ fun MeRoute(
         onLikedClick = { navController.navigateToLikedList() },
         onLocalClick = { navController.navigateToLocalMusic() },
 
+        onAudioClick = { navController.navigateToAudio() },
+        onPurchasedClick = { navController.navigateToPurchased() },
+
         recentPlayList = playlists,
         recentNum = 2,
         recentIcon = playlists.firstOrNull()?.cover ?: "",
@@ -164,6 +169,8 @@ fun MeScreen(
     onVipClick: () -> Unit = {},
     onLikedClick: () -> Unit = {},
     onLocalClick: () -> Unit = {},
+    onAudioClick: () -> Unit = {},
+    onPurchasedClick: () -> Unit = {},
     isLoggedIn: Boolean,
     user: UserInfo? = null,
     onMorePlaylistsClick: () -> Unit = {},
@@ -237,8 +244,18 @@ fun MeScreen(
                     count = "29",
                     onClick = onLocalClick
                 )
-                QuickAccessItem(icon = Icons.Filled.Headphones, text = "有声", count = "6")
-                QuickAccessItem(icon = Icons.Filled.ReceiptLong, text = "已购", count = "1")
+                QuickAccessItem(
+                    icon = Icons.Filled.Headphones,
+                    text = "有声",
+                    count = "6",
+                    onClick = onAudioClick
+                )
+                QuickAccessItem(
+                    icon = Icons.Filled.ReceiptLong,
+                    text = "已购",
+                    count = "1",
+                    onClick = onPurchasedClick
+                )
             }
 
             // Recently Played Section

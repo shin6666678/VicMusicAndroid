@@ -5,10 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.shin.vicmusic.core.manager.AppThemeMode
 import com.shin.vicmusic.core.manager.AuthManager
 import com.shin.vicmusic.core.manager.ThemeManager
-import com.shin.vicmusic.core.manager.BackgroundStyle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
@@ -21,14 +19,6 @@ class SettingViewModel @Inject constructor(
     private val themeManager: ThemeManager,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
-
-    val currentThemeMode = themeManager.themeMode
-
-    fun updateTheme(mode: AppThemeMode) {
-        viewModelScope.launch {
-            themeManager.setThemeMode(mode)
-        }
-    }
 
     fun logout() {
         authManager.setLoginStatus(false)
