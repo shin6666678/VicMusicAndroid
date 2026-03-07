@@ -1,239 +1,514 @@
 package com.shin.vicmusic.feature.auth
 
-import android.util.Log
+import android.widget.Toast
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
-import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
+import com.shin.vicmusic.R
 import com.shin.vicmusic.core.design.composition.LocalNavController
-import com.shin.vicmusic.feature.auth.RegisterViewModel
+import kotlinx.coroutines.flow.collectLatest
 
-@Composable
-@Preview(showBackground = true)
-fun RegisterPreView(){
-    RegisterScreen(email = "",
-        onEmailChange = {},
-        captcha = "",
-        onCaptchaChange = {},
-        captchaImageUrl = "https://via.placeholder.com/150",
-        onCaptchaImageClick = {},
-        onSendEmailCodeClick = {},
-        emailCodeSentStatus = null,
-        password = "",
-        onPasswordChange = {},
-        mailCode = "",
-        onMailCodeChange = {},
-        onRegisterClick = {}
-    )
-}
+// ---- 主题色常量 ----
+private val GradientStart = Color(0xFF020617)
+private val GradientMid = Color(0xFF0F172A)
+private val GradientEnd = Color(0xFF1E293B)
+private val AccentPrimary = Color(0xFF3B82F6)
+private val AccentSecondary = Color(0xFF2DD4BF)
+private val GlassWhite = Color(0x1AFFFFFF)
+private val GlassBorder = Color(0x33FFFFFF)
+private val InputBackground = Color(0x0DFFFFFF)
 
 @Composable
 fun RegisterRoute(
-    viewModel: RegisterViewModel = hiltViewModel()) { // 使用 RegisterViewModel
-
+    viewModel: RegisterViewModel = hiltViewModel()
+) {
     val navController = LocalNavController.current
+    val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
-    // 收集 ViewModel 的 StateFlows
-    val email by viewModel.email.collectAsState()
-    val captcha by viewModel.captcha.collectAsState()
-    val password by viewModel.password.collectAsState()
-    val mailCode by viewModel.mailCode.collectAsState()
-    val captchaImageUrl by viewModel.captchaImageUrl.collectAsState()
-    val sendEmailCodeStatus by viewModel.sendEmailCodeStatus.collectAsState()
-
-    // 初始加载图形验证码
+    // 收集一次性副作用
     LaunchedEffect(Unit) {
-        viewModel.fetchCaptchaImage()
-    }
-
-    // 处理发送邮箱验证码的反馈
-    LaunchedEffect(sendEmailCodeStatus) {
-        when (sendEmailCodeStatus) {
-            true -> {
-                Log.d("RegisterRoute", "邮箱验证码发送成功")
-                // 可以在这里导航到下一个注册步骤或者显示成功消息
+        viewModel.effect.collectLatest { effect ->
+            when (effect) {
+                is RegisterEffect.NavigateBack -> {
+                    Toast.makeText(context, "注册成功，请登录", Toast.LENGTH_SHORT).show()
+                    navController.popBackStack()
+                }
+                is RegisterEffect.ShowToast -> {
+                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                }
             }
-            false -> {
-                Log.e("RegisterRoute", "邮箱验证码发送失败，请重试")
-                // 刷新图形验证码，并提示用户
-                viewModel.fetchCaptchaImage()
-            }
-            else -> { /* 初始状态或加载中 */ }
         }
     }
 
     RegisterScreen(
-        email = email,
-        onEmailChange = { viewModel.updateEmail(it) },
-        captcha = captcha,
-        onCaptchaChange = { viewModel.updateCaptcha(it) },
-        captchaImageUrl = captchaImageUrl,
-        onCaptchaImageClick = { viewModel.fetchCaptchaImage() }, // 点击图片刷新验证码
-        onSendEmailCodeClick = { viewModel.requestEmailVerificationCode(email, captcha) }, // 传递 ViewModel 中的状态
-        emailCodeSentStatus = sendEmailCodeStatus,
-        password = password,
-        onPasswordChange = { viewModel.updatePassword(it) },
-        mailCode = mailCode,
-        onMailCodeChange = { viewModel.updateMailCode(it) }, // 临时处理，需要更新 ViewModel
-        onRegisterClick = { viewModel.register(email, mailCode, password) }
+        uiState = uiState,
+        onIntent = viewModel::processIntent,
+        onBackClick = { navController.popBackStack() }
     )
 }
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
-    email: String,
-    onEmailChange: (String) -> Unit,
-    captcha: String,
-    onCaptchaChange: (String) -> Unit,
-    captchaImageUrl: String?,
-    onCaptchaImageClick: () -> Unit,
-    onSendEmailCodeClick: () -> Unit,
-    onRegisterClick:()->Unit,
-    emailCodeSentStatus: Boolean?,
-    password:String,
-    onPasswordChange: (String) -> Unit,
-    mailCode:String,
-    onMailCodeChange: (String) -> Unit,
+    uiState: RegisterUiState,
+    onIntent: (RegisterIntent) -> Unit,
+    onBackClick: () -> Unit
 ) {
-    val context = LocalContext.current // 获取当前 Context
+    var passwordVisible by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
-    Column(
+    // ---- 入场动画 ----
+    val contentAlpha = remember { Animatable(0f) }
+    val contentSlide = remember { Animatable(60f) }
+    val logoScale = remember { Animatable(0.3f) }
+
+    // 表单切换动画：发送验证码前 vs 发送验证码后
+    val formTransition = updateTransition(targetState = uiState.emailCodeSent, label = "formTransition")
+    
+    val heightAnim by formTransition.animateDp(
+        transitionSpec = { spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow) },
+        label = "heightAnim"
+    ) { sent ->
+        if (sent) 480.dp else 400.dp
+    }
+
+
+    LaunchedEffect(Unit) {
+        logoScale.animateTo(1f, animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow))
+        contentAlpha.animateTo(1f, animationSpec = tween(600))
+        contentSlide.animateTo(0f, animationSpec = tween(600, easing = FastOutSlowInEasing))
+    }
+
+    // ---- 浮动光晕动画 ----
+    val infiniteTransition = rememberInfiniteTransition(label = "glow")
+    val glow1X by infiniteTransition.animateFloat(
+        initialValue = 0f, targetValue = 1f,
+        animationSpec = infiniteRepeatable(tween(7000, easing = LinearEasing), RepeatMode.Reverse),
+        label = "glow1x"
+    )
+    val glow2X by infiniteTransition.animateFloat(
+        initialValue = 1f, targetValue = 0f,
+        animationSpec = infiniteRepeatable(tween(9000, easing = LinearEasing), RepeatMode.Reverse),
+        label = "glow2x"
+    )
+    val pulse by infiniteTransition.animateFloat(
+        initialValue = 0.85f, targetValue = 1f,
+        animationSpec = infiniteRepeatable(tween(2000, easing = FastOutSlowInEasing), RepeatMode.Reverse),
+        label = "pulse"
+    )
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "注册你的VicMusic账户",
-            fontSize = 30.sp,
-            color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 32.dp)
-        )
-
-        // 邮箱输入框
-        TextField(
-            value = email,
-            onValueChange = onEmailChange,
-            label = { Text("邮箱") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // 图形验证码输入框和图片
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            TextField(
-                value = captcha,
-                onValueChange = onCaptchaChange,
-                label = { Text("在此输入验证码") },
-                modifier = Modifier.weight(1f)
+            .background(
+                Brush.verticalGradient(listOf(GradientStart, GradientMid, GradientEnd))
             )
-            Spacer(modifier = Modifier.width(16.dp))
+    ) {
+        // ---- 背景光晕球 ----
+        Box(
+            modifier = Modifier
+                .size(300.dp)
+                .offset(x = (glow1X * 200 - 100).dp, y = (-50).dp)
+                .blur(80.dp)
+                .background(
+                    Brush.radialGradient(
+                        listOf(AccentPrimary.copy(alpha = 0.35f), Color.Transparent),
+                        center = Offset.Zero, radius = 600f
+                    ),
+                    shape = RoundedCornerShape(50)
+                )
+        )
+        Box(
+            modifier = Modifier
+                .size(250.dp)
+                .align(Alignment.BottomEnd)
+                .offset(x = (glow2X * 80).dp, y = (-(glow2X * 60)).dp)
+                .blur(70.dp)
+                .background(
+                    Brush.radialGradient(
+                        listOf(AccentSecondary.copy(alpha = 0.3f), Color.Transparent),
+                        center = Offset.Zero, radius = 500f
+                    ),
+                    shape = RoundedCornerShape(50)
+                )
+        )
+
+        // ---- 顶部返回按钮 ----
+        IconButton(
+            onClick = onBackClick,
+            modifier = Modifier
+                .statusBarsPadding()
+                .padding(16.dp)
+                .alpha(contentAlpha.value)
+        ) {
+            Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+        }
+
+        // ---- 主内容 ----
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 28.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // 中心图标区域
             Box(
                 modifier = Modifier
-                    .size(100.dp, 50.dp) // 调整验证码图片大小
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.LightGray)
-                    .clickable(onClick = onCaptchaImageClick),
+                    .scale(logoScale.value * pulse)
+                    .size(80.dp)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(
+                        Brush.linearGradient(
+                            listOf(AccentPrimary, AccentSecondary),
+                            start = Offset(0f, 0f), end = Offset(300f, 300f)
+                        )
+                    ),
                 contentAlignment = Alignment.Center
             ) {
-                if (captchaImageUrl != null && captchaImageUrl.isNotEmpty()) {
-                    AsyncImage(
-                        model = ImageRequest.Builder(context) // 使用 ImageRequest.Builder
-                            .data(captchaImageUrl)
-                            .diskCachePolicy(CachePolicy.DISABLED) // 禁用磁盘缓存
-                            .memoryCachePolicy(CachePolicy.DISABLED) // 禁用内存缓存
-                            .build(),
-                        contentDescription = "图形",
-                        modifier = Modifier.fillMaxSize(),
-                        // Coil 默认会做图片缓存，需要注意如何处理验证码刷新
-                    )
-                } else {
-                    Text("加载中...", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface)
-                }
-            }
-        }
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // 发送邮箱验证码按钮
-        Button(
-            onClick = onSendEmailCodeClick,
-            modifier = Modifier.fillMaxWidth(),
-            enabled = emailCodeSentStatus != true // 可以在发送中禁用按钮
-        ) {
-            Text(
-                text = when (emailCodeSentStatus) {
-                    true -> "验证码已发送"
-                    false -> "发送失败，请重试"
-                    else -> "发送邮箱验证码"
-                }
-            )
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        if (emailCodeSentStatus == false) {
-            Text("请检查邮箱和验证码", color = MaterialTheme.colorScheme.error, fontSize = 14.sp)
-        }
-        if(emailCodeSentStatus==true){
-            TextField(
-                value = mailCode,
-                onValueChange = onMailCodeChange,
-                label = { Text("邮箱验证码") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            TextField(
-                value = password,
-                onValueChange = onPasswordChange,
-                label = { Text("密码") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Button(
-                onClick = onRegisterClick,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(
-                    "注册"
+                Icon(
+                    Icons.Default.PersonAdd,
+                    contentDescription = "Register",
+                    modifier = Modifier.size(48.dp),
+                    tint = Color.White
                 )
             }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // 标题
+            Text(
+                text = "创建账号",
+                fontSize = 32.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = Color.White,
+                modifier = Modifier.alpha(contentAlpha.value)
+            )
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            // ---- 玻璃拟态卡片 ----
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(heightAnim)
+                    .offset(y = contentSlide.value.dp)
+                    .alpha(contentAlpha.value)
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(GlassWhite)
+                    .padding(1.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(24.dp))
+                        .background(
+                            Brush.verticalGradient(
+                                listOf(Color(0x26FFFFFF), Color(0x0DFFFFFF))
+                            )
+                        )
+                        .padding(horizontal = 24.dp, vertical = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    
+                    if (!uiState.emailCodeSent) {
+                        // ==== 阶段 1：填写邮箱和验证码 ====
+                        Text(
+                            text = "第一步：验证邮箱",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White.copy(alpha = 0.9f),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        // 邮箱输入框
+                        AuthTextField(
+                            value = uiState.email,
+                            onValueChange = { onIntent(RegisterIntent.UpdateEmail(it)) },
+                            label = "邮箱地址",
+                            leadingIcon = {
+                                Icon(Icons.Default.Email, null, tint = AccentPrimary.copy(alpha = 0.8f))
+                            },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Email,
+                                imeAction = ImeAction.Next
+                            )
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // 图形验证码
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(modifier = Modifier.weight(1f)) {
+                                AuthTextField(
+                                    value = uiState.captcha,
+                                    onValueChange = { onIntent(RegisterIntent.UpdateCaptcha(it)) },
+                                    label = "图形验证码",
+                                    leadingIcon = {
+                                        Icon(Icons.Default.Image, null, tint = AccentPrimary.copy(alpha = 0.8f))
+                                    },
+                                    keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Text,
+                                        imeAction = ImeAction.Done
+                                    )
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Box(
+                                modifier = Modifier
+                                    .size(110.dp, 56.dp)
+                                    .clip(RoundedCornerShape(14.dp))
+                                    .background(Color.White.copy(alpha = 0.1f))
+                                    .clickable { onIntent(RegisterIntent.RefreshCaptcha) },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (uiState.captchaImageUrl != null) {
+                                    AsyncImage(
+                                        model = ImageRequest.Builder(context)
+                                            .data(uiState.captchaImageUrl)
+                                            .diskCachePolicy(CachePolicy.DISABLED)
+                                            .memoryCachePolicy(CachePolicy.DISABLED)
+                                            .build(),
+                                        contentDescription = "验证码",
+                                        modifier = Modifier.fillMaxSize()
+                                    )
+                                } else {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(24.dp),
+                                        color = AccentPrimary,
+                                        strokeWidth = 2.dp
+                                    )
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        // 发送验证码按钮
+                        Button(
+                            onClick = { onIntent(RegisterIntent.SendEmailCode) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(54.dp),
+                            enabled = !uiState.emailCodeSending,
+                            shape = RoundedCornerShape(16.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Transparent,
+                                disabledContainerColor = Color.Transparent
+                            ),
+                            contentPadding = PaddingValues(0.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(
+                                        if (!uiState.emailCodeSending)
+                                            Brush.linearGradient(
+                                                listOf(AccentPrimary, AccentSecondary),
+                                                start = Offset(0f, 0f), end = Offset(800f, 0f)
+                                            )
+                                        else
+                                            Brush.linearGradient(
+                                                listOf(Color(0x66FFFFFF), Color(0x33FFFFFF))
+                                            )
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (uiState.emailCodeSending) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(24.dp), color = Color.White, strokeWidth = 2.dp
+                                    )
+                                } else {
+                                    Text("发送邮箱验证码", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                                }
+                            }
+                        }
+
+                    } else {
+                        // ==== 阶段 2：填写收到的验证码和密码 ====
+                        Text(
+                            text = "第二步：设置密码",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White.copy(alpha = 0.9f),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Text(
+                            text = "验证码已发送至 ${uiState.email}",
+                            fontSize = 12.sp,
+                            color = AccentSecondary.copy(alpha = 0.9f),
+                            modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // 邮箱验证码
+                        AuthTextField(
+                            value = uiState.mailCode,
+                            onValueChange = { onIntent(RegisterIntent.UpdateMailCode(it)) },
+                            label = "邮箱收到的验证码",
+                            leadingIcon = {
+                                Icon(Icons.Default.Pin, null, tint = AccentPrimary.copy(alpha = 0.8f))
+                            },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Next
+                            )
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // 密码
+                        AuthTextField(
+                            value = uiState.password,
+                            onValueChange = { onIntent(RegisterIntent.UpdatePassword(it)) },
+                            label = "设置密码",
+                            leadingIcon = {
+                                Icon(Icons.Default.Lock, null, tint = AccentPrimary.copy(alpha = 0.8f))
+                            },
+                            trailingIcon = {
+                                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                    Icon(
+                                        imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                        contentDescription = null,
+                                        tint = Color.White.copy(alpha = 0.5f)
+                                    )
+                                }
+                            },
+                            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Password,
+                                imeAction = ImeAction.Done
+                            )
+                        )
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        // 注册按钮
+                        Button(
+                            onClick = { onIntent(RegisterIntent.Register) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(54.dp),
+                            enabled = !uiState.isLoading,
+                            shape = RoundedCornerShape(16.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Transparent,
+                                disabledContainerColor = Color.Transparent
+                            ),
+                            contentPadding = PaddingValues(0.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(
+                                        if (!uiState.isLoading)
+                                            Brush.linearGradient(
+                                                listOf(AccentPrimary, AccentSecondary),
+                                                start = Offset(0f, 0f), end = Offset(800f, 0f)
+                                            )
+                                        else
+                                            Brush.linearGradient(
+                                                listOf(Color(0x66FFFFFF), Color(0x33FFFFFF))
+                                            )
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (uiState.isLoading) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(24.dp), color = Color.White, strokeWidth = 2.dp
+                                    )
+                                } else {
+                                    Text("立即注册", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(28.dp))
+
+            // 底部提示信息
+            Text(
+                text = "注册即代表您同意 VicMusic 的服务条款和隐私权政策",
+                color = Color.White.copy(alpha = 0.4f),
+                fontSize = 12.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .alpha(contentAlpha.value)
+                    .padding(horizontal = 24.dp)
+            )
         }
     }
+}
+
+/** 统一风格的输入框组件 */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AuthTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label, color = Color.White.copy(alpha = 0.5f), fontSize = 13.sp) },
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
+        visualTransformation = visualTransformation,
+        keyboardOptions = keyboardOptions,
+        singleLine = true,
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(14.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedTextColor = Color.White,
+            unfocusedTextColor = Color.White,
+            focusedBorderColor = AccentPrimary,
+            unfocusedBorderColor = GlassBorder,
+            focusedContainerColor = InputBackground,
+            unfocusedContainerColor = InputBackground,
+            cursorColor = AccentPrimary,
+            focusedLabelColor = AccentPrimary,
+        )
+    )
 }
