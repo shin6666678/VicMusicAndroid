@@ -110,7 +110,7 @@ fun MeRoute(
         BarActionItem(
             icon = Icons.Default.MailOutline,
             contentNumber = unreadCount,
-            onClick = { navController.navigateToMessageList()}
+            onClick = { navController.navigateToMessageList() }
         ),
         BarActionItem(
             icon = Icons.Filled.Tune,
@@ -130,7 +130,7 @@ fun MeRoute(
         onMorePlaylistsClick = { navController.navigateToMyPlaylists() },
 
         onFollowClick = { navController.navigateToRelationship(RelationshipTab.FOLLOWING) },
-        onFansClick = { navController.navigateToRelationship(RelationshipTab.FAN)},
+        onFansClick = { navController.navigateToRelationship(RelationshipTab.FAN) },
         onLevelClick = { navController.navigateToMyInfo() },
         onHeardClick = { navController.navigateToRecentPlay() },
 
@@ -146,9 +146,9 @@ fun MeRoute(
         recentIcon = playlists.firstOrNull()?.cover ?: "",
         onRecentOrMoreClick = navController::navigateToRecentPlay,
 
-        onPlayListClick=  navController::navigateToPlaylistDetail,
+        onPlayListClick = navController::navigateToPlaylistDetail,
 
-    )
+        )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -183,19 +183,17 @@ fun MeScreen(
     onPlayListClick: (String) -> Unit = {}
 ) {
     val appColors = LocalAppColors.current
-    AppBackground {
-        Scaffold(
-            containerColor = Color.Transparent,
-            topBar = {
-                UniversalTopBar(
-                    tabs = topBarTabs,
-                    actions = topBarActions,
-                    backgroundColor = Color.Transparent,
-                    contentColor = appColors.textColor
-                )
-            },
-        ) { paddingValues ->
-            Column(
+    Scaffold(
+        containerColor = Color.Transparent,
+        topBar = {
+            UniversalTopBar(
+                tabs = topBarTabs,
+                actions = topBarActions,
+                contentColor = appColors.textColor
+            )
+        },
+    ) { paddingValues ->
+        Column(
             modifier = Modifier
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
@@ -257,8 +255,8 @@ fun MeScreen(
 
             Spacer(Modifier.height(100.dp))
         }
+
     }
-}
 }
 
 @Composable
@@ -269,15 +267,24 @@ fun QuickAccessItem(
     onClick: () -> Unit = {}
 ) {
     val textColor = LocalAppColors.current.textColor
-    
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.clickable { onClick() }
     ) {
-        Icon(imageVector = icon, contentDescription = text, modifier = Modifier.size(28.dp), tint = textColor)
+        Icon(
+            imageVector = icon,
+            contentDescription = text,
+            modifier = Modifier.size(28.dp),
+            tint = textColor
+        )
         Spacer(Modifier.height(4.dp))
         Text(text = text, style = MaterialTheme.typography.bodySmall, color = textColor)
-        Text(text = count, style = MaterialTheme.typography.labelSmall, color = textColor.copy(alpha = 0.6f))
+        Text(
+            text = count,
+            style = MaterialTheme.typography.labelSmall,
+            color = textColor.copy(alpha = 0.6f)
+        )
     }
 }
 
@@ -287,7 +294,10 @@ fun MeScreenPreview() {
     MeScreen(
         // 预览时需要提供假数据
         topBarTabs = listOf(BarTabItem("我的", true, {})),
-        topBarActions = listOf(BarActionItem(Icons.Default.Search, onClick = {}), BarActionItem(Icons.Default.Menu, onClick = {})),
+        topBarActions = listOf(
+            BarActionItem(Icons.Default.Search, onClick = {}),
+            BarActionItem(Icons.Default.Menu, onClick = {})
+        ),
         isLoggedIn = false
     )
 }

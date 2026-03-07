@@ -97,49 +97,47 @@ fun MusicHall(
         }
     }
 
-    AppBackground {
-        LazyColumn(
-            state = listState,
-            modifier = Modifier
-                .fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 100.dp) // 底部留白给播放条
-        ) {
-            // 1. 顶部 Banner 区域
-            item {
-                BannerSection()
-            }
+    LazyColumn(
+        state = listState,
+        modifier = Modifier
+            .fillMaxSize(),
+        contentPadding = PaddingValues(bottom = 100.dp) // 底部留白给播放条
+    ) {
+        // 1. 顶部 Banner 区域
+        item {
+            BannerSection()
+        }
 
-            // 2. 金刚区 (功能入口：每日推荐、歌单等)
-            item {
-                QuickAccessSection(onItemClick = onQuickAccessClick)
-            }
+        // 2. 金刚区 (功能入口：每日推荐、歌单等)
+        item {
+            QuickAccessSection(onItemClick = onQuickAccessClick)
+        }
 
-            // 3. 可以在这里加 "推荐歌单" 的横向滚动列表 (这里先留空)
+        // 3. 可以在这里加 "推荐歌单" 的横向滚动列表 (这里先留空)
 
-            // 4. "全部播放" 悬浮条头
-            item {
-                PlayAllHeader(count = songs.size)
-            }
+        // 4. "全部播放" 悬浮条头
+        item {
+            PlayAllHeader(count = songs.size)
+        }
 
-            // 5. 歌曲列表 (复用你刚才改好的 ItemSong)
-            items(songs) { song ->
-                ItemSong(
-                    song = song,
-                    modifier = Modifier.clickable { playerManager.playSong(song) },
-                )
-            }
+        // 5. 歌曲列表 (复用你刚才改好的 ItemSong)
+        items(songs) { song ->
+            ItemSong(
+                song = song,
+                modifier = Modifier.clickable { playerManager.playSong(song) },
+            )
+        }
 
-            // 6. 底部加载指示器 (可选)
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp), contentAlignment = Alignment.Center
-                ) {
-                    // 这里可以根据 loading 状态显示/隐藏
-                    // 由于 loading 状态在 VM 内部控制，这里暂时简单放置占位
-                    // 若要精确控制，需从 VM 暴露 isLoading State
-                }
+        // 6. 底部加载指示器 (可选)
+        item {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp), contentAlignment = Alignment.Center
+            ) {
+                // 这里可以根据 loading 状态显示/隐藏
+                // 由于 loading 状态在 VM 内部控制，这里暂时简单放置占位
+                // 若要精确控制，需从 VM 暴露 isLoading State
             }
         }
     }

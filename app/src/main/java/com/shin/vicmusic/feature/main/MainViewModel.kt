@@ -6,14 +6,20 @@ import com.shin.vicmusic.core.data.repository.SystemRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+import com.shin.vicmusic.core.manager.ThemeManager
+import com.shin.vicmusic.core.manager.BackgroundStyle
+
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val systemRepository: SystemRepository
+    private val systemRepository: SystemRepository,
+    private val themeManager: ThemeManager
 ) : ViewModel() {
 
     // Add a state to indicate if the view model is ready.
@@ -23,6 +29,12 @@ class MainViewModel @Inject constructor(
     // 全局未读数 (私信 + 通知)
     private val _unreadCount = MutableStateFlow(0)
     val unreadCount: StateFlow<Int> = _unreadCount.asStateFlow()
+
+    val backgroundStyle: StateFlow<BackgroundStyle> = themeManager.backgroundStyle.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = BackgroundStyle.DYNAMIC_GLOW
+    )
 
     init {
         refreshUnreadCount()

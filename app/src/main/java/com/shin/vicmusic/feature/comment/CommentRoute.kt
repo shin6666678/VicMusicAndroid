@@ -105,97 +105,107 @@ fun CommentScreen(
     }
 
     val appColors = LocalAppColors.current
-    AppBackground {
-        Scaffold(
-            containerColor = Color.Transparent,
-            topBar = {
-                TopAppBar(
-                    title = { Text("评论区 (${uiState.comments.size})", color = appColors.textColor) },
-                    navigationIcon = {
-                        IconButton(onClick = onBackClick) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回", tint = appColors.iconColor)
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.Transparent
-                    )
+    Scaffold(
+        containerColor = Color.Transparent,
+        topBar = {
+            TopAppBar(
+                title = { Text("评论区 (${uiState.comments.size})", color = appColors.textColor) },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "返回",
+                            tint = appColors.iconColor
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent
                 )
-            },
-            bottomBar = {
-                OutlinedTextField(
-                    value = commentText,
-                    onValueChange = { commentText = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.Transparent)
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .navigationBarsPadding(),
-                    placeholder = { Text(placeholderText, color = appColors.textColor.copy(alpha = 0.6f)) },
-                    textStyle = androidx.compose.ui.text.TextStyle(color = appColors.textColor),
-                    trailingIcon = {
-                        TextButton(
-                            onClick = {
-                                if (commentText.isNotBlank()) {
-                                    val parentId = replyInfo?.second?.id ?: replyInfo?.first?.id
-                                    onAddComment(commentText, parentId)
-                                    commentText = ""
-                                    replyInfo = null // Reset reply state
-                                }
-                            }
-                        ) {
-                            Text("发送", color = MaterialTheme.colorScheme.primary)
-                        }
-                    },
-                    colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = appColors.textColor.copy(alpha = 0.5f),
-                        unfocusedBorderColor = appColors.textColor.copy(alpha = 0.3f),
-                        cursorColor = appColors.accentPrimary
-                    )
-                )
-            }
-        ) { paddingValues ->
-            Column(
+            )
+        },
+        bottomBar = {
+            OutlinedTextField(
+                value = commentText,
+                onValueChange = { commentText = it },
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(horizontal = 16.dp)
-            ) {
-                if (uiState.isLoading && uiState.comments.isEmpty()) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
-                    }
-                } else if (uiState.error != null && uiState.comments.isEmpty()) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("加载评论失败: ${uiState.error}", color = MaterialTheme.colorScheme.error)
-                    }
-                } else {
-                    LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                        items(uiState.comments, key = { it.rootComment.id }) { thread ->
-                            ItemCommentThread(
-                                thread = thread,
-                                onLikeClick = onLikeClick,
-                                onReplyClick = { root, reply -> replyInfo = Pair(root, reply) },
-                                onViewMoreRepliesClick = onViewMoreRepliesClick,
-                                onProfileClick = onProfileClick
-                            )
-                            Divider(color = appColors.textColor.copy(alpha = 0.1f))
+                    .fillMaxWidth()
+                    .background(Color.Transparent)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .navigationBarsPadding(),
+                placeholder = {
+                    Text(
+                        placeholderText,
+                        color = appColors.textColor.copy(alpha = 0.6f)
+                    )
+                },
+                textStyle = androidx.compose.ui.text.TextStyle(color = appColors.textColor),
+                trailingIcon = {
+                    TextButton(
+                        onClick = {
+                            if (commentText.isNotBlank()) {
+                                val parentId = replyInfo?.second?.id ?: replyInfo?.first?.id
+                                onAddComment(commentText, parentId)
+                                commentText = ""
+                                replyInfo = null // Reset reply state
+                            }
                         }
+                    ) {
+                        Text("发送", color = MaterialTheme.colorScheme.primary)
+                    }
+                },
+                colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = appColors.textColor.copy(alpha = 0.5f),
+                    unfocusedBorderColor = appColors.textColor.copy(alpha = 0.3f),
+                    cursorColor = appColors.accentPrimary
+                )
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 16.dp)
+        ) {
+            if (uiState.isLoading && uiState.comments.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else if (uiState.error != null && uiState.comments.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("加载评论失败: ${uiState.error}", color = MaterialTheme.colorScheme.error)
+                }
+            } else {
+                LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                    items(uiState.comments, key = { it.rootComment.id }) { thread ->
+                        ItemCommentThread(
+                            thread = thread,
+                            onLikeClick = onLikeClick,
+                            onReplyClick = { root, reply -> replyInfo = Pair(root, reply) },
+                            onViewMoreRepliesClick = onViewMoreRepliesClick,
+                            onProfileClick = onProfileClick
+                        )
+                        Divider(color = appColors.textColor.copy(alpha = 0.1f))
+                    }
 
-                        if (uiState.hasMore) {
-                            item {
-                                LaunchedEffect(Unit) { onLoadMore() }
-                                if (uiState.isLoading) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth().padding(16.dp),
-                                        horizontalArrangement = Arrangement.Center
-                                    ) {
-                                        CircularProgressIndicator()
-                                    }
+                    if (uiState.hasMore) {
+                        item {
+                            LaunchedEffect(Unit) { onLoadMore() }
+                            if (uiState.isLoading) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    CircularProgressIndicator()
                                 }
                             }
                         }
                     }
                 }
+
             }
         }
     }
@@ -213,8 +223,14 @@ fun CommentScreenPreview() {
     )
 
     val replyComment = Comment(
-        id = "2", user = mockUser2, content = "确实，前奏一响就沦陷了。",
-        createTime = System.currentTimeMillis(), likeCount = 88, isLiked = false, parentId = "1", rootId = "1",
+        id = "2",
+        user = mockUser2,
+        content = "确实，前奏一响就沦陷了。",
+        createTime = System.currentTimeMillis(),
+        likeCount = 88,
+        isLiked = false,
+        parentId = "1",
+        rootId = "1",
         replyCount = 0
     )
 
