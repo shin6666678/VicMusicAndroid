@@ -4,6 +4,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import com.shin.vicmusic.core.config.AppGlobalData
 import com.shin.vicmusic.core.config.Config
 import com.shin.vicmusic.core.network.retrofit.MyNetworkApiService
+import com.shin.vicmusic.BuildConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,15 +18,12 @@ import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
-/**
- * 网络依赖注入模块
- */
 @Module
-@InstallIn(SingletonComponent::class) // 1. 指定这是一个全局单例组件
+@InstallIn(SingletonComponent::class)
 object NetWorkModule {
 
     @Provides
-    @Singleton // 2. 标记提供 Json 的方法
+    @Singleton
     fun providesNetworkJson(): Json = Json {
         ignoreUnknownKeys = true
     }
@@ -33,26 +31,32 @@ object NetWorkModule {
     @Provides
     @Singleton
     fun providesOkHttpClient(): OkHttpClient {
-        // 创建日志拦截器 (Create logging interceptor)
         val loggingInterceptor = HttpLoggingInterceptor().apply {
-            // 设置日志级别为 BODY，这将打印请求和响应的全部信息，包括 header 和 body
-            setLevel(HttpLoggingInterceptor.Level.BODY)
+            level = if (BuildConfig.DEBUG) {
+                HttpLoggingInterceptor.Level.BODY
+            } else {
+                HttpLoggingInterceptor.Level.NONE
+            }
         }
-        // [New] 添加认证拦截器
+
         val authInterceptor = Interceptor { chain ->
             val builder = chain.request().newBuilder()
             AppGlobalData.token?.let { token ->
-                // 通常是 "Bearer $token"，请根据后端要求调整
-                builder.addHeader("Authorization", token)
+                // 检查你的后端是否需要 "Bearer " 前缀，大部分规范是需要的
+                val headerValue = if (token.startsWith("Bearer")) token else "Bearer $token"
+                builder.addHeader("Authorization", headerValue)
             }
             chain.proceed(builder.build())
         }
+
         return OkHttpClient.Builder()
+            .addInterceptor(authInterceptor)
             .addInterceptor(loggingInterceptor)
-            .addInterceptor(authInterceptor) // [New] 注册拦截器
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .writeTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(10, TimeUnit.SECONDS)
+            // 添加专门处理 401 刷新的 Authenticator(认证器)
+            // .authenticator(MyTokenAuthenticator())
+            .connectTimeout(15, TimeUnit.SECONDS) // 建议稍微加长一点容错时间
+            .writeTimeout(15, TimeUnit.SECONDS)
+            .readTimeout(15, TimeUnit.SECONDS)
             .build()
     }
 
@@ -64,14 +68,14 @@ object NetWorkModule {
     ): Retrofit {
         val contentType = "application/json".toMediaType()
         return Retrofit.Builder()
-            .baseUrl(Config.BASE_URL) // 4. 使用 Config 中的 BASE_URL
+            .baseUrl(Config.BASE_URL)
             .client(okHttpClient)
-            .addConverterFactory(networkJson.asConverterFactory(contentType)) // 5. 绑定 Serialization
+            .addConverterFactory(networkJson.asConverterFactory(contentType))
             .build()
     }
 
     @Provides
-    @Singleton // 6. 最重要的一步：告诉 Hilt 如何提供 MyNetworkApiService
+    @Singleton
     fun provideMyNetworkApiService(retrofit: Retrofit): MyNetworkApiService {
         return retrofit.create(MyNetworkApiService::class.java)
     }
