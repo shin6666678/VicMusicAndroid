@@ -76,7 +76,8 @@ fun UserInfoCard(
     onHeardClick: () -> Unit = {},
 
     onFriendClick: () -> Unit = {},
-    onCheckInClick: () -> Unit = {}
+    onCheckInClick: () -> Unit = {},
+    onDressUpClick: () -> Unit = {}
 ) {
     val appColors = LocalAppColors.current
     val glassWhite = appColors.glassWhite
@@ -108,7 +109,8 @@ fun UserInfoCard(
                     onHeardClick = onHeardClick,
                     onCheckInClick = onCheckInClick,
                     onVipClick = onVipClick,
-                    onFriendClick = onFriendClick
+                    onFriendClick = onFriendClick,
+                    onDressUpClick = onDressUpClick
                 )
             }
         }
@@ -222,8 +224,8 @@ private fun UserStatsRow(
 
     onFriendClick: () -> Unit,
     onVipClick: () -> Unit = {},
-    onCheckInClick: () -> Unit = {}
-    
+    onCheckInClick: () -> Unit = {},
+    onDressUpClick: () -> Unit = {}
 ) {
 
     Row(
@@ -254,7 +256,12 @@ private fun UserStatsRow(
             iconTint = Color(0xFF00BFA5),
             onClick = onVipClick
         )
-        ActionItem(icon = Icons.Filled.ShoppingCart, text = "装扮", iconTint = Color(0xFF2196F3))
+        ActionItem(
+            icon = Icons.Filled.ShoppingCart,
+            text = "装扮",
+            iconTint = Color(0xFF2196F3),
+            onClick = onDressUpClick
+        )
         ActionItem(icon = Icons.Filled.DateRange,
             text = "日签",
             iconTint = Color(0xFFF44336),

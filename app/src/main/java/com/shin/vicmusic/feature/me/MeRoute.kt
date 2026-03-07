@@ -62,6 +62,7 @@ import com.shin.vicmusic.feature.playlist.meList.navigateToMyPlaylists
 import com.shin.vicmusic.feature.relationship.RelationshipTab
 import com.shin.vicmusic.feature.relationship.navigateToRelationship
 import com.shin.vicmusic.feature.vip.navigateToVip
+import com.shin.vicmusic.feature.me.dressup.navigateToDressUp
 import androidx.compose.animation.core.*
 import androidx.compose.ui.draw.blur
 import androidx.compose.foundation.background
@@ -137,6 +138,7 @@ fun MeRoute(
         onFriendClick = { navController.navigateToRelationship(RelationshipTab.FRIEND) },
         onVipClick = navController::navigateToVip,
         onCheckInClick = { navController.navigateToCheckIn() },
+        onDressUpClick = { navController.navigateToDressUp() },
 
         onLikedClick = { navController.navigateToLikedList() },
         onLocalClick = { navController.navigateToLocalMusic() },
@@ -179,6 +181,7 @@ fun MeScreen(
 
     onFriendClick: () -> Unit = {},
     onCheckInClick: () -> Unit = {},
+    onDressUpClick: () -> Unit = {},
 
     onPlayListClick: (String) -> Unit = {}
 ) {
@@ -212,7 +215,8 @@ fun MeScreen(
                 onLevelClick = onLevelClick,
                 onHeardClick = onHeardClick,
                 onFriendClick = onFriendClick,
-                onCheckInClick = onCheckInClick
+                onCheckInClick = onCheckInClick,
+                onDressUpClick = onDressUpClick
             )
 
             // Quick Access Icons

@@ -23,17 +23,10 @@ class SettingViewModel @Inject constructor(
 ) : ViewModel() {
 
     val currentThemeMode = themeManager.themeMode
-    val currentBackgroundStyle = themeManager.backgroundStyle
 
     fun updateTheme(mode: AppThemeMode) {
         viewModelScope.launch {
             themeManager.setThemeMode(mode)
-        }
-    }
-
-    fun updateBackgroundStyle(style: BackgroundStyle) {
-        viewModelScope.launch {
-            themeManager.updateBackgroundStyle(style)
         }
     }
 
