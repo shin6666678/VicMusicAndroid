@@ -25,12 +25,9 @@ fun SettingRoute(
 ) {
     val navController = LocalNavController.current
     val currentThemeMode by viewModel.currentThemeMode.collectAsState(initial = AppThemeMode.SYSTEM)
-    val currentBackgroundStyle by viewModel.currentBackgroundStyle.collectAsState(initial = com.shin.vicmusic.core.manager.BackgroundStyle.DYNAMIC_GLOW)
     SettingScreen(
         currentThemeMode = currentThemeMode,
-        currentBackgroundStyle = currentBackgroundStyle,
         onThemeChanged = viewModel::updateTheme,
-        onBackgroundStyleChanged = viewModel::updateBackgroundStyle,
         onBackClick = navController::popBackStack,
         onLogoutClick = viewModel::logout,
         onDebugCheckMessage = viewModel::triggerMessageCheck
@@ -41,15 +38,12 @@ fun SettingRoute(
 @Composable
 fun SettingScreen(
     currentThemeMode: AppThemeMode,
-    currentBackgroundStyle: com.shin.vicmusic.core.manager.BackgroundStyle,
     onThemeChanged: (AppThemeMode) -> Unit,
-    onBackgroundStyleChanged: (com.shin.vicmusic.core.manager.BackgroundStyle) -> Unit,
     onBackClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {},
     onDebugCheckMessage: () -> Unit = {}
 ) {
     var showThemeDialog by remember { mutableStateOf(false) }
-    var showBackgroundDialog by remember { mutableStateOf(false) }
 
     val appColors = LocalAppColors.current
 
@@ -75,16 +69,6 @@ fun SettingScreen(
                 AppThemeMode.DARK -> "深色模式"
             }
             SettingItem(title = "外观设置", subtitle = themeText, onClick = { showThemeDialog = true })
-
-            // Only show "装扮" (Dress up) in light mode
-            if (!appColors.isDark) {
-                val backgroundText = when (currentBackgroundStyle) {
-                    com.shin.vicmusic.core.manager.BackgroundStyle.DYNAMIC_GLOW -> "动态光晕"
-                    com.shin.vicmusic.core.manager.BackgroundStyle.SOLID_COLOR -> "纯色背景"
-                    com.shin.vicmusic.core.manager.BackgroundStyle.NONE -> "无背景"
-                }
-                SettingItem(title = "装扮", subtitle = backgroundText, onClick = { showBackgroundDialog = true })
-            }
 
             val context = androidx.compose.ui.platform.LocalContext.current
             SettingItem(title = "【Debug】立即检查消息", onClick = onDebugCheckMessage)
@@ -150,34 +134,6 @@ fun SettingScreen(
                 dismissButton = {
                     TextButton(onClick = { showDarkThemeWarningDialog = false }) {
                         Text("取消")
-                    }
-                }
-            )
-        }
-
-        if (showBackgroundDialog) {
-            AlertDialog(
-                onDismissRequest = { showBackgroundDialog = false },
-                title = { Text("选择装扮样式") },
-                text = {
-                    Column {
-                        ThemeOptionItem(text = "动态光晕", selected = currentBackgroundStyle == com.shin.vicmusic.core.manager.BackgroundStyle.DYNAMIC_GLOW) {
-                            onBackgroundStyleChanged(com.shin.vicmusic.core.manager.BackgroundStyle.DYNAMIC_GLOW)
-                            showBackgroundDialog = false
-                        }
-                        ThemeOptionItem(text = "纯色背景", selected = currentBackgroundStyle == com.shin.vicmusic.core.manager.BackgroundStyle.SOLID_COLOR) {
-                            onBackgroundStyleChanged(com.shin.vicmusic.core.manager.BackgroundStyle.SOLID_COLOR)
-                            showBackgroundDialog = false
-                        }
-                        ThemeOptionItem(text = "无背景", selected = currentBackgroundStyle == com.shin.vicmusic.core.manager.BackgroundStyle.NONE) {
-                            onBackgroundStyleChanged(com.shin.vicmusic.core.manager.BackgroundStyle.NONE)
-                            showBackgroundDialog = false
-                        }
-                    }
-                },
-                confirmButton = {
-                    TextButton(onClick = { showBackgroundDialog = false }) {
-                        Text("关闭")
                     }
                 }
             )

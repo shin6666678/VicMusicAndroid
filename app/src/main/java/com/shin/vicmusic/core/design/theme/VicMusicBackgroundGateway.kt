@@ -10,6 +10,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.shin.vicmusic.core.design.theme.dressUp.dynamicGlow.DynamicGlowAppBackGround
 import com.shin.vicmusic.core.manager.BackgroundStyle
 import com.shin.vicmusic.feature.main.MainViewModel
 
@@ -33,7 +34,7 @@ fun VicMusicBackgroundGateway(
     Box(modifier = modifier.fillMaxSize()) {
         when (currentStyle) {
             BackgroundStyle.DYNAMIC_GLOW -> {
-                AppBackground(content = content)
+                DynamicGlowAppBackGround(content = content)
             }
             BackgroundStyle.SOLID_COLOR -> {
                 Box(Modifier.fillMaxSize().background(LocalAppColors.current.gradientMid)) {
@@ -41,7 +42,6 @@ fun VicMusicBackgroundGateway(
                 }
             }
             BackgroundStyle.NONE -> {
-                // No specific background, relies on the underlying MaterialTheme surface
                 Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
                     content()
                 }
