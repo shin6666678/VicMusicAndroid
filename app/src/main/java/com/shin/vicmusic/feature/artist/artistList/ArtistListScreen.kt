@@ -23,7 +23,6 @@ import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.ARTISTS
 import com.shin.vicmusic.feature.common.item.ItemArtist
 import com.shin.vicmusic.feature.artist.artistDetail.navigateToArtistDetail
 import com.shin.vicmusic.feature.artist.artistList.component.FilterSection
-import com.shin.vicmusic.feature.artist.artistList.component.TopArtistSection
 import com.shin.vicmusic.feature.common.bar.CommonTopBar
 import com.shin.vicmusic.feature.search.navigateToSearch
 
@@ -85,9 +84,6 @@ fun ArtistListScreen(
                 contentPadding = PaddingValues(bottom = 16.dp)
             ) {
                 item {
-                    // 常听歌手/关注歌手 区域
-                    TopArtistSection()
-
                     // 筛选区域
                     FilterSection(
                         selectedRegion = filterState.region,

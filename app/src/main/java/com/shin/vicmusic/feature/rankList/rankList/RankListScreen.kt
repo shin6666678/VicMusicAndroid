@@ -36,11 +36,6 @@ import com.shin.vicmusic.feature.rankList.rankList.component.RecommendedRankList
 import com.shin.vicmusic.feature.rankList.rankListDetail.navigateToRankListDetail
 
 
-@Preview
-@Composable
-fun RankListScreenPreview() {
-}
-
 @Composable
 fun RankListRoute(
     navController: NavController = LocalNavController.current,
@@ -49,7 +44,6 @@ fun RankListRoute(
 
     val rankListPeaks by viewModel.rankListPeaks.collectAsState()
 
-    // 判空处理 (Null/Empty Check)
     if (rankListPeaks.isNullOrEmpty()) {
         Box(
             modifier = Modifier.fillMaxSize(), // fillMaxSize(填满最大尺寸)
@@ -69,10 +63,9 @@ fun RankListRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RankListScreen(
-    recommendedRankLists: List<RecommendedRankListInfo> = emptyList(),
     peakCharts: List<RankListPeak> = emptyList(),
     popBackStack: () -> Unit = {},
-    onRankClick: (String) -> Unit = {} // 新增点击回调
+    onRankClick: (String) -> Unit = {}
 ) {
     Scaffold(
         topBar = { CommonTopBar(
@@ -86,36 +79,7 @@ fun RankListScreen(
                 .padding(paddingValues)
                 .background(MaterialTheme.colorScheme.surface)
         ) {
-            item {
-                // 推荐 (Recommended) Section
-                Text(
-                    text = "推荐",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                )
-            }
-            item {
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(recommendedRankLists) { item ->
-                        RecommendedRankListItem(rankListInfo = item)
-                    }
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-            item {
-                // 巅峰榜 (Peak Charts) Section
-                Text(
-                    text = "巅峰榜",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                )
-            }
-            // 4. 巅峰榜垂直列表 (修复：直接使用 items，不要嵌套 LazyColumn)
+            // 巅峰榜垂直列表
             items(peakCharts) { item ->
                 RankListItem(
                     rankListItemInfo = item,
