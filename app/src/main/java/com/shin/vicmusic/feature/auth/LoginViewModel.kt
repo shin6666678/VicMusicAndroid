@@ -77,7 +77,7 @@ class LoginViewModel @Inject constructor(
                 val response = authRepository.login(req)
 
                 if (response.code == 0) {
-                    val token = response.data.toString()
+                    val token = response.data.toString().trim('"')
                     AppGlobalData.token = token
                     tokenManager.saveToken(token)
                     Log.d("LoginViewModel", "Login Success: ${response.data}")

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -76,9 +77,10 @@ fun UserInfoCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(2.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White) // 显式设置背景色，防止透明
+        shape = RoundedCornerShape(24.dp),
+        elevation = CardDefaults.cardElevation(0.dp),
+        border = BorderStroke(1.dp, Color(0x33FFFFFF)),
+        colors = CardDefaults.cardColors(containerColor = Color(0x1AFFFFFF)) // 玻璃拟态背景
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             // 1. 头部区域：根据登录状态切换
@@ -132,7 +134,8 @@ private fun LoggedInHeader(
             Text(
                 text = user.name,
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = Color.White
             )
             Spacer(modifier = Modifier.height(6.dp))
             Row {
@@ -161,7 +164,7 @@ private fun LoggedOutHeader(onLoginClick: () -> Unit) {
             modifier = Modifier
                 .height(40.dp), // 保持高度，移除 weight(0.5f)
             colors = ButtonDefaults.buttonColors(
-                containerColor = VdGreen,
+                containerColor = Color(0x33FFFFFF),
                 contentColor = Color.White
             ),
             shape = RoundedCornerShape(50),
@@ -189,7 +192,7 @@ private fun LoggedOutHeader(onLoginClick: () -> Unit) {
         Text(
             text = "登录体验更多精彩内容",
             style = MaterialTheme.typography.bodySmall,
-            color = Color.Gray,
+            color = Color.White.copy(alpha = 0.6f),
             modifier = Modifier.weight(1f) // 占据剩下的所有宽度
         )
     }
@@ -256,12 +259,13 @@ fun StatItem(count: Int?, label: String, onClick: () -> Unit = {}) { // 添加 o
         Text(
             text = (count ?: 0).toString(),
             style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = Color.White
         )
         Text(
             text = label,
             style = MaterialTheme.typography.labelSmall,
-            color = Color.Gray
+            color = Color.White.copy(alpha=0.6f)
         )
     }
 }
@@ -282,6 +286,6 @@ fun ActionItem(
             tint = iconTint
         )
         Spacer(Modifier.height(4.dp))
-        Text(text = text, style = MaterialTheme.typography.bodySmall)
+        Text(text = text, style = MaterialTheme.typography.bodySmall, color = Color.White)
     }
 }

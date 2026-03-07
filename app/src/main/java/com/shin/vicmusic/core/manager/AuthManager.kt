@@ -56,6 +56,7 @@ class AuthManager @Inject constructor(
 
     // 供LoginViewModel或其他认证流程调用，以更新全局登录状态
     fun setLoginStatus(loggedIn: Boolean) {
+        if (_isLoggedIn.value == loggedIn) return
         _isLoggedIn.value = loggedIn
         if (loggedIn) {
             fetchUserInfo() // [新增] 登录成功自动获取用户信息
@@ -80,7 +81,11 @@ class AuthManager @Inject constructor(
                     // 异步保存到 Proto DataStore
                     userPrefsDataStore.updateData { result.data.toProto() }
                 }
-                is MyNetWorkResult.Error->{}
+                is MyNetWorkResult.Error->{
+                    android.util.Log.e("AuthManager", "fetchUserInfo Error: ${result.message}")
+                    // Optionally set login status to false or clear token if it's an authorization error
+                    // But for now just log it so we can trace it.
+                }
             }
 
         }

@@ -54,7 +54,7 @@ fun PlaylistsSection(
                 text = "自建歌单",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = Color.White
             )
             Spacer(Modifier.height(4.dp))
             Divider(
@@ -72,7 +72,7 @@ fun PlaylistsSection(
             Text(
                 text = "收藏歌单",
                 style = MaterialTheme.typography.titleMedium,
-                color = Color.Gray
+                color = Color.White.copy(alpha = 0.6f)
             )
             Spacer(Modifier.height(4.dp))
             Divider(
@@ -86,7 +86,7 @@ fun PlaylistsSection(
         Icon(
             imageVector = Icons.Filled.Add,
             contentDescription = "Add Playlist",
-            tint = Color.Gray,
+            tint = Color.White,
             modifier = Modifier.clickable {
                 showCreateDialog = true
             }
@@ -95,7 +95,7 @@ fun PlaylistsSection(
         Icon(
             imageVector = Icons.Filled.KeyboardArrowRight,
             contentDescription = "More Playlists",
-            tint = Color.Gray,
+            tint = Color.White,
             modifier = Modifier.clickable { onMorePlaylistsClick() }
         )
     }
