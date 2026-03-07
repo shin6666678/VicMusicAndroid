@@ -98,6 +98,7 @@ dependencies {
 
     // Hilt (DI)
     implementation(libs.hilt.android)
+    implementation(libs.androidx.glance.appwidget)
     ksp(libs.hilt.compiler) // 使用 KSP 替代 kapt
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.hilt.work)
@@ -140,4 +141,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation("com.google.zxing:core:3.5.3")
+
+    implementation("androidx.glance:glance-appwidget")
 }
