@@ -65,6 +65,8 @@ import com.shin.vicmusic.feature.common.bar.SongBar
 import com.shin.vicmusic.feature.feed.feedScreen
 import com.shin.vicmusic.feature.feed.publish.publishFeedScreen
 import com.shin.vicmusic.feature.me.dressup.dressUpScreen
+import com.shin.vicmusic.feature.me.audio.audioScreen
+import com.shin.vicmusic.feature.me.purchased.purchasedScreen
 import com.shin.vicmusic.feature.liked.likedListScreen
 import com.shin.vicmusic.feature.localMusic.localMusicScreen
 import com.shin.vicmusic.feature.main.MAIN_ROUTE
@@ -240,6 +242,8 @@ fun MyApp(
                 myInfoEditScreen()
                 publishFeedScreen()
                 dressUpScreen(popBackStack = { navController.popBackStack() })
+                audioScreen(onBackClick = { navController.popBackStack() })
+                purchasedScreen(onBackClick = { navController.popBackStack() })
             }
 
             // 底部整体容器 (SongBar + 导航栏)

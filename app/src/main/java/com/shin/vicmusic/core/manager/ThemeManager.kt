@@ -12,26 +12,18 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
-enum class AppThemeMode {
-    SYSTEM,
-    LIGHT,
-    DARK;
+enum class DressUpStyle(val isDarkTheme: Boolean?) {
+    SYSTEM_DEFAULT(null),
+    LIGHT_GLOW(false),
+    DARK_GLOW(true),
+    LIGHT_SOLID(false),
+    DARK_SOLID(true),
+    LIGHT_NONE(false),
+    DARK_NONE(true);
 
     companion object {
-        fun fromOrdinal(ordinal: Int): AppThemeMode {
-            return values().getOrNull(ordinal) ?: SYSTEM
-        }
-    }
-}
-
-enum class BackgroundStyle {
-    DYNAMIC_GLOW,
-    SOLID_COLOR,
-    NONE;
-
-    companion object {
-        fun fromOrdinal(ordinal: Int): BackgroundStyle {
-            return values().getOrNull(ordinal) ?: DYNAMIC_GLOW
+        fun fromOrdinal(ordinal: Int): DressUpStyle {
+            return values().getOrNull(ordinal) ?: SYSTEM_DEFAULT
         }
     }
 }
@@ -43,38 +35,22 @@ class ThemeManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
 
-    private val THEME_KEY = intPreferencesKey("theme_mode")
-    private val BACKGROUND_STYLE_KEY = intPreferencesKey("background_style")
+    private val DRESS_UP_STYLE_KEY = intPreferencesKey("dress_up_style")
 
     /**
-     * 获取当前的主题设置流
+     * 获取当前的装扮样式流
      */
-    val themeMode: Flow<AppThemeMode> = context.themeDataStore.data.map { preferences ->
-        val ordinal = preferences[THEME_KEY] ?: AppThemeMode.SYSTEM.ordinal
-        AppThemeMode.fromOrdinal(ordinal)
+    val dressUpStyle: Flow<DressUpStyle> = context.themeDataStore.data.map { preferences ->
+        val ordinal = preferences[DRESS_UP_STYLE_KEY] ?: DressUpStyle.SYSTEM_DEFAULT.ordinal
+        DressUpStyle.fromOrdinal(ordinal)
     }
 
     /**
-     * 获取当前的背景样式流
+     * 存储用户选择的装扮样式
      */
-    val backgroundStyle: Flow<BackgroundStyle> = context.themeDataStore.data.map { prefs ->
-        val index = prefs[BACKGROUND_STYLE_KEY] ?: BackgroundStyle.DYNAMIC_GLOW.ordinal
-        BackgroundStyle.fromOrdinal(index)
-    }
-
-    /**
-     * 存储用户选择的主题模式
-     */
-    suspend fun setThemeMode(mode: AppThemeMode) {
+    suspend fun updateDressUpStyle(style: DressUpStyle) {
         context.themeDataStore.edit { preferences ->
-            preferences[THEME_KEY] = mode.ordinal
+            preferences[DRESS_UP_STYLE_KEY] = style.ordinal
         }
-    }
-
-    /**
-     * 存储用户选择的背景样式
-     */
-    suspend fun updateBackgroundStyle(style: BackgroundStyle) {
-        context.themeDataStore.edit { it[BACKGROUND_STYLE_KEY] = style.ordinal }
     }
 }

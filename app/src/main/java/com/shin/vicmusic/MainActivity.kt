@@ -71,14 +71,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val navController = rememberNavController()
-            val themeMode by themeManager.themeMode.collectAsState(initial = com.shin.vicmusic.core.manager.AppThemeMode.SYSTEM)
+            val dressUpStyle by themeManager.dressUpStyle.collectAsState(initial = com.shin.vicmusic.core.manager.DressUpStyle.SYSTEM_DEFAULT)
             val isSystemDark = isSystemInDarkTheme()
-            val isDarkTheme = when (themeMode) {
-                com.shin.vicmusic.core.manager.AppThemeMode.LIGHT -> false
-                com.shin.vicmusic.core.manager.AppThemeMode.DARK -> true
-                com.shin.vicmusic.core.manager.AppThemeMode.SYSTEM -> isSystemDark
-                else -> isSystemDark
-            }
+            val isDarkTheme = dressUpStyle.isDarkTheme ?: isSystemDark
+            
             val currentAppColors = if (isDarkTheme) darkAppColors else lightAppColors
             
             CompositionLocalProvider(

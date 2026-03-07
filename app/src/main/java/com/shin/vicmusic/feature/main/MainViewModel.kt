@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 import com.shin.vicmusic.core.manager.ThemeManager
-import com.shin.vicmusic.core.manager.BackgroundStyle
+import com.shin.vicmusic.core.manager.DressUpStyle
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -30,10 +30,10 @@ class MainViewModel @Inject constructor(
     private val _unreadCount = MutableStateFlow(0)
     val unreadCount: StateFlow<Int> = _unreadCount.asStateFlow()
 
-    val backgroundStyle: StateFlow<BackgroundStyle> = themeManager.backgroundStyle.stateIn(
+    val dressUpStyle: StateFlow<DressUpStyle> = themeManager.dressUpStyle.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
-        initialValue = BackgroundStyle.DYNAMIC_GLOW
+        initialValue = DressUpStyle.SYSTEM_DEFAULT
     )
 
     init {

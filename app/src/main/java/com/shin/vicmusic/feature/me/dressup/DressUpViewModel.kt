@@ -3,7 +3,7 @@ package com.shin.vicmusic.feature.me.dressup
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.manager.ThemeManager
-import com.shin.vicmusic.core.manager.BackgroundStyle
+import com.shin.vicmusic.core.manager.DressUpStyle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -14,11 +14,11 @@ class DressUpViewModel @Inject constructor(
     private val themeManager: ThemeManager
 ) : ViewModel() {
 
-    val currentBackgroundStyle: Flow<BackgroundStyle> = themeManager.backgroundStyle
+    val currentDressUpStyle: Flow<DressUpStyle> = themeManager.dressUpStyle
 
-    fun updateBackgroundStyle(style: BackgroundStyle) {
+    fun updateDressUpStyle(style: DressUpStyle) {
         viewModelScope.launch {
-            themeManager.updateBackgroundStyle(style)
+            themeManager.updateDressUpStyle(style)
         }
     }
 }
