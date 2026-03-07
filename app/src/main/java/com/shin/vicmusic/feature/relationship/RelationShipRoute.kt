@@ -1,16 +1,20 @@
 package com.shin.vicmusic.feature.relationship
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.shin.vicmusic.core.design.composition.LocalNavController
+import com.shin.vicmusic.core.design.theme.LocalAppColors
+import com.shin.vicmusic.core.design.theme.AppBackground
 import com.shin.vicmusic.feature.common.bar.BarTabItem
 import com.shin.vicmusic.feature.common.bar.CommonTopBarSelect
 import com.shin.vicmusic.feature.relationship.fanList.FanListScreen
@@ -57,25 +61,28 @@ fun RelationshipScreen(
         )
     }
 
-    Scaffold(
-        topBar = {
-            CommonTopBarSelect(
-                tabs = topBarTabs,
-                backgroundColor = MaterialTheme.colorScheme.surface,
-                onBackClick = onBackClick
-            )
-        }
-    ) { paddingValues ->
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) { page ->
-            when (page) {
-                0 -> FollowListScreen()
-                1 -> FanListScreen()
-                2 -> FriendListScreen()
+    AppBackground {
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = {
+                CommonTopBarSelect(
+                    tabs = topBarTabs,
+                    backgroundColor = Color.Transparent,
+                    onBackClick = onBackClick
+                )
+            }
+        ) { paddingValues ->
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) { page ->
+                when (page) {
+                    0 -> FollowListScreen()
+                    1 -> FanListScreen()
+                    2 -> FriendListScreen()
+                }
             }
         }
     }

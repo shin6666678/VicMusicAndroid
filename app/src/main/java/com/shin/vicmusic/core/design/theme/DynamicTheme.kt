@@ -21,6 +21,8 @@ data class AppColors(
     val inputBackground: Color,
     val textColor: Color,
     val iconColor: Color,
+    val bottomBarBackground: Color,
+    val bottomBarContent: Color,
     val isDark: Boolean
 )
 
@@ -35,6 +37,8 @@ val lightAppColors = AppColors(
     inputBackground = Color(0x0D000000),
     textColor = Color(0xFF1E293B),
     iconColor = Color(0xFF1E293B),
+    bottomBarBackground = Color(0xCCFFFFFF),
+    bottomBarContent = Color(0xFF1E293B),
     isDark = false
 )
 
@@ -49,6 +53,8 @@ val darkAppColors = AppColors(
     inputBackground = Color(0x0DFFFFFF),
     textColor = Color.White,
     iconColor = Color.White,
+    bottomBarBackground = Color(0xCC111827),
+    bottomBarContent = Color.White,
     isDark = true
 )
 

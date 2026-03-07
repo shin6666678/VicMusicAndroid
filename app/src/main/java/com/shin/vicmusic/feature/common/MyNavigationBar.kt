@@ -58,9 +58,9 @@ fun MyNavigationBar(
                 alwaysShowLabel = true,
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = contentColor,
-                    unselectedIconColor = contentColor.copy(alpha = 0.5f),
+                    unselectedIconColor = contentColor.copy(alpha = 0.7f),
                     selectedTextColor = contentColor,
-                    unselectedTextColor = contentColor.copy(alpha = 0.5f),
+                    unselectedTextColor = contentColor.copy(alpha = 0.7f),
                     indicatorColor = contentColor.copy(alpha = 0.1f)
                 )
             )

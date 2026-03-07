@@ -78,9 +78,9 @@ fun UserInfoCard(
     onFriendClick: () -> Unit = {},
     onCheckInClick: () -> Unit = {}
 ) {
-    val isDark = isAppInDarkTheme()
-    val glassWhite = LocalAppColors.current.glassWhite
-    val glassBorder = LocalAppColors.current.glassBorder
+    val appColors = LocalAppColors.current
+    val glassWhite = appColors.glassWhite
+    val glassBorder = appColors.glassBorder
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -126,7 +126,6 @@ private fun LoggedInHeader(
     // 1. 解析 VIP 等级 (默认为 0)
     val vipLevelInt = user.vipLevel
     
-    val isDark = isAppInDarkTheme()
     val textColor = LocalAppColors.current.textColor
 
 
@@ -163,9 +162,9 @@ private fun LoggedInHeader(
 
 @Composable
 private fun LoggedOutHeader(onLoginClick: () -> Unit) {
-    val isDark = isAppInDarkTheme()
-    val textColor = LocalAppColors.current.textColor
-    val glassWhite = LocalAppColors.current.glassWhite
+    val appColors = LocalAppColors.current
+    val textColor = appColors.textColor
+    val glassWhite = appColors.glassWhite
     
     val VdGreen = Color(0xFF1AAD19)
     Row(
@@ -266,7 +265,6 @@ private fun UserStatsRow(
 
 @Composable
 fun StatItem(count: Int?, label: String, onClick: () -> Unit = {}) { // 添加 onClick 参数
-    val isDark = isAppInDarkTheme()
     val textColor = LocalAppColors.current.textColor
 
     Column(
@@ -293,7 +291,6 @@ fun ActionItem(
     iconTint: Color,
     onClick: () -> Unit = {}
 ) {
-    val isDark = isAppInDarkTheme()
     val textColor = LocalAppColors.current.textColor
 
     Column(horizontalAlignment = Alignment.CenterHorizontally,

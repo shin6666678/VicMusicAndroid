@@ -19,6 +19,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.shin.vicmusic.core.design.theme.LocalAppColors
+import com.shin.vicmusic.core.design.theme.AppBackground
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.feature.album.albumList.ALBUM_LIST_ROUTE
 import com.shin.vicmusic.feature.common.bar.BarTabItem
@@ -78,7 +80,7 @@ fun DiscoveryScreen(
             Column {
                 UniversalTopBar(
                     tabs = topBarTabs,
-                    backgroundColor = MaterialTheme.colorScheme.surface
+                    backgroundColor = LocalAppColors.current.gradientStart
                 )
                 SearchBar(toSearch = toSearch)
             }
@@ -89,7 +91,7 @@ fun DiscoveryScreen(
             state = pagerState,
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surface)
+                .background(LocalAppColors.current.gradientMid)
                 .padding(paddingValues)
         ) { page ->
             when (page) {

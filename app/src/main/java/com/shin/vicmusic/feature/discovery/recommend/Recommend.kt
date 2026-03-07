@@ -1,6 +1,8 @@
 package com.shin.vicmusic.feature.discovery.recommend
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,8 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
+import com.shin.vicmusic.core.design.theme.LocalAppColors
 import com.shin.vicmusic.core.design.theme.SpaceExtraMedium
 import com.shin.vicmusic.core.design.theme.SpaceOuter
 import com.shin.vicmusic.core.domain.RecommendCard
@@ -67,38 +72,52 @@ fun RecommendScreen(
     onMediaCardClick: (String) -> Unit = {},
     onMessageClick: () -> Unit = {}
 ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = SpaceOuter),
-        verticalArrangement = Arrangement.spacedBy(SpaceExtraMedium)
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        LocalAppColors.current.gradientStart,
+                        LocalAppColors.current.gradientMid,
+                        LocalAppColors.current.gradientEnd
+                    )
+                )
+            )
     ) {
-        // 1. 用户问候区 (包含红点逻辑)
-        item {
-            UserGreeting(
-                user = user,
-                unreadCount = unreadCount,
-                onMessageClick = onMessageClick
-            )
-        }
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(bottom = SpaceOuter),
+            verticalArrangement = Arrangement.spacedBy(SpaceExtraMedium)
+        ) {
+            // 1. 用户问候区 (包含红点逻辑)
+            item {
+                UserGreeting(
+                    user = user,
+                    unreadCount = unreadCount,
+                    onMessageClick = onMessageClick
+                )
+            }
 
-        // 2. 横向卡片区
-        item {
-            HorizontalMediaCards(
-                mediaCards = listOf(
-                    MediaCardData("1", "下午茶", "此刻别无所求...", "https://picsum.photos/200/300?random=1"),
-                    MediaCardData("2", "Daily 30", "每日30首", "https://picsum.photos/200/300?random=2", true),
-                    MediaCardData("3", "跑步专属", "节奏感超强", "https://picsum.photos/200/300?random=3")
-                ),
-                onMediaCardClick = onMediaCardClick
-            )
-        }
+            // 2. 横向卡片区
+            item {
+                HorizontalMediaCards(
+                    mediaCards = listOf(
+                        MediaCardData("1", "下午茶", "此刻别无所求...", "https://picsum.photos/200/300?random=1"),
+                        MediaCardData("2", "Daily 30", "每日30首", "https://picsum.photos/200/300?random=2", true),
+                        MediaCardData("3", "跑步专属", "节奏感超强", "https://picsum.photos/200/300?random=3")
+                    ),
+                    onMediaCardClick = onMediaCardClick
+                )
+            }
 
-        // 3. "也在听" 区块
-        item {
-            AlsoListeningSection(
-                title = recommendCard.title,
-                songs = recommendCard.songs,
-            )
+            // 3. "也在听" 区块
+            item {
+                AlsoListeningSection(
+                    title = recommendCard.title,
+                    songs = recommendCard.songs,
+                )
+            }
         }
     }
 }

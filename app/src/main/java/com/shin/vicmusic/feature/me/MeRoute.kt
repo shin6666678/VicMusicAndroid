@@ -73,6 +73,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import com.shin.vicmusic.core.design.theme.LocalAppColors
+import com.shin.vicmusic.core.design.theme.AppBackground
 
 
 @Composable
@@ -181,66 +182,8 @@ fun MeScreen(
 
     onPlayListClick: (String) -> Unit = {}
 ) {
-    // ---- 浮动光晕动画 ----
-    val infiniteTransition = rememberInfiniteTransition(label = "glow")
-    val glow1X by infiniteTransition.animateFloat(
-        initialValue = 0f, targetValue = 1f,
-        animationSpec = infiniteRepeatable(tween(7000, easing = LinearEasing), RepeatMode.Reverse),
-        label = "glow1x"
-    )
-    val glow2X by infiniteTransition.animateFloat(
-        initialValue = 1f, targetValue = 0f,
-        animationSpec = infiniteRepeatable(tween(9000, easing = LinearEasing), RepeatMode.Reverse),
-        label = "glow2x"
-    )
-
-    val isDark = isAppInDarkTheme()
-    val textColor = LocalAppColors.current.textColor
-    val accentPrimary = LocalAppColors.current.accentPrimary
-    val accentSecondary = LocalAppColors.current.accentSecondary
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        LocalAppColors.current.gradientStart,
-                        LocalAppColors.current.gradientMid,
-                        LocalAppColors.current.gradientEnd
-                    )
-                )
-            )
-    ) {
-        // ---- 背景光晕球 ----
-        Box(
-            modifier = Modifier
-                .size(300.dp)
-                .offset(x = (glow1X * 200 - 100).dp, y = (-50).dp)
-                .blur(80.dp)
-                .background(
-                    Brush.radialGradient(
-                        listOf(accentPrimary.copy(alpha = 0.35f), Color.Transparent),
-                        center = Offset.Zero, radius = 600f
-                    ),
-                    shape = RoundedCornerShape(50)
-                )
-        )
-        Box(
-            modifier = Modifier
-                .size(250.dp)
-                .align(Alignment.BottomEnd)
-                .offset(x = (glow2X * 80).dp, y = (-(glow2X * 60)).dp)
-                .blur(70.dp)
-                .background(
-                    Brush.radialGradient(
-                        listOf(accentSecondary.copy(alpha = 0.3f), Color.Transparent),
-                        center = Offset.Zero, radius = 500f
-                    ),
-                    shape = RoundedCornerShape(50)
-                )
-        )
-
+    val appColors = LocalAppColors.current
+    AppBackground {
         Scaffold(
             containerColor = Color.Transparent,
             topBar = {
@@ -248,7 +191,7 @@ fun MeScreen(
                     tabs = topBarTabs,
                     actions = topBarActions,
                     backgroundColor = Color.Transparent,
-                    contentColor = textColor
+                    contentColor = appColors.textColor
                 )
             },
         ) { paddingValues ->
@@ -325,7 +268,6 @@ fun QuickAccessItem(
     count: String,
     onClick: () -> Unit = {}
 ) {
-    val isDark = isAppInDarkTheme()
     val textColor = LocalAppColors.current.textColor
     
     Column(

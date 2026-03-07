@@ -362,7 +362,6 @@ private fun AuthTextField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
-    val isDark = isAppInDarkTheme()
     val textColor = LocalAppColors.current.textColor
     val accentPrimary = LocalAppColors.current.accentPrimary
     val glassBorder = LocalAppColors.current.glassBorder

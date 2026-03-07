@@ -80,7 +80,6 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
-import androidx.compose.foundation.isSystemInDarkTheme
 import com.shin.vicmusic.core.design.theme.LocalAppColors
 import com.shin.vicmusic.core.design.theme.isAppInDarkTheme
 import androidx.compose.ui.draw.scale
@@ -239,10 +238,10 @@ fun MyInfoScreen(
         label = "glow2x"
     )
 
-    val isDark = isSystemInDarkTheme()
-    val textColor = LocalAppColors.current.textColor
-    val accentPrimary = LocalAppColors.current.accentPrimary
-    val accentSecondary = LocalAppColors.current.accentSecondary
+    val appColors = LocalAppColors.current
+    val textColor = appColors.textColor
+    val accentPrimary = appColors.accentPrimary
+    val accentSecondary = appColors.accentSecondary
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -452,11 +451,11 @@ private fun UserInfoCard(
     onEditClick: () -> Unit = {},
     onFollowClick: () -> Unit = {},
 ) {
-    val isDark = isSystemInDarkTheme()
-    val textColor = LocalAppColors.current.textColor
-    val accentPrimary = LocalAppColors.current.accentPrimary
-    val accentSecondary = LocalAppColors.current.accentSecondary
-    val glassWhite = LocalAppColors.current.glassWhite
+    val appColors = LocalAppColors.current
+    val textColor = appColors.textColor
+    val accentPrimary = appColors.accentPrimary
+    val accentSecondary = appColors.accentSecondary
+    val glassWhite = appColors.glassWhite
 
     Card(
         modifier = Modifier.fillMaxWidth().padding(1.dp),
@@ -585,10 +584,10 @@ private fun FollowerInfoItem(label: String, count: Int) {
 
 @Composable
 private fun LevelExperienceCard(user: UserInfo) {
-    val isDark = isSystemInDarkTheme()
-    val textColor = LocalAppColors.current.textColor
-    val accentPrimary = LocalAppColors.current.accentPrimary
-    val glassWhite = LocalAppColors.current.glassWhite
+    val appColors = LocalAppColors.current
+    val textColor = appColors.textColor
+    val accentPrimary = appColors.accentPrimary
+    val glassWhite = appColors.glassWhite
 
     Card(
         modifier = Modifier.fillMaxWidth().padding(1.dp),
@@ -670,8 +669,7 @@ private fun LevelExperienceCard(user: UserInfo) {
 
 @Composable
 private fun InfoListSection(user: UserInfo) {
-    val isDark = isSystemInDarkTheme()
-    val glassWhite = com.shin.vicmusic.core.design.theme.LocalAppColors.current.glassWhite
+    val glassWhite = LocalAppColors.current.glassWhite
 
     Card(
         modifier = Modifier.fillMaxWidth().padding(1.dp),
@@ -702,9 +700,9 @@ private fun InfoListSection(user: UserInfo) {
 
 @Composable
 private fun InfoRowItem(icon: ImageVector, label: String, value: String) {
-    val isDark = isSystemInDarkTheme()
-    val textColor = com.shin.vicmusic.core.design.theme.LocalAppColors.current.textColor
-    val accentPrimary = com.shin.vicmusic.core.design.theme.LocalAppColors.current.accentPrimary
+    val appColors = LocalAppColors.current
+    val textColor = appColors.textColor
+    val accentPrimary = appColors.accentPrimary
 
     Row(
         modifier = Modifier

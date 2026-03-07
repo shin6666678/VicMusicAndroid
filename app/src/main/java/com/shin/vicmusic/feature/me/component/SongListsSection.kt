@@ -44,7 +44,6 @@ fun PlaylistsSection(
         )
     }
 
-    val isDark = isAppInDarkTheme()
     val textColor = LocalAppColors.current.textColor
 
     Row(
