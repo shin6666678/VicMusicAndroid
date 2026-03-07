@@ -74,6 +74,23 @@ import com.shin.vicmusic.feature.common.icon.VipIcon
 import com.shin.vicmusic.feature.feed.component.FeedItemCard
 import com.shin.vicmusic.feature.myInfo.edit.navigateToMyInfoEdit
 import com.shin.vicmusic.util.copyUriToCache
+import kotlinx.coroutines.launch
+
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
+
+// ---- 视觉风格常量 (与登录页对齐) ----
+private val ProfileGradientStart = Color(0xFF020617)
+private val ProfileGradientMid = Color(0xFF0F172A)
+private val ProfileGradientEnd = Color(0xFF1E293B)
+private val ProfileAccentPrimary = Color(0xFF3B82F6)
+private val ProfileAccentSecondary = Color(0xFF2DD4BF)
+private val ProfileGlassWhite = Color(0x1AFFFFFF)
+private val ProfileGlassBorder = Color(0x33FFFFFF)
 
 @Preview(showBackground = true)
 @Composable
@@ -189,8 +206,40 @@ fun MyInfoScreen(
 ) {
     val cardHeightDp = remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
+
+    // ---- 入场动画状态 ----
+    val contentAlpha = remember { Animatable(0f) }
+    val contentSlide = remember { Animatable(50f) }
+    val headerScale = remember { Animatable(0.95f) }
+
+    LaunchedEffect(Unit) {
+        launch {
+            contentAlpha.animateTo(1f, animationSpec = tween(800))
+        }
+        launch {
+            contentSlide.animateTo(0f, animationSpec = tween(800, easing = FastOutSlowInEasing))
+        }
+        launch {
+            headerScale.animateTo(1f, animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessLow))
+        }
+    }
+
+    // ---- 动态背景光晕 ----
+    val infiniteTransition = rememberInfiniteTransition(label = "profile_glow")
+    val glow1X by infiniteTransition.animateFloat(
+        initialValue = 0f, targetValue = 1f,
+        animationSpec = infiniteRepeatable(tween(10000, easing = LinearEasing), RepeatMode.Reverse),
+        label = "glow1x"
+    )
+    val glow2X by infiniteTransition.animateFloat(
+        initialValue = 1f, targetValue = 0f,
+        animationSpec = infiniteRepeatable(tween(12000, easing = LinearEasing), RepeatMode.Reverse),
+        label = "glow2x"
+    )
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
+        containerColor = ProfileGradientMid, // 设置基础背景色
         topBar = {
             TopAppBar(
                 title = { },
@@ -218,11 +267,46 @@ fun MyInfoScreen(
             )
         },
     ) { paddingValues ->
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(listOf(ProfileGradientStart, ProfileGradientMid, ProfileGradientEnd))
+            )
+        ) {
+            // ---- 背景光晕球 (与登录页一致) ----
+            Box(
+                modifier = Modifier
+                    .size(400.dp)
+                    .offset(x = (glow1X * 300 - 150).dp, y = (-100).dp)
+                    .blur(100.dp)
+                    .background(
+                        Brush.radialGradient(
+                            listOf(ProfileAccentPrimary.copy(alpha = 0.2f), Color.Transparent),
+                            center = Offset.Zero, radius = 800f
+                        ),
+                        shape = RoundedCornerShape(50)
+                    )
+            )
+            Box(
+                modifier = Modifier
+                    .size(350.dp)
+                    .align(Alignment.CenterEnd)
+                    .offset(x = (glow2X * 100).dp, y = 200.dp)
+                    .blur(90.dp)
+                    .background(
+                        Brush.radialGradient(
+                            listOf(ProfileAccentSecondary.copy(alpha = 0.15f), Color.Transparent),
+                            center = Offset.Zero, radius = 700f
+                        ),
+                        shape = RoundedCornerShape(50)
+                    )
+            )
+
             // 可滚动的内容区域
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .alpha(contentAlpha.value),
                 contentPadding = PaddingValues(bottom = paddingValues.calculateBottomPadding() + 32.dp)
             ) {
                 if (userInfo == null) {
@@ -244,14 +328,26 @@ fun MyInfoScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(300.dp)
+                                .scale(headerScale.value)
                                 .clickable(enabled = !uiState.isLoading, onClick = onBgClick)
                         ) {
-                            // 背景图片
-                            MyAsyncImage(
-                                model = userInfo.bgImg,
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
+                            // 背景图片 - 增加遮罩效果
+                            Box(modifier = Modifier.fillMaxSize()) {
+                                MyAsyncImage(
+                                    model = userInfo.bgImg,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(
+                                            Brush.verticalGradient(
+                                                listOf(Color.Transparent, Color.Black.copy(alpha = 0.4f))
+                                            )
+                                        )
+                                )
+                            }
 
                             // 底部居中的用户信息卡片，中心线与底部对齐
                             Box(
@@ -291,7 +387,8 @@ fun MyInfoScreen(
                         Column(
                             modifier = Modifier
                                 .padding(horizontal = 16.dp)
-                                .padding(top = cardHeightDp.value / 2 + 16.dp),
+                                .padding(top = cardHeightDp.value / 2 + 16.dp)
+                                .offset(y = contentSlide.value.dp),
                             verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
 
@@ -303,6 +400,7 @@ fun MyInfoScreen(
                                 text = "动态列表",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
+                                color = Color.White,
                                 modifier = Modifier.padding(top = 8.dp)
                             )
                         }
@@ -342,104 +440,112 @@ private fun UserInfoCard(
     onFollowClick: () -> Unit = {},
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(1.dp),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f)
+            containerColor = ProfileGlassWhite
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top
-            ) {
-                Box(modifier = Modifier.size(80.dp)) {
-                    MyAsyncImage(
-                        model = user.headImg,
-                        modifier = Modifier
-                            .size(72.dp)
-                            .clip(CircleShape)
-                            .align(Alignment.Center)
-                    )
-                    Text(
-                        text = "LV${user.level}",
-                        modifier = Modifier
-                            .align(Alignment.TopStart)
-                            .background(
-                                Brush.horizontalGradient(
-                                    colors = listOf(Color(0xFFFDD835), Color(0xFFF57F17))
-                                ),
-                                shape = RoundedCornerShape(
-                                    topStart = 12.dp, bottomEnd = 12.dp, topEnd = 4.dp, bottomStart = 4.dp
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                Brush.verticalGradient(
+                    listOf(Color(0x33FFFFFF), Color(0x12FFFFFF))
+                )
+            )
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Box(modifier = Modifier.size(80.dp)) {
+                        MyAsyncImage(
+                            model = user.headImg,
+                            modifier = Modifier
+                                .size(72.dp)
+                                .clip(CircleShape)
+                                .align(Alignment.Center)
+                        )
+                        Text(
+                            text = "LV${user.level}",
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .background(
+                                    Brush.horizontalGradient(
+                                        colors = listOf(Color(0xFFFDD835), Color(0xFFF57F17))
+                                    ),
+                                    shape = RoundedCornerShape(
+                                        topStart = 12.dp, bottomEnd = 12.dp, topEnd = 4.dp, bottomStart = 4.dp
+                                    )
                                 )
-                            )
-                            .padding(horizontal = 8.dp, vertical = 2.dp),
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 12.sp
-                    )
-                }
+                                .padding(horizontal = 8.dp, vertical = 2.dp),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 12.sp
+                        )
+                    }
 
-                Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(16.dp))
 
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = user.name,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = if (user.sex == 1) "男" else "女",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row {
-                        VipIcon(vipLevelInt = user.vipLevel)
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = user.name,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = if (user.sex == 1) "男" else "女",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White.copy(alpha = 0.7f)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row {
+                            VipIcon(vipLevelInt = user.vipLevel)
+                        }
+                    }
+
+                    FilledTonalButton(
+                        onClick = if (isMe) onEditClick else onFollowClick,
+                        modifier = Modifier.height(32.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
+                        shape = CircleShape,
+                        colors = ButtonDefaults.filledTonalButtonColors(
+                            containerColor = if (isMe || !(user.isFollowing ?: false))
+                                ProfileAccentPrimary.copy(alpha = 0.9f)
+                            else
+                                ProfileAccentSecondary.copy(alpha = 0.7f),
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text(
+                            text = if (isMe) "编辑资料" else if (user.isFollowing == true) "已关注" else "关注",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
 
-                FilledTonalButton(
-                    onClick = if (isMe) onEditClick else onFollowClick,
-                    modifier = Modifier.height(32.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
-                    shape = CircleShape,
-                    colors = ButtonDefaults.filledTonalButtonColors(
-                        containerColor = if (isMe || !(user.isFollowing ?: false))
-                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f)
-                        else
-                            MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.7f),
-                        contentColor = if (isMe || !(user.isFollowing ?: false))
-                            MaterialTheme.colorScheme.onPrimaryContainer
-                        else
-                            MaterialTheme.colorScheme.onSecondaryContainer
-                    )
+                Divider(
+                    modifier = Modifier.padding(vertical = 12.dp),
+                    color = Color.White.copy(alpha = 0.1f)
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround
                 ) {
-                    Text(
-                        text = if (isMe) "编辑资料" else if (user.isFollowing == true) "已关注" else "关注",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    FollowerInfoItem("关注", user.followCount)
+                    FollowerInfoItem("粉丝", user.followerCount)
                 }
-            }
-
-            Divider(
-                modifier = Modifier.padding(vertical = 12.dp),
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround
-            ) {
-                FollowerInfoItem("关注", user.followCount)
-                FollowerInfoItem("粉丝", user.followerCount)
             }
         }
     }
 }
+
 
 @Composable
 private fun FollowerInfoItem(label: String, count: Int) {
@@ -461,88 +567,108 @@ private fun FollowerInfoItem(label: String, count: Int) {
 @Composable
 private fun LevelExperienceCard(user: UserInfo) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp), // 统一圆角
+        modifier = Modifier.fillMaxWidth().padding(1.dp),
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            // 【修改点】alpha值调高，降低透明度
-            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f) // 统一颜色和透明度
+            containerColor = ProfileGlassWhite
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp) // 统一阴影
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "当前等级",
-                    style = MaterialTheme.typography.titleMedium,
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                Brush.verticalGradient(
+                    listOf(Color(0x33FFFFFF), Color(0x12FFFFFF))
                 )
-                Text(
-                    text = "Lv.${user.level}",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // 经验条
-            val progress = if (user.nextLevelExp > 0) {
-                user.experience.toFloat() / user.nextLevelExp.toFloat()
-            } else 0f
-
-            LinearProgressIndicator(
-                progress = { progress },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(8.dp)
-                    .clip(RoundedCornerShape(4.dp)),
-                color = MaterialTheme.colorScheme.primary
             )
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "当前等级",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.White
+                    )
+                    Text(
+                        text = "Lv.${user.level}",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = ProfileAccentPrimary
+                    )
+                }
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "${user.experience} / ${user.nextLevelExp} EXP",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.outline
+                // 经验条
+                val progress = if (user.nextLevelExp > 0) {
+                    user.experience.toFloat() / user.nextLevelExp.toFloat()
+                } else 0f
+
+                LinearProgressIndicator(
+                    progress = { progress },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(8.dp)
+                        .clip(RoundedCornerShape(4.dp)),
+                    color = ProfileAccentPrimary,
+                    trackColor = Color.White.copy(alpha = 0.1f)
                 )
 
-                val hours = user.totalListenTime / 3600
-                val minutes = (user.totalListenTime % 3600) / 60
-                Text(
-                    text = "总听歌: ${hours}小时${minutes}分",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.outline
-                )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "${user.experience} / ${user.nextLevelExp} EXP",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = Color.White.copy(alpha = 0.5f)
+                    )
+
+                    val hours = user.totalListenTime / 3600
+                    val minutes = (user.totalListenTime % 3600) / 60
+                    Text(
+                        text = "总听歌: ${hours}小时${minutes}分",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = Color.White.copy(alpha = 0.5f)
+                    )
+                }
             }
         }
     }
 }
 
+
 @Composable
 private fun InfoListSection(user: UserInfo) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(1.dp),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f)
+            containerColor = ProfileGlassWhite
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
-        Column(modifier = Modifier.padding(vertical = 8.dp)) {
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                Brush.verticalGradient(
+                    listOf(Color(0x33FFFFFF), Color(0x12FFFFFF))
+                )
+            )
+        ) {
+            Column(modifier = Modifier.padding(vertical = 8.dp)) {
             InfoRowItem(icon = Icons.Default.Person, label = "用户ID", value = user.id)
             Divider(modifier = Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(0.2f))
             InfoRowItem(icon = Icons.Default.Email, label = "邮箱", value = user.mail ?: "未绑定")
             Divider(modifier = Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(0.2f))
             InfoRowItem(icon = Icons.Default.Info, label = "注册时间", value = "2024-01-01")
+            }
         }
     }
 }
@@ -558,19 +684,20 @@ private fun InfoRowItem(icon: ImageVector, label: String, value: String) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = ProfileAccentPrimary,
             modifier = Modifier.size(20.dp)
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
+            color = Color.White.copy(alpha = 0.8f),
             modifier = Modifier.width(80.dp)
         )
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+            color = Color.White.copy(alpha = 0.6f),
             maxLines = 1
         )
     }

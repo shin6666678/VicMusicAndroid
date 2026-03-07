@@ -62,6 +62,25 @@ import com.shin.vicmusic.feature.playlist.meList.navigateToMyPlaylists
 import com.shin.vicmusic.feature.relationship.RelationshipTab
 import com.shin.vicmusic.feature.relationship.navigateToRelationship
 import com.shin.vicmusic.feature.vip.navigateToVip
+import androidx.compose.animation.core.*
+import androidx.compose.ui.draw.blur
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
+
+// ---- 主题色常量 ----
+private val GradientStart = Color(0xFF020617)
+private val GradientMid = Color(0xFF0F172A)
+private val GradientEnd = Color(0xFF1E293B)
+private val AccentPrimary = Color(0xFF3B82F6)
+private val AccentSecondary = Color(0xFF2DD4BF)
+private val GlassWhite = Color(0x1AFFFFFF)
+private val GlassBorder = Color(0x33FFFFFF)
+private val InputBackground = Color(0x0DFFFFFF)
 
 @Composable
 fun MeRoute(
@@ -169,16 +188,67 @@ fun MeScreen(
 
     onPlayListClick: (String) -> Unit = {}
 ) {
-    Scaffold(
-        topBar = {
-            UniversalTopBar(
-                tabs = topBarTabs,
-                actions = topBarActions,
-                backgroundColor = MaterialTheme.colorScheme.surface
+    // ---- 浮动光晕动画 ----
+    val infiniteTransition = rememberInfiniteTransition(label = "glow")
+    val glow1X by infiniteTransition.animateFloat(
+        initialValue = 0f, targetValue = 1f,
+        animationSpec = infiniteRepeatable(tween(7000, easing = LinearEasing), RepeatMode.Reverse),
+        label = "glow1x"
+    )
+    val glow2X by infiniteTransition.animateFloat(
+        initialValue = 1f, targetValue = 0f,
+        animationSpec = infiniteRepeatable(tween(9000, easing = LinearEasing), RepeatMode.Reverse),
+        label = "glow2x"
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(listOf(GradientStart, GradientMid, GradientEnd))
             )
-        },
-    ) { paddingValues ->
-        Column(
+    ) {
+        // ---- 背景光晕球 ----
+        Box(
+            modifier = Modifier
+                .size(300.dp)
+                .offset(x = (glow1X * 200 - 100).dp, y = (-50).dp)
+                .blur(80.dp)
+                .background(
+                    Brush.radialGradient(
+                        listOf(AccentPrimary.copy(alpha = 0.35f), Color.Transparent),
+                        center = Offset.Zero, radius = 600f
+                    ),
+                    shape = RoundedCornerShape(50)
+                )
+        )
+        Box(
+            modifier = Modifier
+                .size(250.dp)
+                .align(Alignment.BottomEnd)
+                .offset(x = (glow2X * 80).dp, y = (-(glow2X * 60)).dp)
+                .blur(70.dp)
+                .background(
+                    Brush.radialGradient(
+                        listOf(AccentSecondary.copy(alpha = 0.3f), Color.Transparent),
+                        center = Offset.Zero, radius = 500f
+                    ),
+                    shape = RoundedCornerShape(50)
+                )
+        )
+
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = {
+                UniversalTopBar(
+                    tabs = topBarTabs,
+                    actions = topBarActions,
+                    backgroundColor = Color.Transparent,
+                    contentColor = Color.White
+                )
+            },
+        ) { paddingValues ->
+            Column(
             modifier = Modifier
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
@@ -242,6 +312,7 @@ fun MeScreen(
         }
     }
 }
+}
 
 @Composable
 fun QuickAccessItem(
@@ -254,10 +325,10 @@ fun QuickAccessItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.clickable { onClick() }
     ) {
-        Icon(imageVector = icon, contentDescription = text, modifier = Modifier.size(28.dp))
+        Icon(imageVector = icon, contentDescription = text, modifier = Modifier.size(28.dp), tint = Color.White)
         Spacer(Modifier.height(4.dp))
-        Text(text = text, style = MaterialTheme.typography.bodySmall)
-        Text(text = count, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+        Text(text = text, style = MaterialTheme.typography.bodySmall, color = Color.White)
+        Text(text = count, style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.6f))
     }
 }
 

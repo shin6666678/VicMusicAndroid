@@ -67,13 +67,14 @@ fun ItemPlaylist(playlist: Playlist, onClick: () -> Unit) {
                 text = playlist.name,
                 style = MaterialTheme.typography.titleMedium,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                color = Color.White
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = "${playlist.playCount}首 来自 ${playlist.ownerName}",
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = Color.White.copy(alpha = 0.6f)
             )
         }
     }
@@ -117,7 +118,8 @@ fun ItemPlaylistSquare(
             style = MaterialTheme.typography.bodyMedium,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis, // 超出显示省略号
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            color = Color.White
         )
     }
 }

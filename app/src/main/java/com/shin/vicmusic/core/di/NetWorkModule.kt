@@ -42,9 +42,7 @@ object NetWorkModule {
         val authInterceptor = Interceptor { chain ->
             val builder = chain.request().newBuilder()
             AppGlobalData.token?.let { token ->
-                // 检查你的后端是否需要 "Bearer " 前缀，大部分规范是需要的
-                val headerValue = if (token.startsWith("Bearer")) token else "Bearer $token"
-                builder.addHeader("Authorization", headerValue)
+                builder.addHeader("Authorization", token)
             }
             chain.proceed(builder.build())
         }

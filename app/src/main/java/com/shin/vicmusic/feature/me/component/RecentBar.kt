@@ -52,7 +52,8 @@ fun RecentBar(
             Text(
                 text = "最近播放",
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = Color.White
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -61,12 +62,12 @@ fun RecentBar(
                 Text(
                     text = "更多",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray
+                    color = Color.White.copy(alpha = 0.6f)
                 )
                 Icon(
                     imageVector = Icons.Filled.KeyboardArrowRight,
                     contentDescription = "More",
-                    tint = Color.Gray
+                    tint = Color.White.copy(alpha = 0.6f)
                 )
             }
         }
@@ -98,7 +99,8 @@ fun RecentBar(
                     Text(
                         text = "已播歌曲${recentNum}首",
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        color = Color.White
                     )
                 }
             }
