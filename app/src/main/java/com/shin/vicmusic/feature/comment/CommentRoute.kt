@@ -40,6 +40,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
+import com.shin.vicmusic.core.design.theme.LocalAppColors
+import com.shin.vicmusic.core.design.theme.AppBackground
 import com.shin.vicmusic.core.domain.Comment
 import com.shin.vicmusic.core.domain.CommentThread
 import com.shin.vicmusic.core.domain.User
@@ -102,91 +104,93 @@ fun CommentScreen(
         "留下你的精彩评论吧"
     }
 
-    Scaffold(
-        containerColor = Color.Transparent,
-        topBar = {
-            TopAppBar(
-                title = { Text("评论区 (${uiState.comments.size})", color = Color.White) },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回", tint = Color.White)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent
-                )
-            )
-        },
-        bottomBar = {
-            OutlinedTextField(
-                value = commentText,
-                onValueChange = { commentText = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.Transparent)
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .navigationBarsPadding(),
-                placeholder = { Text(placeholderText, color = Color.White.copy(alpha = 0.6f)) },
-                textStyle = androidx.compose.ui.text.TextStyle(color = Color.White),
-                trailingIcon = {
-                    TextButton(
-                        onClick = {
-                            if (commentText.isNotBlank()) {
-                                val parentId = replyInfo?.second?.id ?: replyInfo?.first?.id
-                                onAddComment(commentText, parentId)
-                                commentText = ""
-                                replyInfo = null // Reset reply state
-                            }
+    val appColors = LocalAppColors.current
+    AppBackground {
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = {
+                TopAppBar(
+                    title = { Text("评论区 (${uiState.comments.size})", color = appColors.textColor) },
+                    navigationIcon = {
+                        IconButton(onClick = onBackClick) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回", tint = appColors.iconColor)
                         }
-                    ) {
-                        Text("发送", color = MaterialTheme.colorScheme.primary)
-                    }
-                },
-                colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
-                     focusedBorderColor = Color.White.copy(alpha = 0.5f),
-                     unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
-                     cursorColor = MaterialTheme.colorScheme.primary
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent
+                    )
                 )
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .background(Color.Transparent)
-                .padding(horizontal = 16.dp)
-        ) {
-            if (uiState.isLoading && uiState.comments.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
-            } else if (uiState.error != null && uiState.comments.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("加载评论失败: ${uiState.error}", color = MaterialTheme.colorScheme.error)
-                }
-            } else {
-                LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                    items(uiState.comments, key = { it.rootComment.id }) { thread ->
-                        ItemCommentThread(
-                            thread = thread,
-                            onLikeClick = onLikeClick,
-                            onReplyClick = { root, reply -> replyInfo = Pair(root, reply) },
-                            onViewMoreRepliesClick = onViewMoreRepliesClick,
-                            onProfileClick = onProfileClick
-                        )
-                        Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
+            },
+            bottomBar = {
+                OutlinedTextField(
+                    value = commentText,
+                    onValueChange = { commentText = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Transparent)
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .navigationBarsPadding(),
+                    placeholder = { Text(placeholderText, color = appColors.textColor.copy(alpha = 0.6f)) },
+                    textStyle = androidx.compose.ui.text.TextStyle(color = appColors.textColor),
+                    trailingIcon = {
+                        TextButton(
+                            onClick = {
+                                if (commentText.isNotBlank()) {
+                                    val parentId = replyInfo?.second?.id ?: replyInfo?.first?.id
+                                    onAddComment(commentText, parentId)
+                                    commentText = ""
+                                    replyInfo = null // Reset reply state
+                                }
+                            }
+                        ) {
+                            Text("发送", color = MaterialTheme.colorScheme.primary)
+                        }
+                    },
+                    colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = appColors.textColor.copy(alpha = 0.5f),
+                        unfocusedBorderColor = appColors.textColor.copy(alpha = 0.3f),
+                        cursorColor = appColors.accentPrimary
+                    )
+                )
+            }
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(horizontal = 16.dp)
+            ) {
+                if (uiState.isLoading && uiState.comments.isEmpty()) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
                     }
+                } else if (uiState.error != null && uiState.comments.isEmpty()) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("加载评论失败: ${uiState.error}", color = MaterialTheme.colorScheme.error)
+                    }
+                } else {
+                    LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                        items(uiState.comments, key = { it.rootComment.id }) { thread ->
+                            ItemCommentThread(
+                                thread = thread,
+                                onLikeClick = onLikeClick,
+                                onReplyClick = { root, reply -> replyInfo = Pair(root, reply) },
+                                onViewMoreRepliesClick = onViewMoreRepliesClick,
+                                onProfileClick = onProfileClick
+                            )
+                            Divider(color = appColors.textColor.copy(alpha = 0.1f))
+                        }
 
-                    if (uiState.hasMore) {
-                        item {
-                            LaunchedEffect(Unit) { onLoadMore() }
-                            if (uiState.isLoading) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth().padding(16.dp),
-                                    horizontalArrangement = Arrangement.Center
-                                ) {
-                                    CircularProgressIndicator()
+                        if (uiState.hasMore) {
+                            item {
+                                LaunchedEffect(Unit) { onLoadMore() }
+                                if (uiState.isLoading) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        CircularProgressIndicator()
+                                    }
                                 }
                             }
                         }

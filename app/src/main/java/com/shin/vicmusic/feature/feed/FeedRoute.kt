@@ -9,7 +9,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -23,6 +22,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
+import com.shin.vicmusic.core.design.theme.LocalAppColors
+import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.feature.common.bar.BarActionItem
 import com.shin.vicmusic.feature.common.bar.BarTabItem
 import com.shin.vicmusic.feature.feed.publish.navigateToPublishFeed
@@ -75,26 +76,21 @@ fun FeedRoute(
     }
 
     // --- TopBar Background Color Logic ---
-    // 1. Extract Composable calls out of the derivedStateOf block
-    val surfaceColor = MaterialTheme.colorScheme.surface
+    val surfaceColor = LocalAppColors.current.bottomBarBackground
     val headerHeightPx = with(LocalDensity.current) { 280.dp.toPx() }
 
-    val topBarContainerColor by remember {
+    val topBarContainerColor by remember(selectedTabIndex, surfaceColor) {
         derivedStateOf {
             val isFollowingTab = selectedTabIndex == 1
             val firstItem = followingListState.firstVisibleItemIndex
             val offset = followingListState.firstVisibleItemScrollOffset
 
-            // 2. Use the extracted values in the calculation
             if (isFollowingTab && firstItem == 0) {
-                // Header is at least partially visible. Calculate alpha based on scroll offset.
                 val alpha = (offset / headerHeightPx).coerceIn(0f, 1f)
                 surfaceColor.copy(alpha = alpha)
             } else if (isFollowingTab) {
-                // Scrolled past the header. TopBar should be fully opaque.
                 surfaceColor
             } else {
-                // Not on the "Following" tab. TopBar should be transparent.
                 Color.Transparent
             }
         }

@@ -2,6 +2,7 @@ package com.shin.vicmusic.feature.me.setting
 
 import android.content.Intent
 import android.provider.Settings
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -13,6 +14,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Alignment
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
+import com.shin.vicmusic.core.design.theme.LocalAppColors
+import com.shin.vicmusic.core.design.theme.AppBackground
 import com.shin.vicmusic.core.manager.AppThemeMode
 import com.shin.vicmusic.feature.common.bar.CommonTopBar
 
@@ -42,68 +45,72 @@ fun SettingScreen(
 ) {
     var showThemeDialog by remember { mutableStateOf(false) }
 
-    Scaffold(
-        topBar = {
-            CommonTopBar(midText = "设置", popBackStack = onBackClick)
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxWidth()
-        ) {
-            SettingItem(title = "账号安全")
-            SettingItem(title = "消息通知")
-            SettingItem(title = "隐私设置")
-            SettingItem(title = "通用")
-
-            val themeText = when (currentThemeMode) {
-                AppThemeMode.SYSTEM -> "跟随系统"
-                AppThemeMode.LIGHT -> "浅色模式"
-                AppThemeMode.DARK -> "深色模式"
+    val appColors = LocalAppColors.current
+    AppBackground {
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = {
+                CommonTopBar(midText = "设置", popBackStack = onBackClick)
             }
-            SettingItem(title = "外观设置", subtitle = themeText, onClick = { showThemeDialog = true })
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize()
+            ) {
+                SettingItem(title = "账号安全")
+                SettingItem(title = "消息通知")
+                SettingItem(title = "隐私设置")
+                SettingItem(title = "通用")
 
-            val context = androidx.compose.ui.platform.LocalContext.current
-            SettingItem(title = "【Debug】立即检查消息", onClick = onDebugCheckMessage)
-            SettingItem(
-                title = "允许后台运行 (忽略电池优化)",
-                onClick = {
-                    val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-                    context.startActivity(intent)
+                val themeText = when (currentThemeMode) {
+                    AppThemeMode.SYSTEM -> "跟随系统"
+                    AppThemeMode.LIGHT -> "浅色模式"
+                    AppThemeMode.DARK -> "深色模式"
                 }
-            )
-            HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp), thickness = 8.dp, color = Color.LightGray.copy(0.2f))
-            SettingItem(title = "切换账号")
-            SettingItem(title = "退出登录", textColor = Color.Red, onClick = onLogoutClick)
-        }
+                SettingItem(title = "外观设置", subtitle = themeText, onClick = { showThemeDialog = true })
 
-        if (showThemeDialog) {
-            AlertDialog(
-                onDismissRequest = { showThemeDialog = false },
-                title = { Text("选择外观主题") },
-                text = {
-                    Column {
-                        ThemeOptionItem(text = "跟随系统", selected = currentThemeMode == AppThemeMode.SYSTEM) {
-                            onThemeChanged(AppThemeMode.SYSTEM)
-                            showThemeDialog = false
+                val context = androidx.compose.ui.platform.LocalContext.current
+                SettingItem(title = "【Debug】立即检查消息", onClick = onDebugCheckMessage)
+                SettingItem(
+                    title = "允许后台运行 (忽略电池优化)",
+                    onClick = {
+                        val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+                        context.startActivity(intent)
+                    }
+                )
+                HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp), thickness = 8.dp, color = appColors.textColor.copy(0.05f))
+                SettingItem(title = "切换账号")
+                SettingItem(title = "退出登录", textColor = Color.Red, onClick = onLogoutClick)
+            }
+
+            if (showThemeDialog) {
+                AlertDialog(
+                    onDismissRequest = { showThemeDialog = false },
+                    title = { Text("选择外观主题") },
+                    text = {
+                        Column {
+                            ThemeOptionItem(text = "跟随系统", selected = currentThemeMode == AppThemeMode.SYSTEM) {
+                                onThemeChanged(AppThemeMode.SYSTEM)
+                                showThemeDialog = false
+                            }
+                            ThemeOptionItem(text = "浅色模式", selected = currentThemeMode == AppThemeMode.LIGHT) {
+                                onThemeChanged(AppThemeMode.LIGHT)
+                                showThemeDialog = false
+                            }
+                            ThemeOptionItem(text = "深色模式", selected = currentThemeMode == AppThemeMode.DARK) {
+                                onThemeChanged(AppThemeMode.DARK)
+                                showThemeDialog = false
+                            }
                         }
-                        ThemeOptionItem(text = "浅色模式", selected = currentThemeMode == AppThemeMode.LIGHT) {
-                            onThemeChanged(AppThemeMode.LIGHT)
-                            showThemeDialog = false
-                        }
-                        ThemeOptionItem(text = "深色模式", selected = currentThemeMode == AppThemeMode.DARK) {
-                            onThemeChanged(AppThemeMode.DARK)
-                            showThemeDialog = false
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { showThemeDialog = false }) {
+                            Text("关闭")
                         }
                     }
-                },
-                confirmButton = {
-                    TextButton(onClick = { showThemeDialog = false }) {
-                        Text("关闭")
-                    }
-                }
-            )
+                )
+            }
         }
     }
 }

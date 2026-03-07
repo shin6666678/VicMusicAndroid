@@ -103,7 +103,6 @@ fun RegisterScreen(
         contentSlide.animateTo(0f, animationSpec = tween(600, easing = FastOutSlowInEasing))
     }
 
-    val isDark = isAppInDarkTheme()
     val textColor = LocalAppColors.current.textColor
     val accentPrimary = LocalAppColors.current.accentPrimary
     val accentSecondary = LocalAppColors.current.accentSecondary
@@ -493,7 +492,6 @@ private fun AuthTextField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
-    val isDark = isAppInDarkTheme()
     val textColor = LocalAppColors.current.textColor
     val accentPrimary = LocalAppColors.current.accentPrimary
     val glassBorder = LocalAppColors.current.glassBorder

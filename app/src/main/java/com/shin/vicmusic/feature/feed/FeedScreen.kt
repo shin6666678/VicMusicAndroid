@@ -13,12 +13,15 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.shin.vicmusic.core.domain.Feed
 import com.shin.vicmusic.core.domain.UserInfo
+import com.shin.vicmusic.core.design.theme.LocalAppColors
+import com.shin.vicmusic.core.design.theme.AppBackground
 import com.shin.vicmusic.feature.common.bar.BarActionItem
 import com.shin.vicmusic.feature.common.bar.BarTabItem
 import com.shin.vicmusic.feature.common.bar.UniversalTopBar
@@ -44,8 +47,8 @@ fun FeedScreen(
     onCommentClick: (String) -> Unit,
     onBgClick: () -> Unit,
 ) {
-    // Use Box to allow content to draw behind the TopAppBar
-    Box(modifier = Modifier.fillMaxSize()) {
+    // Use AppBackground to allow content to draw behind the TopAppBar
+    AppBackground {
         // The Pager is now the bottom layer
         HorizontalPager(
             state = pagerState,

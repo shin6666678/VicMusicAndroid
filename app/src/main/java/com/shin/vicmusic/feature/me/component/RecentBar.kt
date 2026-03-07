@@ -40,7 +40,6 @@ fun RecentBar(
     recentIcon: String = "",                 // 最近播放歌曲封面
     onRecentOrMoreClick: () -> Unit = {},    // 点击"全部已播"或"更多"
 ) {
-    val isDark = isAppInDarkTheme()
     val textColor = LocalAppColors.current.textColor
 
     Column(modifier = Modifier.fillMaxWidth()) {

@@ -62,6 +62,7 @@ import coil.request.ImageRequest
 import coil.request.SuccessResult
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
+import com.shin.vicmusic.core.design.theme.LocalAppColors
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.manager.PlayerState
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONG
@@ -231,7 +232,8 @@ fun SongDetailRoute(
                 uiState.song
             }
 
-            Box(modifier = Modifier.fillMaxSize().background(Color(0xFF1C1C1E))) {
+            val appColors = LocalAppColors.current
+            Box(modifier = Modifier.fillMaxSize().background(if (appColors.isDark) Color(0xFF1C1C1E) else Color(0xFFF8FAFC))) {
                 // 1. 背景层：高斯模糊封面
                 val context = LocalContext.current
                 var isLoading by remember { mutableStateOf(true) }

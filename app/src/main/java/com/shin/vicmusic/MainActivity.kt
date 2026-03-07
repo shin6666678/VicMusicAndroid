@@ -79,17 +79,19 @@ class MainActivity : ComponentActivity() {
                 com.shin.vicmusic.core.manager.AppThemeMode.SYSTEM -> isSystemDark
                 else -> isSystemDark
             }
-            VicMusicTheme {
-                CompositionLocalProvider(
-                    LocalPlayerManager provides playerManager,
-                    LocalNavController provides navController,
-                    LocalPlaybackQueueManager provides playbackQueueManager,
-                    LocalAuthManager provides authManager,
-                    LocalTokenManager provides tokenManager,
-                    LocalSongActionManager provides songActionManager,
-                    LocalThemeIsDark provides isDarkTheme,
-                    LocalAppColors provides if (isDarkTheme) darkAppColors else lightAppColors
-                ) {
+            val currentAppColors = if (isDarkTheme) darkAppColors else lightAppColors
+            
+            CompositionLocalProvider(
+                LocalPlayerManager provides playerManager,
+                LocalNavController provides navController,
+                LocalPlaybackQueueManager provides playbackQueueManager,
+                LocalAuthManager provides authManager,
+                LocalTokenManager provides tokenManager,
+                LocalSongActionManager provides songActionManager,
+                LocalThemeIsDark provides isDarkTheme,
+                LocalAppColors provides currentAppColors
+            ) {
+                VicMusicTheme(darkTheme = isDarkTheme, appColors = currentAppColors) {
                     MyApp()
                 }
             }

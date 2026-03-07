@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import com.shin.vicmusic.core.design.theme.isAppInDarkTheme
+import com.shin.vicmusic.core.design.theme.LocalAppColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -38,6 +39,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -181,25 +183,20 @@ fun MyApp(
     // 动态底部栏颜色状态
     val isMeTabSelected = mainTabState.intValue == TopLevelDestination.entries.indexOf(TopLevelDestination.ME)
     
+    val appColors = LocalAppColors.current
     val isDark = isAppInDarkTheme()
-    val meTabContainerColor = if (isDark) Color(0x33000000) else Color(0x33FFFFFF)
-    val meTabContentColor = if (isDark) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
 
     val bottomContainerColor by animateColorAsState(
         targetValue = if (isMeTabSelected) {
-            meTabContainerColor
+            appColors.bottomBarBackground
         } else {
-            MaterialTheme.colorScheme.surface.copy(alpha = 0.75f) // 原默认亮色系透明
+            appColors.bottomBarBackground.copy(alpha = 0.9f) // 保持一致的背景逻辑
         },
         label = "bottomContainerColor"
     )
 
     val bottomContentColor by animateColorAsState(
-        targetValue = if (isMeTabSelected) {
-            meTabContentColor
-        } else {
-            MaterialTheme.colorScheme.onSurface // 其他页面文字/图标颜色
-        },
+        targetValue = appColors.bottomBarContent,
         label = "bottomContentColor"
     )
 
@@ -250,7 +247,14 @@ fun MyApp(
                 modifier = Modifier
                     .fillMaxWidth()
                     .offset(y = navBarTranslationY)
-                    .background(bottomContainerColor)
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                bottomContainerColor.copy(alpha = 0f),
+                                bottomContainerColor.copy(alpha = 0.9f)
+                            )
+                        )
+                    )
             ) {
                 // 如果当前有歌曲，就显示 SongBar
                 if (currentSong != null) {

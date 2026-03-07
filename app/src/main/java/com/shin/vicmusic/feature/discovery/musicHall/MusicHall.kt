@@ -53,8 +53,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
-import com.shin.vicmusic.core.design.theme.PremiumDarkBlue
-import com.shin.vicmusic.core.design.theme.VividIndigo
+import com.shin.vicmusic.core.design.theme.LocalAppColors
+import com.shin.vicmusic.core.design.theme.AppBackground
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONGS
 import com.shin.vicmusic.feature.common.item.ItemSong
@@ -97,45 +97,50 @@ fun MusicHall(
         }
     }
 
-    LazyColumn(
-        state = listState,
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
-        contentPadding = PaddingValues(bottom = 100.dp) // 底部留白给播放条
-    ) {
-        // 1. 顶部 Banner 区域
-        item {
-            BannerSection()
-        }
+    AppBackground {
+        LazyColumn(
+            state = listState,
+            modifier = Modifier
+                .fillMaxSize(),
+            contentPadding = PaddingValues(bottom = 100.dp) // 底部留白给播放条
+        ) {
+            // 1. 顶部 Banner 区域
+            item {
+                BannerSection()
+            }
 
-        // 2. 金刚区 (功能入口：每日推荐、歌单等)
-        item {
-            QuickAccessSection(onItemClick = onQuickAccessClick)
-        }
+            // 2. 金刚区 (功能入口：每日推荐、歌单等)
+            item {
+                QuickAccessSection(onItemClick = onQuickAccessClick)
+            }
 
-        // 3. 可以在这里加 "推荐歌单" 的横向滚动列表 (这里先留空)
+            // 3. 可以在这里加 "推荐歌单" 的横向滚动列表 (这里先留空)
 
-        // 4. "全部播放" 悬浮条头
-        item {
-            PlayAllHeader(count = songs.size)
-        }
+            // 4. "全部播放" 悬浮条头
+            item {
+                PlayAllHeader(count = songs.size)
+            }
 
-        // 5. 歌曲列表 (复用你刚才改好的 ItemSong)
-        items(songs) { song ->
-            ItemSong(
-                song = song,
-                modifier = Modifier.clickable { playerManager.playSong(song)} ,
-            )
-        }
+            // 5. 歌曲列表 (复用你刚才改好的 ItemSong)
+            items(songs) { song ->
+                ItemSong(
+                    song = song,
+                    modifier = Modifier.clickable { playerManager.playSong(song) },
+                )
+            }
 
-        // 6. 底部加载指示器 (可选)
-        item {
-           Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
-               // 这里可以根据 loading 状态显示/隐藏
-               // 由于 loading 状态在 VM 内部控制，这里暂时简单放置占位
-               // 若要精确控制，需从 VM 暴露 isLoading State
-           }
+            // 6. 底部加载指示器 (可选)
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp), contentAlignment = Alignment.Center
+                ) {
+                    // 这里可以根据 loading 状态显示/隐藏
+                    // 由于 loading 状态在 VM 内部控制，这里暂时简单放置占位
+                    // 若要精确控制，需从 VM 暴露 isLoading State
+                }
+            }
         }
     }
 }
@@ -148,21 +153,22 @@ fun QuickAccessSection() {
 
 @Composable
 fun BannerSection() {
+    val appColors = LocalAppColors.current
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
             .height(140.dp)
             .clip(RoundedCornerShape(16.dp))
-            .background(Color.LightGray) // 占位背景
+            .background(appColors.textColor.copy(alpha = 0.1f)) // 使用主题相关的占位背景
     ) {
-        // 模拟一个紫色渐变 Banner
+        // 模拟一个主题色的渐变 Banner
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
                     brush = Brush.linearGradient(
-                        colors = listOf(PremiumDarkBlue, VividIndigo),
+                        colors = listOf(appColors.accentPrimary, appColors.accentSecondary),
                         start = Offset(0f, 0f),
                         end = Offset(1000f, 1000f)
                     )
@@ -244,6 +250,10 @@ fun QuickAccessItem(
     label: String,
     onClick: () -> Unit = {} // [新增] 点击回调
 ) {
+    val appColors = LocalAppColors.current
+    val textColor = appColors.textColor
+    val accentPrimary = appColors.accentPrimary
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -257,15 +267,15 @@ fun QuickAccessItem(
         // 圆形图标背景
         Surface(
             shape = CircleShape,
-            // 使用 primaryContainer 配合透明度，做成淡色背景
-            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+            // 使用 accentPrimary 配合透明度
+            color = accentPrimary.copy(alpha = 0.2f),
             modifier = Modifier.size(48.dp)
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
                     imageVector = icon,
                     contentDescription = label,
-                    tint = MaterialTheme.colorScheme.primary, // 图标颜色
+                    tint = accentPrimary, // 图标颜色
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -274,7 +284,7 @@ fun QuickAccessItem(
         Text(
             text = label,
             fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = textColor,
             maxLines = 1 // 限制一行
         )
     }
@@ -288,10 +298,11 @@ fun PlayAllHeader(count: Int) {
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        val textColor = LocalAppColors.current.textColor
         Icon(
             imageVector = Icons.Default.PlayArrow,
             contentDescription = "播放全部",
-            tint = MaterialTheme.colorScheme.onSurface,
+            tint = textColor,
             modifier = Modifier
                 .size(28.dp)
         )
@@ -300,13 +311,13 @@ fun PlayAllHeader(count: Int) {
             text = "播放全部",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
+            color = textColor
         )
         Spacer(modifier = Modifier.width(4.dp))
         Text(
             text = "($count)",
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant // 灰色数字
+            color = textColor.copy(alpha = 0.6f) // 灰色数字
         )
         Spacer(modifier = Modifier.weight(1f))
 
