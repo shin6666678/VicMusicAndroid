@@ -121,11 +121,14 @@ dependencies {
     implementation(libs.androidx.media3.ui)
     implementation(libs.androidx.media3.session)
 
-    // DataStore
+    // DataStore & Room
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.datastore)
     implementation(libs.protobuf.javalite)
     implementation(libs.protobuf.kotlin.lite)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
 
     // Accompanist (注意：这些库已大部分废弃，建议未来迁移)
     implementation(libs.accompanist.flowlayout) // 推荐迁移至 Compose Foundation 的 FlowRow
