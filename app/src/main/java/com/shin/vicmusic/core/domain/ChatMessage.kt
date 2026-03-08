@@ -8,6 +8,6 @@ data class ChatMessage(
     val fromUserId: String,
     val toUserId: String,
     val content: String,
-    val createTime: Long? = null, // 后端传回的时间戳
+    val createTime: Long? = null,
     val status: Int = 0
 )

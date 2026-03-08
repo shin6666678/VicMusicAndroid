@@ -13,3 +13,27 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# ======= VicMusic 自定义忽略规则 =======
+
+# 忽略所有构建目录
+build/
+app/build/
+release/
+
+# 忽略所有的日志文件
+*.log
+
+# 忽略 Kotlin 和 Gradle 的编译缓存
+.kotlin/
+.gradle/
+.idea/
+
+# 忽略极其重要的签名文件 (绝对不能上传)
+*.jks
+*.keystore
+vic-music-keystore
+/vic-music-keystore
+
+# 忽略本地网络配置文件 (防止服务器 IP 泄露)
+app/src/main/java/com/shin/vicmusic/core/config/Config.kt

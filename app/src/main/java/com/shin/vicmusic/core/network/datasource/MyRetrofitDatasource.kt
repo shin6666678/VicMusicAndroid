@@ -3,6 +3,7 @@ package com.shin.vicmusic.core.network.datasource
 import android.R.attr.description
 import android.R.attr.name
 import android.util.Log
+import com.shin.vicmusic.core.domain.ChatMessage
 import com.shin.vicmusic.core.domain.User
 import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.core.model.api.AlbumDetailResp
@@ -348,6 +349,11 @@ Notify通知
         return safeApiCall { service.getUnreadCount() }
     }
 
+    suspend fun getChatHistory(targetUserId: String,
+                               page: Int,
+                               size: Int):NetworkResponse<List<ChatMessage>>{
+        return safeApiCall { service.getChatHistory(targetUserId, page, size) }
+    }
     suspend fun getChatSessions(): NetworkResponse<List<ChatSessionDto>> {
         return safeApiCall { service.getChatSessions() }
     }
