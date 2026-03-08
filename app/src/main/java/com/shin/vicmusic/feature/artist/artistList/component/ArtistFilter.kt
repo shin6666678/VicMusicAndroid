@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.shin.vicmusic.core.design.theme.LocalAppColors
 
 @Composable
 fun FilterSection(
@@ -69,7 +70,7 @@ fun FilterRow(
                     selectedContainerColor = Color(0xFF1DB954),
                     selectedLabelColor = Color.White,
                     containerColor = Color.Transparent,
-                    labelColor = Color.Black
+                    labelColor = LocalAppColors.current.textColor
                 ),
                 border = null,
                 shape = RoundedCornerShape(50)

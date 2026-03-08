@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,6 +25,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.shin.vicmusic.core.design.theme.LocalAppColors
 
 @Composable
 fun CommonTopBarSelect(
@@ -33,7 +35,7 @@ fun CommonTopBarSelect(
     tabs: List<BarTabItem> = emptyList(),
     actions: List<BarActionItem> = emptyList(),
     backgroundColor: Color = Color.Transparent,
-    contentColor: Color = Color.Black,
+    contentColor: Color = LocalAppColors.current.textColor,
 ) {
     Row(
         modifier = Modifier
@@ -47,7 +49,10 @@ fun CommonTopBarSelect(
         if(showBackButton){
             IconButton(
                 onClick = onBackClick,
-                modifier = Modifier.size(48.dp) // 标准触摸区域大小
+                modifier = Modifier.size(48.dp),
+                colors = IconButtonDefaults.iconButtonColors(
+                    contentColor = contentColor
+                )
             ) {
                 Icon(
                     imageVector = backImageVictor,
@@ -93,7 +98,10 @@ fun CommonTopBarSelect(
                 actions.forEach { action ->
                     IconButton(
                         onClick = action.onClick,
-                        modifier = Modifier.size(40.dp)
+                        modifier = Modifier.size(40.dp),
+                        colors = IconButtonDefaults.iconButtonColors(
+                            contentColor = contentColor
+                        )
                     ) {
                         Icon(
                             imageVector = action.icon,

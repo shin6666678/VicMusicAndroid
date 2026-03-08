@@ -11,6 +11,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -390,7 +391,6 @@ fun SongDetailScreen(
                         }
                     ),
                 ),
-                contentColor = MaterialTheme.colorScheme.surface
             )
         },
         containerColor = Color.Transparent
@@ -411,20 +411,41 @@ fun SongDetailScreen(
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Spacer(modifier = Modifier.height(35.dp))
-                        RecordPlayerView(albumArtUrl = song.icon, isPlaying = playerState.isPlaying)
-                        Spacer(modifier = Modifier.height(28.dp))
+                        // 1. 顶部黑胶唱片区域：使用 weight(1.5f) 占据最多的弹性空间
+                        // 无论屏幕多高，它始终能保持视觉重心的居中
+                        Box(
+                            modifier = Modifier.weight(1.5f),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            RecordPlayerView(
+                                albumArtUrl = song.icon,
+                                isPlaying = playerState.isPlaying
+                            )
+                        }
+
+                        // 2. 中间歌曲信息区域：由自身内容决定高度 (Wrap Content)
                         SongInfoSection(song = song)
-                        Spacer(modifier = Modifier.height(28.dp))
-                        Column {
-                            // 将 onCommentClick 传递给 SongActionButtons
+
+                        // 3. 底部控制区域：使用 weight(1f) 占据剩余弹性空间
+                        // 并使用 Arrangement.SpaceEvenly (均匀分布) 自动在内部组件之间生成动态间距
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+                            verticalArrangement = Arrangement.SpaceEvenly,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
                             SongActionButtons(
                                 isLiked = song.isLiked,
                                 onLikeClick = onToggleLike,
-                                onCommentClick = onCommentClick // 传递事件
+                                onCommentClick = onCommentClick
                             )
-                            Spacer(modifier = Modifier.height(16.dp))
-                            PlaybackControlBar(playerState = playerState, onSeek = onSeek)
+
+                            PlaybackControlBar(
+                                playerState = playerState,
+                                onSeek = onSeek
+                            )
+
                             PlayerControls(
                                 playerState = playerState,
                                 onTogglePlayPause = onTogglePlayPause,
