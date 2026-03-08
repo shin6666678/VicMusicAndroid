@@ -166,16 +166,6 @@ fun ArtistMainCard(
                     }
                 }
             }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = "这里是上底部广告区",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-            }
         }
 
     }

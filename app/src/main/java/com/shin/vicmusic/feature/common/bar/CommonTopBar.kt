@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import com.shin.vicmusic.core.design.theme.LocalAppColors
 
 @Preview
 @Composable
@@ -31,7 +32,7 @@ fun CommonTopBar(
     navigateToSearch: () -> Unit = {},
     onShareClick: (() -> Unit)? = null, // 新增分享回调
     containerColor: Color = Color.Transparent,
-    contentColor: Color = Color.Black
+    contentColor: Color = LocalAppColors.current.textColor
 ) {
     CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
