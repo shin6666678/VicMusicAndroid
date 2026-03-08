@@ -21,8 +21,8 @@ import com.shin.vicmusic.feature.common.bar.CommonTopBar
 @Composable
 fun LocalMusicRoute(
     viewModel: LocalMusicViewModel = hiltViewModel()
-){
-    val navController= LocalNavController.current
+) {
+    val navController = LocalNavController.current
     val localSongs by viewModel.localSongs.collectAsState()
 
     LaunchedEffect(Unit) {
@@ -33,6 +33,7 @@ fun LocalMusicRoute(
         localSongs = localSongs
     )
 }
+
 @Composable
 fun LocalMusicScreen(
     onBackClick: () -> Unit,
@@ -43,7 +44,7 @@ fun LocalMusicScreen(
         topBar = {
             CommonTopBar(
                 midText = "本地音乐",
-                popBackStack =  onBackClick
+                popBackStack = onBackClick
             )
         }
     ) {
