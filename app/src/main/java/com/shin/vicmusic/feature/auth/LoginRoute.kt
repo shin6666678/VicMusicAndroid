@@ -196,7 +196,7 @@ fun LoginScreen(
             Text(
                 text = "探索无限音乐世界",
                 fontSize = 14.sp,
-                color = Color.White.copy(alpha = 0.6f),
+                color = textColor.copy(alpha = 0.6f),
                 modifier = Modifier
                     .alpha(contentAlpha.value)
                     .padding(top = 4.dp)

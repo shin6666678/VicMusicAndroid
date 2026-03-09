@@ -28,6 +28,7 @@ import com.shin.vicmusic.core.model.request.FollowReq
 import com.shin.vicmusic.core.model.request.LikeReq
 import com.shin.vicmusic.core.model.request.PageReq
 import com.shin.vicmusic.core.model.request.PlaylistSongReq
+import com.shin.vicmusic.core.model.request.PlaylistUpdateRequest
 import com.shin.vicmusic.core.model.request.PublishFeedReq
 import com.shin.vicmusic.core.model.request.UserLoginReq
 import com.shin.vicmusic.core.model.request.UserRegisterReq
@@ -217,13 +218,10 @@ interface MyNetworkApiService {
         @Path("id") id: String,
     ): NetworkResponse<Unit>
 
-    @Multipart
+
     @POST("/api/playlist/v1/update")
     suspend fun updatePlaylist(
-        @Part("id") id: RequestBody,
-        @Part("name") name: RequestBody,
-        @Part("description") description: RequestBody?,
-        @Part cover: MultipartBody.Part?
+        @Body req: PlaylistUpdateRequest
     ): NetworkResponse<Unit>
 
     /*

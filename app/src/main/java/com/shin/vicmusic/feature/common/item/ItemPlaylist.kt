@@ -75,7 +75,7 @@ fun ItemPlaylist(playlist: Playlist, onClick: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "${playlist.playCount}首 来自 ${playlist.ownerName}",
+                text = "${playlist.songCount}首 来自 ${playlist.ownerName}",
                 style = MaterialTheme.typography.bodySmall,
                 color = textColor.copy(alpha = 0.6f)
             )
@@ -97,11 +97,11 @@ fun ItemPlaylistSquare(
         horizontalAlignment = Alignment.CenterHorizontally // 内容水平居中
     ) {
         Surface(
-            modifier = Modifier.size(100.dp), // 图片设为正方形
+            modifier = Modifier.size(90.dp),
             shape = RoundedCornerShape(12.dp),
             color = MaterialTheme.colorScheme.surfaceVariant
         ) {
-            if (playlist.cover.isNullOrEmpty()) {
+            if (playlist.cover.isEmpty()) {
                 Icon(
                     painter = rememberVectorPainter(Icons.Default.MusicNote),
                     contentDescription = null,

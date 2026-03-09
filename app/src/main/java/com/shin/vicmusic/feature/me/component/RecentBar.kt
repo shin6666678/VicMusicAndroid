@@ -31,13 +31,15 @@ import coil.compose.AsyncImage
 import com.shin.vicmusic.core.domain.Playlist
 import com.shin.vicmusic.feature.common.item.ItemPlaylistSquare
 import com.shin.vicmusic.core.design.theme.LocalAppColors
+import com.shin.vicmusic.feature.common.MyAsyncImage
 
 @Composable
 fun RecentBar(
     playlists: List<Playlist> = emptyList(), // 歌单列表
-    recentNum: Int = 0,                      // 最近播放歌曲数量
-    recentIcon: String = "",                 // 最近播放歌曲封面
-    onRecentOrMoreClick: () -> Unit = {},    // 点击"全部已播"或"更多"
+    recentNum: Int = 0,
+    recentIcon: String = "",
+    onRecentOrMoreClick: () -> Unit = {},
+    onPlaylistClick: (String) -> Unit
 ) {
     val textColor = LocalAppColors.current.textColor
 
@@ -82,20 +84,19 @@ fun RecentBar(
             horizontalArrangement = Arrangement.spacedBy(12.dp), // Item 之间的间距
             contentPadding = PaddingValues(horizontal = 16.dp)   // 列表两端的 Padding
         ) {
-            // 1. 第一个Item: 固定显示"全部已播" (Recent Songs)
+            // 第一个Item: 固定显示"全部已播"
             item {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
-                        .width(100.dp) // 固定宽度，保持整齐
+                        .width(100.dp)
                         .clickable { onRecentOrMoreClick() }
                 ) {
-                    AsyncImage(
-                        model = recentIcon.ifEmpty { "https://picsum.photos/100/100" },
-                        contentDescription = "Recent Songs Cover",
+                    MyAsyncImage(
+                        model = recentIcon,
                         modifier = Modifier
-                            .size(100.dp)
-                            .clip(RoundedCornerShape(12.dp)), // 圆角
+                            .size(90.dp)
+                            .clip(RoundedCornerShape(12.dp)),
                         contentScale = ContentScale.Crop
                     )
                     Spacer(Modifier.height(6.dp))
@@ -110,7 +111,7 @@ fun RecentBar(
 
             // 2. 后续Items: 最近播放的歌单列表 (Playlists)
             items(playlists) { playlist ->
-                ItemPlaylistSquare(playlist = playlist)
+                ItemPlaylistSquare(playlist = playlist,onClick = { onPlaylistClick(playlist.id) })
             }
         }
     }

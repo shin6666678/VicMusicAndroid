@@ -45,6 +45,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.shin.vicmusic.core.design.composition.LocalAuthManager
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
 import com.shin.vicmusic.core.design.theme.AppBackground
@@ -53,7 +54,10 @@ import com.shin.vicmusic.feature.album.albumDetail.albumDetailScreen
 import com.shin.vicmusic.feature.album.albumList.albumListScreen
 import com.shin.vicmusic.feature.artist.artistDetail.artistDetailScreen
 import com.shin.vicmusic.feature.artist.artistList.artistListScreen
+import com.shin.vicmusic.feature.auth.LOGIN_ROUTE
+import com.shin.vicmusic.feature.auth.REGISTER_ROUTE
 import com.shin.vicmusic.feature.auth.loginScreen
+import com.shin.vicmusic.feature.auth.navigateToLogin
 import com.shin.vicmusic.feature.auth.registerScreen
 import com.shin.vicmusic.feature.chat.chatScreen
 import com.shin.vicmusic.feature.checkIn.CHECK_IN_ROUTE
@@ -101,9 +105,11 @@ fun MyApp(
 
     val navController = LocalNavController.current
     val playerManager = LocalPlayerManager.current
+    val authManager = LocalAuthManager.current
 
     val currentSong by playerManager.currentPlayingSong.collectAsState()
     val playerState by playerManager.playerState.collectAsState()
+    val isLoggedIn by authManager.isLoggedIn.collectAsState()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -111,6 +117,16 @@ fun MyApp(
     val unreadCount by mainViewModel.unreadCount.collectAsState()
 
     var showCopyrightDialog by rememberSaveable { mutableStateOf(false) }
+
+    // 全局未登录拦截：当确认未登录时，强制跳转登录页并清空回退栈
+    LaunchedEffect(isLoggedIn) {
+        if (isLoggedIn == false) {
+            val currentDest = navController.currentBackStackEntry?.destination?.route
+            if (currentDest != LOGIN_ROUTE && currentDest != REGISTER_ROUTE) {
+                navController.navigateToLogin()
+            }
+        }
+    }
 
     // 监听路由变化，自动刷新未读数
     LaunchedEffect(currentRoute) {

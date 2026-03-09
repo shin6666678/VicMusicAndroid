@@ -59,7 +59,7 @@ fun PlaylistHeader(detail: PlaylistDetail) {
                 .clip(RoundedCornerShape(16.dp)),
             color = MaterialTheme.colorScheme.surface
         ) {
-            if (playlist.cover.isNullOrEmpty()) {
+            if (playlist.cover.isEmpty()) {
                 Icon(
                     painter = rememberVectorPainter(Icons.Default.MusicNote),
                     contentDescription = null,

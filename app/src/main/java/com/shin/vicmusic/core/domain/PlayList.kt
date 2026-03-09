@@ -11,14 +11,18 @@ data class Playlist(
     val songCount: Int = 0,
     val playCount: Int = 0,
     val likeCount: Int = 0,
-    val isPublic: Int? = 0,
+    val isPublic: Int = 0,
     val isLiked: Boolean = false,
-
     val ownerName: String="",
+    val ownerId: String="",
 )
 
 @Serializable
 data class PlaylistDetail(
     val info: Playlist,
-    val songs: List<Song> // 复用现有的 Song Domain
-)
+    val songs: List<Song> = emptyList()
+) {
+    companion object {
+        val EMPTY = PlaylistDetail(info = Playlist(id = "", name = ""), songs = emptyList())
+    }
+}

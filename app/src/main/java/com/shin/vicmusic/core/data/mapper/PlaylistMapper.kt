@@ -8,6 +8,7 @@ import com.shin.vicmusic.core.model.api.PlaylistDto
 fun PlaylistDto.toDomain(): Playlist {
     return Playlist(
         id = id,
+        ownerId = ownerId ?:"",
         name = name ?: "",
         cover = cover?:"",
         description = description?:"",
@@ -16,13 +17,13 @@ fun PlaylistDto.toDomain(): Playlist {
         likeCount = likeCount ?: 0,
         isPublic = isPublic ?: 0,
         ownerName = ownerName ?: "",
+        isLiked = isLiked ?: false
     )
 }
 
 fun PlaylistDetailDto.toDomain(): PlaylistDetail {
     return PlaylistDetail(
         info = info.toDomain(),
-        // 复用 SongMapper 中的 toDomain()
         songs = songs.map { it.toDomain() }
     )
 }

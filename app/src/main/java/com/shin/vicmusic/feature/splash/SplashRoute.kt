@@ -44,7 +44,6 @@ fun SplashRoute(
     val timeLeft by viewModel.timeLeft.collectAsStateWithLifecycle()
     val navigateToMain by viewModel.navigateToMain.collectAsState()
     val updateInfo by viewModel.updateState.collectAsStateWithLifecycle()
-    val releaseNotes by viewModel.releaseNoteState.collectAsStateWithLifecycle()
     val downloadProgress by viewModel.downloadProgress.collectAsStateWithLifecycle()
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -54,12 +53,7 @@ fun SplashRoute(
             onSkipAdClick = viewModel::onSkipAdClick
         )
 
-        if (releaseNotes != null) {
-            ReleaseNoteDialog(
-                content = releaseNotes!!,
-                onConfirm = viewModel::onReleaseNoteConfirm
-            )
-        } else if (updateInfo != null) {
+        if (updateInfo != null) {
             UpdateDialog(
                 updateInfo = updateInfo!!,
                 downloadProgress = downloadProgress,
@@ -86,9 +80,11 @@ fun SplashScreen(
     onSkipAdClick: () -> Unit = {},
     timeLeft: Long = 0
 ) {
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .background(color = Color.White)) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = Color.White)
+    ) {
         Image(
             painter = painterResource(id = R.drawable.logo),
             contentDescription = null,
@@ -126,23 +122,6 @@ fun SplashScreen(
 }
 
 @Composable
-fun ReleaseNoteDialog(
-    content: String,
-    onConfirm: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = {},
-        title = { Text(text = "更新说明") },
-        text = { Text(text = content) },
-        confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text(text = "知道了")
-            }
-        }
-    )
-}
-
-@Composable
 fun UpdateDialog(
     updateInfo: AppUpdateDto,
     downloadProgress: Int,
@@ -169,7 +148,7 @@ fun UpdateDialog(
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        text = if(downloadProgress == 100) "下载完成" else "正在下载: $downloadProgress%",
+                        text = if (downloadProgress == 100) "下载完成" else "正在下载: $downloadProgress%",
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.align(Alignment.End)
                     )
@@ -178,13 +157,16 @@ fun UpdateDialog(
         },
         confirmButton = {
             TextButton(onClick = onUpdate, enabled = !isDownloading) {
-                Text(text = if(isDownloading) "下载中..." else "立即更新")
+                Text(text = if (isDownloading) "下载中..." else "立即更新")
             }
         },
         dismissButton = {
             if (!updateInfo.isForce) {
                 TextButton(onClick = onCancel, enabled = !isDownloading) {
-                    Text(text = "暂不更新", color = if(isDownloading) Color.Gray.copy(alpha=0.5f) else Color.Gray)
+                    Text(
+                        text = "暂不更新",
+                        color = if (isDownloading) Color.Gray.copy(alpha = 0.5f) else Color.Gray
+                    )
                 }
             }
         }

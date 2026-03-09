@@ -10,13 +10,13 @@ import com.shin.vicmusic.core.data.repository.UserRepository
 import com.shin.vicmusic.core.domain.Feed
 import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.domain.UserInfo
+import com.shin.vicmusic.core.domain.usecase.UpdateBgImgUseCase
 import com.shin.vicmusic.core.manager.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.io.File
 import javax.inject.Inject
 
 data class MyInfoUiState(
@@ -36,6 +36,7 @@ class MyInfoViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val feedRepository: FeedRepository,
     private val relationshipRepository: RelationshipRepository,
+    private val updateBgImgUseCase: UpdateBgImgUseCase
 ) : ViewModel() {
 
     private val targetUserId: String? = savedStateHandle[USER_ID_ARG]
@@ -111,40 +112,20 @@ class MyInfoViewModel @Inject constructor(
         _uiState.update { it.copy(error = null, message = null) }
     }
 
-    // 独立修改背景图逻辑
     fun updateUserBg(localPath: String) {
-        if (_uiState.value.isLoading) return
-
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null, message = null) }
-
-            try {
-                val file = File(localPath)
-                if (!file.exists()) {
-                    throw Exception("文件不存在")
+            when (val result = updateBgImgUseCase(localPath, "user")) {
+                is MyNetWorkResult.Success -> {
+                    _uiState.update {
+                        it.copy(isLoading = false, message = "背景更新成功")
+                    }
                 }
-
-                // 1. 上传图片
-                val uploadResult = commonRepository.uploadImage(file, "user")
-                val finalBgImgUrl = when (uploadResult) {
-                    is MyNetWorkResult.Success -> uploadResult.data
-                    is MyNetWorkResult.Error -> throw Exception(uploadResult.message ?: "图片上传失败")
+                is MyNetWorkResult.Error -> {
+                    _uiState.update {
+                        it.copy(isLoading = false, error = result.message)
+                    }
                 }
-
-                // 2. 更新用户背景图 (单独接口)
-                val updateResult = userRepository.updateUserBgImg(finalBgImgUrl)
-                if (updateResult is MyNetWorkResult.Error) {
-                    throw Exception(updateResult.message ?: "更新背景失败")
-                }
-
-                // 3. 刷新用户信息
-                authManager.fetchUserInfo()
-
-                _uiState.update { it.copy(isLoading = false, message = "背景图更换成功") }
-
-            } catch (e: Exception) {
-                e.printStackTrace()
-                _uiState.update { it.copy(isLoading = false, error = e.message ?: "操作失败") }
             }
         }
     }

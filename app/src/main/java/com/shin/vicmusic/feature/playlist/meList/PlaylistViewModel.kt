@@ -43,13 +43,4 @@ class PlaylistViewModel @Inject constructor(
             }
         }
     }
-
-    fun updatePlaylist(id: String, name: String, description: String? = null, cover: File? = null) {
-        viewModelScope.launch {
-            val result = repository.updatePlaylist(id, name, description, cover)
-            if (result is MyNetWorkResult.Success) {
-                fetchMyPlaylists() // Refresh list
-            }
-        }
-    }
 }

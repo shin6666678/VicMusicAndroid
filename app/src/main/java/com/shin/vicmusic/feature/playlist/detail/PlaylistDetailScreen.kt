@@ -1,94 +1,132 @@
 package com.shin.vicmusic.feature.playlist.detail
 
-import androidx.compose.foundation.layout.Box
+import android.graphics.drawable.BitmapDrawable
+import android.os.UserManager
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.shin.vicmusic.core.design.composition.LocalNavController
-import com.shin.vicmusic.core.domain.PlaylistDetail
-import com.shin.vicmusic.feature.common.DetailControllerBar
-import com.shin.vicmusic.feature.common.item.ItemSongNumbered
-import com.shin.vicmusic.feature.common.bar.CommonTopBar
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import com.shin.vicmusic.feature.playlist.PlaylistShareActionSheet
-import com.shin.vicmusic.util.ShareUtils
-import com.shin.vicmusic.feature.playlist.detail.component.PlaySongActionHeader
-import com.shin.vicmusic.feature.playlist.detail.component.PlaylistHeader
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.Dispatchers
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.imageLoader
 import coil.request.ImageRequest
 import coil.request.SuccessResult
-import android.graphics.drawable.BitmapDrawable
+import com.shin.vicmusic.core.design.composition.LocalNavController
+import com.shin.vicmusic.core.model.UiState
+import com.shin.vicmusic.feature.common.DetailControllerBar
+import com.shin.vicmusic.feature.common.bar.BarActionItem
+import com.shin.vicmusic.feature.common.bar.BarTabItem
+import com.shin.vicmusic.feature.common.bar.CommonTopBarSelect
+import com.shin.vicmusic.feature.common.item.ItemSongNumbered
+import com.shin.vicmusic.feature.playlist.PlaylistShareCard
+import com.shin.vicmusic.feature.playlist.detail.component.PlaylistHeader
+import com.shin.vicmusic.feature.playlist.sheet.PlaylistSettingSheet
+import com.shin.vicmusic.feature.playlist.sheet.PlaylistShareActionSheet
 import com.shin.vicmusic.util.QRCodeUtils
 import com.shin.vicmusic.util.ResourceUtil
+import com.shin.vicmusic.util.ShareUtils
 import com.shin.vicmusic.util.captureComposable
-import com.shin.vicmusic.feature.playlist.PlaylistShareCard
-import android.util.Log
+import com.shin.vicmusic.util.copyUriToCache
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun PlaylistDetailRoute(
     viewModel: PlaylistDetailViewModel = hiltViewModel()
 ) {
-    val detail by viewModel.detail.collectAsState()
-    val navController = LocalNavController.current
-
-    if (detail != null) {
-        PlaylistDetailScreen(
-            detail = detail!!,
-            onBackClick = navController::popBackStack,
-            onChangePublicStatus = viewModel::changePublicStatus,
-            onRemoveSong = { songId -> viewModel.removeSongFromPlaylist(songId) },
-            onCollectClick = viewModel::toggleCollect,
-            onPlayAllClick = {},
-            onShareToFeed = { playlistId ->
-                navController.navigate("publish_feed?targetId=$playlistId&targetType=playlist")
+    val context = LocalContext.current
+    // 图片选择启动器
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        uri?.let {
+            val localPath = copyUriToCache(context, it)
+            if (localPath != null) {
+                viewModel.onNewCoverSelected(localPath)
             }
-        )
-    } else {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("加载中...")
         }
     }
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val navController = LocalNavController.current
+
+    PlaylistDetailScreen(
+        uiState = uiState,
+        onBackClick = navController::popBackStack,
+        onRemoveSong = viewModel::removeSongFromPlaylist,
+        onPublicStatusChange = { newStatus -> viewModel.onPublicStatusChange(newStatus) },
+        onCollectClick = viewModel::toggleCollect,
+        onPlayAllClick = { /* 以后对接播放器 */ },
+        onShareToFeed = { playlistId ->
+            navController.navigate("publish_feed?targetId=$playlistId&targetType=playlist")
+        },
+        onNameChange = viewModel::onNameChange,
+        onDescriptionChange = viewModel::onDescriptionChange,
+        onCoverClick = {
+            photoPickerLauncher.launch(
+                PickVisualMediaRequest(
+                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                )
+            )
+        },
+        saveChanges = viewModel::saveChanges
+    )
+
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaylistDetailScreen(
-    detail: PlaylistDetail,
+    uiState: UiState<PlayListDetailUiState>,
     onBackClick: () -> Unit,
-    onChangePublicStatus: (String) -> Unit = {},
-    onRemoveSong: (String) -> Unit = {},
-    onCollectClick: () -> Unit = {},
-    onPlayAllClick: () -> Unit = {},
-    onShareToFeed: (String) -> Unit = {}
-) {
+    onRemoveSong: (String) -> Unit,
+    onPublicStatusChange: (Int) -> Unit,
+    onCollectClick: () -> Unit,
+    onPlayAllClick: () -> Unit,
+    onShareToFeed: (String) -> Unit,
+
+    onNameChange: (String) -> Unit,
+    onDescriptionChange: (String) -> Unit,
+    onCoverClick: () -> Unit,
+    saveChanges: () -> Unit,
+
+    ) {
+
+    val detail = uiState.data.detail
+    val info = detail.info
+    val songs = detail.songs
     var showShareSheet by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    
+
     val coroutineScope = rememberCoroutineScope()
     val compositionContext = rememberCompositionContext()
-    
+
     if (showShareSheet) {
         PlaylistShareActionSheet(
             playlist = detail.info,
             onDismissRequest = { showShareSheet = false },
             onShareToFeedClick = {
-                 onShareToFeed(detail.info.id)
+                onShareToFeed(detail.info.id)
             },
             onGenerateCardClick = {
                 // 生成海报逻辑
@@ -109,7 +147,8 @@ fun PlaylistDetailScreen(
 
                         // 2. 生成二维码 (H5 落地页 URL)
                         // 假设落地页 URL 格式统一
-                        val shareLandingUrl = "http://115.190.155.131:9001/share_playlist.html?id=${detail.info.id}"
+                        val shareLandingUrl =
+                            "http://115.190.155.131:9001/share_playlist.html?id=${detail.info.id}"
                         val qrBitmap = withContext(Dispatchers.Default) {
                             QRCodeUtils.createQRCode(shareLandingUrl, 200)
                         }
@@ -138,13 +177,43 @@ fun PlaylistDetailScreen(
             }
         )
     }
+    var showSettingSheet by remember { mutableStateOf(false) }
+    if (showSettingSheet) {
+        PlaylistSettingSheet(
+            info = uiState.data.detail.info,
+            onDismissRequest = { showSettingSheet = false },
+            onNameChange = { onNameChange(it) },
+            onDescriptionChange = { onDescriptionChange(it) },
+            onCoverClick = { onCoverClick() },
+            onPublicStatusChange = { onPublicStatusChange(it) },
+            onSaveClick = { saveChanges() }
+        )
+    }
 
     Scaffold(
         topBar = {
-            CommonTopBar(
-                midText = "歌单详情",
-                popBackStack = onBackClick,
-                onShareClick = { showShareSheet = true }
+            CommonTopBarSelect(
+                onBackClick = onBackClick,
+                tabs = listOf(
+                    BarTabItem(
+                        isSelected = true,
+                        name = detail.info.name,
+                        onClick = {}
+                    ),
+                ),
+                actions =
+                    listOf(
+                        BarActionItem(
+                            icon = Icons.Default.Share,
+                            contentDescription = "分享",
+                            onClick = { showShareSheet = true }
+                        ),
+                        BarActionItem(
+                            icon = Icons.Default.Settings,
+                            contentDescription = "设置",
+                            onClick = { showSettingSheet = true }
+                        )
+                    ),
             )
         }
     ) { paddingValues ->
@@ -170,18 +239,10 @@ fun PlaylistDetailScreen(
                 )
             }
 
-            item {
-                PlaySongActionHeader(
-                    playListId = detail.info.id,
-                    songCount = detail.info.songCount,
-                    onChangePublicStatus = onChangePublicStatus
-                )
-            }
-
             itemsIndexed(detail.songs) { index, song ->
                 ItemSongNumbered(
                     song = song,
-                    num = index + 1,
+                    num = index,
                     showDeleteFromPlaylist = true,
                     onDeleteClick = { onRemoveSong(song.id) }
                 )

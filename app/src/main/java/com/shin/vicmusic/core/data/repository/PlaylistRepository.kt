@@ -1,5 +1,6 @@
 package com.shin.vicmusic.core.data.repository
 
+import android.R.attr.name
 import com.shin.vicmusic.core.data.mapper.toDomain
 import com.shin.vicmusic.core.domain.Playlist
 import com.shin.vicmusic.core.domain.PlaylistDetail
@@ -24,12 +25,13 @@ class PlaylistRepository @Inject constructor(
             MyNetWorkResult.Error(resp.message ?: "获取歌单失败")
         }
     }
+
     suspend fun getPublicPlaylists(): MyNetWorkResult<NetworkPageData<Playlist>> {
         val resp = datasource.getPublicPlaylists()
         return if (resp.code == 0 && resp.data != null) {
             val dtoList = resp.data.list ?: emptyList()
-            val domainList=dtoList.map { it.toDomain() }
-            val domainData=NetworkPageData(
+            val domainList = dtoList.map { it.toDomain() }
+            val domainData = NetworkPageData(
                 list = domainList,
                 pagination = resp.data.pagination
             )
@@ -69,19 +71,29 @@ class PlaylistRepository @Inject constructor(
         )
     }
 
-    suspend fun addPlaylist(name: String, description: String?, cover: File?): MyNetWorkResult<Unit> {
+    suspend fun addPlaylist(
+        name: String,
+        description: String?,
+        cover: File?
+    ): MyNetWorkResult<Unit> {
         val resp = datasource.addPlaylist(name, description, cover)
-        return if (resp.code == 0) MyNetWorkResult.Success(Unit) else MyNetWorkResult.Error(resp.message ?: "创建失败")
+        return if (resp.code == 0) MyNetWorkResult.Success(Unit) else MyNetWorkResult.Error(
+            resp.message ?: "创建失败"
+        )
     }
 
-    suspend fun updatePlaylist(id: String, name: String, description: String?, cover: File?): MyNetWorkResult<Unit> {
-        val resp = datasource.updatePlaylist(id, name, description, cover)
-        return if (resp.code == 0) MyNetWorkResult.Success(Unit) else MyNetWorkResult.Error(resp.message ?: "更新失败")
+    suspend fun updatePlaylist(
+        id: String,
+        name: String?,
+        description: String?,
+        cover: String?,
+        isPublic: Int?
+    ): MyNetWorkResult<Unit> {
+        val resp = datasource.updatePlaylist(id, name, description, cover, isPublic)
+        return if (resp.code == 0) MyNetWorkResult.Success(Unit) else MyNetWorkResult.Error(
+            resp.message ?: "更新失败"
+        )
     }
 
-    suspend fun changePublicStatus(id:String):MyNetWorkResult<Unit>{
-        val resp = datasource.changePublicStatus(id)
-        return if (resp.code == 0) MyNetWorkResult.Success(Unit) else MyNetWorkResult.Error(resp.message ?: "更新失败")
-    }
 }
 
