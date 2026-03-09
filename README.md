@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-lightgrey.svg)](LICENSE)
 
 VicMusicFront 是一款完全使用 **Jetpack Compose** 开发的现代化 Android 音乐播放器。它不仅提供了丝滑的音乐播放体验，还集成了基于 WebSocket 的实时聊天系统、动态主题换肤以及完整的社交互动功能。
-下载体验:api.vicmusic.homes
+**📥 [点击此处下载体验 (Download APK)](http://api.vicmusic.homes)**
 
 
 ## ✨ 功能特性 (Features)
