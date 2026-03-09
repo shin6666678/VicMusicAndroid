@@ -1,6 +1,5 @@
 package com.shin.vicmusic.feature.common.bar
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,41 +32,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.shin.vicmusic.core.design.composition.LocalSongActionManager
 import com.shin.vicmusic.core.design.theme.LocalAppColors
-import com.shin.vicmusic.core.design.theme.VicMusicTheme
 import com.shin.vicmusic.core.domain.PayType
 import com.shin.vicmusic.core.domain.Song
-import com.shin.vicmusic.core.manager.PlayerState
-import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONG // 导入示例歌曲数据
+import com.shin.vicmusic.core.manager.PlayerUiState
 import com.shin.vicmusic.feature.common.MyAsyncImage
 
-@Preview
-@Composable
-fun SongBarPreView() {
-    VicMusicTheme() {
-        SongBarScreen(
-            song = SONG, // 使用示例歌曲数据
-            playerState = PlayerState(
-                isPlaying = false,
-                duration = 100000,
-                currentPosition = 50000
-            ),
-            onTogglePlayPause = {},
-            onLikeClick = {},
-            onPlaylistClick = {},
-            onBarClick = {} // 预览时提供空实现
-        )
-    }
-}
 
 @Composable
 fun SongBar(
     song: Song?, // 接收 Song 对象
-    playerState: PlayerState,
+    playerUiState: PlayerUiState,
     onTogglePlayPause: () -> Unit,
     onPlaylistClick: () -> Unit,
     onBarClick: () -> Unit, // 添加整个bar的点击事件
@@ -78,7 +56,7 @@ fun SongBar(
     val actionManager = LocalSongActionManager.current
     SongBarScreen(
         song = song, // 使用接收的 Song 对象
-        playerState = playerState,
+        playerUiState = playerUiState,
         onTogglePlayPause = onTogglePlayPause,
         onLikeClick = {actionManager.toggleLike(song)},
         onPlaylistClick = onPlaylistClick,
@@ -90,7 +68,7 @@ fun SongBar(
 @Composable
 fun SongBarScreen(
     song: Song?,
-    playerState: PlayerState,
+    playerUiState: PlayerUiState,
     onTogglePlayPause: () -> Unit,
     onLikeClick: () -> Unit,
     onPlaylistClick: () -> Unit,
@@ -195,8 +173,8 @@ fun SongBarScreen(
                 onClick = { onTogglePlayPause() },
             ) {
                 Icon(
-                    imageVector = if (playerState.isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                    contentDescription = if (playerState.isPlaying) "暂停" else "播放",
+                    imageVector = if (playerUiState.isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                    contentDescription = if (playerUiState.isPlaying) "暂停" else "播放",
                     tint = LocalAppColors.current.textColor,
                     modifier = Modifier.size(28.dp)
                 )

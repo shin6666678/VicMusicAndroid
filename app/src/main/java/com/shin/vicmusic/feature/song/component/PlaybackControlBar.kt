@@ -21,12 +21,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
-import com.shin.vicmusic.core.manager.PlayerState
+import com.shin.vicmusic.core.manager.PlayerUiState
 import com.shin.vicmusic.util.TimeUtil.formatTime
 
 @Composable
 fun PlaybackControlBar(
-    playerState: PlayerState,
+    playerUiState: PlayerUiState,
     onSeek: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -36,17 +36,17 @@ fun PlaybackControlBar(
     val sliderPosition = if (isDragging.value) {
         draggedPosition.floatValue
     } else {
-        playerState.currentPosition.toFloat()
+        playerUiState.currentPosition.toFloat()
     }
 
-    val bufferProgress = if (playerState.duration > 0) {
-        (playerState.bufferedPosition.toFloat() / playerState.duration.toFloat()).coerceIn(0f, 1f)
+    val bufferProgress = if (playerUiState.duration > 0) {
+        (playerUiState.bufferedPosition.toFloat() / playerUiState.duration.toFloat()).coerceIn(0f, 1f)
     } else {
         0f
     }
 
-    val currentFormattedTime = formatTime(playerState.currentPosition)
-    val totalFormattedTime = formatTime(playerState.duration)
+    val currentFormattedTime = formatTime(playerUiState.currentPosition)
+    val totalFormattedTime = formatTime(playerUiState.duration)
 
     Column(modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
 
@@ -76,8 +76,8 @@ fun PlaybackControlBar(
                     onSeek(draggedPosition.floatValue.toLong())
                     isDragging.value = false
                 },
-                valueRange = 0f..playerState.duration.coerceAtLeast(0).toFloat(),
-                enabled = playerState.duration > 0,
+                valueRange = 0f..playerUiState.duration.coerceAtLeast(0).toFloat(),
+                enabled = playerUiState.duration > 0,
                 colors = SliderDefaults.colors(
                     thumbColor = MaterialTheme.colorScheme.primary,
                     activeTrackColor = MaterialTheme.colorScheme.primary,

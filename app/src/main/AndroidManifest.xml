@@ -51,14 +51,6 @@
                 <data android:host="song" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".SsoAuthActivity"
-            android:exported="true"
-            android:theme="@style/Theme.VicMusic.Transparent"> <intent-filter>
-            <action android:name="com.shin.vicmusic.action.SSO_LOGIN" />
-            <category android:name="android.intent.category.DEFAULT" />
-        </intent-filter>
-        </activity>
 
         <service
             android:name=".core.service.PlaybackService"

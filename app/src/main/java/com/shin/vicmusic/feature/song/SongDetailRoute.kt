@@ -1,5 +1,6 @@
 package com.shin.vicmusic.feature.song
 
+import android.graphics.drawable.BitmapDrawable
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
@@ -9,22 +10,20 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Feed
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -53,11 +52,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
+import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
 import coil.request.SuccessResult
@@ -65,8 +65,8 @@ import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
 import com.shin.vicmusic.core.design.theme.LocalAppColors
 import com.shin.vicmusic.core.domain.Song
-import com.shin.vicmusic.core.manager.PlayerState
-import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONG
+import com.shin.vicmusic.core.manager.PlayerUiEvent
+import com.shin.vicmusic.core.manager.PlayerUiState
 import com.shin.vicmusic.feature.comment.CommentRoute
 import com.shin.vicmusic.feature.common.bar.BarActionItem
 import com.shin.vicmusic.feature.common.bar.CommonTopBarSelect
@@ -85,15 +85,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-@Preview
-@Composable
-fun SongDetailPreview() {
-    SongDetailScreen(
-        song = SONG,
-        playerState = PlayerState(),
-    )
-}
-
 @androidx.annotation.OptIn(UnstableApi::class)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -105,7 +96,8 @@ fun SongDetailRoute(
     val navController = LocalNavController.current
     val playerManager = LocalPlayerManager.current
     val songUiState by viewModel.songUiState.collectAsState()
-    val currentPlayingSong by playerManager.currentPlayingSong.collectAsState()
+    val playerUiState by playerManager.uiState.collectAsState()
+    val currentPlayingSong = playerUiState.song
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -128,16 +120,17 @@ fun SongDetailRoute(
     }
 
     DisposableEffect(Unit) {
-        playerManager.isSongDetailVisible = true
+        playerManager.setSongDetailVisible(true)
         onDispose {
-            playerManager.isSongDetailVisible = false
+            playerManager.setSongDetailVisible(false)
         }
     }
 
     LaunchedEffect(playerManager.uiEvent) {
         playerManager.uiEvent.collect { event ->
             when (event) {
-                "SHOW_VIP_DIALOG" -> showVipDialog = true
+                PlayerUiEvent.ShowVipDialog -> showVipDialog = true
+                else ->{}
             }
         }
     }
@@ -171,7 +164,7 @@ fun SongDetailRoute(
                         .allowHardware(false)
                         .build()
                     (loader.execute(request) as? SuccessResult)?.let {
-                        (it.drawable as android.graphics.drawable.BitmapDrawable).bitmap
+                        (it.drawable as BitmapDrawable).bitmap
                     }
                 }
 
@@ -226,7 +219,7 @@ fun SongDetailRoute(
         }
 
         is SongUiState.Success -> {
-            val playerState by playerManager.playerState.collectAsState()
+            val playerUiState by playerManager.uiState.collectAsState()
             val displaySong = if (currentPlayingSong?.id == uiState.song.id) {
                 currentPlayingSong!!
             } else {
@@ -239,8 +232,8 @@ fun SongDetailRoute(
                 val context = LocalContext.current
                 var isLoading by remember { mutableStateOf(true) }
 
-                androidx.compose.foundation.Image(
-                    painter = coil.compose.rememberAsyncImagePainter(
+                Image(
+                    painter = rememberAsyncImagePainter(
                         model = ImageRequest.Builder(context)
                             .data(ResourceUtil.r2(displaySong.icon))
                             .crossfade(true)
@@ -249,7 +242,7 @@ fun SongDetailRoute(
                         onSuccess = { isLoading = false }
                     ),
                     contentDescription = null,
-                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxSize()
                         .blur(radius = 50.dp) // Android 12+ 生效
@@ -286,7 +279,7 @@ fun SongDetailRoute(
                         // 播放页容器：传入透明背景
                         SongDetailScreen(
                             song = displaySong,
-                            playerState = playerState,
+                            playerUiState = playerUiState,
                             onTogglePlayPause = playerManager::togglePlayPause,
                             onSeek = playerManager::seekTo,
                             onBackClick = onDismiss,
@@ -361,7 +354,7 @@ fun ShareBottomSheet(
 @Composable
 fun SongDetailScreen(
     song: Song,
-    playerState: PlayerState,
+    playerUiState: PlayerUiState,
     onTogglePlayPause: () -> Unit = {},
     onSeek: (Long) -> Unit = {},
     onBackClick: () -> Unit = {},
@@ -412,7 +405,7 @@ fun SongDetailScreen(
                         ) {
                             RecordPlayerView(
                                 albumArtUrl = song.icon,
-                                isPlaying = playerState.isPlaying
+                                isPlaying = playerUiState.isPlaying
                             )
                         }
 
@@ -435,12 +428,12 @@ fun SongDetailScreen(
                             )
 
                             PlaybackControlBar(
-                                playerState = playerState,
+                                playerUiState = playerUiState,
                                 onSeek = onSeek
                             )
 
                             PlayerControls(
-                                playerState = playerState,
+                                playerUiState = playerUiState,
                                 onTogglePlayPause = onTogglePlayPause,
                                 onNextClick = onSkipNext,
                                 onPreviousClick = onSkipPrevious
@@ -450,8 +443,7 @@ fun SongDetailScreen(
                 } else {
                     LyricView(
                         lyricList = song.lyricList,
-                        currentIndex = playerState.currentLyricLineIndex,
-                        onLineClick = onSeek
+                        currentIndex = playerUiState.currentLyricLineIndex
                     )
                 }
             }

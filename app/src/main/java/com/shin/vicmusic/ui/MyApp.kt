@@ -50,6 +50,7 @@ import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
 import com.shin.vicmusic.core.design.theme.AppBackground
 import com.shin.vicmusic.core.design.theme.VicMusicBackgroundGateway
+import com.shin.vicmusic.core.manager.PlayerUiEvent
 import com.shin.vicmusic.feature.album.albumDetail.albumDetailScreen
 import com.shin.vicmusic.feature.album.albumList.albumListScreen
 import com.shin.vicmusic.feature.artist.artistDetail.artistDetailScreen
@@ -106,9 +107,10 @@ fun MyApp(
     val navController = LocalNavController.current
     val playerManager = LocalPlayerManager.current
     val authManager = LocalAuthManager.current
+    val playerUiState by playerManager.uiState.collectAsState()
 
-    val currentSong by playerManager.currentPlayingSong.collectAsState()
-    val playerState by playerManager.playerState.collectAsState()
+    val currentSong = playerUiState.song
+    val playerState = playerUiState.isPlaying
     val isLoggedIn by authManager.isLoggedIn.collectAsState()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -141,7 +143,8 @@ fun MyApp(
     LaunchedEffect(playerManager.uiEvent) {
         playerManager.uiEvent.collect { event ->
             when (event) {
-                "SHOW_COPYRIGHT_DIALOG" -> showCopyrightDialog = true
+                PlayerUiEvent.ShowCopyrightDialog -> showCopyrightDialog = true
+                else->{}
             }
         }
     }
@@ -285,7 +288,7 @@ fun MyApp(
                     if (currentSong != null) {
                         SongBar(
                             song = currentSong!!,
-                            playerState = playerState,
+                            playerUiState = playerUiState,
                             onTogglePlayPause = playerManager::togglePlayPause,
                             onPlaylistClick = { showPlaylistSheet = true },
                             onBarClick = { showSongDetailSheet = true },
@@ -313,7 +316,7 @@ fun MyApp(
                     onDismissRequest = { showPlaylistSheet = false },
                     sheetState = sheetState,
                     containerColor = LocalAppColors.current.textColor,
-                    dragHandle = null // 隐藏默认的拖拽手柄，使顶部更紧凑
+                    dragHandle = null
                 ) {
                     PlaybackQueueSheet(
                         isPlayingQueue = playQueue,

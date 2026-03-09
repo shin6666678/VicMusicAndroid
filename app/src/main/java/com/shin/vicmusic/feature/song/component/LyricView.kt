@@ -23,8 +23,7 @@ import com.shin.vicmusic.core.domain.LyricLine
 fun LyricView(
     lyricList: List<LyricLine>,
     currentIndex: Int,
-    modifier: Modifier = Modifier,
-    onLineClick: (Long) -> Unit = {} // 可选：点击歌词跳转进度
+    modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
 

@@ -22,10 +22,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.shin.vicmusic.core.manager.PlayerState
+import com.shin.vicmusic.core.manager.PlayerUiState
+
 @Composable
 fun PlayerControls(
-    playerState: PlayerState,
+    playerUiState: PlayerUiState,
     onTogglePlayPause: () -> Unit,
     onPreviousClick: () -> Unit = {},
     onNextClick: () -> Unit = {},
@@ -52,8 +53,8 @@ fun PlayerControls(
                 .background(MaterialTheme.colorScheme.primaryContainer)
         ) {
             Icon(
-                imageVector = if (playerState.isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                contentDescription = if (playerState.isPlaying) "暂停" else "播放",
+                imageVector = if (playerUiState.isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                contentDescription = if (playerUiState.isPlaying) "暂停" else "播放",
                 tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 modifier = Modifier.size(48.dp)
             )
