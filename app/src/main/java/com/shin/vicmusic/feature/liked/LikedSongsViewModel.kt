@@ -7,6 +7,7 @@ import com.shin.vicmusic.core.domain.Album
 import com.shin.vicmusic.core.domain.Playlist
 import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.domain.Song
+import com.shin.vicmusic.core.manager.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -20,7 +21,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LikedSongsViewModel @Inject constructor(
-    private val likeRepository: LikeRepository
+    private val likeRepository: LikeRepository,
+    private val authManager: AuthManager
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<LikedSongsUiState>(LikedSongsUiState.Loading)
     val uiState: StateFlow<LikedSongsUiState> = _uiState.asStateFlow()
@@ -35,6 +37,15 @@ class LikedSongsViewModel @Inject constructor(
 
     init {
         switchTab(0)
+        // 监听退出登录事件，及时清空收藏数据
+        viewModelScope.launch {
+            authManager.isLoggedIn.collect { loggedIn ->
+                if (loggedIn == false) {
+                    fetchJob?.cancel()
+                    _uiState.value = LikedSongsUiState.Loading
+                }
+            }
+        }
     }
 
     fun switchTab(index: Int) {

@@ -44,6 +44,9 @@ class MeViewModel @Inject constructor(
             isLoggedIn.collect { loggedIn ->
                 if (loggedIn == true) {
                     refreshAllData()
+                } else if (loggedIn == false) {
+                    // 退出登录时，立即清空所有需要登录才能获取的数据
+                    _uiState.value = MeUiState()
                 }
             }
         }

@@ -75,7 +75,7 @@ fun ItemPlaylist(playlist: Playlist, onClick: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "${playlist.playCount}首 来自 ${playlist.ownerName}",
+                text = "${playlist.songCount}首 来自 ${playlist.ownerName}",
                 style = MaterialTheme.typography.bodySmall,
                 color = textColor.copy(alpha = 0.6f)
             )
