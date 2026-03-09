@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DataSaverOff
@@ -30,22 +30,10 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.shin.vicmusic.core.domain.Song
-import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONGS
+import com.shin.vicmusic.core.design.theme.LocalAppColors // 关键：导入自定义颜色系统
 import com.shin.vicmusic.feature.common.icon.PayTypeIcon
-
-@Preview
-@Composable
-fun IsPlayIngQueuePreview() {
-    IsPlayingQueue(
-        queue = SONGS,
-        currentIndex = 1,
-        onSongClick = {},
-        onRemoveSong = {},
-    )
-}
 
 @Composable
 fun IsPlayingQueue(
@@ -54,49 +42,38 @@ fun IsPlayingQueue(
     onSongClick: (Int) -> Unit,
     onRemoveSong: (Int) -> Unit,
 ) {
-    // 定义靛青色 (Indigo) 用于高亮正在播放的歌曲
-    val indigoColor = Color(0xFF005599)
+    val colors = LocalAppColors.current
+    val activeHighlightColor = colors.accentPrimary
 
-    // --- 正在播放列表 ---
-    Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
-        // 列表头信息（歌曲数量 + 播放模式）
-        Row(
-            modifier = Modifier
-                .fillMaxWidth().background(Color.Gray)
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text("预留区")
-        }
-
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Transparent)
+    ) {
         LazyColumn(
             modifier = Modifier.weight(1f)
         ) {
-            items(queue.indices.toList()) { index ->
-                val song = queue[index]
+            // 使用 itemsIndexed 获取索引和对象，代码更简洁
+            itemsIndexed(queue) { index, song ->
                 val isPlaying = index == currentIndex
 
-                // 根据播放状态决定颜色
-                val titleColor = if (isPlaying) indigoColor else MaterialTheme.colorScheme.onSurface
-                val artistColor = if (isPlaying) indigoColor.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                val titleColor = if (isPlaying) activeHighlightColor else colors.textColor
+                val artistColor = if (isPlaying)
+                    activeHighlightColor.copy(alpha = 0.7f)
+                else
+                    colors.textColor.copy(alpha = 0.5f)
 
-                // 富文本：歌名和歌手
                 val displayText = buildAnnotatedString {
-                    // 歌名部分
                     withStyle(style = SpanStyle(
                         color = titleColor,
                         fontSize = MaterialTheme.typography.bodyLarge.fontSize
-                    )
-                    ) {
+                    )) {
                         append(song.title)
                     }
-                    // 歌手部分
                     withStyle(style = SpanStyle(
                         color = artistColor,
                         fontSize = MaterialTheme.typography.bodyMedium.fontSize
-                    )
-                    ) {
+                    )) {
                         append(" - ${song.artist.name}")
                     }
                 }
@@ -108,8 +85,6 @@ fun IsPlayingQueue(
                         .padding(vertical = 12.dp, horizontal = 16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-
-                    // 歌曲信息 (歌名 - 歌手 在一行)
                     Row(
                         modifier = Modifier.weight(0.7f),
                         verticalAlignment = Alignment.CenterVertically
@@ -118,38 +93,36 @@ fun IsPlayingQueue(
                             text = displayText,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            // 意思：有优先权占满空间(weight 1f)，但如果字很少，就只占字那么宽(fill false)
-                            modifier = Modifier.weight(1f,fill = false) // 关键：让文本占据剩余所有空间，迫使超长部分省略
+                            modifier = Modifier.weight(1f, fill = false)
                         )
-                        Spacer(
-                            modifier = Modifier.width(8.dp)
-                        )
-                        PayTypeIcon(song=song)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        PayTypeIcon(song = song)
                     }
-                    // [区域2] 操作按钮区：占据 30% 宽度
+
                     Row(
-                        modifier = Modifier.weight(0.3f), // ⭐ 关键：权重 0.3
+                        modifier = Modifier.weight(0.3f),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.End // 按钮靠右对齐
+                        horizontalArrangement = Arrangement.End
                     ) {
                         if (isPlaying) {
                             Icon(
-                                imageVector = Icons.Default.DataSaverOff, // 暂时用 Favorite 代表播放中
+                                imageVector = Icons.Default.DataSaverOff,
                                 contentDescription = "正在播放",
-                                tint = indigoColor,
+                                tint = activeHighlightColor, // 同步主题色
                                 modifier = Modifier.size(20.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                         }
 
                         IconButton(
-                            onClick = { },
-                            modifier = Modifier.size(28.dp) // 稍微调小以适应 30% 空间
+                            onClick = { /* TODO: 处理喜欢逻辑 */ },
+                            modifier = Modifier.size(28.dp)
                         ) {
                             Icon(
                                 imageVector = if (song.isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                                 contentDescription = "喜欢",
-                                tint = if (song.isLiked) Color(0xFFFE3C30) else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                // 喜欢状态固定红色，非喜欢状态使用主题图标色
+                                tint = if (song.isLiked) Color(0xFFFE3C30) else colors.iconColor.copy(alpha = 0.6f),
                                 modifier = Modifier.size(18.dp)
                             )
                         }
@@ -163,7 +136,7 @@ fun IsPlayingQueue(
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = "移除",
-                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                                tint = colors.iconColor.copy(alpha = 0.4f), // 使用主题中的图标色
                                 modifier = Modifier.size(18.dp)
                             )
                         }

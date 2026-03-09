@@ -56,8 +56,6 @@ import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.feature.common.bar.CommonTopBar
 
 // 定义符合主流APP的高级浅色调配色方案
-// 浅灰白背景，干净清爽
-private val AppBackground = Color(0xFFF5F6F8)
 // 尊贵深蓝 (用于卡片主色)
 private val PremiumDarkBlue = Color(0xFF2C3E50)
 // 活力靛青 (用于渐变和按钮)
@@ -123,7 +121,6 @@ fun CheckInScreen(
         topBar = {
             CommonTopBar(midText = "签到中心", popBackStack = onBackClick)
         },
-        containerColor = AppBackground
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -135,12 +132,12 @@ fun CheckInScreen(
         ) {
             Spacer(modifier = Modifier.height(20.dp))
 
-            // 1. 顶部会员积分卡 (类似信用卡的质感)
+            //顶部会员积分卡
             MembershipCard(points = points)
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // 2. 核心签到按钮区域 (带有呼吸效果)
+            //核心签到按钮区域
             CheckInButtonArea(
                 onCheckInClick = onCheckInClick,
                 isLoading = isLoading
@@ -148,7 +145,7 @@ fun CheckInScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // 3. 规则说明区域 (极简风格)
+            // 规则说明区域
             CheckInRules()
 
             Spacer(modifier = Modifier.height(30.dp))

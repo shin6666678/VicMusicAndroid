@@ -321,6 +321,8 @@ class MyRetrofitDatasource @Inject constructor(
      */
     suspend fun getHistory() = safeApiCall { service.getHistory() }
 
+    suspend fun getRecentPlayCount() =safeApiCall { service.getHistoryCount() }
+
     /*
     Recommend推荐
      */

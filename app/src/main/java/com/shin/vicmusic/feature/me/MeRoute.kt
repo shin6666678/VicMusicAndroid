@@ -74,6 +74,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.shin.vicmusic.core.design.theme.LocalAppColors
 import com.shin.vicmusic.core.design.theme.AppBackground
 
@@ -83,22 +84,12 @@ fun MeRoute(
     viewModel: MeViewModel = hiltViewModel(),
     mainViewModel: MainViewModel = hiltViewModel(viewModelStoreOwner = LocalContext.current as ComponentActivity),
 ) {
-    val navController = LocalNavController.current
 
+    val navController = LocalNavController.current
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isLoggedIn by viewModel.isLoggedIn.collectAsState()
     val currentUser by viewModel.currentUser.collectAsState()
-    val playlists by viewModel.myPlaylists.collectAsState()
     val unreadCount by mainViewModel.unreadCount.collectAsState()
-
-    // 如果已登录但无用户信息，尝试获取
-    LaunchedEffect(isLoggedIn) {
-        if (isLoggedIn == true) {
-            if (currentUser == null) {
-                viewModel.fetchUserInfo()
-            }
-            viewModel.fetchMyPlaylists()
-        }
-    }
 
     val topBarTabs = listOf(
         BarTabItem(
@@ -128,7 +119,8 @@ fun MeRoute(
         onLoginClick = navController::navigateToLogin,
         isLoggedIn = isLoggedIn ?: false,
         user = currentUser,
-        myPlaylists = playlists,
+        myPlaylists = uiState.myPlaylists,
+        likedPlayLists = uiState.likedPlayLists,
         onMorePlaylistsClick = { navController.navigateToMyPlaylists() },
 
         onFollowClick = { navController.navigateToRelationship(RelationshipTab.FOLLOWING) },
@@ -147,11 +139,10 @@ fun MeRoute(
         onAudioClick = { navController.navigateToAudio() },
         onPurchasedClick = { navController.navigateToPurchased() },
 
-        recentPlayList = playlists,
-        recentNum = 2,
-        recentIcon = playlists.firstOrNull()?.cover ?: "",
+        recentPlayList = uiState.myPlaylists,
+        recentNum = uiState.recentPlay.count,
+        recentIcon = uiState.recentPlay.uri,
         onRecentOrMoreClick = navController::navigateToRecentPlay,
-
         onPlayListClick = navController::navigateToPlaylistDetail,
 
         )
@@ -174,7 +165,7 @@ fun MeScreen(
     user: UserInfo? = null,
     onMorePlaylistsClick: () -> Unit = {},
     myPlaylists: List<Playlist> = emptyList(), // 歌单列表
-
+    likedPlayLists: List<Playlist> = emptyList(),
     recentPlayList: List<Playlist> = emptyList(),
     recentNum: Int = 0,                      // 最近播放歌曲数量
     recentIcon: String = "",                 // 最近播放歌曲封面
@@ -234,25 +225,21 @@ fun MeScreen(
                 QuickAccessItem(
                     icon = Icons.Filled.Favorite,
                     text = "收藏",
-                    count = "2",
                     onClick = onLikedClick
                 )
                 QuickAccessItem(
                     icon = Icons.Filled.Download,
                     text = "本地",
-                    count = "29",
                     onClick = onLocalClick
                 )
                 QuickAccessItem(
                     icon = Icons.Filled.Headphones,
                     text = "有声",
-                    count = "0",
                     onClick = onAudioClick
                 )
                 QuickAccessItem(
                     icon = Icons.Filled.ReceiptLong,
                     text = "已购",
-                    count = "0",
                     onClick = onPurchasedClick
                 )
             }
@@ -268,7 +255,8 @@ fun MeScreen(
             // Song Lists Section
             Spacer(Modifier.height(24.dp))
             PlaylistsSection(
-                playlists = myPlaylists,
+                myPlaylists = myPlaylists,
+                likedPlayLists=likedPlayLists,
                 onPlaylistClick = onPlayListClick,
                 onMorePlaylistsClick = onMorePlaylistsClick
             )
@@ -283,7 +271,6 @@ fun MeScreen(
 fun QuickAccessItem(
     icon: ImageVector,
     text: String,
-    count: String,
     onClick: () -> Unit = {}
 ) {
     val textColor = LocalAppColors.current.textColor
@@ -300,11 +287,6 @@ fun QuickAccessItem(
         )
         Spacer(Modifier.height(4.dp))
         Text(text = text, style = MaterialTheme.typography.bodySmall, color = textColor)
-        Text(
-            text = count,
-            style = MaterialTheme.typography.labelSmall,
-            color = textColor.copy(alpha = 0.6f)
-        )
     }
 }
 

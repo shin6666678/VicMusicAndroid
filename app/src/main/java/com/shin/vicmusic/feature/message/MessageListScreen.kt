@@ -29,6 +29,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.domain.ChatSession
 import com.shin.vicmusic.core.model.api.NotifyDto
+import com.shin.vicmusic.feature.chat.navigateToChat
 import com.shin.vicmusic.feature.common.bar.CommonTopBar
 import com.shin.vicmusic.feature.common.item.ItemChat
 import com.shin.vicmusic.feature.common.item.ItemNotify
@@ -57,7 +58,7 @@ fun MessageListRoute(
         onTabChange = viewModel::switchTab,
         onSessionClick = { session ->
             viewModel.clearUnread(session.userId)
-            navController.navigate("chat/${session.userId}/${session.username}")
+            navController.navigateToChat(session.userId,session.username)
         }
     )
 }
@@ -67,7 +68,7 @@ fun MessageListScreen(
     uiState: MessageListUiState,
     onBackClick: () -> Unit,
     onTabChange: (Int) -> Unit,
-    onSessionClick: (ChatSession) -> Unit // 添加這個回調參數
+    onSessionClick: (ChatSession) -> Unit
 ) {
     Scaffold(
         topBar = {

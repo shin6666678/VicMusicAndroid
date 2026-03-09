@@ -1,7 +1,5 @@
 package com.shin.vicmusic.feature.common.bar
 
-import android.R.attr.contentDescription
-import android.R.attr.text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,8 +30,9 @@ import com.shin.vicmusic.core.design.theme.SpaceOuter
 @Composable
 fun SearchBar(
     toSearch: () -> Unit,
+    toMe: () -> Unit,
     placeHolderString: String = ""
-){
+) {
     // 搜索框区域
     Row(
         modifier = Modifier
@@ -75,14 +74,15 @@ fun SearchBar(
         ) {
             // 第一个右侧图标 (使用 AccountCircle 作为占位符，需要替换为实际的货币图标)
             Icon(
-                imageVector = Icons.Default.AccountCircle, // TODO: 替换为实际的货币图标 drawable (R.drawable.ic_currency_yen)
+                imageVector = Icons.Default.AccountCircle,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary, // 根据图片，这个图标是橙色
                 modifier = Modifier
                     .size(28.dp) // 调整图标大小
                     .clip(RoundedCornerShape(50.dp))
-                    .background(MaterialTheme.colorScheme.surface) // 背景颜色
-                    .padding(4.dp) // 图标内部边距
+                    .background(MaterialTheme.colorScheme.surface)
+                    .clickable { toMe() }
+                    .padding(4.dp)
             )
             // 第二个右侧图标 (使用 MusicNote 作为占位符，需要替换为实际的音乐音符图标)
             Icon(
@@ -103,8 +103,8 @@ fun SearchBar(
 fun CommonSearchBar(
     toSearch: () -> Unit,
     placeHolderString: String = "",
-    inImageVector: ImageVector=Icons.Default.Search
-){
+    inImageVector: ImageVector = Icons.Default.Search
+) {
     // 搜索框区域
     Row(
         modifier = Modifier

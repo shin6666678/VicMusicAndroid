@@ -23,6 +23,7 @@ import com.shin.vicmusic.core.design.theme.SpaceOuter
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONGS
+import com.shin.vicmusic.feature.common.item.ItemSong
 import com.shin.vicmusic.feature.common.item.ItemSongContent
 
 @Preview(showBackground = true)
@@ -80,7 +81,9 @@ fun AlsoListeningSection(
                     verticalArrangement = Arrangement.spacedBy(12.dp) // 同一列中，歌曲与歌曲的垂直间距
                 ) {
                     columnSongs.forEach { song ->
-                        ItemSongContent(song = song)
+                        ItemSong(
+                            song = song
+                        )
                     }
                 }
             }

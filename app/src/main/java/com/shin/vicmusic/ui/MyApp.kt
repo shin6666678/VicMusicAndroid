@@ -259,7 +259,7 @@ fun MyApp(
                         .background(
                             Brush.verticalGradient(
                                 colors = listOf(
-                                    bottomContainerColor.copy(alpha = 0.2f),
+                                    bottomContainerColor.copy(alpha = 0.7f),
                                     bottomContainerColor.copy(alpha = 1f)
                                 )
                             )
@@ -296,7 +296,7 @@ fun MyApp(
                 ModalBottomSheet(
                     onDismissRequest = { showPlaylistSheet = false },
                     sheetState = sheetState,
-                    containerColor = MaterialTheme.colorScheme.surface,
+                    containerColor = LocalAppColors.current.textColor,
                     dragHandle = null // 隐藏默认的拖拽手柄，使顶部更紧凑
                 ) {
                     PlaybackQueueSheet(
@@ -304,16 +304,15 @@ fun MyApp(
                         currentIndex = currentQueueIndex,
                         onSongClick = playerManager::playAtIndex,
                         onRemoveSong = playerManager::removeSong,
-                        onClose = { showPlaylistSheet = false },
                     )
                 }
             }
 
             // 歌曲详情页 Edge-to-Edge 覆盖层
-            androidx.compose.animation.AnimatedVisibility(
+            AnimatedVisibility(
                 visible = showSongDetailSheet,
-                enter = androidx.compose.animation.slideInVertically(initialOffsetY = { it }),
-                exit = androidx.compose.animation.slideOutVertically(targetOffsetY = { it }),
+                enter = slideInVertically(initialOffsetY = { it }),
+                exit = slideOutVertically(targetOffsetY = { it }),
                 modifier = Modifier.fillMaxSize()
             ) {
                 androidx.activity.compose.BackHandler {

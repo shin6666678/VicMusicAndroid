@@ -57,9 +57,16 @@ fun FeedScreen(
             when (it) {
                 0 -> {
                     if (discoveryItems.isEmpty()) {
-                        Text(
-                            text = "还没有人公布自己的动态,要不要发一个呢?",
-                        )
+                        Column{
+                            Text(
+                                text = "暂不开放大社区功能",
+                                color = LocalAppColors.current.textColor.copy(alpha = 0.5f)
+                            )
+                            Text(
+                                text = "可前往顶部关注界面查看动态",
+                                color = LocalAppColors.current.textColor.copy(alpha = 0.5f)
+                            )
+                        }
                     } else
                         FeedList(
                             items = discoveryItems, onProfileClick, onSongClick, onPlaylistClick,
