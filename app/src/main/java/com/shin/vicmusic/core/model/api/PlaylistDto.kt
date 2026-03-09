@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PlaylistDto(
     val id: String,
+    val ownerId: String?=null,
     val name: String?=null,
     val cover: String?=null,
     val description: String?=null,

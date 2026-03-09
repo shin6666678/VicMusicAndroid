@@ -33,6 +33,7 @@ import com.shin.vicmusic.core.model.request.FollowReq
 import com.shin.vicmusic.core.model.request.LikeReq
 import com.shin.vicmusic.core.model.request.PageReq
 import com.shin.vicmusic.core.model.request.PlaylistSongReq
+import com.shin.vicmusic.core.model.request.PlaylistUpdateRequest
 import com.shin.vicmusic.core.model.request.PublishFeedReq
 import com.shin.vicmusic.core.model.request.SongPageReq
 import com.shin.vicmusic.core.model.request.UserLoginReq
@@ -298,18 +299,12 @@ class MyRetrofitDatasource @Inject constructor(
 
     suspend fun updatePlaylist(
         id: String,
-        name: String,
+        name: String?,
         description: String?,
-        cover: File?
+        cover: String?,
+        isPublic: Int?,
     ): NetworkResponse<Unit> {
-        val idBody = id.toRequestBody("text/plain".toMediaTypeOrNull())
-        val nameBody = name.toRequestBody("text/plain".toMediaTypeOrNull())
-        val descBody = description?.toRequestBody("text/plain".toMediaTypeOrNull())
-        val coverPart = cover?.let {
-            val body = it.asRequestBody("image/*".toMediaTypeOrNull())
-            MultipartBody.Part.createFormData("cover", it.name, body)
-        }
-        return safeApiCall { service.updatePlaylist(idBody, nameBody, descBody, coverPart) }
+        return safeApiCall { service.updatePlaylist(PlaylistUpdateRequest(id, name, description, cover,isPublic)) }
     }
 
     suspend fun changePublicStatus(id: String): NetworkResponse<Unit> {

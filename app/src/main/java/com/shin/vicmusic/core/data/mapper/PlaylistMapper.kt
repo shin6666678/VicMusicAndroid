@@ -8,6 +8,7 @@ import com.shin.vicmusic.core.model.api.PlaylistDto
 fun PlaylistDto.toDomain(): Playlist {
     return Playlist(
         id = id,
+        ownerId = ownerId ?:"",
         name = name ?: "",
         cover = cover?:"",
         description = description?:"",

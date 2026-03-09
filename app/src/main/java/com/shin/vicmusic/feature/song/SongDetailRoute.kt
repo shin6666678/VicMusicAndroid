@@ -383,13 +383,6 @@ fun SongDetailScreen(
                         contentDescription = "分享",
                         onClick = onShareClick
                     ),
-                    BarActionItem(
-                        icon = Icons.Default.List,
-                        contentDescription = "其他功能",
-                        onClick = {
-                            onCommentClick()
-                        }
-                    ),
                 ),
             )
         },

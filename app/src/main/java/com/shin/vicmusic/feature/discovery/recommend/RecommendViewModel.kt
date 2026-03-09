@@ -7,7 +7,9 @@ import com.shin.vicmusic.core.domain.RecommendCard
 import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.core.manager.AuthManager
+import com.shin.vicmusic.core.manager.SongActionManager
 import com.shin.vicmusic.core.model.api.SongListItemDto
+import com.shin.vicmusic.util.syncCustomStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,10 +20,12 @@ import javax.inject.Inject
 @HiltViewModel
 class RecommendViewModel @Inject constructor(
     private val songRepository: SongRepository,
+    private val songActionManager: SongActionManager,
     authManager: AuthManager
 ) : ViewModel() {
 
     val userInfo: StateFlow<UserInfo?> = authManager.currentUser
+
 
     private val _recommendCard = MutableStateFlow(RecommendCard(title = "", songs = emptyList()))
     val recommendCard: StateFlow<RecommendCard> = _recommendCard.asStateFlow()
@@ -32,6 +36,10 @@ class RecommendViewModel @Inject constructor(
 
 
     init {
+        // 2. 同步嵌套在 RecommendCard 里的歌曲
+        syncCustomStatus(_recommendCard, songActionManager) { card, updatedSong ->
+            card.copy(songs = card.songs.map { if (it.id == updatedSong.id) updatedSong else it })
+        }
         loadData()
     }
     private fun loadData() {

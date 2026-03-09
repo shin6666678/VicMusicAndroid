@@ -144,7 +144,6 @@ fun MeRoute(
         recentIcon = uiState.recentPlay.uri,
         onRecentOrMoreClick = navController::navigateToRecentPlay,
         onPlayListClick = navController::navigateToPlaylistDetail,
-
         )
 }
 
@@ -250,13 +249,14 @@ fun MeScreen(
                 recentNum = recentNum,
                 recentIcon = recentIcon,
                 onRecentOrMoreClick = onRecentOrMoreClick,
+                onPlaylistClick = onPlayListClick
             )
 
             // Song Lists Section
             Spacer(Modifier.height(24.dp))
             PlaylistsSection(
                 myPlaylists = myPlaylists,
-                likedPlayLists=likedPlayLists,
+                likedPlayLists = likedPlayLists,
                 onPlaylistClick = onPlayListClick,
                 onMorePlaylistsClick = onMorePlaylistsClick
             )
@@ -288,18 +288,4 @@ fun QuickAccessItem(
         Spacer(Modifier.height(4.dp))
         Text(text = text, style = MaterialTheme.typography.bodySmall, color = textColor)
     }
-}
-
-@Preview
-@Composable
-fun MeScreenPreview() {
-    MeScreen(
-        // 预览时需要提供假数据
-        topBarTabs = listOf(BarTabItem("我的", true, {})),
-        topBarActions = listOf(
-            BarActionItem(Icons.Default.Search, onClick = {}),
-            BarActionItem(Icons.Default.Menu, onClick = {})
-        ),
-        isLoggedIn = false
-    )
 }

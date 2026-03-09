@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import com.shin.vicmusic.core.domain.ChatSession
 import com.shin.vicmusic.core.model.api.NotifyDto
 import com.shin.vicmusic.feature.common.MyAsyncImage
+import com.shin.vicmusic.util.TimeUtil
 
 @Composable
 fun ItemNotify(
@@ -73,7 +74,7 @@ fun ItemChat(
             )
         }
         Column(horizontalAlignment = Alignment.End) {
-            Text(text = session.lastTime.toString(), fontSize = 10.sp, color = Color.Gray)
+            Text(text =  TimeUtil.getFriendlyTimeSpan(session.lastTime?:0), fontSize = 10.sp, color = Color.Gray)
             if (session.unreadCount > 0) {
                 Badge { Text(text = session.unreadCount.toString()) }
             }

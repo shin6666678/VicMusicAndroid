@@ -2,29 +2,26 @@ package com.shin.vicmusic.feature.feed
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.shin.vicmusic.core.data.repository.CommonRepository // 新增
 import com.shin.vicmusic.core.data.repository.FeedRepository
-import com.shin.vicmusic.core.data.repository.UserRepository // 新增
 import com.shin.vicmusic.core.domain.ArtistUpdate
 import com.shin.vicmusic.core.domain.Feed
 import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.domain.SystemRecommendation
 import com.shin.vicmusic.core.domain.UserActivity
 import com.shin.vicmusic.core.domain.UserPost
+import com.shin.vicmusic.core.domain.usecase.UpdateBgImgUseCase
 import com.shin.vicmusic.core.manager.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
 class FeedViewModel @Inject constructor(
     private val feedRepository: FeedRepository,
-    private val commonRepository: CommonRepository, // 新增注入
-    private val userRepository: UserRepository,     // 新增注入
-    private val authManager: AuthManager
+    private val authManager: AuthManager,
+    private val updateBgImgUseCase: UpdateBgImgUseCase
 ) : ViewModel() {
 
     // --- UI State ---
@@ -126,41 +123,16 @@ class FeedViewModel @Inject constructor(
         }
     }
 
-    // 复用逻辑：更新背景图
-    fun updateUserBg(localPath: String) {
-        if (_isLoading.value) return
 
+    fun updateUserBg(localPath: String) {
         viewModelScope.launch {
             _isLoading.value = true
-            _error.value = null
-
-            try {
-                val file = File(localPath)
-                if (!file.exists()) throw Exception("文件不存在")
-
-                // 1. 上传图片
-                val uploadResult = commonRepository.uploadImage(file, "user")
-                val finalBgUrl = when(uploadResult) {
-                    is MyNetWorkResult.Success -> uploadResult.data
-                    is MyNetWorkResult.Error -> throw Exception(uploadResult.message)
-                }
-
-                // 2. 更新用户信息
-                val updateResult = userRepository.updateUserBgImg(finalBgUrl)
-                if (updateResult is MyNetWorkResult.Error) {
-                    throw Exception(updateResult.message)
-                }
-
-                // 3. 刷新本地用户缓存 (这会自动触发 headerBackgroundImage 更新)
-                authManager.fetchUserInfo()
-                _message.value = "背景图更新成功"
-
-            } catch (e: Exception) {
-                e.printStackTrace()
-                _error.value = e.message ?: "更新失败"
-            } finally {
-                _isLoading.value = false
+            when (val result = updateBgImgUseCase(localPath,"user")) {
+                is MyNetWorkResult.Success -> _message.value = "背景更新成功"
+                is MyNetWorkResult.Error -> _error.value = result.message
             }
+
+            _isLoading.value = false
         }
     }
 }

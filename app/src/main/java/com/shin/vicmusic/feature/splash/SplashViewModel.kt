@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.concurrent.timer
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
@@ -33,16 +34,8 @@ class SplashViewModel @Inject constructor(
     private val _downloadProgress = MutableStateFlow(-1)
     val downloadProgress = _downloadProgress.asStateFlow()
 
-    private val _releaseNoteState = MutableStateFlow<String?>(null)
-    val releaseNoteState = _releaseNoteState.asStateFlow()
-
     val navigateToMain = MutableStateFlow(false)
     private var timer: CountDownTimer? = null
-
-    private val currentReleaseNotes = """
-        本次更新内容：
-            修复已知问题,提升用户体验
-    """.trimIndent()
 
     init {
         checkVersionAndInit()
@@ -50,26 +43,9 @@ class SplashViewModel @Inject constructor(
 
     private fun checkVersionAndInit() {
         viewModelScope.launch {
-            val currentCode = systemRepository.getCurrentVersionCode()
-            val savedCode = versionManager.getSavedVersionCode()
-
-            if (savedCode < currentCode) {
-                _releaseNoteState.value = currentReleaseNotes
-            } else {
-                checkUpdate()
-            }
-        }
-    }
-
-    fun onReleaseNoteConfirm() {
-        viewModelScope.launch {
-            val currentCode = systemRepository.getCurrentVersionCode()
-            versionManager.saveVersionCode(currentCode)
-            _releaseNoteState.value = null
             checkUpdate()
         }
     }
-
     private fun checkUpdate() {
         viewModelScope.launch {
             val result = systemRepository.checkAppUpdate()
