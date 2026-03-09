@@ -13,6 +13,7 @@ data class PlaylistDto(
     val playCount: Int? = null,
     val likeCount: Int? = null,
     val isPublic: Int? = null,
+    val isLiked: Boolean? = null,
 
     val ownerName: String?=null,
 )

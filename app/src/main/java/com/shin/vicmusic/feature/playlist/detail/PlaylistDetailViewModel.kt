@@ -9,11 +9,13 @@ import com.shin.vicmusic.core.data.repository.PlaylistRepository
 import com.shin.vicmusic.core.domain.PlaylistDetail
 import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.domain.Song
+import com.shin.vicmusic.core.manager.SongActionManager
 import com.shin.vicmusic.core.model.UiState
 import com.shin.vicmusic.core.model.error
 import com.shin.vicmusic.core.model.loading
 import com.shin.vicmusic.core.model.success
 import com.shin.vicmusic.feature.myInfo.edit.MyInfoEditUiState
+import com.shin.vicmusic.util.syncCustomStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,6 +33,7 @@ class PlaylistDetailViewModel @Inject constructor(
     private val repository: PlaylistRepository,
     private val likeRepository: LikeRepository,
     private val commonRepository: CommonRepository,
+    private val songActionManager: SongActionManager,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -45,6 +48,22 @@ class PlaylistDetailViewModel @Inject constructor(
     private var originalData: PlaylistDetail? = null
 
     init {
+        syncCustomStatus(_uiState, songActionManager) { state, updatedSong ->
+            // 如果 state 还是 loading 状态或者没有 data，直接返回
+            val currentDetail = state.data.detail
+
+            // 找到并更新歌曲列表
+            val newSongs = currentDetail.songs.map { oldSong ->
+                if (oldSong.id == updatedSong.id) updatedSong else oldSong
+            }
+
+            // 层层 copy 回去
+            state.copy(
+                data = state.data.copy(
+                    detail = currentDetail.copy(songs = newSongs)
+                )
+            )
+        }
         fetchDetail()
     }
 
