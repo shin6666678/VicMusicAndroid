@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
+import com.shin.vicmusic.core.design.theme.LocalAppColors
 import com.shin.vicmusic.feature.common.MyAsyncImage
 import com.shin.vicmusic.feature.common.bar.BarActionItem
 import com.shin.vicmusic.feature.common.bar.BarTabItem
@@ -122,11 +123,7 @@ fun MyInfoEditScreen(
     onSaveClick: () -> Unit,
     onBackClick: () -> Unit
 ) {
-    // --- 颜色定义 (亮色模式) ---
-    val backgroundColor = Color.White
-    val contentColor = Color(0xFF212121)
-    val dividerColor = Color(0xFFEEEEEE)
-    val primaryBrandColor = Color(0xFFFF5722)
+
 
     // 性别下拉框状态
     var genderExpanded by remember { mutableStateOf(false) }
@@ -134,7 +131,6 @@ fun MyInfoEditScreen(
     val genderOptions = listOf("男" to 1, "女" to 0, "保密" to 2)
 
     Scaffold(
-        containerColor = backgroundColor,
         topBar = {
             CommonTopBarSelect(
                 backImageVictor=Icons.Default.Close,
@@ -183,7 +179,7 @@ fun MyInfoEditScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(primaryBrandColor, CircleShape),
+                            .background(LocalAppColors.current.inputBackground, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
@@ -219,9 +215,9 @@ fun MyInfoEditScreen(
                 label = "名称",
                 value = uiState.name,
                 onValueChange = onNameChange,
-                textColor = contentColor,
-                dividerColor = dividerColor,
-                cursorColor = primaryBrandColor
+                textColor = LocalAppColors.current.textColor,
+                dividerColor = LocalAppColors.current.dividerColor,
+                cursorColor = LocalAppColors.current.inputBackground
             )
 
             // 2. 签名
@@ -229,9 +225,9 @@ fun MyInfoEditScreen(
                 label = "签名",
                 value = uiState.slogan,
                 onValueChange = onSloganChange,
-                textColor = contentColor,
-                dividerColor = dividerColor,
-                cursorColor = primaryBrandColor
+                textColor = LocalAppColors.current.textColor,
+                dividerColor = LocalAppColors.current.dividerColor,
+                cursorColor = LocalAppColors.current.inputBackground
             )
 
             // 3. 性别 (修改点 2：下拉框 Dropdown)
@@ -250,7 +246,7 @@ fun MyInfoEditScreen(
                     // Label
                     Text(
                         text = "性别",
-                        style = TextStyle(color = contentColor, fontSize = 16.sp, fontWeight = FontWeight.Bold),
+                        style = TextStyle(color = LocalAppColors.current.textColor, fontSize = 16.sp, fontWeight = FontWeight.Bold),
                         modifier = Modifier.width(80.dp)
                     )
 
@@ -262,7 +258,7 @@ fun MyInfoEditScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = currentText,
-                                style = TextStyle(color = contentColor, fontSize = 16.sp),
+                                style = TextStyle(color = LocalAppColors.current.textColor, fontSize = 16.sp),
                                 modifier = Modifier.weight(1f)
                             )
                             // 可选：添加一个小箭头提示是下拉菜单
@@ -277,7 +273,7 @@ fun MyInfoEditScreen(
                         DropdownMenu(
                             expanded = genderExpanded,
                             onDismissRequest = { genderExpanded = false },
-                            modifier = Modifier.background(Color.White)
+                            modifier = Modifier.background(LocalAppColors.current.inputBackground)
                         ) {
                             genderOptions.forEach { (label, value) ->
                                 DropdownMenuItem(
@@ -285,7 +281,7 @@ fun MyInfoEditScreen(
                                         Text(
                                             text = label,
                                             // 选中项高亮显示
-                                            color = if(uiState.sex == value) primaryBrandColor else contentColor
+                                            color = if(uiState.sex == value) LocalAppColors.current.inputBackground else LocalAppColors.current.textColor
                                         )
                                     },
                                     onClick = {
@@ -297,7 +293,7 @@ fun MyInfoEditScreen(
                         }
                     }
                 }
-                HorizontalDivider(color = dividerColor, thickness = 0.5.dp)
+                HorizontalDivider(color = LocalAppColors.current.dividerColor, thickness = 0.5.dp)
             }
         }
     }

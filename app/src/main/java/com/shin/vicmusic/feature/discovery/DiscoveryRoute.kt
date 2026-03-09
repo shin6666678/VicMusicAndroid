@@ -30,6 +30,7 @@ import com.shin.vicmusic.feature.common.bar.SearchBar
 import com.shin.vicmusic.feature.common.bar.UniversalTopBar
 import com.shin.vicmusic.feature.discovery.musicHall.MusicHall
 import com.shin.vicmusic.feature.discovery.recommend.RecommendRoute
+import com.shin.vicmusic.feature.myInfo.navigateToMyInfo
 import com.shin.vicmusic.feature.playlist.publicList.PUBLIC_PLAYLISTS_ROUTE
 import com.shin.vicmusic.feature.rankList.rankList.RANK_LIST_ROUTE
 import com.shin.vicmusic.feature.search.navigateToSearch
@@ -46,6 +47,7 @@ fun DiscoveryRoute(
     DiscoveryScreen(
         songs = datum,
         toSearch = { navController.navigateToSearch() },
+        toMe = { navController.navigateToMyInfo() },
         onQuickAccessClick = { label ->
             when (label) {
                 "歌手" -> navController.navigate("artist_list")
@@ -60,6 +62,7 @@ fun DiscoveryRoute(
 @Composable
 fun DiscoveryScreen(
     toSearch: () -> Unit = {},
+    toMe: () -> Unit = {},
     songs: List<Song> = listOf(),
     onQuickAccessClick: (String) -> Unit = {}
 ) {
@@ -83,7 +86,10 @@ fun DiscoveryScreen(
                 UniversalTopBar(
                     tabs = topBarTabs,
                 )
-                SearchBar(toSearch = toSearch)
+                SearchBar(
+                    toSearch = toSearch,
+                    toMe=toMe
+                )
             }
         },
         containerColor = Color.Transparent,

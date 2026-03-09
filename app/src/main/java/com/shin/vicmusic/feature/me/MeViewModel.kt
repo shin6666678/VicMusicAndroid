@@ -2,26 +2,76 @@ package com.shin.vicmusic.feature.me
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.shin.vicmusic.core.data.repository.HistoryRepository
+import com.shin.vicmusic.core.data.repository.LikeRepository
 import com.shin.vicmusic.core.data.repository.PlaylistRepository
 import com.shin.vicmusic.core.data.repository.UserRepository
 import com.shin.vicmusic.core.domain.Playlist
 import com.shin.vicmusic.core.domain.MyNetWorkResult
+import com.shin.vicmusic.core.domain.RecentPlayCount
 import com.shin.vicmusic.core.manager.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MeViewModel @Inject constructor(
-    private val authManager: AuthManager, // ✅ 这里可以正常注入你的单例 Manager
+    private val authManager: AuthManager,
     private val playlistRepository: PlaylistRepository,
+    private val historyRepository: HistoryRepository,
+    private val likeRepository: LikeRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
 
+
+    data class MeUiState(
+        val myPlaylists: List<Playlist> = emptyList(),
+        val likedPlayLists : List<Playlist> = emptyList(),
+        val recentPlay: RecentPlayCount = RecentPlayCount(0, ""),
+        val isLoading: Boolean = false
+    )
+    private val _uiState = MutableStateFlow(MeUiState())
+    val uiState = _uiState.asStateFlow()
     val isLoggedIn = authManager.isLoggedIn
     val currentUser = authManager.currentUser
+    init {
+        // 当登录状态变为 true 时，自动拉取数据
+        viewModelScope.launch {
+            isLoggedIn.collect { loggedIn ->
+                if (loggedIn == true) {
+                    refreshAllData()
+                }
+            }
+        }
+    }
+    fun refreshAllData() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            // 并发执行三个请求，提高加载效率
+            val playlistsDeferred = async { playlistRepository.getMyPlaylists() }
+            val countDeferred = async { historyRepository.getRecentPlayCount() }
+            val likedPlayListsDeferred = async { likeRepository.likedPlaylists() }
+
+            val playlistRes = playlistsDeferred.await()
+            val countRes = countDeferred.await()
+            val likedPlayListRes =likedPlayListsDeferred.await()
+
+            _uiState.update { state ->
+                state.copy(
+                    myPlaylists = (playlistRes as? MyNetWorkResult.Success)?.data ?: emptyList(),
+                    likedPlayLists = (likedPlayListRes as? MyNetWorkResult.Success)?.data?.list ?: emptyList(),
+                    recentPlay = (countRes as? MyNetWorkResult.Success)?.data ?: RecentPlayCount(0, ""),
+                    isLoading = false
+                )
+            }
+            // 同时刷新用户信息
+            authManager.fetchUserInfo()
+        }
+    }
 
     // 用于 UI 显示 Toast 提示
     private val _toastMessage = MutableStateFlow<String?>(null)
@@ -29,24 +79,6 @@ class MeViewModel @Inject constructor(
     //  暴露获取用户信息的方法
     fun fetchUserInfo() {
         authManager.fetchUserInfo()
-    }
-
-    // 歌单列表状态
-    private val _myPlaylists = MutableStateFlow<List<Playlist>>(emptyList())
-    val myPlaylists = _myPlaylists.asStateFlow()
-    //获取我的歌单
-    fun fetchMyPlaylists() {
-        viewModelScope.launch {
-            // 这里假设 Repository 会处理 token 等逻辑，或者 API 不需要特殊处理
-            when (val result = playlistRepository.getMyPlaylists()) {
-                is MyNetWorkResult.Success -> {
-                    _myPlaylists.value = result.data
-                }
-                is MyNetWorkResult.Error -> {
-                    // 可以处理错误，比如提示用户
-                }
-            }
-        }
     }
     // --- 新增：签到逻辑 ---
     fun checkIn() {

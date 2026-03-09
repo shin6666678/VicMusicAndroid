@@ -30,7 +30,7 @@ fun CommonTopBar(
     showSearch: Boolean = false,
     popBackStack: () -> Unit = {},
     navigateToSearch: () -> Unit = {},
-    onShareClick: (() -> Unit)? = null, // 新增分享回调
+    onShareClick: (() -> Unit)? = null,
     containerColor: Color = Color.Transparent,
     contentColor: Color = LocalAppColors.current.textColor
 ) {

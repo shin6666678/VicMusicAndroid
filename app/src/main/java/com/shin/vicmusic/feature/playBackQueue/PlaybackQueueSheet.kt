@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.shin.vicmusic.core.design.theme.LocalAppColors
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.ui.DiscoveryPreviewParameterData.SONGS
 
@@ -58,15 +59,14 @@ fun PlaybackQueueSheet(
     onSongClick: (Int) -> Unit,
     onRemoveSong: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    onClose:()->Unit={},
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf("正在播放 ${isPlayingQueue.size}", "已播歌曲", "已播歌单")
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.6f) // 占屏幕高度的 60%
-            .background(MaterialTheme.colorScheme.surface)
+            .fillMaxHeight(0.6f)
+            .background(LocalAppColors.current.bottomBarBackground)
             .padding(16.dp)
     ) {
 
@@ -81,7 +81,7 @@ fun PlaybackQueueSheet(
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
         )
 
-        // 2. 内容区域
+        // 内容区域
         Box(modifier = Modifier.fillMaxSize()) {
             when (selectedTab) {
                 0 -> IsPlayingQueue(isPlayingQueue, currentIndex, onSongClick, onRemoveSong)

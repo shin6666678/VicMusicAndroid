@@ -37,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.shin.vicmusic.core.design.composition.LocalSongActionManager
+import com.shin.vicmusic.core.design.theme.LocalAppColors
 import com.shin.vicmusic.core.design.theme.VicMusicTheme
 import com.shin.vicmusic.core.domain.PayType
 import com.shin.vicmusic.core.domain.Song
@@ -88,20 +89,18 @@ fun SongBar(
 
 @Composable
 fun SongBarScreen(
-    song: Song?, // 接收 Song 对象
+    song: Song?,
     playerState: PlayerState,
     onTogglePlayPause: () -> Unit,
     onLikeClick: () -> Unit,
     onPlaylistClick: () -> Unit,
-    onBarClick: () -> Unit, // 添加整个bar的点击事件
+    onBarClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val appColors = com.shin.vicmusic.core.design.theme.LocalAppColors.current
-    // 整个播放条的背景和形状
     Card(
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = appColors.glassWhite, // Use glass background instead of surfaceVariant
+            containerColor = LocalAppColors.current.glassWhite, // Use glass background instead of surfaceVariant
         ),
         modifier = modifier
             .fillMaxWidth()
@@ -117,7 +116,7 @@ fun SongBarScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             // 专辑封面 (左侧，带半圆露出)
-            Box(modifier = Modifier.offset(x = (7).dp)) { // 微调位置，使其左侧露出
+            Box(modifier = Modifier.offset(x = (7).dp)) {
                 MyAsyncImage(model = song?.icon, modifier = Modifier.size(50.dp))
             }
 
@@ -129,17 +128,17 @@ fun SongBarScreen(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = song?.title ?: "未知歌曲", // 歌曲标题
+                    text = song?.title ?: "未知歌曲",
                     style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    color = LocalAppColors.current.textColor,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = song?.artist?.name ?: "未知艺术家", // 艺术家
+                        text = song?.artist?.name ?: "未知艺术家",
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
+                        color = LocalAppColors.current.textColor.copy(alpha = 0.7f),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -186,7 +185,7 @@ fun SongBarScreen(
                 Icon(
                     imageVector = Icons.Default.FavoriteBorder,
                     contentDescription = "喜欢",
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    tint = LocalAppColors.current.textColor,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -198,7 +197,7 @@ fun SongBarScreen(
                 Icon(
                     imageVector = if (playerState.isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
                     contentDescription = if (playerState.isPlaying) "暂停" else "播放",
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    tint = LocalAppColors.current.textColor,
                     modifier = Modifier.size(28.dp)
                 )
             }
@@ -208,7 +207,7 @@ fun SongBarScreen(
                 Icon(
                     imageVector = Icons.Default.List,
                     contentDescription = "播放列表",
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    tint = LocalAppColors.current.textColor,
                     modifier = Modifier.size(24.dp)
                 )
             }

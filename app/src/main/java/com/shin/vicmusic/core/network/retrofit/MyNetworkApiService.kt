@@ -15,6 +15,7 @@ import com.shin.vicmusic.core.model.api.PlaylistDetailDto
 import com.shin.vicmusic.core.model.api.PlaylistDto
 import com.shin.vicmusic.core.model.api.RankListDetailDto
 import com.shin.vicmusic.core.model.api.RankListPeakDto
+import com.shin.vicmusic.core.model.api.RecentPlayCountDto
 import com.shin.vicmusic.core.model.api.RecommendCardDto
 import com.shin.vicmusic.core.model.api.SearchComprehensiveDto
 import com.shin.vicmusic.core.model.api.SongDetailDto
@@ -231,6 +232,9 @@ interface MyNetworkApiService {
 
     @GET("/api/history/v1/list")
     suspend fun getHistory(): NetworkResponse<List<SongListItemDto>>
+
+    @GET("/api/history/v1/count")
+    suspend fun getHistoryCount(): NetworkResponse<RecentPlayCountDto>
 
     /*
     recommend推荐

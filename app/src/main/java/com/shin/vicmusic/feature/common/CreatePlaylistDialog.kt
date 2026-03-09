@@ -24,10 +24,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.shin.vicmusic.core.design.theme.LocalAppColors
 import com.shin.vicmusic.feature.playlist.meList.PlaylistViewModel
 
 @Preview
@@ -44,6 +46,9 @@ fun CreatePlaylistDialog(
     onDismiss: () -> Unit,
     viewModel: PlaylistViewModel = hiltViewModel()
 ) {
+
+    val colors = LocalAppColors.current
+
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
@@ -51,7 +56,7 @@ fun CreatePlaylistDialog(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = Color.White,
+        containerColor = colors.gradientEnd,
         dragHandle = null // 移除默认拖拽条，使用自定义顶部栏
     ) {
         Column(
@@ -71,11 +76,12 @@ fun CreatePlaylistDialog(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 TextButton(onClick = onDismiss) {
-                    Text("取消", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("取消", color = colors.textColor)
                 }
 
                 Text(
                     text = "新建歌单",
+                    color = colors.textColor,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -89,7 +95,7 @@ fun CreatePlaylistDialog(
                     },
                     enabled = name.isNotBlank()
                 ) {
-                    Text("完成", fontWeight = FontWeight.Bold)
+                    Text("完成", fontWeight = FontWeight.Bold,color=colors.textColor)
                 }
             }
 
