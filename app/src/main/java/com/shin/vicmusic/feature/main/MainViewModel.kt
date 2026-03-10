@@ -22,7 +22,6 @@ class MainViewModel @Inject constructor(
     private val themeManager: ThemeManager
 ) : ViewModel() {
 
-    // Add a state to indicate if the view model is ready.
     private val _isReady = MutableStateFlow(false)
     val isReady: StateFlow<Boolean> = _isReady.asStateFlow()
 

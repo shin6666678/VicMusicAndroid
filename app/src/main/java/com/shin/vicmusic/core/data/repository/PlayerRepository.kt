@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.core.content.edit
 import com.shin.vicmusic.core.domain.Song
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
 

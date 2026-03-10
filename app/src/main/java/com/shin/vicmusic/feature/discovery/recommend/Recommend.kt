@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.shin.vicmusic.core.design.LocalMainViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.theme.LocalAppColors
 import com.shin.vicmusic.core.design.theme.SpaceExtraMedium
@@ -46,9 +47,9 @@ data class RecommendSongData(
 @Composable
 fun RecommendRoute(
     viewModel: RecommendViewModel = hiltViewModel(),
-    mainViewModel: MainViewModel = hiltViewModel()
 ){
     val navController = LocalNavController.current
+    val mainViewModel = LocalMainViewModel.current
 
     // 收集状态
     val user by viewModel.userInfo.collectAsState()

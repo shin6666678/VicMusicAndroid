@@ -1,6 +1,5 @@
 package com.shin.vicmusic.feature.me
 
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,9 +16,7 @@ import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.material.icons.filled.MailOutline
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.ReceiptLong
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -27,18 +24,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.shin.vicmusic.core.design.LocalMainViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
+import com.shin.vicmusic.core.design.theme.LocalAppColors
 import com.shin.vicmusic.core.domain.Playlist
 import com.shin.vicmusic.core.domain.UserInfo
 import com.shin.vicmusic.feature.auth.navigateToLogin
@@ -49,10 +46,12 @@ import com.shin.vicmusic.feature.common.bar.UniversalTopBar
 import com.shin.vicmusic.feature.liked.navigateToLikedList
 import com.shin.vicmusic.feature.localMusic.navigateToLocalMusic
 import com.shin.vicmusic.feature.main.MainViewModel
-import com.shin.vicmusic.feature.main.TopLevelDestination
+import com.shin.vicmusic.feature.me.audio.navigateToAudio
 import com.shin.vicmusic.feature.me.component.PlaylistsSection
 import com.shin.vicmusic.feature.me.component.RecentBar
 import com.shin.vicmusic.feature.me.component.UserInfoCard
+import com.shin.vicmusic.feature.me.dressup.navigateToDressUp
+import com.shin.vicmusic.feature.me.purchased.navigateToPurchased
 import com.shin.vicmusic.feature.me.recentPlay.navigateToRecentPlay
 import com.shin.vicmusic.feature.me.setting.navigateToSetting
 import com.shin.vicmusic.feature.message.navigateToMessageList
@@ -62,27 +61,12 @@ import com.shin.vicmusic.feature.playlist.meList.navigateToMyPlaylists
 import com.shin.vicmusic.feature.relationship.RelationshipTab
 import com.shin.vicmusic.feature.relationship.navigateToRelationship
 import com.shin.vicmusic.feature.vip.navigateToVip
-import com.shin.vicmusic.feature.me.dressup.navigateToDressUp
-import com.shin.vicmusic.feature.me.audio.navigateToAudio
-import com.shin.vicmusic.feature.me.purchased.navigateToPurchased
-import androidx.compose.animation.core.*
-import androidx.compose.ui.draw.blur
-import androidx.compose.foundation.background
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.shin.vicmusic.core.design.theme.LocalAppColors
-import com.shin.vicmusic.core.design.theme.AppBackground
 
 
 @Composable
 fun MeRoute(
     viewModel: MeViewModel = hiltViewModel(),
-    mainViewModel: MainViewModel = hiltViewModel(viewModelStoreOwner = LocalContext.current as ComponentActivity),
+    mainViewModel: MainViewModel = LocalMainViewModel.current,
 ) {
 
     val navController = LocalNavController.current

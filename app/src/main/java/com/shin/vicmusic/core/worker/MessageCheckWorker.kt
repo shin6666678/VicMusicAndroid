@@ -56,18 +56,18 @@ class MessageCheckWorker @AssistedInject constructor(
      */
     override suspend fun doWork(): Result {
         return try {
-//            if (webSocketManager.isConnected) {
-//                Log.d("MessageCheckWorker", "WebSocket已连接，跳过轮询检查")
-//                return Result.success()
-//            }
+            if (webSocketManager.isConnected) {
+                Log.d("MessageCheckWorker", "WebSocket已连接，跳过轮询检查")
+                return Result.success()
+            }
             Log.d("MessageCheckWorker", "正在检查新私信...")
-            // 调用仓库获取最新的未读统计
+
             val result = notifyRepository.getUnreadCount()
             if (result is MyNetWorkResult.Success) {
                 // 获取各项未读数
                 val chatUnreadCount = result.data["chat"] ?: 0
                 val notifyUnreadCount = result.data["notify"] ?: 0
-                // 计算总未读数（私信 + 系统通知）
+                // 计算总未读数
                 val currentTotalUnreadCount = chatUnreadCount + notifyUnreadCount
                 
                 // 从 DataStore 获取上一次保存的未读数量
@@ -77,12 +77,12 @@ class MessageCheckWorker @AssistedInject constructor(
 
                 Log.d("MessageCheckWorker", "当前总未读: $currentTotalUnreadCount (私信: $chatUnreadCount, 通知: $notifyUnreadCount), 上次记录: $lastTotalUnreadCount")
 
-                // 逻辑判断：如果有未读且数量比上次记录的要多，说明有新消息，触发系统通知
+                // 如果有未读且数量比上次记录的要多，说明有新消息，触发系统通知
                 if (currentTotalUnreadCount > 0 && currentTotalUnreadCount > lastTotalUnreadCount) {
                     sendNotification(currentTotalUnreadCount)
                 }
 
-                // 更新 DataStore 中的记录，确保下次比对正确
+                // 更新 DataStore 中的记录
                 applicationContext.dataStore.edit { preferences ->
                     preferences[LAST_UNREAD_COUNT_KEY] = currentTotalUnreadCount
                 }

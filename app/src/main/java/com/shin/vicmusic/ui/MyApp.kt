@@ -45,6 +45,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.shin.vicmusic.core.design.LocalMainViewModel
 import com.shin.vicmusic.core.design.composition.LocalAuthManager
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
@@ -101,9 +102,9 @@ import com.shin.vicmusic.feature.vip.vipScreen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyApp(
-    mainViewModel: MainViewModel = hiltViewModel()
 ) {
 
+    val mainViewModel = LocalMainViewModel.current
     val navController = LocalNavController.current
     val playerManager = LocalPlayerManager.current
     val authManager = LocalAuthManager.current

@@ -7,6 +7,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.shin.vicmusic.core.manager.AuthManager
 import com.shin.vicmusic.core.manager.ThemeManager
+import com.shin.vicmusic.core.worker.MessageCheckWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
@@ -25,7 +26,7 @@ class SettingViewModel @Inject constructor(
     }
 
     fun triggerMessageCheck() {
-        val workRequest = OneTimeWorkRequestBuilder<com.shin.vicmusic.core.worker.MessageCheckWorker>()
+        val workRequest = OneTimeWorkRequestBuilder<MessageCheckWorker>()
             .setExpedited(androidx.work.OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             .build()
         WorkManager.getInstance(context).enqueue(workRequest)

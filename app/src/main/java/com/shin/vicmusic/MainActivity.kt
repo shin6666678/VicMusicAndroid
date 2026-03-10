@@ -15,6 +15,7 @@ import androidx.work.WorkManager
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.foundation.isSystemInDarkTheme
+import com.shin.vicmusic.core.design.LocalMainViewModel
 import com.shin.vicmusic.core.design.composition.LocalAuthManager
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.composition.LocalPlaybackQueueManager
@@ -93,7 +94,8 @@ class MainActivity : ComponentActivity() {
                 LocalAuthManager provides authManager,
                 LocalTokenManager provides tokenManager,
                 LocalSongActionManager provides songActionManager,
-                LocalAppColors provides currentAppColors
+                LocalAppColors provides currentAppColors,
+                LocalMainViewModel provides mainViewModel
             ) {
                 VicMusicTheme(appColors = currentAppColors) {
                     MyApp()
@@ -111,7 +113,7 @@ class MainActivity : ComponentActivity() {
             .setRequiredNetworkType(androidx.work.NetworkType.CONNECTED)
             .build()
 
-        // 创建周期性任务请求：每隔 15 分钟运行一次 (WorkManager 最小间隔)
+        // 创建周期性任务请求：每隔 15 分钟运行一次
         val workRequest = PeriodicWorkRequestBuilder<MessageCheckWorker>(
             15, java.util.concurrent.TimeUnit.MINUTES
         )
@@ -128,7 +130,7 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
-     * ‼️ 只需要保留这个：当 App 在后台运行，点击 DeepLink 唤起时，
+     * 当 App 在后台运行，点击 DeepLink 唤起时，
      * 必须更新 Intent，否则 NavHost 可能拿不到最新的跳转参数。
      */
     override fun onNewIntent(intent: Intent) {
