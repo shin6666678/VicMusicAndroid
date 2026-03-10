@@ -1,6 +1,7 @@
 package com.shin.vicmusic.core.service
 
 import android.content.Context
+import androidx.media3.common.AudioAttributes
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DefaultHttpDataSource
@@ -40,7 +41,6 @@ class PlaybackService : MediaSessionService() {
     override fun onCreate() {
         super.onCreate()
 
-        // 2. [已修复] 纠正数据源工厂的配置
         val loadControl = DefaultLoadControl.Builder()
             .setBufferDurationsMs(30_000, 1_200_000, 500, 0)
             .build()
@@ -58,6 +58,8 @@ class PlaybackService : MediaSessionService() {
 
         exoPlayer = ExoPlayer.Builder(this)
             .setMediaSourceFactory(mediaSourceFactory)
+            .setAudioAttributes(AudioAttributes.DEFAULT, true)
+            .setHandleAudioBecomingNoisy(true)
             .setLoadControl(loadControl)
             .build()
 

@@ -17,12 +17,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -65,8 +67,8 @@ class PlayerManager @Inject constructor(
     val uiState: StateFlow<PlayerUiState> = _uiState.asStateFlow()
 
     // --- 强类型事件 ---
-    private val _uiEvent = MutableSharedFlow<PlayerUiEvent>()
-    val uiEvent = _uiEvent.asSharedFlow()
+    private val _uiEvent = Channel<PlayerUiEvent>(Channel.BUFFERED)
+    val uiEvent = _uiEvent.receiveAsFlow()
 
     // 公开快捷变量（供其它业务逻辑方便获取）
     val currentQueueIndex: StateFlow<Int> = queueManager.currentIndex
@@ -96,7 +98,7 @@ class PlayerManager @Inject constructor(
             val intercept = playbackPermissionInterceptor.check(song, 0, false, _uiState.value.isSongDetailVisible)
             if (intercept is PlaybackPermissionInterceptor.Result.ShowCopyrightDialog) {
                 _uiState.update { it.copy(song = song) }
-                _uiEvent.emit(PlayerUiEvent.ShowCopyrightDialog)
+                _uiEvent.send(PlayerUiEvent.ShowCopyrightDialog)
                 return@launch
             }
 
@@ -120,7 +122,7 @@ class PlayerManager @Inject constructor(
             val intercept = playbackPermissionInterceptor.check(song, 0, false, _uiState.value.isSongDetailVisible)
             if (intercept is PlaybackPermissionInterceptor.Result.ShowCopyrightDialog) {
                 _uiState.update { it.copy(song = song) }
-                scope.launch { _uiEvent.emit(PlayerUiEvent.ShowCopyrightDialog) }
+                scope.launch { _uiEvent.send(PlayerUiEvent.ShowCopyrightDialog) }
                 return
             }
             queueManager.updateIndex(index)
@@ -139,7 +141,7 @@ class PlayerManager @Inject constructor(
         } else {
             // 如果没版权且未在播放（即处于被拦截状态），点击播放应重新弹窗
             if (song != null && !song.isCopyright && !controller.playWhenReady) {
-                scope.launch { _uiEvent.emit(PlayerUiEvent.ShowCopyrightDialog) }
+                scope.launch { _uiEvent.send(PlayerUiEvent.ShowCopyrightDialog) }
                 return
             }
             if (controller.playWhenReady) controller.pause() else controller.play()
@@ -230,7 +232,7 @@ class PlayerManager @Inject constructor(
                 if (song != null) {
                     if (!song.isCopyright) {
                         mediaController?.pause()
-                        scope.launch { _uiEvent.emit(PlayerUiEvent.ShowCopyrightDialog) }
+                        scope.launch { _uiEvent.send(PlayerUiEvent.ShowCopyrightDialog) }
                     } else {
                         val index = playbackQueue.value.indexOf(song)
                         queueManager.updateIndex(index)
@@ -269,11 +271,11 @@ class PlayerManager @Inject constructor(
             when(result) {
                 PlaybackPermissionInterceptor.Result.ShowCopyrightDialog -> {
                     controller.pause()
-                    _uiEvent.emit(PlayerUiEvent.ShowCopyrightDialog)
+                    _uiEvent.send(PlayerUiEvent.ShowCopyrightDialog)
                 }
                 PlaybackPermissionInterceptor.Result.ShowVipDialog -> {
                     controller.pause()
-                    _uiEvent.emit(PlayerUiEvent.ShowVipDialog)
+                    _uiEvent.send(PlayerUiEvent.ShowVipDialog)
                 }
                 PlaybackPermissionInterceptor.Result.ForceSkip -> skipToNext()
                 else -> {}

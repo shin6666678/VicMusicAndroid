@@ -50,9 +50,7 @@ object NetWorkModule {
         return OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
             .addInterceptor(loggingInterceptor)
-            // 添加专门处理 401 刷新的 Authenticator(认证器)
-            // .authenticator(MyTokenAuthenticator())
-            .connectTimeout(15, TimeUnit.SECONDS) // 建议稍微加长一点容错时间
+            .connectTimeout(15, TimeUnit.SECONDS)
             .writeTimeout(15, TimeUnit.SECONDS)
             .readTimeout(15, TimeUnit.SECONDS)
             .build()

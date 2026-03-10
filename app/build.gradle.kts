@@ -146,4 +146,5 @@ dependencies {
     implementation("com.google.zxing:core:3.5.3")
 
     implementation("androidx.glance:glance-appwidget")
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
 }

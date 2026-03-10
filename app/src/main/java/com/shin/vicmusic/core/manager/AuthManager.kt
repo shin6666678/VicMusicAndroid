@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton// 更改为 @Singleton
+@Singleton
 class AuthManager @Inject constructor(
     private val authRepository: AuthRepository,
     private val tokenManager: TokenManager, // 必须注入
