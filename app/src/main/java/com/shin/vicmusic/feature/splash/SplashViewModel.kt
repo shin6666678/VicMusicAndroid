@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.SystemRepository
 import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.manager.ApkInstaller
-import com.shin.vicmusic.core.manager.VersionManager
 import com.shin.vicmusic.core.model.api.AppUpdateDto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,12 +14,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.concurrent.timer
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
     private val systemRepository: SystemRepository,
-    private val versionManager: VersionManager,
     private val apkInstaller: ApkInstaller
 ) : ViewModel() {
 

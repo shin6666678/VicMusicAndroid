@@ -2,20 +2,26 @@ package com.shin.vicmusic.feature.me.setting
 
 import android.content.Intent
 import android.provider.Settings
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.Alignment
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.theme.LocalAppColors
-import com.shin.vicmusic.core.design.theme.AppBackground
 import com.shin.vicmusic.feature.common.bar.CommonTopBar
 
 @Composable
@@ -37,7 +43,6 @@ fun SettingScreen(
     onLogoutClick: () -> Unit = {},
     onDebugCheckMessage: () -> Unit = {}
 ) {
-    var showThemeDialog by remember { mutableStateOf(false) }
 
     val appColors = LocalAppColors.current
 
@@ -67,24 +72,9 @@ fun SettingScreen(
                 }
             )
             HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp), thickness = 8.dp, color = appColors.textColor.copy(0.05f))
-            SettingItem(title = "切换账号")
+            SettingItem(title = "切换账号", textColor = Color.Red, onClick = onLogoutClick)
             SettingItem(title = "退出登录", textColor = Color.Red, onClick = onLogoutClick)
         }
-    }
-}
-
-@Composable
-fun ThemeOptionItem(text: String, selected: Boolean, onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        RadioButton(selected = selected, onClick = onClick)
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(text)
     }
 }
 

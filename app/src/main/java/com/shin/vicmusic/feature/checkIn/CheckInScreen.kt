@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -58,12 +59,16 @@ import com.shin.vicmusic.feature.common.bar.CommonTopBar
 // 定义符合主流APP的高级浅色调配色方案
 // 尊贵深蓝 (用于卡片主色)
 private val PremiumDarkBlue = Color(0xFF2C3E50)
+
 // 活力靛青 (用于渐变和按钮)
 private val VividIndigo = Color(0xFF3F51B5)
+
 // 柔和灰 (用于次要文字)
 private val TextSecondary = Color(0xFF909399)
+
 // 浅黑 (用于标题)
 private val TextPrimary = Color(0xFF303133)
+
 // 纯白
 private val White = Color.White
 
@@ -122,6 +127,32 @@ fun CheckInScreen(
             CommonTopBar(midText = "签到中心", popBackStack = onBackClick)
         },
     ) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+                .padding(horizontal = 20.dp)
+                .navigationBarsPadding(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            item { Spacer(modifier = Modifier.height(20.dp)) }
+            item { MembershipCard(points = points) }
+            item { Spacer(modifier = Modifier.height(20.dp)) }
+            item {
+                CheckInButtonArea(
+                    onCheckInClick = onCheckInClick,
+                    isLoading = isLoading
+                )
+            }
+            item {
+                Spacer(modifier = Modifier.height(20.dp))
+                CheckInRules()
+            }
+            item {
+                Spacer(modifier = Modifier.height(60.dp))
+            }
+
+        }
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -130,25 +161,7 @@ fun CheckInScreen(
                 .navigationBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(20.dp))
 
-            //顶部会员积分卡
-            MembershipCard(points = points)
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            //核心签到按钮区域
-            CheckInButtonArea(
-                onCheckInClick = onCheckInClick,
-                isLoading = isLoading
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            // 规则说明区域
-            CheckInRules()
-
-            Spacer(modifier = Modifier.height(30.dp))
         }
     }
 }

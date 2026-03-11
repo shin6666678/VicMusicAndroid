@@ -1,6 +1,5 @@
 package com.shin.vicmusic.feature.discovery
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.exclude
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
@@ -18,13 +16,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.shin.vicmusic.core.design.theme.LocalAppColors
-import com.shin.vicmusic.core.design.theme.AppBackground
 import com.shin.vicmusic.core.domain.Song
-import com.shin.vicmusic.feature.album.albumList.ALBUM_LIST_ROUTE
+import com.shin.vicmusic.feature.album.albumList.navigateToAlbumList
 import com.shin.vicmusic.feature.common.bar.BarTabItem
 import com.shin.vicmusic.feature.common.bar.SearchBar
 import com.shin.vicmusic.feature.common.bar.UniversalTopBar
@@ -52,7 +47,7 @@ fun DiscoveryRoute(
             when (label) {
                 "歌手" -> navController.navigate("artist_list")
                 "排行" -> navController.navigate(RANK_LIST_ROUTE)
-                "专辑" -> navController.navigate(ALBUM_LIST_ROUTE)
+                "专辑" -> navController.navigateToAlbumList()
                 "歌单" -> navController.navigate(PUBLIC_PLAYLISTS_ROUTE)
             }
         }

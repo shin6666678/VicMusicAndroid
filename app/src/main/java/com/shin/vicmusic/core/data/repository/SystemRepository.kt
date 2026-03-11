@@ -10,7 +10,7 @@ import javax.inject.Singleton
 
 @Singleton
 class SystemRepository @Inject constructor(
-    private val datasource: MyRetrofitDatasource, // 假设你有Datasource封装，或者直接用Api
+    private val datasource: MyRetrofitDatasource,
     @ApplicationContext private val context: Context
 ) {
     // 获取当前APP版本号

@@ -1,6 +1,7 @@
 package com.shin.vicmusic.ui
 
 import android.Manifest
+import android.R.attr.label
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -131,21 +132,12 @@ fun MyApp(
         }
     }
 
-    // 监听路由变化，自动刷新未读数
-    LaunchedEffect(currentRoute) {
-        Log.d("MyApp", "currentRoute: $currentRoute")
-        val isTopLevel = currentRoute == MAIN_ROUTE
-        if (isTopLevel) {
-            mainViewModel.refreshUnreadCount()
-        }
-    }
-
     // 监听全局 UI 事件 (如版权弹窗)
     LaunchedEffect(playerManager.uiEvent) {
         playerManager.uiEvent.collect { event ->
             when (event) {
                 PlayerUiEvent.ShowCopyrightDialog -> showCopyrightDialog = true
-                else->{}
+                else -> {}
             }
         }
     }
@@ -175,11 +167,10 @@ fun MyApp(
     val isSongDetail = currentRoute?.contains("songDetail") == true
     val isChatScreen = currentRoute?.contains("chat") == true
     val isVipScreen = currentRoute == VIP_ROUTE
-    val isCheckInScreen = currentRoute == CHECK_IN_ROUTE
     val isCommentScreen = currentRoute?.contains("comment") == true
     val showBottomContainer = currentRoute != null
             && !isSplashScreen && !isSongDetail
-            && !isVipScreen && !isCheckInScreen
+            && !isVipScreen
             && !isChatScreen
             && !isCommentScreen
 
@@ -193,7 +184,6 @@ fun MyApp(
 
     // BottomSheet 状态
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val songDetailSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     // 2. 定义位移量
     // 如果是主页 -> 位移 0dp
@@ -204,17 +194,11 @@ fun MyApp(
         label = "navBarTranslation"
     )
 
-    // 动态底部栏颜色状态
-    val isMeTabSelected = mainTabState.intValue == TopLevelDestination.entries.indexOf(TopLevelDestination.ME)
-    
+
     val appColors = LocalAppColors.current
 
     val bottomContainerColor by animateColorAsState(
-        targetValue = if (isMeTabSelected) {
-            appColors.bottomBarBackground
-        } else {
-            appColors.bottomBarBackground.copy(alpha = 0.9f) // 保持一致的背景逻辑
-        },
+        targetValue = appColors.bottomBarBackground,
         label = "bottomContainerColor"
     )
 
@@ -288,7 +272,7 @@ fun MyApp(
                     // 如果当前有歌曲，就显示 SongBar
                     if (currentSong != null) {
                         SongBar(
-                            song = currentSong!!,
+                            song = currentSong,
                             playerUiState = playerUiState,
                             onTogglePlayPause = playerManager::togglePlayPause,
                             onPlaylistClick = { showPlaylistSheet = true },
