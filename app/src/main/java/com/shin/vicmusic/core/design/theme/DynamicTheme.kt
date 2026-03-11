@@ -17,7 +17,10 @@ data class AppColors(
     val bottomBarBackground: Color,
     val bottomBarContent: Color,
     val songDetailBackground: Color,
-    val dividerColor: Color
+    val dividerColor: Color,
+    val songDetailIconColor : Color = Color(0xFFCBD5E1),
+    val songDetailTextStart : Color = Color(0xFFF1F5F9),
+    val songDetailTextEnd : Color = Color(0xFFCBD5E1),
 )
 
 val lightAppColors = AppColors(
@@ -34,7 +37,8 @@ val lightAppColors = AppColors(
     bottomBarBackground = Color(0xCCFFFFFF),
     bottomBarContent = Color(0xFF1E293B),
     songDetailBackground = Color(0xFFF8FAFC),
-    dividerColor = Color(0xFFF5F5F5)
+    dividerColor = Color(0xFFF5F5F5),
+    songDetailIconColor = Color(0xFFCBD5E1),
 )
 
 val darkAppColors = AppColors(
@@ -51,7 +55,8 @@ val darkAppColors = AppColors(
     bottomBarBackground = Color(0xCC111827),
     bottomBarContent = Color.White,
     songDetailBackground = Color(0xFF1C1C1E),
-    dividerColor = Color(0xFF000000)
+    dividerColor = Color(0xFF000000),
+    songDetailIconColor = Color(0xFFCBD5E1),
 )
 
 val redAppColors = AppColors(
@@ -68,7 +73,8 @@ val redAppColors = AppColors(
     bottomBarBackground = Color(0xCCFFFFFF),
     bottomBarContent = Color.Red,
     songDetailBackground = Color.White,
-    dividerColor = Color(0xFFF5F5F5)
+    dividerColor = Color(0xFFF5F5F5),
+    songDetailIconColor = Color(0xFFCBD5E1),
 )
 
 val LocalAppColors = staticCompositionLocalOf<AppColors> {

@@ -1,5 +1,7 @@
 package com.shin.vicmusic.feature.feed
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shin.vicmusic.core.data.repository.FeedRepository
@@ -11,7 +13,9 @@ import com.shin.vicmusic.core.domain.UserActivity
 import com.shin.vicmusic.core.domain.UserPost
 import com.shin.vicmusic.core.domain.usecase.UpdateBgImgUseCase
 import com.shin.vicmusic.core.manager.AuthManager
+import com.shin.vicmusic.util.copyUriToCache
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -133,6 +137,14 @@ class FeedViewModel @Inject constructor(
             }
 
             _isLoading.value = false
+        }
+    }
+    fun handleImageSelection(context: Context, uri: Uri) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val localPath = copyUriToCache(context, uri)
+            if (localPath != null) {
+                updateUserBg(localPath)
+            }
         }
     }
 }

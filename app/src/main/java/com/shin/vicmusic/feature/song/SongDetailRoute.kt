@@ -221,7 +221,7 @@ fun SongDetailRoute(
         is SongUiState.Success -> {
             val playerUiState by playerManager.uiState.collectAsState()
             val displaySong = if (currentPlayingSong?.id == uiState.song.id) {
-                currentPlayingSong!!
+                currentPlayingSong
             } else {
                 uiState.song
             }
@@ -377,6 +377,7 @@ fun SongDetailScreen(
                         onClick = onShareClick
                     ),
                 ),
+                contentColor = LocalAppColors.current.songDetailIconColor
             )
         },
         containerColor = Color.Transparent

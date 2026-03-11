@@ -15,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -29,7 +30,10 @@ import com.shin.vicmusic.feature.common.bar.BarTabItem
 import com.shin.vicmusic.feature.feed.publish.navigateToPublishFeed
 import com.shin.vicmusic.feature.myInfo.navigateToMyInfo
 import com.shin.vicmusic.util.copyUriToCache
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -46,17 +50,13 @@ fun FeedRoute(
     val pagerState = rememberPagerState(initialPage = selectedTabIndex) { 2 }
     val followingListState = rememberLazyListState()
 
+    val scope = rememberCoroutineScope()
+
     // 图片选择器
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
-        uri?.let {
-            // 复用工具方法
-            val localPath = copyUriToCache(context, it)
-            if (localPath != null) {
-                viewModel.updateUserBg(localPath)
-            }
-        }
+        uri?.let { viewModel.handleImageSelection(context, it) }
     }
 
     // 当 ViewModel 中的 Tab 变化时，滚动 Pager

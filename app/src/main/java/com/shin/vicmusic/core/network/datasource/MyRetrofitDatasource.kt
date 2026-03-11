@@ -65,18 +65,20 @@ class MyRetrofitDatasource @Inject constructor(
      * @return 封装了结果或错误信息的 NetworkResponse。
      */
     private suspend fun <T> safeApiCall(call: suspend () -> NetworkResponse<T>): NetworkResponse<T> {
-
-        val resp = try {
+        return try {
             call()
-        } catch (e: IOException) {
-            NetworkResponse(code = -1, message = "网络连接失败: ${e.message}", data = null)
-        } catch (e: HttpException) {
-            NetworkResponse(code = e.code(), message = "HTTP 错误: ${e.message()}", data = null)
         } catch (e: Exception) {
-            NetworkResponse(code = -99, message = "未知错误: ${e.message}", data = null)
+            Log.e("NetworkError", "Request Failed: ${e.javaClass.simpleName} - ${e.message}")
+
+            val response = when (e) {
+                is java.net.SocketTimeoutException ->
+                    NetworkResponse(code = -1, message = "连接服务器超时，请检查地区限制", data = null)
+                is IOException ->
+                    NetworkResponse(code = -1, message = "网络连接失败: ${e.message}", data = null)
+                else -> NetworkResponse(code = -99, message = "未知错误: ${e.message}", data = null)
+            }
+            response as NetworkResponse<T>
         }
-        Log.d("HTTPPPPPPPP", resp.toString())
-        return resp as NetworkResponse<T>
     }
 
     /*
@@ -235,13 +237,13 @@ class MyRetrofitDatasource @Inject constructor(
         return safeApiCall { service.follow(followReq) }
     }
 
-    suspend fun getFollowedUsers() = service.getFollowedUsers()
+    suspend fun getFollowedUsers() = safeApiCall { service.getFollowedUsers() }
 
-    suspend fun getFollowedArtists() = service.getFollowedArtists()
+    suspend fun getFollowedArtists() =safeApiCall { service.getFollowedArtists() }
 
-    suspend fun getFans() = service.getFans()
+    suspend fun getFans() = safeApiCall { service.getFans() }
 
-    suspend fun getFriends() = service.getFriends()
+    suspend fun getFriends() = safeApiCall { service.getFriends() }
 
 
     /*
@@ -322,7 +324,7 @@ class MyRetrofitDatasource @Inject constructor(
     Recommend推荐
      */
     suspend fun getDailyRecommendSongs(): NetworkResponse<List<SongListItemDto>> {
-        return service.getDailyRecommendSongs()
+        return safeApiCall { service.getDailyRecommendSongs() }
     }
 
     suspend fun getAlsoListening(): NetworkResponse<RecommendCardDto> {

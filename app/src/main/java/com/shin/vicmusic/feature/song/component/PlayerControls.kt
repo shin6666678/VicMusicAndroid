@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.shin.vicmusic.core.design.theme.LocalAppColors
 import com.shin.vicmusic.core.manager.PlayerUiState
 
 @Composable
@@ -34,15 +35,26 @@ fun PlayerControls(
     onPlaylistClick: () -> Unit = {}
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = onShuffleClick) {
-            Icon(Icons.Default.Refresh, contentDescription = "随机播放") // 随机图标（暂时用Refresh代替）
+            Icon(
+                Icons.Default.Refresh,
+                contentDescription = "随机播放",
+                tint = LocalAppColors.current.songDetailIconColor
+            ) // 随机图标（暂时用Refresh代替）
         }
         IconButton(onClick = onPreviousClick) {
-            Icon(Icons.Default.SkipPrevious, contentDescription = "上一首", modifier = Modifier.size(36.dp))
+            Icon(
+                Icons.Default.SkipPrevious,
+                contentDescription = "上一首",
+                modifier = Modifier.size(36.dp),
+                tint = LocalAppColors.current.songDetailIconColor
+            )
         }
         // 播放/暂停按钮
         IconButton(
@@ -60,10 +72,19 @@ fun PlayerControls(
             )
         }
         IconButton(onClick = onNextClick) {
-            Icon(Icons.Default.SkipNext, contentDescription = "下一首", modifier = Modifier.size(36.dp))
+            Icon(
+                Icons.Default.SkipNext,
+                contentDescription = "下一首",
+                modifier = Modifier.size(36.dp),
+                tint = LocalAppColors.current.songDetailIconColor
+            )
         }
         IconButton(onClick = onPlaylistClick) {
-            Icon(Icons.Default.List, contentDescription = "播放列表")
+            Icon(
+                Icons.Default.List,
+                contentDescription = "播放列表",
+                tint = LocalAppColors.current.songDetailIconColor
+            )
         }
     }
 }

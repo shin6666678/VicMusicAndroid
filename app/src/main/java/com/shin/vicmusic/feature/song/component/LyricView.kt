@@ -9,7 +9,12 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,6 +22,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.google.common.collect.Multimaps.index
 import com.shin.vicmusic.core.domain.LyricLine
 
 @Composable
@@ -27,11 +36,22 @@ fun LyricView(
 ) {
     val listState = rememberLazyListState()
 
-    // 监听索引变化并执行平滑滚动(Smooth Scroll)
-    LaunchedEffect(currentIndex) {
-        if (currentIndex > 0) {
-            // 滚动到当前行的上一行，保持视觉居中
-            listState.animateScrollToItem((currentIndex - 1).coerceAtLeast(0))
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var isPaused by remember { mutableStateOf(false) }
+
+    // 监听 Activity 生命周期
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            isPaused = (event == Lifecycle.Event.ON_PAUSE)
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
+    LaunchedEffect(currentIndex, isPaused) {
+        if (currentIndex > 0 && !isPaused) {
+            listState.animateScrollToItem(currentIndex, scrollOffset = -300)
+            //listState.animateScrollToItem((currentIndex - 1).coerceAtLeast(0))
         }
     }
 

@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
+import com.shin.vicmusic.core.design.theme.LocalAppColors
 import com.shin.vicmusic.core.manager.PlayerUiState
 import com.shin.vicmusic.util.TimeUtil.formatTime
 
@@ -48,7 +49,9 @@ fun PlaybackControlBar(
     val currentFormattedTime = formatTime(playerUiState.currentPosition)
     val totalFormattedTime = formatTime(playerUiState.duration)
 
-    Column(modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+    Column(modifier = modifier
+        .fillMaxWidth()
+        .padding(horizontal = 16.dp, vertical = 8.dp)) {
 
         // 使用 Box 进行层叠布局
         Box(contentAlignment = Alignment.Center) {
@@ -89,8 +92,16 @@ fun PlaybackControlBar(
         }
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(text = currentFormattedTime, style = MaterialTheme.typography.labelSmall)
-            Text(text = totalFormattedTime, style = MaterialTheme.typography.labelSmall)
+            Text(
+                text = currentFormattedTime,
+                style = MaterialTheme.typography.labelSmall,
+                color = LocalAppColors.current.songDetailTextEnd
+            )
+            Text(
+                text = totalFormattedTime,
+                style = MaterialTheme.typography.labelSmall,
+                color = LocalAppColors.current.songDetailTextEnd
+            )
         }
     }
 }

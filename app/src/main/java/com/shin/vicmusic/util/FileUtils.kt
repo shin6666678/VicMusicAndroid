@@ -11,6 +11,11 @@ import java.io.FileOutputStream
  */
 fun copyUriToCache(context: Context, uri: Uri): String? {
     return try {
+        // 清理
+        context.cacheDir.listFiles { file ->
+            file.name.startsWith("temp_img_")
+        }?.forEach { it.delete() }
+
         val inputStream = context.contentResolver.openInputStream(uri)
         // 使用时间戳防止文件名冲突
         val file = File(context.cacheDir, "temp_img_${System.currentTimeMillis()}.jpg")

@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import okhttp3.*
 import java.util.Collections
 import java.util.LinkedHashMap
@@ -33,7 +34,10 @@ class WebSocketManager @Inject constructor(
         .pingInterval(15, TimeUnit.SECONDS)
         .build()
 
-    private val gson = Gson()
+    private val json = Json {
+        ignoreUnknownKeys = true
+        encodeDefaults = true
+    }
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     private val _incomingMessages = MutableSharedFlow<ChatMessage>(extraBufferCapacity = 64)
@@ -84,7 +88,7 @@ class WebSocketManager @Inject constructor(
 
                 override fun onMessage(webSocket: WebSocket, text: String) {
                     try {
-                        val msg = gson.fromJson(text, ChatMessage::class.java)
+                        val msg = json.decodeFromString<ChatMessage>(text)
 
                         val msgId = msg.id
                         if (msgId != null && !messageIdCache.contains(msgId)) {
@@ -116,8 +120,12 @@ class WebSocketManager @Inject constructor(
     }
 
     fun sendMessage(msg: ChatMessage) {
-        val json = gson.toJson(msg)
-        webSocket?.send(json)
+        try {
+            val jsonText = json.encodeToString(msg)
+            webSocket?.send(jsonText)
+        } catch (e: Exception) {
+            Log.e("WebSocket", "序列化消息失败: ${e.message}")
+        }
     }
 
     fun disconnect() {
