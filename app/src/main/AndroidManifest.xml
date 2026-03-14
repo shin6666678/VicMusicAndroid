@@ -50,6 +50,12 @@
                 <data android:scheme="vicmusic" />
                 <data android:host="song" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="vicmusic" android:host="messages" />
+            </intent-filter>
         </activity>
 
         <service

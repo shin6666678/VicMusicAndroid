@@ -75,7 +75,15 @@ class PlayerManager @Inject constructor(
     val playbackQueue: StateFlow<List<Song>> = queueManager.queue
 
     init {
-        initializeMediaController()
+
+        val sessionToken = SessionToken(context, ComponentName(context, PlaybackService::class.java))
+        val controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
+
+        controllerFuture.addListener({
+            mediaController = controllerFuture.get()
+            mediaController?.addListener(playerListener)
+            syncStateWithController()
+        }, ContextCompat.getMainExecutor(context))
         // 自动保存最后播放
         scope.launch {
             uiState.collect { state ->
@@ -157,19 +165,6 @@ class PlayerManager @Inject constructor(
     fun skipToNext() = mediaController?.seekToNextMediaItem()
     fun skipToPrevious() = mediaController?.seekToPreviousMediaItem()
 
-
-    // --- 内部逻辑控制 ---
-
-    private fun initializeMediaController() {
-        val sessionToken = SessionToken(context, ComponentName(context, PlaybackService::class.java))
-        val controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
-
-        controllerFuture.addListener({
-            mediaController = controllerFuture.get()
-            mediaController?.addListener(playerListener)
-            syncStateWithController()
-        }, ContextCompat.getMainExecutor(context))
-    }
 
     private fun syncStateWithController() {
         val controller = mediaController ?: return

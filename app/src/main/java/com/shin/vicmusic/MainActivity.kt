@@ -1,6 +1,10 @@
 package com.shin.vicmusic
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -35,6 +39,7 @@ import com.shin.vicmusic.core.manager.SongActionManager
 import com.shin.vicmusic.core.manager.ThemeManager
 import com.shin.vicmusic.core.manager.TokenManager
 import com.shin.vicmusic.core.worker.MessageCheckWorker
+import com.shin.vicmusic.core.worker.MessageCheckWorker.Companion.CHANNEL_ID
 import com.shin.vicmusic.feature.main.MainViewModel
 import com.shin.vicmusic.ui.MyApp
 import dagger.hilt.android.AndroidEntryPoint
@@ -64,6 +69,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         // 初始化后台消息检查任务（WorkManager）
+        createNotificationChannel()
         scheduleMessageCheckWorker()
 
         splashScreen.setKeepOnScreenCondition {
@@ -136,5 +142,22 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+    }
+
+    /**
+     * 创建系统通知渠道，适配 Android 8.0+
+     */
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "新消息通知"
+            val descriptionText = "接收新私信和系统通知"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+                description = descriptionText
+            }
+            val notificationManager: NotificationManager =
+                applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
     }
 }

@@ -33,8 +33,8 @@ fun MyAsyncImage(model: String?,
             contentDescription = null,
             contentScale = contentScale,
             modifier = modifier,
-            placeholder = painterResource(id = R.drawable.ic_disc), // 替换为你的默认封面
-            error = painterResource(id = R.drawable.logo) // 加载失败时显示
+            placeholder = painterResource(id = R.drawable.ic_disc),
+            error = painterResource(id = R.drawable.logo)
         )
     }
 }

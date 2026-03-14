@@ -1,13 +1,11 @@
 package com.shin.vicmusic.core.worker
 
 import android.Manifest
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
+import android.net.Uri
 import android.util.Log
 import androidx.annotation.OptIn
 import androidx.core.app.ActivityCompat
@@ -106,15 +104,15 @@ class MessageCheckWorker @AssistedInject constructor(
             return
         }
 
-        // 创建通知渠道（Android 8.0+ 必须）
-        createNotificationChannel()
-
         // 点击通知后的跳转意图，指向 MainActivity
-        val intent = Intent(applicationContext, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
+        val routeUri = Uri.parse("vicmusic://messages")
+        val intent = Intent(Intent.ACTION_VIEW, routeUri, applicationContext, MainActivity::class.java)
+
         val pendingIntent: PendingIntent = PendingIntent.getActivity(
-            applicationContext, 0, intent, PendingIntent.FLAG_IMMUTABLE
+            applicationContext,
+            0,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
         // 构建通知内容
@@ -138,20 +136,4 @@ class MessageCheckWorker @AssistedInject constructor(
         }
     }
 
-    /**
-     * 创建系统通知渠道，适配 Android 8.0+
-     */
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "新消息通知"
-            val descriptionText = "接收新私信和系统通知"
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
-                description = descriptionText
-            }
-            val notificationManager: NotificationManager =
-                applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
-    }
 }
