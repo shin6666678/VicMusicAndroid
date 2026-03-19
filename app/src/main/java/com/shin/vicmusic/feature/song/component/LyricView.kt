@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.google.common.collect.Multimaps.index
 import com.shin.vicmusic.core.domain.LyricLine
 
 @Composable

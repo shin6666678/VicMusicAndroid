@@ -16,9 +16,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
@@ -54,7 +57,10 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import coil.compose.rememberAsyncImagePainter
@@ -130,7 +136,7 @@ fun SongDetailRoute(
         playerManager.uiEvent.collect { event ->
             when (event) {
                 PlayerUiEvent.ShowVipDialog -> showVipDialog = true
-                else ->{}
+                else -> {}
             }
         }
     }
@@ -204,9 +210,9 @@ fun SongDetailRoute(
                 }
                 showShareBottomSheet = false
             },
-            onShareToOtherApps = { 
+            onShareToOtherApps = {
                 shareToOtherApps()
-                showShareBottomSheet = false 
+                showShareBottomSheet = false
             }
         )
     }
@@ -227,7 +233,9 @@ fun SongDetailRoute(
             }
 
             val appColors = LocalAppColors.current
-            Box(modifier = Modifier.fillMaxSize().background(appColors.songDetailBackground)) {
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .background(appColors.songDetailBackground)) {
                 // 1. 背景层：高斯模糊封面
                 val context = LocalContext.current
                 var isLoading by remember { mutableStateOf(true) }
@@ -247,9 +255,11 @@ fun SongDetailRoute(
                         .fillMaxSize()
                         .blur(radius = 50.dp) // Android 12+ 生效
                 )
-                
+
                 // 2. 遮罩层：半透明黑色，提升文字可读性
-                Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f)))
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.6f)))
 
                 // 3. 内容层：平移切换
                 AnimatedContent(
@@ -269,11 +279,11 @@ fun SongDetailRoute(
                     if (isCommentVisible) {
                         // 评论页容器：必须透明
                         Box(modifier = Modifier.fillMaxSize()) {
-                             CommentRoute(
-                                 resourceId = displaySong.id,
-                                 resourceType = "song",
-                                 onBackClick = { showComments = false }
-                             )
+                            CommentRoute(
+                                resourceId = displaySong.id,
+                                resourceType = "song",
+                                onBackClick = { showComments = false }
+                            )
                         }
                     } else {
                         // 播放页容器：传入透明背景
@@ -287,7 +297,7 @@ fun SongDetailRoute(
                             onSkipPrevious = playerManager::skipToPrevious,
                             onToggleLike = viewModel::toggleLike,
                             onCommentClick = {
-                                 showComments = true
+                                showComments = true
                             },
                             onShareClick = { showShareBottomSheet = true }
                         )
@@ -442,10 +452,23 @@ fun SongDetailScreen(
                         }
                     }
                 } else {
-                    LyricView(
-                        lyricList = song.lyricList,
-                        currentIndex = playerUiState.currentLyricLineIndex
-                    )
+                    if (song.lyricList.isEmpty()) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "此歌曲暂无歌词",
+                                color = Color.White,
+                                textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        }
+                    } else
+                        LyricView(
+                            lyricList = song.lyricList,
+                            currentIndex = playerUiState.currentLyricLineIndex
+                        )
                 }
             }
         }
