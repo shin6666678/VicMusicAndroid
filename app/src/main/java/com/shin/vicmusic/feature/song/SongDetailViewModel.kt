@@ -3,15 +3,14 @@ package com.shin.vicmusic.feature.song
 import androidx.lifecycle.SavedStateHandle // 导入 SavedStateHandle 用于获取导航参数
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.shin.vicmusic.core.data.repository.LikeRepository
 import com.shin.vicmusic.core.data.repository.SongRepository
 import com.shin.vicmusic.core.domain.MyNetWorkResult
 import com.shin.vicmusic.core.domain.Song
+import com.shin.vicmusic.core.manager.SongActionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,7 +30,7 @@ sealed class SongUiState {
 class SongDetailViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle, // 用于获取导航参数
     private val songRepository: SongRepository,
-    private val likeRepository: LikeRepository,
+    private val songActionManager: SongActionManager,
 ) : ViewModel() {
 
 
@@ -98,26 +97,7 @@ class SongDetailViewModel @Inject constructor(
     fun toggleLike() {
         val currentState = _songUiState.value
         if (currentState is SongUiState.Success) {
-            val currentSong = currentState.song
-
-            viewModelScope.launch {
-                // 发送网络请求
-                val result = likeRepository.toggleLike(currentSong.id,1)
-                when (result) {
-                    is MyNetWorkResult.Success -> {
-                        _songUiState.update {
-                            if (it is SongUiState.Success) {
-                                it.copy(song = it.song.copy(isLiked = !it.song.isLiked))
-                            } else {
-                                it
-                            }
-                        }
-                    }
-                    is MyNetWorkResult.Error -> {
-
-                    }
-                }
-            }
+            songActionManager.toggleLike(currentState.song)
         }
     }
 

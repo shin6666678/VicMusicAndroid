@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Pause
@@ -27,6 +28,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -54,11 +60,25 @@ fun SongBar(
     if(song == null)
          return
     val actionManager = LocalSongActionManager.current
+    var currentSong by remember(song?.id) { mutableStateOf(song) }
+
+    LaunchedEffect(song?.id) {
+        currentSong = song
+    }
+
+    LaunchedEffect(song?.id) {
+        actionManager.songUpdateEvent.collect { updatedSong ->
+            if (updatedSong.id == song?.id) {
+                currentSong = updatedSong
+            }
+        }
+    }
+
     SongBarScreen(
-        song = song, // 使用接收的 Song 对象
+        song = currentSong,
         playerUiState = playerUiState,
         onTogglePlayPause = onTogglePlayPause,
-        onLikeClick = {actionManager.toggleLike(song)},
+        onLikeClick = { currentSong?.let { actionManager.toggleLike(it) } },
         onPlaylistClick = onPlaylistClick,
         onBarClick = onBarClick,
         modifier = modifier
@@ -161,9 +181,9 @@ fun SongBarScreen(
             // 喜欢按钮
             IconButton(onClick = onLikeClick) {
                 Icon(
-                    imageVector = Icons.Default.FavoriteBorder,
+                    imageVector = if (song?.isLiked == true) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                     contentDescription = "喜欢",
-                    tint = LocalAppColors.current.textColor,
+                    tint = if (song?.isLiked == true) Color(0xFFFE3C30) else LocalAppColors.current.textColor,
                     modifier = Modifier.size(24.dp)
                 )
             }

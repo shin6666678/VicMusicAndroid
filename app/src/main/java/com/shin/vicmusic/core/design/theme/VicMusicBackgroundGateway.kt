@@ -43,8 +43,13 @@ fun VicMusicBackgroundGateway(
                     content()
                 }
             }
-            DressUpStyle.LIGHT_NONE, DressUpStyle.DARK_NONE -> {
+            DressUpStyle.LIGHT_NONE -> {
                 Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+                    content()
+                }
+            }
+            DressUpStyle.DARK_NONE -> {
+                Box(Modifier.fillMaxSize().background(LocalAppColors.current.gradientMid)) {
                     content()
                 }
             }

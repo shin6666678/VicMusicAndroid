@@ -16,12 +16,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
@@ -57,10 +54,8 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import coil.compose.rememberAsyncImagePainter
@@ -69,6 +64,7 @@ import coil.request.ImageRequest
 import coil.request.SuccessResult
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
+import com.shin.vicmusic.core.design.composition.LocalSongActionManager
 import com.shin.vicmusic.core.design.theme.LocalAppColors
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.manager.PlayerUiEvent
@@ -101,6 +97,7 @@ fun SongDetailRoute(
 ) {
     val navController = LocalNavController.current
     val playerManager = LocalPlayerManager.current
+    val songActionManager = LocalSongActionManager.current
     val songUiState by viewModel.songUiState.collectAsState()
     val playerUiState by playerManager.uiState.collectAsState()
     val currentPlayingSong = playerUiState.song
@@ -111,6 +108,21 @@ fun SongDetailRoute(
     var showShareBottomSheet by remember { mutableStateOf(false) }
 
     var showComments by rememberSaveable { mutableStateOf(false) }
+
+    var displaySong by remember { mutableStateOf<Song?>(null) }
+
+    LaunchedEffect(currentPlayingSong, songUiState) {
+        val songFromUiState = (songUiState as? SongUiState.Success)?.song
+        displaySong = if (currentPlayingSong?.id == songFromUiState?.id) currentPlayingSong else songFromUiState
+    }
+
+    LaunchedEffect(displaySong?.id) {
+        songActionManager.songUpdateEvent.collect { updatedSong ->
+            if (updatedSong.id == displaySong?.id) {
+                displaySong = updatedSong
+            }
+        }
+    }
 
     BackHandler(enabled = showComments) {
         showComments = false
@@ -159,14 +171,14 @@ fun SongDetailRoute(
 
     val shareToOtherApps: () -> Unit = {
         coroutineScope.launch {
-            val displaySong = (songUiState as? SongUiState.Success)?.song ?: return@launch
+            val songToShare = displaySong ?: (songUiState as? SongUiState.Success)?.song ?: return@launch
             val tag = "ShareProcess"
             try {
                 // 1. 加载封面图 (IO 线程)
                 val albumArtBitmap = withContext(Dispatchers.IO) {
                     val loader = context.imageLoader
                     val request = ImageRequest.Builder(context)
-                        .data(ResourceUtil.r2(displaySong.icon))
+                        .data(ResourceUtil.r2(songToShare.icon))
                         .allowHardware(false)
                         .build()
                     (loader.execute(request) as? SuccessResult)?.let {
@@ -175,7 +187,7 @@ fun SongDetailRoute(
                 }
 
                 // 2. 生成二维码 (H5 落地页 URL)
-                val shareLandingUrl = "http://115.190.155.131:9001/share.html?id=${displaySong.id}"
+                val shareLandingUrl = "http://115.190.155.131:9001/share.html?id=${songToShare.id}"
                 val qrBitmap = withContext(Dispatchers.Default) {
                     QRCodeUtils.createQRCode(shareLandingUrl, 200)
                 }
@@ -184,7 +196,7 @@ fun SongDetailRoute(
                 val shareCardBitmap = withContext(Dispatchers.Main) {
                     captureComposable(context, parentComposition) {
                         SongShareCard(
-                            song = displaySong,
+                            song = songToShare,
                             albumArtBitmap = albumArtBitmap,
                             qrCodeBitmap = qrBitmap
                         )
@@ -192,7 +204,7 @@ fun SongDetailRoute(
                 }
 
                 // 4. 调用系统分享
-                ShareUtils.shareSong(context, displaySong, shareCardBitmap)
+                ShareUtils.shareSong(context, songToShare, shareCardBitmap)
 
             } catch (e: Exception) {
                 Log.e(tag, "分享异常", e)
@@ -204,7 +216,7 @@ fun SongDetailRoute(
         ShareBottomSheet(
             onDismiss = { showShareBottomSheet = false },
             onShareToFeed = {
-                val songIdToShare = (songUiState as? SongUiState.Success)?.song?.id
+                val songIdToShare = displaySong?.id
                 if (songIdToShare != null) {
                     navController.navigateToPublishFeed(songIdToShare, "song")
                 }
@@ -226,7 +238,7 @@ fun SongDetailRoute(
 
         is SongUiState.Success -> {
             val playerUiState by playerManager.uiState.collectAsState()
-            val displaySong = if (currentPlayingSong?.id == uiState.song.id) {
+            val song = displaySong ?: if (currentPlayingSong?.id == uiState.song.id) {
                 currentPlayingSong
             } else {
                 uiState.song
@@ -243,7 +255,7 @@ fun SongDetailRoute(
                 Image(
                     painter = rememberAsyncImagePainter(
                         model = ImageRequest.Builder(context)
-                            .data(ResourceUtil.r2(displaySong.icon))
+                            .data(ResourceUtil.r2(song.icon))
                             .crossfade(true)
                             .build(),
                         onLoading = { isLoading = true },
@@ -280,7 +292,7 @@ fun SongDetailRoute(
                         // 评论页容器：必须透明
                         Box(modifier = Modifier.fillMaxSize()) {
                             CommentRoute(
-                                resourceId = displaySong.id,
+                                resourceId = song.id,
                                 resourceType = "song",
                                 onBackClick = { showComments = false }
                             )
@@ -288,7 +300,7 @@ fun SongDetailRoute(
                     } else {
                         // 播放页容器：传入透明背景
                         SongDetailScreen(
-                            song = displaySong,
+                            song = song,
                             playerUiState = playerUiState,
                             onTogglePlayPause = playerManager::togglePlayPause,
                             onSeek = playerManager::seekTo,
