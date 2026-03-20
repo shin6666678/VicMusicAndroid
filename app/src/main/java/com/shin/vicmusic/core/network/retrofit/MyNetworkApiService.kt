@@ -196,6 +196,9 @@ interface MyNetworkApiService {
     @GET("/api/playlist/v1/detail/{id}")
     suspend fun getPlaylistDetail(@Path("id") id: String): NetworkResponse<PlaylistDetailDto>
 
+    @GET("/api/playlist/v1/daily")
+    suspend fun getDailyPlaylist(): NetworkResponse<PlaylistDetailDto>
+
     @POST("/api/playlist/v1/song/add")
     suspend fun addSongToPlaylist(@Body req: PlaylistSongReq): NetworkResponse<Unit>
 

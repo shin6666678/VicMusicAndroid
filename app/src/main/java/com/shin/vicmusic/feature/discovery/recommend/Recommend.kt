@@ -25,6 +25,7 @@ import com.shin.vicmusic.feature.discovery.recommend.component.HorizontalMediaCa
 import com.shin.vicmusic.feature.discovery.recommend.component.UserGreeting
 import com.shin.vicmusic.feature.main.MainViewModel
 import com.shin.vicmusic.feature.message.navigateToMessageList
+import com.shin.vicmusic.feature.playlist.daily.navigateToDailyPlaylist
 
 // UI Data Classes
 data class MediaCardData(
@@ -61,7 +62,11 @@ fun RecommendRoute(
         recommendCard = recommendCard,
         unreadCount = unreadCount,
         onMessageClick = { navController.navigateToMessageList() },
-        onMediaCardClick = {  }
+        onMediaCardClick = { cardId ->
+            if (cardId == "daily") {
+                navController.navigateToDailyPlaylist()
+            }
+        }
     )
 }
 
@@ -92,7 +97,7 @@ fun RecommendScreen(
                 HorizontalMediaCards(
                     mediaCards = listOf(
                         MediaCardData("1", "下午茶", "此刻别无所求...", "https://picsum.photos/200/300?random=1"),
-                        MediaCardData("2", "Daily 30", "每日30首", "https://picsum.photos/200/300?random=2", true),
+                        MediaCardData("daily", "Daily 5", "每日5首", "https://picsum.photos/200/300?random=2", true),
                         MediaCardData("3", "跑步专属", "节奏感超强", "https://picsum.photos/200/300?random=3")
                     ),
                     onMediaCardClick = onMediaCardClick

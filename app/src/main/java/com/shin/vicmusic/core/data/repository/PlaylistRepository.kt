@@ -50,6 +50,15 @@ class PlaylistRepository @Inject constructor(
         }
     }
 
+    suspend fun getDailyPlaylist(): MyNetWorkResult<PlaylistDetail> {
+        val resp = datasource.getDailyPlaylist()
+        return if (resp.code == 0 && resp.data != null) {
+            MyNetWorkResult.Success(resp.data.toDomain())
+        } else {
+            MyNetWorkResult.Error(resp.message ?: "获取每日推荐失败")
+        }
+    }
+
     suspend fun addSongToPlaylist(playlistId: String, songId: String): MyNetWorkResult<Unit> {
         val resp = datasource.addSongToPlaylist(playlistId, songId)
         return if (resp.code == 0) MyNetWorkResult.Success(Unit) else MyNetWorkResult.Error(

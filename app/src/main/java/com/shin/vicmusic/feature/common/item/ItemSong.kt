@@ -60,6 +60,7 @@ fun ItemSong(
     viewModel: PlaylistViewModel? = null,
     showPlayCount: Boolean = false,
     showDeleteFromPlaylist: Boolean = false,
+    onClick: () -> Unit = {},
     onDeleteClick: () -> Unit = {}
 ) {
     if (LocalInspectionMode.current) {
@@ -132,7 +133,8 @@ fun ItemSong(
         onLikeClick = { actionManager.toggleLike(song) },
         // 点击"更多"图标时，只负责改变状态
         onMoreClick = { showMoreSheet = true },
-        showPlayCount = showPlayCount
+        showPlayCount = showPlayCount,
+        onClick = onClick
     )
 }
 
@@ -144,12 +146,13 @@ fun ItemSongContent(
     onLikeClick: () -> Unit = {},
     onMoreClick: () -> Unit = {},
     showPlayCount: Boolean = false,
+    onClick: () -> Unit = {},
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clickable { onPlayClick() },
+            .clickable { onPlayClick(); onClick() },
         verticalAlignment = Alignment.CenterVertically
     ) {
         MyAsyncImage(

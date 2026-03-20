@@ -31,6 +31,7 @@ fun ItemSongNumbered(
     isRank: Boolean = false,
     showPlayCount: Boolean = false,
     showDeleteFromPlaylist: Boolean = false,
+    onClick: () -> Unit = {},
     onDeleteClick: () -> Unit = {}
 ) {
 
@@ -58,6 +59,7 @@ fun ItemSongNumbered(
             modifier = Modifier.weight(1f),
             showPlayCount = showPlayCount,
             showDeleteFromPlaylist = showDeleteFromPlaylist,
+            onClick = onClick,
             onDeleteClick = onDeleteClick
         )
     }

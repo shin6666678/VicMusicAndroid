@@ -103,7 +103,7 @@ fun MediaCard(data: MediaCardData, onClick: () -> Unit) {
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text(text = "Daily 30", style = MaterialTheme.typography.labelSmall, color = Color.White)
+                            Text(text = "Daily 5", style = MaterialTheme.typography.labelSmall, color = Color.White)
                         }
                     }
                 } else {

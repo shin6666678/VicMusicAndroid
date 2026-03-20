@@ -60,15 +60,15 @@ fun SongBar(
     if(song == null)
          return
     val actionManager = LocalSongActionManager.current
-    var currentSong by remember(song?.id) { mutableStateOf(song) }
+    var currentSong by remember(song.id) { mutableStateOf(song) }
 
-    LaunchedEffect(song?.id) {
+    LaunchedEffect(song.id) {
         currentSong = song
     }
 
-    LaunchedEffect(song?.id) {
+    LaunchedEffect(song.id) {
         actionManager.songUpdateEvent.collect { updatedSong ->
-            if (updatedSong.id == song?.id) {
+            if (updatedSong.id == song.id) {
                 currentSong = updatedSong
             }
         }

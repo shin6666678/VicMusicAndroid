@@ -273,6 +273,10 @@ class MyRetrofitDatasource @Inject constructor(
         return safeApiCall { service.getPlaylistDetail(id) }
     }
 
+    suspend fun getDailyPlaylist(): NetworkResponse<PlaylistDetailDto> {
+        return safeApiCall { service.getDailyPlaylist() }
+    }
+
     suspend fun addSongToPlaylist(playlistId: String, songId: String): NetworkResponse<Unit> {
         return safeApiCall { service.addSongToPlaylist(PlaylistSongReq(playlistId, songId)) }
     }

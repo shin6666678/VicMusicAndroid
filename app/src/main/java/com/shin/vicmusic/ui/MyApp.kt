@@ -87,6 +87,7 @@ import com.shin.vicmusic.feature.myInfo.myInfoScreen
 import com.shin.vicmusic.feature.playBackQueue.PlaybackQueueSheet
 import com.shin.vicmusic.feature.common.dialog.CopyrightDialog
 import com.shin.vicmusic.feature.playlist.detail.playlistDetailScreen
+import com.shin.vicmusic.feature.playlist.daily.dailyPlaylistScreen
 import com.shin.vicmusic.feature.playlist.meList.myPlaylistScreen
 import com.shin.vicmusic.feature.playlist.publicList.publicPlaylistScreen
 import com.shin.vicmusic.feature.rankList.rankList.rankListScreen
@@ -229,6 +230,7 @@ fun MyApp(
                 albumListScreen()
                 albumDetailScreen()
                 playlistDetailScreen()
+                dailyPlaylistScreen()
                 myPlaylistScreen()
                 likedListScreen()
                 recentPlayScreen()
