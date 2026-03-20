@@ -44,9 +44,9 @@ fun PlayerControls(
         IconButton(onClick = onShuffleClick) {
             Icon(
                 Icons.Default.Refresh,
-                contentDescription = "随机播放",
+                contentDescription = "从头开始",
                 tint = LocalAppColors.current.songDetailIconColor
-            ) // 随机图标（暂时用Refresh代替）
+            )
         }
         IconButton(onClick = onPreviousClick) {
             Icon(

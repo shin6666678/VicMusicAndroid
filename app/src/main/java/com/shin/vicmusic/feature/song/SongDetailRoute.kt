@@ -65,6 +65,7 @@ import coil.request.SuccessResult
 import com.shin.vicmusic.core.design.composition.LocalNavController
 import com.shin.vicmusic.core.design.composition.LocalPlayerManager
 import com.shin.vicmusic.core.design.composition.LocalSongActionManager
+import com.shin.vicmusic.feature.playBackQueue.PlaybackQueueSheet
 import com.shin.vicmusic.core.design.theme.LocalAppColors
 import com.shin.vicmusic.core.domain.Song
 import com.shin.vicmusic.core.manager.PlayerUiEvent
@@ -101,6 +102,8 @@ fun SongDetailRoute(
     val songUiState by viewModel.songUiState.collectAsState()
     val playerUiState by playerManager.uiState.collectAsState()
     val currentPlayingSong = playerUiState.song
+    val playQueue by playerManager.playbackQueue.collectAsState()
+    val currentQueueIndex by playerManager.currentQueueIndex.collectAsState()
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -108,6 +111,7 @@ fun SongDetailRoute(
     var showShareBottomSheet by remember { mutableStateOf(false) }
 
     var showComments by rememberSaveable { mutableStateOf(false) }
+    var showQueueSheet by rememberSaveable { mutableStateOf(false) }
 
     var displaySong by remember { mutableStateOf<Song?>(null) }
 
@@ -311,7 +315,9 @@ fun SongDetailRoute(
                             onCommentClick = {
                                 showComments = true
                             },
-                            onShareClick = { showShareBottomSheet = true }
+                            onShareClick = { showShareBottomSheet = true },
+                            onReplayClick = { playerManager.seekTo(0) },
+                            onPlaylistClick = { showQueueSheet = true }
                         )
                     }
                 }
@@ -332,6 +338,25 @@ fun SongDetailRoute(
             }
         }
     }
+
+    if (showQueueSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showQueueSheet = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            containerColor = LocalAppColors.current.bottomBarBackground,
+            dragHandle = null
+        ) {
+            PlaybackQueueSheet(
+                isPlayingQueue = playQueue,
+                currentIndex = currentQueueIndex,
+                onSongClick = { index ->
+                    playerManager.playAtIndex(index)
+                    showQueueSheet = false
+                },
+                onRemoveSong = playerManager::removeSong
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -346,8 +371,11 @@ fun ShareBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = modalBottomSheetState,
+        containerColor = LocalAppColors.current.textColor,
     ) {
-        Column {
+        Column (
+            modifier=Modifier.background(LocalAppColors.current.bottomBarBackground)
+        ){
             ListItem(
                 headlineContent = { Text("分享到动态") },
                 leadingContent = {
@@ -384,7 +412,9 @@ fun SongDetailScreen(
     onSkipPrevious: () -> Unit = {},
     onToggleLike: () -> Unit = {},
     onCommentClick: () -> Unit = {},
-    onShareClick: () -> Unit = {}
+    onShareClick: () -> Unit = {},
+    onReplayClick: () -> Unit = {},
+    onPlaylistClick: () -> Unit = {}
 ) {
     val pagerState = rememberPagerState(pageCount = { 2 })
     Scaffold(
@@ -459,7 +489,9 @@ fun SongDetailScreen(
                                 playerUiState = playerUiState,
                                 onTogglePlayPause = onTogglePlayPause,
                                 onNextClick = onSkipNext,
-                                onPreviousClick = onSkipPrevious
+                                onPreviousClick = onSkipPrevious,
+                                onShuffleClick = onReplayClick,
+                                onPlaylistClick = onPlaylistClick
                             )
                         }
                     }
